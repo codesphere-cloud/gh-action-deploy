@@ -1,0 +1,30 @@
+name: 'Codesphere Deploy'
+description: 'Deploys the repository in Codesphere'
+inputs:
+  email:
+    description: 'email of the codesphere user'
+    required: true
+  password:
+    description: 'Password of the codesphere user account'
+    required: true
+  team:
+    description: 'Name of the codesphere team'
+    required: true
+  plan:
+    description: |
+      workspace plan that the 
+
+      Available options:
+      - Micro
+      - Boost
+      - Pro
+    required: false
+    default: 'Boost'
+  apiUrl:
+    description: 'codesphere url'
+    required: false
+    default: 'https://codesphere.com'
+outputs: {}
+runs:
+  using: 'node16'
+  main: 'main.js'
