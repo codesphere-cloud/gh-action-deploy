@@ -766,7 +766,7 @@ var require_utils = __commonJS({
 var require_command = __commonJS({
   "../../node_modules/@actions/core/lib/command.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding2 = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
       if (k2 === void 0)
         k2 = k;
       Object.defineProperty(o, k2, { enumerable: true, get: function() {
@@ -777,26 +777,26 @@ var require_command = __commonJS({
         k2 = k;
       o[k2] = m[k];
     });
-    var __setModuleDefault = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
+    var __setModuleDefault2 = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
       Object.defineProperty(o, "default", { enumerable: true, value: v });
     } : function(o, v) {
       o["default"] = v;
     });
-    var __importStar = exports2 && exports2.__importStar || function(mod) {
+    var __importStar2 = exports2 && exports2.__importStar || function(mod) {
       if (mod && mod.__esModule)
         return mod;
       var result = {};
       if (mod != null) {
         for (var k in mod)
           if (k !== "default" && Object.hasOwnProperty.call(mod, k))
-            __createBinding(result, mod, k);
+            __createBinding2(result, mod, k);
       }
-      __setModuleDefault(result, mod);
+      __setModuleDefault2(result, mod);
       return result;
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.issue = exports2.issueCommand = void 0;
-    var os = __importStar(require("os"));
+    var os = __importStar2(require("os"));
     var utils_1 = require_utils();
     function issueCommand(command, properties, message) {
       const cmd = new Command(command, properties, message);
@@ -1344,7 +1344,7 @@ var require_dist = __commonJS({
 var require_file_command = __commonJS({
   "../../node_modules/@actions/core/lib/file-command.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding2 = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
       if (k2 === void 0)
         k2 = k;
       Object.defineProperty(o, k2, { enumerable: true, get: function() {
@@ -1355,27 +1355,27 @@ var require_file_command = __commonJS({
         k2 = k;
       o[k2] = m[k];
     });
-    var __setModuleDefault = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
+    var __setModuleDefault2 = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
       Object.defineProperty(o, "default", { enumerable: true, value: v });
     } : function(o, v) {
       o["default"] = v;
     });
-    var __importStar = exports2 && exports2.__importStar || function(mod) {
+    var __importStar2 = exports2 && exports2.__importStar || function(mod) {
       if (mod && mod.__esModule)
         return mod;
       var result = {};
       if (mod != null) {
         for (var k in mod)
           if (k !== "default" && Object.hasOwnProperty.call(mod, k))
-            __createBinding(result, mod, k);
+            __createBinding2(result, mod, k);
       }
-      __setModuleDefault(result, mod);
+      __setModuleDefault2(result, mod);
       return result;
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.prepareKeyValueMessage = exports2.issueFileCommand = void 0;
-    var fs = __importStar(require("fs"));
-    var os = __importStar(require("os"));
+    var fs = __importStar2(require("fs"));
+    var os = __importStar2(require("os"));
     var uuid_1 = require_dist();
     var utils_1 = require_utils();
     function issueFileCommand(command, message) {
@@ -1703,7 +1703,7 @@ var require_tunnel2 = __commonJS({
 var require_lib = __commonJS({
   "../../node_modules/@actions/http-client/lib/index.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding2 = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
       if (k2 === void 0)
         k2 = k;
       Object.defineProperty(o, k2, { enumerable: true, get: function() {
@@ -1714,21 +1714,21 @@ var require_lib = __commonJS({
         k2 = k;
       o[k2] = m[k];
     });
-    var __setModuleDefault = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
+    var __setModuleDefault2 = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
       Object.defineProperty(o, "default", { enumerable: true, value: v });
     } : function(o, v) {
       o["default"] = v;
     });
-    var __importStar = exports2 && exports2.__importStar || function(mod) {
+    var __importStar2 = exports2 && exports2.__importStar || function(mod) {
       if (mod && mod.__esModule)
         return mod;
       var result = {};
       if (mod != null) {
         for (var k in mod)
           if (k !== "default" && Object.hasOwnProperty.call(mod, k))
-            __createBinding(result, mod, k);
+            __createBinding2(result, mod, k);
       }
-      __setModuleDefault(result, mod);
+      __setModuleDefault2(result, mod);
       return result;
     };
     var __awaiter = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
@@ -1760,10 +1760,10 @@ var require_lib = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.HttpClient = exports2.isHttps = exports2.HttpClientResponse = exports2.HttpClientError = exports2.getProxyUrl = exports2.MediaTypes = exports2.Headers = exports2.HttpCodes = void 0;
-    var http = __importStar(require("http"));
-    var https = __importStar(require("https"));
-    var pm = __importStar(require_proxy());
-    var tunnel = __importStar(require_tunnel2());
+    var http = __importStar2(require("http"));
+    var https = __importStar2(require("https"));
+    var pm = __importStar2(require_proxy());
+    var tunnel = __importStar2(require_tunnel2());
     var HttpCodes;
     (function(HttpCodes2) {
       HttpCodes2[HttpCodes2["OK"] = 200] = "OK";
@@ -2383,7 +2383,7 @@ var require_oidc_utils = __commonJS({
     exports2.OidcClient = void 0;
     var http_client_1 = require_lib();
     var auth_1 = require_auth();
-    var core_12 = require_core();
+    var core_1 = require_core();
     var OidcClient = class {
       static createHttpClient(allowRetry = true, maxRetry = 10) {
         const requestOptions = {
@@ -2432,9 +2432,9 @@ var require_oidc_utils = __commonJS({
               const encodedAudience = encodeURIComponent(audience);
               id_token_url = `${id_token_url}&audience=${encodedAudience}`;
             }
-            core_12.debug(`ID token url is ${id_token_url}`);
+            core_1.debug(`ID token url is ${id_token_url}`);
             const id_token = yield OidcClient.getCall(id_token_url);
-            core_12.setSecret(id_token);
+            core_1.setSecret(id_token);
             return id_token;
           } catch (error) {
             throw new Error(`Error message: ${error.message}`);
@@ -2615,7 +2615,7 @@ var require_summary = __commonJS({
 var require_path_utils = __commonJS({
   "../../node_modules/@actions/core/lib/path-utils.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding2 = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
       if (k2 === void 0)
         k2 = k;
       Object.defineProperty(o, k2, { enumerable: true, get: function() {
@@ -2626,26 +2626,26 @@ var require_path_utils = __commonJS({
         k2 = k;
       o[k2] = m[k];
     });
-    var __setModuleDefault = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
+    var __setModuleDefault2 = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
       Object.defineProperty(o, "default", { enumerable: true, value: v });
     } : function(o, v) {
       o["default"] = v;
     });
-    var __importStar = exports2 && exports2.__importStar || function(mod) {
+    var __importStar2 = exports2 && exports2.__importStar || function(mod) {
       if (mod && mod.__esModule)
         return mod;
       var result = {};
       if (mod != null) {
         for (var k in mod)
           if (k !== "default" && Object.hasOwnProperty.call(mod, k))
-            __createBinding(result, mod, k);
+            __createBinding2(result, mod, k);
       }
-      __setModuleDefault(result, mod);
+      __setModuleDefault2(result, mod);
       return result;
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.toPlatformPath = exports2.toWin32Path = exports2.toPosixPath = void 0;
-    var path = __importStar(require("path"));
+    var path = __importStar2(require("path"));
     function toPosixPath(pth) {
       return pth.replace(/[\\]/g, "/");
     }
@@ -2665,7 +2665,7 @@ var require_path_utils = __commonJS({
 var require_core = __commonJS({
   "../../node_modules/@actions/core/lib/core.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding2 = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
       if (k2 === void 0)
         k2 = k;
       Object.defineProperty(o, k2, { enumerable: true, get: function() {
@@ -2676,21 +2676,21 @@ var require_core = __commonJS({
         k2 = k;
       o[k2] = m[k];
     });
-    var __setModuleDefault = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
+    var __setModuleDefault2 = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
       Object.defineProperty(o, "default", { enumerable: true, value: v });
     } : function(o, v) {
       o["default"] = v;
     });
-    var __importStar = exports2 && exports2.__importStar || function(mod) {
+    var __importStar2 = exports2 && exports2.__importStar || function(mod) {
       if (mod && mod.__esModule)
         return mod;
       var result = {};
       if (mod != null) {
         for (var k in mod)
           if (k !== "default" && Object.hasOwnProperty.call(mod, k))
-            __createBinding(result, mod, k);
+            __createBinding2(result, mod, k);
       }
-      __setModuleDefault(result, mod);
+      __setModuleDefault2(result, mod);
       return result;
     };
     var __awaiter = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
@@ -2725,8 +2725,8 @@ var require_core = __commonJS({
     var command_1 = require_command();
     var file_command_1 = require_file_command();
     var utils_1 = require_utils();
-    var os = __importStar(require("os"));
-    var path = __importStar(require("path"));
+    var os = __importStar2(require("os"));
+    var path = __importStar2(require("path"));
     var oidc_utils_1 = require_oidc_utils();
     var ExitCode;
     (function(ExitCode2) {
@@ -2949,7 +2949,7 @@ var require_context = __commonJS({
 var require_utils2 = __commonJS({
   "../../node_modules/@actions/github/lib/internal/utils.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding2 = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
       if (k2 === void 0)
         k2 = k;
       Object.defineProperty(o, k2, { enumerable: true, get: function() {
@@ -2960,26 +2960,26 @@ var require_utils2 = __commonJS({
         k2 = k;
       o[k2] = m[k];
     });
-    var __setModuleDefault = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
+    var __setModuleDefault2 = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
       Object.defineProperty(o, "default", { enumerable: true, value: v });
     } : function(o, v) {
       o["default"] = v;
     });
-    var __importStar = exports2 && exports2.__importStar || function(mod) {
+    var __importStar2 = exports2 && exports2.__importStar || function(mod) {
       if (mod && mod.__esModule)
         return mod;
       var result = {};
       if (mod != null) {
         for (var k in mod)
           if (k !== "default" && Object.hasOwnProperty.call(mod, k))
-            __createBinding(result, mod, k);
+            __createBinding2(result, mod, k);
       }
-      __setModuleDefault(result, mod);
+      __setModuleDefault2(result, mod);
       return result;
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.getApiBaseUrl = exports2.getProxyAgent = exports2.getAuthString = void 0;
-    var httpClient = __importStar(require_lib());
+    var httpClient = __importStar2(require_lib());
     function getAuthString(token, options) {
       if (!token && !options.auth) {
         throw new Error("Parameter token or opts.auth is required");
@@ -11782,7 +11782,7 @@ var require_dist_node10 = __commonJS({
 var require_utils4 = __commonJS({
   "../../node_modules/@actions/github/lib/utils.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding2 = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
       if (k2 === void 0)
         k2 = k;
       Object.defineProperty(o, k2, { enumerable: true, get: function() {
@@ -11793,28 +11793,28 @@ var require_utils4 = __commonJS({
         k2 = k;
       o[k2] = m[k];
     });
-    var __setModuleDefault = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
+    var __setModuleDefault2 = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
       Object.defineProperty(o, "default", { enumerable: true, value: v });
     } : function(o, v) {
       o["default"] = v;
     });
-    var __importStar = exports2 && exports2.__importStar || function(mod) {
+    var __importStar2 = exports2 && exports2.__importStar || function(mod) {
       if (mod && mod.__esModule)
         return mod;
       var result = {};
       if (mod != null) {
         for (var k in mod)
           if (k !== "default" && Object.hasOwnProperty.call(mod, k))
-            __createBinding(result, mod, k);
+            __createBinding2(result, mod, k);
       }
-      __setModuleDefault(result, mod);
+      __setModuleDefault2(result, mod);
       return result;
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.getOctokitOptions = exports2.GitHub = exports2.defaults = exports2.context = void 0;
-    var Context = __importStar(require_context());
-    var Utils = __importStar(require_utils2());
-    var core_12 = require_dist_node8();
+    var Context = __importStar2(require_context());
+    var Utils = __importStar2(require_utils2());
+    var core_1 = require_dist_node8();
     var plugin_rest_endpoint_methods_1 = require_dist_node9();
     var plugin_paginate_rest_1 = require_dist_node10();
     exports2.context = new Context.Context();
@@ -11825,7 +11825,7 @@ var require_utils4 = __commonJS({
         agent: Utils.getProxyAgent(baseUrl)
       }
     };
-    exports2.GitHub = core_12.Octokit.plugin(plugin_rest_endpoint_methods_1.restEndpointMethods, plugin_paginate_rest_1.paginateRest).defaults(exports2.defaults);
+    exports2.GitHub = core_1.Octokit.plugin(plugin_rest_endpoint_methods_1.restEndpointMethods, plugin_paginate_rest_1.paginateRest).defaults(exports2.defaults);
     function getOctokitOptions(token, options) {
       const opts = Object.assign({}, options || {});
       const auth = Utils.getAuthString(token, opts);
@@ -11842,7 +11842,7 @@ var require_utils4 = __commonJS({
 var require_github = __commonJS({
   "../../node_modules/@actions/github/lib/github.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding2 = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
       if (k2 === void 0)
         k2 = k;
       Object.defineProperty(o, k2, { enumerable: true, get: function() {
@@ -11853,26 +11853,26 @@ var require_github = __commonJS({
         k2 = k;
       o[k2] = m[k];
     });
-    var __setModuleDefault = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
+    var __setModuleDefault2 = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
       Object.defineProperty(o, "default", { enumerable: true, value: v });
     } : function(o, v) {
       o["default"] = v;
     });
-    var __importStar = exports2 && exports2.__importStar || function(mod) {
+    var __importStar2 = exports2 && exports2.__importStar || function(mod) {
       if (mod && mod.__esModule)
         return mod;
       var result = {};
       if (mod != null) {
         for (var k in mod)
           if (k !== "default" && Object.hasOwnProperty.call(mod, k))
-            __createBinding(result, mod, k);
+            __createBinding2(result, mod, k);
       }
-      __setModuleDefault(result, mod);
+      __setModuleDefault2(result, mod);
       return result;
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.getOctokit = exports2.context = void 0;
-    var Context = __importStar(require_context());
+    var Context = __importStar2(require_context());
     var utils_1 = require_utils4();
     exports2.context = new Context.Context();
     function getOctokit(token, options, ...additionalPlugins) {
@@ -11914,12 +11914,12 @@ var require_dist_node12 = __commonJS({
   "../../node_modules/@octokit/rest/dist-node/index.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    var core = require_dist_node8();
+    var core2 = require_dist_node8();
     var pluginRequestLog = require_dist_node11();
     var pluginPaginateRest = require_dist_node10();
     var pluginRestEndpointMethods = require_dist_node9();
     var VERSION = "18.12.0";
-    var Octokit = core.Octokit.plugin(pluginRequestLog.requestLog, pluginRestEndpointMethods.legacyRestEndpointMethods, pluginPaginateRest.paginateRest).defaults({
+    var Octokit = core2.Octokit.plugin(pluginRequestLog.requestLog, pluginRestEndpointMethods.legacyRestEndpointMethods, pluginPaginateRest.paginateRest).defaults({
       userAgent: `octokit-rest.js/${VERSION}`
     });
     exports2.Octokit = Octokit;
@@ -12465,7 +12465,7 @@ var require_relativeTime = __commonJS({
 var require_datetime = __commonJS({
   "../utils/common/lib/datetime.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding2 = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
       if (k2 === void 0)
         k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -12480,21 +12480,21 @@ var require_datetime = __commonJS({
         k2 = k;
       o[k2] = m[k];
     });
-    var __setModuleDefault = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
+    var __setModuleDefault2 = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
       Object.defineProperty(o, "default", { enumerable: true, value: v });
     } : function(o, v) {
       o["default"] = v;
     });
-    var __importStar = exports2 && exports2.__importStar || function(mod) {
+    var __importStar2 = exports2 && exports2.__importStar || function(mod) {
       if (mod && mod.__esModule)
         return mod;
       var result = {};
       if (mod != null) {
         for (var k in mod)
           if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k))
-            __createBinding(result, mod, k);
+            __createBinding2(result, mod, k);
       }
-      __setModuleDefault(result, mod);
+      __setModuleDefault2(result, mod);
       return result;
     };
     var __importDefault2 = exports2 && exports2.__importDefault || function(mod) {
@@ -12503,8 +12503,8 @@ var require_datetime = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.isExpired = exports2.dateFromUnix = exports2.relativeTimeFromNow = exports2.duration = void 0;
     var dayjs_1 = __importDefault2(require_dayjs_min());
-    var dayjsDuration = __importStar(require_duration());
-    var relativeTime = __importStar(require_relativeTime());
+    var dayjsDuration = __importStar2(require_duration());
+    var relativeTime = __importStar2(require_relativeTime());
     dayjs_1.default.extend(dayjsDuration.default);
     dayjs_1.default.extend(relativeTime.default);
     exports2.duration = dayjs_1.default.duration;
@@ -18487,7 +18487,7 @@ var require_Endpoint = __commonJS({
 var require_time = __commonJS({
   "../streamy/common/lib/support/time.js"(exports2) {
     "use strict";
-    var __createBinding = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
+    var __createBinding2 = exports2 && exports2.__createBinding || (Object.create ? function(o, m, k, k2) {
       if (k2 === void 0)
         k2 = k;
       var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -18502,21 +18502,21 @@ var require_time = __commonJS({
         k2 = k;
       o[k2] = m[k];
     });
-    var __setModuleDefault = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
+    var __setModuleDefault2 = exports2 && exports2.__setModuleDefault || (Object.create ? function(o, v) {
       Object.defineProperty(o, "default", { enumerable: true, value: v });
     } : function(o, v) {
       o["default"] = v;
     });
-    var __importStar = exports2 && exports2.__importStar || function(mod) {
+    var __importStar2 = exports2 && exports2.__importStar || function(mod) {
       if (mod && mod.__esModule)
         return mod;
       var result = {};
       if (mod != null) {
         for (var k in mod)
           if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k))
-            __createBinding(result, mod, k);
+            __createBinding2(result, mod, k);
       }
-      __setModuleDefault(result, mod);
+      __setModuleDefault2(result, mod);
       return result;
     };
     var __importDefault2 = exports2 && exports2.__importDefault || function(mod) {
@@ -18525,7 +18525,7 @@ var require_time = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.duration = void 0;
     var dayjs_1 = __importDefault2(require_dayjs_min());
-    var dayjsDuration = __importStar(require_duration());
+    var dayjsDuration = __importStar2(require_duration());
     dayjs_1.default.extend(dayjsDuration.default);
     exports2.duration = dayjs_1.default.duration;
   }
@@ -24147,7 +24147,7 @@ var require_core3 = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     var id_1 = require_id2();
     var ref_1 = require_ref();
-    var core = [
+    var core2 = [
       "$schema",
       "$id",
       "$defs",
@@ -24157,7 +24157,7 @@ var require_core3 = __commonJS({
       id_1.default,
       ref_1.default
     ];
-    exports2.default = core;
+    exports2.default = core2;
   }
 });
 
@@ -25589,13 +25589,13 @@ var require_draft7 = __commonJS({
   "../../node_modules/ajv/dist/vocabularies/draft7.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    var core_12 = require_core3();
+    var core_1 = require_core3();
     var validation_1 = require_validation();
     var applicator_1 = require_applicator();
     var format_12 = require_format2();
     var metadata_1 = require_metadata2();
     var draft7Vocabularies = [
-      core_12.default,
+      core_1.default,
       validation_1.default,
       applicator_1.default,
       format_12.default,
@@ -25790,12 +25790,12 @@ var require_ajv = __commonJS({
     Object.defineProperty(exports2, "CodeGen", { enumerable: true, get: function() {
       return codegen_1.CodeGen;
     } });
-    var core_12 = require_core2();
+    var core_1 = require_core2();
     var draft7_1 = require_draft7();
     var draft7MetaSchema = require_json_schema_draft_07();
     var META_SUPPORT_DATA = ["/properties"];
     var META_SCHEMA_ID = "http://json-schema.org/draft-07/schema";
-    var Ajv = class extends core_12.default {
+    var Ajv = class extends core_1.default {
       _addVocabularies() {
         super._addVocabularies();
         draft7_1.default.forEach((v) => this.addVocabulary(v));
@@ -26748,14 +26748,46 @@ var require_WorkspaceServiceStubFactory = __commonJS({
 });
 
 // lib/github-action-deploy-workspace.js
+var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
+  if (k2 === void 0)
+    k2 = k;
+  var desc = Object.getOwnPropertyDescriptor(m, k);
+  if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+    desc = { enumerable: true, get: function() {
+      return m[k];
+    } };
+  }
+  Object.defineProperty(o, k2, desc);
+} : function(o, m, k, k2) {
+  if (k2 === void 0)
+    k2 = k;
+  o[k2] = m[k];
+});
+var __setModuleDefault = exports && exports.__setModuleDefault || (Object.create ? function(o, v) {
+  Object.defineProperty(o, "default", { enumerable: true, value: v });
+} : function(o, v) {
+  o["default"] = v;
+});
+var __importStar = exports && exports.__importStar || function(mod) {
+  if (mod && mod.__esModule)
+    return mod;
+  var result = {};
+  if (mod != null) {
+    for (var k in mod)
+      if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k))
+        __createBinding(result, mod, k);
+  }
+  __setModuleDefault(result, mod);
+  return result;
+};
 var __importDefault = exports && exports.__importDefault || function(mod) {
   return mod && mod.__esModule ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 require_Reflect();
 var path_1 = __importDefault(require("path"));
-var core_1 = __importDefault(require_core());
-var github_1 = __importDefault(require_github());
+var core = __importStar(require_core());
+var github = __importStar(require_github());
 var rest_1 = require_dist_node12();
 var AuthServiceStub_1 = require_AuthServiceStub();
 var errors_1 = require_errors3();
@@ -26820,35 +26852,35 @@ var PipelineStageFailed = class extends CodesphereApiRequestFailed {
 };
 var getConfig = () => {
   var _a, _b;
-  if (github_1.default.context.eventName !== "pull_request") {
-    throw new errors_2.InvalidArgument(`Only pull_request events are supported, got ${github_1.default.context.eventName}`);
+  if (github.context.eventName !== "pull_request") {
+    throw new errors_2.InvalidArgument(`Only pull_request events are supported, got ${github.context.eventName}`);
   }
-  if (!["opened", "closed"].includes(github_1.default.context.action)) {
-    throw new InvalidGitHubEvent(github_1.default.context.action);
+  if (!["opened", "closed"].includes(github.context.action)) {
+    throw new InvalidGitHubEvent(github.context.action);
   }
-  const pr = github_1.default.context.payload.pull_request;
+  const pr = github.context.payload.pull_request;
   if (!(0, has_1.has)(pr)) {
-    throw new MissingProperty(github_1.default.context.payload, "pull_request");
+    throw new MissingProperty(github.context.payload, "pull_request");
   }
   const repoUrl = new URL((0, getEnv_1.getEnv)("GITHUB_SERVER_URL"));
   repoUrl.pathname = (0, getEnv_1.getEnv)("GITHUB_REPOSITORY");
-  const plan = core_1.default.getInput("plan");
-  const planId = (_a = Object.values(Plan_1.planMap).find((p) => p.title === core_1.default.getInput("plan"))) === null || _a === void 0 ? void 0 : _a.planId;
+  const plan = core.getInput("plan");
+  const planId = (_a = Object.values(Plan_1.planMap).find((p) => p.title === core.getInput("plan"))) === null || _a === void 0 ? void 0 : _a.planId;
   if ((0, has_1.has)(plan) && !(0, has_1.has)(planId)) {
-    throw new errors_2.InvalidArgument(`Unknown plan ${core_1.default.getInput("plan")}`);
+    throw new errors_2.InvalidArgument(`Unknown plan ${core.getInput("plan")}`);
   }
   return {
-    apiUrl: new URL((_b = core_1.default.getInput("apiUrl")) !== null && _b !== void 0 ? _b : "https://codesphere.com"),
-    team: core_1.default.getInput("team", { required: true }),
+    apiUrl: new URL((_b = core.getInput("apiUrl")) !== null && _b !== void 0 ? _b : "https://codesphere.com"),
+    team: core.getInput("team", { required: true }),
     planId: planId !== null && planId !== void 0 ? planId : Plan_1.PlanId.Boost,
     authentication: {
-      email: core_1.default.getInput("email", { required: true }),
-      password: core_1.default.getInput("password", { required: true })
+      email: core.getInput("email", { required: true }),
+      password: core.getInput("password", { required: true })
     },
-    action: github_1.default.context.action,
+    action: github.context.action,
     repository: {
-      name: github_1.default.context.repo.repo,
-      owner: github_1.default.context.repo.owner,
+      name: github.context.repo.repo,
+      owner: github.context.repo.owner,
       url: repoUrl.toString()
     },
     branch: (0, getEnv_1.getEnv)("GITHUB_REF_NAME"),
