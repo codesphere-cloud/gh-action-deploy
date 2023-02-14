@@ -26850,18 +26850,16 @@ var PipelineStageFailed = class extends CodesphereApiRequestFailed {
     super(`Pipeline stage ${stage} failed: ${msg}`);
   }
 };
-var getConfig = () => {
+var getConfig = async () => {
   var _a, _b;
   if (github.context.eventName !== "pull_request") {
-    throw new errors_2.InvalidArgument(`Only pull_request events are supported, got ${github.context.eventName}`);
+    throw new InvalidGitHubEvent(`Only pull_request events are supported, got ${github.context.eventName}`);
   }
-  if (!["opened", "closed"].includes(github.context.action)) {
-    throw new InvalidGitHubEvent(github.context.action);
-  }
-  const pr = github.context.payload.pull_request;
-  if (!(0, has_1.has)(pr)) {
+  const prPayload = github.context.payload.pull_request;
+  if (!(0, has_1.has)(prPayload)) {
     throw new MissingProperty(github.context.payload, "pull_request");
   }
+  const githubToken = (0, getEnv_1.getEnv)("GITHUB_TOKEN");
   const repoUrl = new URL((0, getEnv_1.getEnv)("GITHUB_SERVER_URL"));
   repoUrl.pathname = (0, getEnv_1.getEnv)("GITHUB_REPOSITORY");
   const plan = core.getInput("plan");
@@ -26869,6 +26867,12 @@ var getConfig = () => {
   if ((0, has_1.has)(plan) && !(0, has_1.has)(planId)) {
     throw new errors_2.InvalidArgument(`Unknown plan ${core.getInput("plan")}`);
   }
+  const o = new rest_1.Octokit({ auth: githubToken });
+  const { data: pr } = await o.rest.pulls.get({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    pull_number: prPayload.number
+  });
   return {
     apiUrl: new URL((_b = core.getInput("apiUrl")) !== null && _b !== void 0 ? _b : "https://codesphere.com"),
     team: core.getInput("team", { required: true }),
@@ -26877,15 +26881,15 @@ var getConfig = () => {
       email: core.getInput("email", { required: true }),
       password: core.getInput("password", { required: true })
     },
-    action: github.context.action,
+    open: pr.state === "open",
     repository: {
       name: github.context.repo.repo,
       owner: github.context.repo.owner,
       url: repoUrl.toString()
     },
     branch: (0, getEnv_1.getEnv)("GITHUB_REF_NAME"),
-    pullRequestNumber: pr.number,
-    githubToken: (0, getEnv_1.getEnv)("GITHUB_TOKEN")
+    pullRequestNumber: prPayload.number,
+    githubToken
   };
 };
 var authenticate = async (apiUrl, email, password) => {
@@ -27077,7 +27081,7 @@ var createGitHubDeployment = async (token, owner, repo, branch) => {
 };
 var main = async () => {
   (0, logging_2.initLogging)(logging_2.LogEnv.Script);
-  const c = getConfig();
+  const c = await getConfig();
   const endpointCreator = (dataCenterId) => new Endpoint_1.HttpEndpoint(`https://${dataCenterId}.${c.apiUrl.host}`);
   const ghDeploy = await createGitHubDeployment(c.githubToken, c.repository.owner, c.repository.name, c.branch);
   await ghDeploy.pending();
