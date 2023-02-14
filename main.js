@@ -26887,7 +26887,7 @@ var getConfig = async () => {
       owner: github.context.repo.owner,
       url: repoUrl.toString()
     },
-    branch: (0, getEnv_1.getEnv)("GITHUB_REF_NAME"),
+    branch: (0, getEnv_1.getEnv)("GITHUB_HEAD_REF"),
     pullRequestNumber: prPayload.number,
     githubToken
   };
