@@ -30,3 +30,43 @@ with:
   team: 'MyTeam'
   plan: 'Boost'
 ```
+
+```yaml
+on:
+  workflow_dispatch:
+  # open, reopen and synchronize will deploy a workspace for the current commit.
+  # If a workspce is already deployed, that workspace is updated to the newest version.
+  #
+  # closed: Workspace will be deleted
+  pull_request:
+    types:
+    - closed
+    - opened
+    - reopened
+    - synchronize
+
+permissions:
+  contents: read
+  pull-requests: read
+  deployments: write
+
+jobs:
+  deploy:
+    # prevent multiple workspaces to be created for the same branch
+    concurrency: codesphere
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Deploy
+        uses: codesphere-cloud/gh-action-deploy@v0.1
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+            email: ${{ secrets.CS_EMAIL }}
+            password: ${{ secrets.CS_PASSWORD }}
+            team: 'My Team'
+            plan: 'Boost'
+```
+
