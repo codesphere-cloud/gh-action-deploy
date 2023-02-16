@@ -1,6 +1,11 @@
 # Codesphere Deployment action
 
-This action prints "Hello World" or "Hello" + the name of a person to greet to the log.
+This action creates a preview environment of your repository in Codesphere.
+
+## :warning: Prerequisites
+
+- Configure a user in Codesphere https://codesphere.com with username and password.
+- Connect your user account with GitHub and allow access to your repository.
 
 ## Inputs
 
@@ -18,9 +23,18 @@ This action prints "Hello World" or "Hello" + the name of a person to greet to t
 
 ### `plan`
 
-The name of the person to greet. Default `"Boost"`.
+Plan of the created workspace. 
+
+Available options:
+- Micro
+- Boost
+- Pro
+
+Default `"Boost"`.
 
 ## Example usage
+
+#### Action
 
 ```yaml
 uses: codesphere-cloud/gh-action-deploy@v0.1
@@ -30,6 +44,8 @@ with:
   team: 'MyTeam'
   plan: 'Boost'
 ```
+
+#### Workflow
 
 ```yaml
 on:

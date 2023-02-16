@@ -12,7 +12,7 @@ inputs:
     required: true
   plan:
     description: |
-      workspace plan that the 
+      Plan of the created workspace. 
 
       Available options:
       - Micro
