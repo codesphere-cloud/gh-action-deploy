@@ -20,6 +20,13 @@ inputs:
       - Pro
     required: false
     default: 'Boost'
+  env:
+    description: |
+      Set environment variables in your workspace.
+      
+      Use dotenv like environment variables definition.
+      See https://www.npmjs.com/package/dotenv for details.
+    required: false
   apiUrl:
     description: 'codesphere url'
     required: false

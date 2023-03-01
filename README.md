@@ -1,4 +1,4 @@
-# Codesphere Deployment action
+# Codesphere Deployment Action
 
 This action creates a preview environment of your repository in Codesphere.
 
@@ -32,6 +32,14 @@ Available options:
 
 Default `"Boost"`.
 
+### `env`
+
+Set environment variables in your workspace.
+      
+Use dotenv like environment variables definition.
+See https://www.npmjs.com/package/dotenv for details.
+
+
 ## Example usage
 
 #### Action
@@ -43,6 +51,8 @@ with:
   password: '123'
   team: 'MyTeam'
   plan: 'Boost'
+  env: |
+    MY_ENV: test
 ```
 
 #### Workflow
@@ -84,5 +94,8 @@ jobs:
             password: ${{ secrets.CS_PASSWORD }}
             team: 'My Team'
             plan: 'Boost'
+            env: |
+              MY_ENV: test
+              MY_SECRET: ${{ secrets.MY_SECRET }}
 ```
 
