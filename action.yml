@@ -1,5 +1,11 @@
 name: 'Codesphere Deploy'
 description: 'Deploys the repository in Codesphere'
+branding:
+  icon: 'circle'
+  color: 'purple'
+runs:
+  using: 'node16'
+  main: 'main.js'
 inputs:
   email:
     description: 'email of the codesphere user'
@@ -32,6 +38,3 @@ inputs:
     required: false
     default: 'https://codesphere.com'
 outputs: {}
-runs:
-  using: 'node16'
-  main: 'main.js'
