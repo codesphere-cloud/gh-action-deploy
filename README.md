@@ -52,7 +52,7 @@ with:
   team: 'MyTeam'
   plan: 'Boost'
   env: |
-    MY_ENV: test
+    MY_ENV=test
 ```
 
 #### Workflow
@@ -95,7 +95,7 @@ jobs:
             team: 'My Team'
             plan: 'Boost'
             env: |
-              MY_ENV: test
-              MY_SECRET: ${{ secrets.MY_SECRET }}
+              MY_ENV=test
+              MY_SECRET=${{ secrets.MY_SECRET }}
 ```
 
