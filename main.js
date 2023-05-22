@@ -5959,18 +5959,25 @@ Error ${i + 1} of ${es.length}: ${msg}`;
       }).join("\n");
     };
     exports2.concatErrors = concatErrors;
-    var ignoreError = (func) => {
+    var throwIfNotOneOf = (e, kinds) => {
+      if (kinds && !kinds.some((k) => e instanceof k)) {
+        throw e;
+      }
+    };
+    var ignoreError = (func, kinds) => {
       try {
         return func();
       } catch (e) {
+        throwIfNotOneOf(e, kinds);
         return void 0;
       }
     };
     exports2.ignoreError = ignoreError;
-    var ignoreErrorAsync = async (func) => {
+    var ignoreErrorAsync = async (func, kinds) => {
       try {
         return await func();
       } catch (e) {
+        throwIfNotOneOf(e, kinds);
         return void 0;
       }
     };
@@ -6564,7 +6571,7 @@ var require_exceptions2 = __commonJS({
   "packages/utils/common/lib/exceptions.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.throwInternalException = exports2.InternalException = exports2.UnexpectedSymLink = exports2.TooManyEvents = exports2.InvalidState = exports2.AlreadyClosed = exports2.AlreadyCalled = exports2.MultiException = exports2.Closed = exports2.TimedOut = exports2.HttpException = exports2.NotAuthorized = exports2.NotFound = exports2.WeakPassword = exports2.AlreadyUnregistered = exports2.AlreadyRegistered = exports2.AlreadyExists = exports2.Aborted = exports2.UnknownException = exports2.Exception = void 0;
+    exports2.throwInternalException = exports2.InternalException = exports2.UnexpectedSymLink = exports2.TooManyEvents = exports2.InvalidState = exports2.AlreadyClosed = exports2.AlreadyCalled = exports2.MultiException = exports2.Closed = exports2.TimedOut = exports2.HttpException = exports2.NotAuthorized = exports2.NotFound = exports2.WeakPassword = exports2.AlreadyUnregistered = exports2.AlreadyRegistered = exports2.AlreadyExists = exports2.Aborted = exports2.UnknownException = exports2.SimpleSerializableException = exports2.Exception = void 0;
     var datetime_1 = require_datetime();
     var errors_12 = require_errors();
     var has_12 = require_has();
@@ -6579,6 +6586,21 @@ var require_exceptions2 = __commonJS({
       }
     };
     exports2.Exception = Exception;
+    var SimpleSerializableException = class extends Exception {
+      static fromJson(x) {
+        if (!(0, types_1.isString)(x)) {
+          throw new TypeError(`${x} not of type string`);
+        }
+        return new this(x);
+      }
+      constructor(message) {
+        super(message);
+      }
+      toJSON() {
+        return this.message;
+      }
+    };
+    exports2.SimpleSerializableException = SimpleSerializableException;
     var UnknownException = class extends Exception {
       constructor(message) {
         super(message);
@@ -7916,6 +7938,7 @@ var require_serviceArgs = __commonJS({
       isPrivateRepo: typing_1.toBoolean,
       gitUrl: (0, typing_1.toNullOr)(typing_1.toString),
       initialBranch: (0, typing_1.toNullOr)(typing_1.toString),
+      sourceWorkspaceId: (0, typing_1.toNullOr)(number_1.toPositiveInteger),
       welcomeMessage: (0, typing_1.toNullOr)(typing_1.toString)
     });
     exports2.toUpdateWorkspaceServiceArgs = (0, typing_1.toObject)({
@@ -8292,7 +8315,6 @@ var require_serviceArgs2 = __commonJS({
     (function(ResourceType2) {
       ResourceType2["CPU"] = "cpu";
       ResourceType2["Memory"] = "memory";
-      ResourceType2["DiskUsage"] = "disk";
     })(ResourceType = exports2.ResourceType || (exports2.ResourceType = {}));
     exports2.toSetEnvVarsArgs = (0, typing_1.toObject)({
       ...serviceArgs_1.workspaceServiceArgs,
@@ -8379,9 +8401,28 @@ var require_PrometheusResponse = __commonJS({
   "packages/deployment-service/common/lib/PrometheusResponse.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.toUnixTimeAndValueTuple = void 0;
+    exports2.toPrometheusResponse = exports2.toPrometheusResponseError = exports2.toPrometheusResponseSuccess = exports2.toUnixTimeAndValueTuple = void 0;
     var typing_1 = require_typing();
     exports2.toUnixTimeAndValueTuple = (0, typing_1.toTuple)(typing_1.toNumber, (0, typing_1.toOr)(typing_1.toString, typing_1.toNumber));
+    var toRangeVectorResultEntry = (0, typing_1.toObject)({
+      metric: (0, typing_1.toRecord)(typing_1.toString),
+      values: (0, typing_1.toArray)(exports2.toUnixTimeAndValueTuple)
+    });
+    var toRangeVectorResultData = (0, typing_1.toObject)({
+      resultType: (0, typing_1.toLiteral)("matrix"),
+      result: (0, typing_1.toArray)(toRangeVectorResultEntry)
+    });
+    exports2.toPrometheusResponseSuccess = (0, typing_1.toObject)({
+      status: (0, typing_1.toLiteral)("success"),
+      data: toRangeVectorResultData,
+      warnings: (0, typing_1.toUndefOr)((0, typing_1.toArray)(typing_1.toString))
+    });
+    exports2.toPrometheusResponseError = (0, typing_1.toObject)({
+      status: (0, typing_1.toLiteral)("error"),
+      errorType: typing_1.toString,
+      error: typing_1.toString
+    });
+    exports2.toPrometheusResponse = (0, typing_1.toOr)(exports2.toPrometheusResponseSuccess, exports2.toPrometheusResponseError);
   }
 });
 
@@ -8390,17 +8431,26 @@ var require_WorkspaceResourceUtilizationData = __commonJS({
   "packages/deployment-service/common/lib/WorkspaceResourceUtilizationData.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.toWorkspaceResourceUtilizationData = exports2.Metrics = void 0;
+    exports2.toWorkspaceResourceUtilizationData = exports2.resourceToMetrics = exports2.Metrics = void 0;
     var typing_1 = require_typing();
     var PrometheusResponse_1 = require_PrometheusResponse();
+    var serviceArgs_1 = require_serviceArgs2();
     var Metrics;
     (function(Metrics2) {
-      Metrics2["Consumption"] = "consumption";
-      Metrics2["Limit"] = "limit";
+      Metrics2["CpuConsumption"] = "cpuConsumption";
+      Metrics2["CpuLimit"] = "cpuLimit";
+      Metrics2["MemoryConsumption"] = "memoryConsumption";
+      Metrics2["MemoryLimit"] = "memoryLimit";
     })(Metrics = exports2.Metrics || (exports2.Metrics = {}));
+    exports2.resourceToMetrics = {
+      [serviceArgs_1.ResourceType.CPU]: [Metrics.CpuConsumption, Metrics.CpuLimit],
+      [serviceArgs_1.ResourceType.Memory]: [Metrics.MemoryConsumption, Metrics.MemoryLimit]
+    };
     exports2.toWorkspaceResourceUtilizationData = (0, typing_1.toObject)({
-      [Metrics.Consumption]: (0, typing_1.toArray)(PrometheusResponse_1.toUnixTimeAndValueTuple),
-      [Metrics.Limit]: (0, typing_1.toArray)(PrometheusResponse_1.toUnixTimeAndValueTuple)
+      [Metrics.CpuConsumption]: (0, typing_1.toUndefOr)((0, typing_1.toArray)(PrometheusResponse_1.toUnixTimeAndValueTuple)),
+      [Metrics.CpuLimit]: (0, typing_1.toUndefOr)((0, typing_1.toArray)(PrometheusResponse_1.toUnixTimeAndValueTuple)),
+      [Metrics.MemoryConsumption]: (0, typing_1.toUndefOr)((0, typing_1.toArray)(PrometheusResponse_1.toUnixTimeAndValueTuple)),
+      [Metrics.MemoryLimit]: (0, typing_1.toUndefOr)((0, typing_1.toArray)(PrometheusResponse_1.toUnixTimeAndValueTuple))
     });
   }
 });
@@ -8446,6 +8496,11 @@ var require_workspaceDeployment = __commonJS({
           access: "public",
           response: typing_2.toBoolean,
           request: serviceArgs_1.toWorkspaceServiceArgs
+        }),
+        hasCapacity: (0, spec_2.rpc)({
+          access: "public",
+          response: typing_2.toBoolean,
+          request: Plan_12.toPlanId
         })
       }
     };
@@ -8484,11 +8539,6 @@ var require_workspaceDeployment = __commonJS({
           access: "internal",
           response: typing_2.toVoid,
           request: serviceArgs_1.toWorkspaceServiceArgs
-        }),
-        hasCapacity: (0, spec_2.rpc)({
-          access: "public",
-          response: typing_2.toBoolean,
-          request: Plan_12.toPlanId
         })
       }
     };
@@ -8636,6 +8686,7 @@ var require_pipeline = __commonJS({
     var spec_12 = require_spec2();
     var typing_1 = require_typing3();
     var spec_2 = require_spec();
+    var datetime_1 = require_datetime();
     var typing_2 = require_typing();
     var types_1 = require_types2();
     var serviceArgs_1 = require_serviceArgs();
@@ -8652,7 +8703,10 @@ var require_pipeline = __commonJS({
         setPipeline: (0, spec_2.rpc)({
           access: "public",
           response: typing_2.toVoid,
-          request: serviceArgs_2.toSetPipelineServiceArgs
+          request: serviceArgs_2.toSetPipelineServiceArgs,
+          defaultOptions: {
+            timeout: (0, datetime_1.duration)({ seconds: 10 })
+          }
         }),
         startPipeline: (0, spec_2.rpc)({
           access: "public",
@@ -16857,7 +16911,7 @@ var require_errors2 = __commonJS({
   "packages/streamy/common/lib/support/errors.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.withCurrentStack = exports2.toError = exports2.threw = exports2.RuntimeError = exports2.rethrow = exports2.MultiError = exports2.InvalidOperation = exports2.InvalidArgument = exports2.logErrorAsync = exports2.logError = exports2.ignoreErrorAsync = exports2.ignoreError = exports2.catchErrorAsync = void 0;
+    exports2.withCurrentStack = exports2.toError = exports2.threw = exports2.RuntimeError = exports2.rethrow = exports2.NotImplemented = exports2.MultiError = exports2.InvalidOperation = exports2.InvalidArgument = exports2.logErrorAsync = exports2.logError = exports2.ignoreErrorAsync = exports2.ignoreError = exports2.catchErrorAsync = void 0;
     var errors_12 = require_errors();
     Object.defineProperty(exports2, "catchErrorAsync", { enumerable: true, get: function() {
       return errors_12.catchErrorAsync;
@@ -16882,6 +16936,9 @@ var require_errors2 = __commonJS({
     } });
     Object.defineProperty(exports2, "MultiError", { enumerable: true, get: function() {
       return errors_12.MultiError;
+    } });
+    Object.defineProperty(exports2, "NotImplemented", { enumerable: true, get: function() {
+      return errors_12.NotImplemented;
     } });
     Object.defineProperty(exports2, "rethrow", { enumerable: true, get: function() {
       return errors_12.rethrow;
@@ -17119,7 +17176,14 @@ var require_stub = __commonJS({
           provider: this.createStubProvider(() => this.release(serviceName), this.resolveAddress(serviceName))
         };
         p.refs++;
-        return await p.provider;
+        try {
+          return await p.provider;
+        } catch (e) {
+          if (0 === --p.refs) {
+            delete this.providers[serviceName];
+          }
+          throw e;
+        }
       }
       async release(serviceName) {
         const p = this.providers[serviceName];
@@ -22184,7 +22248,8 @@ var require_errors4 = __commonJS({
   "packages/workspace-service/common/lib/errors.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.WorkspaceHasDifferentDataCenter = exports2.workspaceDoesNotExist = exports2.tooManyBasicWorkspaces = exports2.workspaceAlreadyExists = exports2.workspaceNameMinLength = exports2.userIsNotAuthorized = exports2.teamIsNotAuthorized = void 0;
+    exports2.InvalidSourceWorkspace = exports2.InvalidWorkspaceName = exports2.WorkspaceHasDifferentDataCenter = exports2.workspaceDoesNotExist = exports2.tooManyBasicWorkspaces = exports2.workspaceAlreadyExists = exports2.workspaceNameMinLength = exports2.userIsNotAuthorized = exports2.teamIsNotAuthorized = void 0;
+    var errors_12 = require_errors();
     var exceptions_1 = require_exceptions2();
     var teamIsNotAuthorized = (teamId, workspaceId) => `Team ${teamId} is not authorized to access workspace ${workspaceId}.`;
     exports2.teamIsNotAuthorized = teamIsNotAuthorized;
@@ -22204,6 +22269,18 @@ var require_errors4 = __commonJS({
       }
     };
     exports2.WorkspaceHasDifferentDataCenter = WorkspaceHasDifferentDataCenter;
+    var InvalidWorkspaceName = class extends errors_12.InvalidArgument {
+      constructor(reason) {
+        super(reason);
+      }
+    };
+    exports2.InvalidWorkspaceName = InvalidWorkspaceName;
+    var InvalidSourceWorkspace = class extends errors_12.InvalidArgument {
+      constructor(workspaceId) {
+        super(`Team does not own any workspace with id: ${workspaceId}`);
+      }
+    };
+    exports2.InvalidSourceWorkspace = InvalidSourceWorkspace;
   }
 });
 
@@ -22320,7 +22397,8 @@ var require_codesphere = __commonJS({
         isPrivateRepo: true,
         gitUrl: repository.url,
         initialBranch: pullRequest.branch,
-        welcomeMessage: null
+        welcomeMessage: null,
+        sourceWorkspaceId: null
       });
       try {
         await deployment.startWorkspace({ workspaceId: ws.id });
@@ -29530,7 +29608,8 @@ var require_team = __commonJS({
         createTeam: (0, spec_2.rpc)({
           access: "public",
           request: TeamServiceArgs_1.toCreateTeamArgs,
-          response: TeamServiceTypes_1.toTeam
+          response: TeamServiceTypes_1.toTeam,
+          defaultOptions: { timeout: (0, datetime_1.duration)({ seconds: 10 }) }
         }),
         deleteTeam: (0, spec_2.rpc)({
           access: "public",
@@ -29646,6 +29725,7 @@ var require_Workspace = __commonJS({
       isPrivateRepo: (0, typing_1.readOnly)(typing_1.toBoolean),
       welcomeMessage: (0, typing_1.readOnly)((0, typing_1.toNullOr)(typing_1.toString)),
       initialBranch: (0, typing_1.readOnly)((0, typing_1.toNullOr)(typing_1.toString)),
+      sourceWorkspaceId: (0, typing_1.readOnly)((0, typing_1.toNullOr)(number_1.toPositiveInteger)),
       planId: (0, typing_1.toUndefOr)(Plan_12.toPlanId)
     };
     exports2.toWorkspace = (0, typing_1.toObject)(exports2.workspace);
@@ -29684,6 +29764,12 @@ var require_workspaces = __commonJS({
       name: "Workspaces",
       context: typing_1.toHttpContext,
       methods: {
+        createWorkspace: (0, spec_2.rpc)({
+          access: "public",
+          request: serviceArgs_1.toCreateWorkspaceServiceArgs,
+          response: Workspace_12.toWorkspace,
+          defaultOptions: { timeout: (0, datetime_1.duration)({ seconds: 10 }) }
+        }),
         hasAccess: (0, spec_2.rpc)({
           access: "public",
           request: serviceArgs_1.toHasAccessArgs,
@@ -29701,12 +29787,6 @@ var require_workspaces = __commonJS({
       context: typing_1.toHttpContext,
       methods: {
         ...exports2.implWorkspacesService.methods,
-        createWorkspace: (0, spec_2.rpc)({
-          access: "public",
-          request: serviceArgs_1.toCreateWorkspaceServiceArgs,
-          response: Workspace_12.toWorkspace,
-          defaultOptions: { timeout: (0, datetime_1.duration)({ seconds: 10 }) }
-        }),
         deleteWorkspace: (0, spec_2.rpc)({
           access: "public",
           request: serviceArgs_1.toWorkspaceServiceArgs,
