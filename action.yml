@@ -4,7 +4,7 @@ branding:
   icon: 'circle'
   color: 'purple'
 runs:
-  using: 'node18'
+  using: 'node16'
   main: 'main.js'
 inputs:
   email:
