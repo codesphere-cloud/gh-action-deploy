@@ -45,7 +45,7 @@ See https://www.npmjs.com/package/dotenv for details.
 #### Action
 
 ```yaml
-uses: codesphere-cloud/gh-action-deploy@v1.48.2
+uses: codesphere-cloud/gh-action-deploy@main
 with:
   email: 'bot@example.com'
   password: '123'
