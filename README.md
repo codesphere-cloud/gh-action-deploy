@@ -45,7 +45,7 @@ See https://www.npmjs.com/package/dotenv for details.
 #### Action
 
 ```yaml
-uses: codesphere-cloud/gh-action-deploy@main
+uses: codesphere-cloud/gh-action-deploy@v1.48.5
 with:
   email: 'bot@example.com'
   password: '123'
@@ -86,7 +86,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Deploy
-        uses: codesphere-cloud/gh-action-deploy@v1.48.2
+        uses: codesphere-cloud/gh-action-deploy@v1.48.5
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
