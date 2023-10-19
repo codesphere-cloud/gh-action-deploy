@@ -26,6 +26,10 @@ inputs:
       - Pro
     required: false
     default: 'Boost'
+  onDemand:
+    description: Use a Codepshere onDemand workspace that shuts down if unused.
+    required: false
+    default: false
   env:
     description: |
       Set environment variables in your workspace.
