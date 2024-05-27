@@ -39,6 +39,11 @@ Set environment variables in your workspace.
 Use dotenv like environment variables definition.
 See https://www.npmjs.com/package/dotenv for details.
 
+### `vpnConfig`
+
+Name of the vpn config the workspace should connect to.
+The vpn configuration has to be configured in the team before.
+
 
 ## Example usage
 

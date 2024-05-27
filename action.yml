@@ -27,15 +27,20 @@ inputs:
     required: false
     default: 'Boost'
   onDemand:
-    description: Use a Codepshere onDemand workspace that shuts down if unused.
+    description: Use a Codesphere onDemand workspace that shuts down if unused.
     required: false
-    default: false
+    default: 'false'
   env:
     description: |
       Set environment variables in your workspace.
       
       Use dotenv like environment variables definition.
       See https://www.npmjs.com/package/dotenv for details.
+    required: false
+  vpnConfig:
+    description: |
+      Name of the vpn config the workspace should connect to.
+      The vpn configuration has to be configured in the team before.
     required: false
   apiUrl:
     description: 'codesphere url'
