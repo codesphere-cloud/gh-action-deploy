@@ -47,9 +47,12 @@ The vpn configuration has to be configured in the team before.
 
 ## Example usage
 
+This integration can either be used as an action or as a workflow.
+
 #### Action
 
 ```yaml
+# .github/workflows/codesphere.yaml
 uses: codesphere-cloud/gh-action-deploy@main
 with:
   email: 'bot@example.com'
@@ -63,6 +66,7 @@ with:
 #### Workflow
 
 ```yaml
+# .github/workflows/codesphere.yaml
 on:
   workflow_dispatch:
   # open, reopen and synchronize will deploy a workspace for the current commit.
