@@ -37,7 +37,7 @@ inputs:
     required: false
     default: 'false'
   cloneDepth:
-    description: Wheter the repository clone should be shallow or not.
+    description: Whether the repository clone should be shallow or not.
     required: false
   env:
     description: |
