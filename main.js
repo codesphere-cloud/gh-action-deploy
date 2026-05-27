@@ -20581,7 +20581,7 @@ var require_permessage_deflate = __commonJS({
     var kBuffer = /* @__PURE__ */ Symbol("kBuffer");
     var kLength = /* @__PURE__ */ Symbol("kLength");
     var kDefaultMaxDecompressedSize = 4 * 1024 * 1024;
-    var PerMessageDeflate2 = class {
+    var PerMessageDeflate = class {
       /** @type {import('node:zlib').InflateRaw} */
       #inflate;
       #options = {};
@@ -20659,7 +20659,7 @@ var require_permessage_deflate = __commonJS({
         });
       }
     };
-    module2.exports = { PerMessageDeflate: PerMessageDeflate2 };
+    module2.exports = { PerMessageDeflate };
   }
 });
 
@@ -20684,7 +20684,7 @@ var require_receiver = __commonJS({
     } = require_util8();
     var { WebsocketFrameSend } = require_frame();
     var { closeWebSocketConnection } = require_connection();
-    var { PerMessageDeflate: PerMessageDeflate2 } = require_permessage_deflate();
+    var { PerMessageDeflate } = require_permessage_deflate();
     var ByteParser = class extends Writable {
       #buffers = [];
       #byteOffset = 0;
@@ -20703,7 +20703,7 @@ var require_receiver = __commonJS({
         this.ws = ws;
         this.#extensions = extensions == null ? /* @__PURE__ */ new Map() : extensions;
         if (this.#extensions.has("permessage-deflate")) {
-          this.#extensions.set("permessage-deflate", new PerMessageDeflate2(extensions));
+          this.#extensions.set("permessage-deflate", new PerMessageDeflate(extensions));
         }
       }
       /**
@@ -38983,7 +38983,7 @@ var require_permessage_deflate2 = __commonJS({
     var kBuffer = /* @__PURE__ */ Symbol("kBuffer");
     var kLength = /* @__PURE__ */ Symbol("kLength");
     var kDefaultMaxDecompressedSize = 4 * 1024 * 1024;
-    var PerMessageDeflate2 = class {
+    var PerMessageDeflate = class {
       /** @type {import('node:zlib').InflateRaw} */
       #inflate;
       #options = {};
@@ -39061,7 +39061,7 @@ var require_permessage_deflate2 = __commonJS({
         });
       }
     };
-    module2.exports = { PerMessageDeflate: PerMessageDeflate2 };
+    module2.exports = { PerMessageDeflate };
   }
 });
 
@@ -39086,7 +39086,7 @@ var require_receiver2 = __commonJS({
     } = require_util16();
     var { WebsocketFrameSend } = require_frame2();
     var { closeWebSocketConnection } = require_connection2();
-    var { PerMessageDeflate: PerMessageDeflate2 } = require_permessage_deflate2();
+    var { PerMessageDeflate } = require_permessage_deflate2();
     var ByteParser = class extends Writable {
       #buffers = [];
       #byteOffset = 0;
@@ -39105,7 +39105,7 @@ var require_receiver2 = __commonJS({
         this.ws = ws;
         this.#extensions = extensions == null ? /* @__PURE__ */ new Map() : extensions;
         if (this.#extensions.has("permessage-deflate")) {
-          this.#extensions.set("permessage-deflate", new PerMessageDeflate2(extensions));
+          this.#extensions.set("permessage-deflate", new PerMessageDeflate(extensions));
         }
       }
       /**
@@ -46191,7 +46191,7 @@ var require_permessage_deflate3 = __commonJS({
     var kBuffers = /* @__PURE__ */ Symbol("buffers");
     var kError = /* @__PURE__ */ Symbol("error");
     var zlibLimiter;
-    var PerMessageDeflate2 = class {
+    var PerMessageDeflate = class {
       /**
        * Creates a PerMessageDeflate instance.
        *
@@ -46202,9 +46202,6 @@ var require_permessage_deflate3 = __commonJS({
        *     acknowledge disabling of client context takeover
        * @param {Number} [options.concurrencyLimit=10] The number of concurrent
        *     calls to zlib
-       * @param {Boolean} [options.isServer=false] Create the instance in either
-       *     server or client mode
-       * @param {Number} [options.maxPayload=0] The maximum allowed message length
        * @param {(Boolean|Number)} [options.serverMaxWindowBits] Request/confirm the
        *     use of a custom server window size
        * @param {Boolean} [options.serverNoContextTakeover=false] Request/accept
@@ -46215,12 +46212,15 @@ var require_permessage_deflate3 = __commonJS({
        *     deflate
        * @param {Object} [options.zlibInflateOptions] Options to pass to zlib on
        *     inflate
+       * @param {Boolean} [isServer=false] Create the instance in either server or
+       *     client mode
+       * @param {Number} [maxPayload=0] The maximum allowed message length
        */
-      constructor(options) {
+      constructor(options, isServer, maxPayload) {
+        this._maxPayload = maxPayload | 0;
         this._options = options || {};
         this._threshold = this._options.threshold !== void 0 ? this._options.threshold : 1024;
-        this._maxPayload = this._options.maxPayload | 0;
-        this._isServer = !!this._options.isServer;
+        this._isServer = !!isServer;
         this._deflate = null;
         this._inflate = null;
         this.params = null;
@@ -46529,7 +46529,7 @@ var require_permessage_deflate3 = __commonJS({
         });
       }
     };
-    module2.exports = PerMessageDeflate2;
+    module2.exports = PerMessageDeflate;
     function deflateOnData(chunk) {
       this[kBuffers].push(chunk);
       this[kTotalLength] += chunk.length;
@@ -46764,7 +46764,7 @@ var require_receiver3 = __commonJS({
   "node_modules/ws/lib/receiver.js"(exports2, module2) {
     "use strict";
     var { Writable } = require("stream");
-    var PerMessageDeflate2 = require_permessage_deflate3();
+    var PerMessageDeflate = require_permessage_deflate3();
     var {
       BINARY_TYPES,
       EMPTY_BUFFER,
@@ -46931,7 +46931,7 @@ var require_receiver3 = __commonJS({
           return;
         }
         const compressed = (buf[0] & 64) === 64;
-        if (compressed && !this._extensions[PerMessageDeflate2.extensionName]) {
+        if (compressed && !this._extensions[PerMessageDeflate.extensionName]) {
           const error = this.createError(
             RangeError,
             "RSV1 must be clear",
@@ -47175,7 +47175,7 @@ var require_receiver3 = __commonJS({
        * @private
        */
       decompress(data, cb) {
-        const perMessageDeflate = this._extensions[PerMessageDeflate2.extensionName];
+        const perMessageDeflate = this._extensions[PerMessageDeflate.extensionName];
         perMessageDeflate.decompress(data, this._fin, (err, buf) => {
           if (err) return cb(err);
           if (buf.length) {
@@ -47357,10 +47357,7 @@ var require_sender3 = __commonJS({
     "use strict";
     var { Duplex } = require("stream");
     var { randomFillSync } = require("crypto");
-    var {
-      types: { isUint8Array }
-    } = require("util");
-    var PerMessageDeflate2 = require_permessage_deflate3();
+    var PerMessageDeflate = require_permessage_deflate3();
     var { EMPTY_BUFFER, kWebSocket, NOOP } = require_constants12();
     var { isBlob, isValidStatusCode } = require_validation();
     var { mask: applyMask, toBuffer } = require_buffer_util();
@@ -47513,10 +47510,8 @@ var require_sender3 = __commonJS({
           buf.writeUInt16BE(code, 0);
           if (typeof data === "string") {
             buf.write(data, 2);
-          } else if (isUint8Array(data)) {
-            buf.set(data, 2);
           } else {
-            throw new TypeError("Second argument must be a string or a Uint8Array");
+            buf.set(data, 2);
           }
         }
         const options = {
@@ -47646,7 +47641,7 @@ var require_sender3 = __commonJS({
        * @public
        */
       send(data, options, cb) {
-        const perMessageDeflate = this._extensions[PerMessageDeflate2.extensionName];
+        const perMessageDeflate = this._extensions[PerMessageDeflate.extensionName];
         let opcode = options.binary ? 2 : 1;
         let rsv1 = options.compress;
         let byteLength;
@@ -47770,7 +47765,7 @@ var require_sender3 = __commonJS({
           this.sendFrame(_Sender.frame(data, options), cb);
           return;
         }
-        const perMessageDeflate = this._extensions[PerMessageDeflate2.extensionName];
+        const perMessageDeflate = this._extensions[PerMessageDeflate.extensionName];
         this._bufferedBytes += options[kByteLength];
         this._state = DEFLATING;
         perMessageDeflate.compress(data, options.fin, (_, buf) => {
@@ -48208,11 +48203,11 @@ var require_extension = __commonJS({
       return offers;
     }
     function format(extensions) {
-      return Object.keys(extensions).map((extension2) => {
-        let configurations = extensions[extension2];
+      return Object.keys(extensions).map((extension) => {
+        let configurations = extensions[extension];
         if (!Array.isArray(configurations)) configurations = [configurations];
         return configurations.map((params) => {
-          return [extension2].concat(
+          return [extension].concat(
             Object.keys(params).map((k) => {
               let values = params[k];
               if (!Array.isArray(values)) values = [values];
@@ -48238,7 +48233,7 @@ var require_websocket3 = __commonJS({
     var { randomBytes, createHash } = require("crypto");
     var { Duplex, Readable } = require("stream");
     var { URL: URL2 } = require("url");
-    var PerMessageDeflate2 = require_permessage_deflate3();
+    var PerMessageDeflate = require_permessage_deflate3();
     var Receiver2 = require_receiver3();
     var Sender2 = require_sender3();
     var { isBlob } = require_validation();
@@ -48446,8 +48441,8 @@ var require_websocket3 = __commonJS({
           this.emit("close", this._closeCode, this._closeMessage);
           return;
         }
-        if (this._extensions[PerMessageDeflate2.extensionName]) {
-          this._extensions[PerMessageDeflate2.extensionName].cleanup();
+        if (this._extensions[PerMessageDeflate.extensionName]) {
+          this._extensions[PerMessageDeflate.extensionName].cleanup();
         }
         this._receiver.removeAllListeners();
         this._readyState = _WebSocket.CLOSED;
@@ -48609,7 +48604,7 @@ var require_websocket3 = __commonJS({
           fin: true,
           ...options
         };
-        if (!this._extensions[PerMessageDeflate2.extensionName]) {
+        if (!this._extensions[PerMessageDeflate.extensionName]) {
           opts.compress = false;
         }
         this._sender.send(data || EMPTY_BUFFER, opts, cb);
@@ -48735,7 +48730,7 @@ var require_websocket3 = __commonJS({
       } else {
         try {
           parsedUrl = new URL2(address);
-        } catch {
+        } catch (e) {
           throw new SyntaxError(`Invalid URL: ${address}`);
         }
       }
@@ -48783,13 +48778,13 @@ var require_websocket3 = __commonJS({
       opts.path = parsedUrl.pathname + parsedUrl.search;
       opts.timeout = opts.handshakeTimeout;
       if (opts.perMessageDeflate) {
-        perMessageDeflate = new PerMessageDeflate2({
-          ...opts.perMessageDeflate,
-          isServer: false,
-          maxPayload: opts.maxPayload
-        });
+        perMessageDeflate = new PerMessageDeflate(
+          opts.perMessageDeflate !== true ? opts.perMessageDeflate : {},
+          false,
+          opts.maxPayload
+        );
         opts.headers["Sec-WebSocket-Extensions"] = format({
-          [PerMessageDeflate2.extensionName]: perMessageDeflate.offer()
+          [PerMessageDeflate.extensionName]: perMessageDeflate.offer()
         });
       }
       if (protocols.length) {
@@ -48932,19 +48927,19 @@ var require_websocket3 = __commonJS({
             return;
           }
           const extensionNames = Object.keys(extensions);
-          if (extensionNames.length !== 1 || extensionNames[0] !== PerMessageDeflate2.extensionName) {
+          if (extensionNames.length !== 1 || extensionNames[0] !== PerMessageDeflate.extensionName) {
             const message = "Server indicated an extension that was not requested";
             abortHandshake(websocket, socket, message);
             return;
           }
           try {
-            perMessageDeflate.accept(extensions[PerMessageDeflate2.extensionName]);
+            perMessageDeflate.accept(extensions[PerMessageDeflate.extensionName]);
           } catch (err) {
             const message = "Invalid Sec-WebSocket-Extensions header";
             abortHandshake(websocket, socket, message);
             return;
           }
-          websocket._extensions[PerMessageDeflate2.extensionName] = perMessageDeflate;
+          websocket._extensions[PerMessageDeflate.extensionName] = perMessageDeflate;
         }
         websocket.setSocket(socket, head, {
           allowSynchronousEvents: opts.allowSynchronousEvents,
@@ -49263,9 +49258,9 @@ var require_websocket_server = __commonJS({
     var http = require("http");
     var { Duplex } = require("stream");
     var { createHash } = require("crypto");
-    var extension2 = require_extension();
-    var PerMessageDeflate2 = require_permessage_deflate3();
-    var subprotocol2 = require_subprotocol();
+    var extension = require_extension();
+    var PerMessageDeflate = require_permessage_deflate3();
+    var subprotocol = require_subprotocol();
     var WebSocket2 = require_websocket3();
     var { CLOSE_TIMEOUT, GUID, kWebSocket } = require_constants12();
     var keyRegex = /^[+/0-9A-Za-z]{22}==$/;
@@ -49488,7 +49483,7 @@ var require_websocket_server = __commonJS({
         let protocols = /* @__PURE__ */ new Set();
         if (secWebSocketProtocol !== void 0) {
           try {
-            protocols = subprotocol2.parse(secWebSocketProtocol);
+            protocols = subprotocol.parse(secWebSocketProtocol);
           } catch (err) {
             const message = "Invalid Sec-WebSocket-Protocol header";
             abortHandshakeOrEmitwsClientError(this, req, socket, 400, message);
@@ -49498,16 +49493,16 @@ var require_websocket_server = __commonJS({
         const secWebSocketExtensions = req.headers["sec-websocket-extensions"];
         const extensions = {};
         if (this.options.perMessageDeflate && secWebSocketExtensions !== void 0) {
-          const perMessageDeflate = new PerMessageDeflate2({
-            ...this.options.perMessageDeflate,
-            isServer: true,
-            maxPayload: this.options.maxPayload
-          });
+          const perMessageDeflate = new PerMessageDeflate(
+            this.options.perMessageDeflate,
+            true,
+            this.options.maxPayload
+          );
           try {
-            const offers = extension2.parse(secWebSocketExtensions);
-            if (offers[PerMessageDeflate2.extensionName]) {
-              perMessageDeflate.accept(offers[PerMessageDeflate2.extensionName]);
-              extensions[PerMessageDeflate2.extensionName] = perMessageDeflate;
+            const offers = extension.parse(secWebSocketExtensions);
+            if (offers[PerMessageDeflate.extensionName]) {
+              perMessageDeflate.accept(offers[PerMessageDeflate.extensionName]);
+              extensions[PerMessageDeflate.extensionName] = perMessageDeflate;
             }
           } catch (err) {
             const message = "Invalid or unacceptable Sec-WebSocket-Extensions header";
@@ -49578,10 +49573,10 @@ var require_websocket_server = __commonJS({
             ws._protocol = protocol;
           }
         }
-        if (extensions[PerMessageDeflate2.extensionName]) {
-          const params = extensions[PerMessageDeflate2.extensionName].params;
-          const value = extension2.format({
-            [PerMessageDeflate2.extensionName]: [params]
+        if (extensions[PerMessageDeflate.extensionName]) {
+          const params = extensions[PerMessageDeflate.extensionName].params;
+          const value = extension.format({
+            [PerMessageDeflate.extensionName]: [params]
           });
           headers.push(`Sec-WebSocket-Extensions: ${value}`);
           ws._extensions = extensions;
@@ -58739,65 +58734,92 @@ var require_data = __commonJS({
   }
 });
 
+// node_modules/fast-uri/lib/scopedChars.js
+var require_scopedChars = __commonJS({
+  "node_modules/fast-uri/lib/scopedChars.js"(exports2, module2) {
+    "use strict";
+    var HEX = {
+      0: 0,
+      1: 1,
+      2: 2,
+      3: 3,
+      4: 4,
+      5: 5,
+      6: 6,
+      7: 7,
+      8: 8,
+      9: 9,
+      a: 10,
+      A: 10,
+      b: 11,
+      B: 11,
+      c: 12,
+      C: 12,
+      d: 13,
+      D: 13,
+      e: 14,
+      E: 14,
+      f: 15,
+      F: 15
+    };
+    module2.exports = {
+      HEX
+    };
+  }
+});
+
 // node_modules/fast-uri/lib/utils.js
 var require_utils5 = __commonJS({
   "node_modules/fast-uri/lib/utils.js"(exports2, module2) {
     "use strict";
-    var isUUID = RegExp.prototype.test.bind(/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iu);
-    var isIPv4 = RegExp.prototype.test.bind(/^(?:(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)$/u);
-    var isHexPair = RegExp.prototype.test.bind(/^[\da-f]{2}$/iu);
-    var isUnreserved = RegExp.prototype.test.bind(/^[\da-z\-._~]$/iu);
-    var isPathCharacter = RegExp.prototype.test.bind(/^[\da-z\-._~!$&'()*+,;=:@/]$/iu);
-    function stringArrayToHexStripped(input) {
+    var { HEX } = require_scopedChars();
+    var IPV4_REG = /^(?:(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)$/u;
+    function normalizeIPv4(host) {
+      if (findToken(host, ".") < 3) {
+        return { host, isIPV4: false };
+      }
+      const matches = host.match(IPV4_REG) || [];
+      const [address] = matches;
+      if (address) {
+        return { host: stripLeadingZeros(address, "."), isIPV4: true };
+      } else {
+        return { host, isIPV4: false };
+      }
+    }
+    function stringArrayToHexStripped(input, keepZero = false) {
       let acc = "";
-      let code = 0;
-      let i = 0;
-      for (i = 0; i < input.length; i++) {
-        code = input[i].charCodeAt(0);
-        if (code === 48) {
-          continue;
-        }
-        if (!(code >= 48 && code <= 57 || code >= 65 && code <= 70 || code >= 97 && code <= 102)) {
-          return "";
-        }
-        acc += input[i];
-        break;
+      let strip = true;
+      for (const c of input) {
+        if (HEX[c] === void 0) return void 0;
+        if (c !== "0" && strip === true) strip = false;
+        if (!strip) acc += c;
       }
-      for (i += 1; i < input.length; i++) {
-        code = input[i].charCodeAt(0);
-        if (!(code >= 48 && code <= 57 || code >= 65 && code <= 70 || code >= 97 && code <= 102)) {
-          return "";
-        }
-        acc += input[i];
-      }
+      if (keepZero && acc.length === 0) acc = "0";
       return acc;
-    }
-    var nonSimpleDomain = RegExp.prototype.test.bind(/[^!"$&'()*+,\-.;=_`a-z{}~]/u);
-    function consumeIsZone(buffer) {
-      buffer.length = 0;
-      return true;
-    }
-    function consumeHextets(buffer, address, output) {
-      if (buffer.length) {
-        const hex = stringArrayToHexStripped(buffer);
-        if (hex !== "") {
-          address.push(hex);
-        } else {
-          output.error = true;
-          return false;
-        }
-        buffer.length = 0;
-      }
-      return true;
     }
     function getIPV6(input) {
       let tokenCount = 0;
       const output = { error: false, address: "", zone: "" };
       const address = [];
       const buffer = [];
+      let isZone = false;
       let endipv6Encountered = false;
       let endIpv6 = false;
-      let consume = consumeHextets;
+      function consume() {
+        if (buffer.length) {
+          if (isZone === false) {
+            const hex = stringArrayToHexStripped(buffer);
+            if (hex !== void 0) {
+              address.push(hex);
+            } else {
+              output.error = true;
+              return false;
+            }
+          }
+          buffer.length = 0;
+        }
+        return true;
+      }
       for (let i = 0; i < input.length; i++) {
         const cursor = input[i];
         if (cursor === "[" || cursor === "]") {
@@ -58807,30 +58829,31 @@ var require_utils5 = __commonJS({
           if (endipv6Encountered === true) {
             endIpv6 = true;
           }
-          if (!consume(buffer, address, output)) {
+          if (!consume()) {
             break;
           }
-          if (++tokenCount > 7) {
+          tokenCount++;
+          address.push(":");
+          if (tokenCount > 7) {
             output.error = true;
             break;
           }
-          if (i > 0 && input[i - 1] === ":") {
+          if (i - 1 >= 0 && input[i - 1] === ":") {
             endipv6Encountered = true;
           }
-          address.push(":");
           continue;
         } else if (cursor === "%") {
-          if (!consume(buffer, address, output)) {
+          if (!consume()) {
             break;
           }
-          consume = consumeIsZone;
+          isZone = true;
         } else {
           buffer.push(cursor);
           continue;
         }
       }
       if (buffer.length) {
-        if (consume === consumeIsZone) {
+        if (isZone) {
           output.zone = buffer.join("");
         } else if (endIpv6) {
           address.push(buffer.join(""));
@@ -58853,10 +58876,32 @@ var require_utils5 = __commonJS({
           newHost += "%" + ipv6.zone;
           escapedHost += "%25" + ipv6.zone;
         }
-        return { host: newHost, isIPV6: true, escapedHost };
+        return { host: newHost, escapedHost, isIPV6: true };
       } else {
         return { host, isIPV6: false };
       }
+    }
+    function stripLeadingZeros(str, token) {
+      let out = "";
+      let skip = true;
+      const l = str.length;
+      for (let i = 0; i < l; i++) {
+        const c = str[i];
+        if (c === "0" && skip) {
+          if (i + 1 <= l && str[i + 1] === token || i + 1 === l) {
+            out += c;
+            skip = false;
+          }
+        } else {
+          if (c === token) {
+            skip = true;
+          } else {
+            skip = false;
+          }
+          out += c;
+        }
+      }
+      return out;
     }
     function findToken(str, token) {
       let ind = 0;
@@ -58865,187 +58910,89 @@ var require_utils5 = __commonJS({
       }
       return ind;
     }
-    function removeDotSegments(path2) {
-      let input = path2;
+    var RDS1 = /^\.\.?\//u;
+    var RDS2 = /^\/\.(?:\/|$)/u;
+    var RDS3 = /^\/\.\.(?:\/|$)/u;
+    var RDS5 = /^\/?(?:.|\n)*?(?=\/|$)/u;
+    function removeDotSegments(input) {
       const output = [];
-      let nextSlash = -1;
-      let len = 0;
-      while (len = input.length) {
-        if (len === 1) {
-          if (input === ".") {
-            break;
-          } else if (input === "/") {
-            output.push("/");
-            break;
-          } else {
-            output.push(input);
-            break;
-          }
-        } else if (len === 2) {
-          if (input[0] === ".") {
-            if (input[1] === ".") {
-              break;
-            } else if (input[1] === "/") {
-              input = input.slice(2);
-              continue;
-            }
-          } else if (input[0] === "/") {
-            if (input[1] === "." || input[1] === "/") {
-              output.push("/");
-              break;
-            }
-          }
-        } else if (len === 3) {
-          if (input === "/..") {
-            if (output.length !== 0) {
-              output.pop();
-            }
-            output.push("/");
-            break;
-          }
-        }
-        if (input[0] === ".") {
-          if (input[1] === ".") {
-            if (input[2] === "/") {
-              input = input.slice(3);
-              continue;
-            }
-          } else if (input[1] === "/") {
-            input = input.slice(2);
-            continue;
-          }
-        } else if (input[0] === "/") {
-          if (input[1] === ".") {
-            if (input[2] === "/") {
-              input = input.slice(2);
-              continue;
-            } else if (input[2] === ".") {
-              if (input[3] === "/") {
-                input = input.slice(3);
-                if (output.length !== 0) {
-                  output.pop();
-                }
-                continue;
-              }
-            }
-          }
-        }
-        if ((nextSlash = input.indexOf("/", 1)) === -1) {
-          output.push(input);
-          break;
+      while (input.length) {
+        if (input.match(RDS1)) {
+          input = input.replace(RDS1, "");
+        } else if (input.match(RDS2)) {
+          input = input.replace(RDS2, "/");
+        } else if (input.match(RDS3)) {
+          input = input.replace(RDS3, "/");
+          output.pop();
+        } else if (input === "." || input === "..") {
+          input = "";
         } else {
-          output.push(input.slice(0, nextSlash));
-          input = input.slice(nextSlash);
+          const im = input.match(RDS5);
+          if (im) {
+            const s = im[0];
+            input = input.slice(s.length);
+            output.push(s);
+          } else {
+            throw new Error("Unexpected dot segment condition");
+          }
         }
       }
       return output.join("");
     }
-    var HOST_DELIMS = { "@": "%40", "/": "%2F", "?": "%3F", "#": "%23", ":": "%3A" };
-    var HOST_DELIM_RE = /[@/?#:]/g;
-    var HOST_DELIM_NO_COLON_RE = /[@/?#]/g;
-    function reescapeHostDelimiters(host, isIP) {
-      const re2 = isIP ? HOST_DELIM_NO_COLON_RE : HOST_DELIM_RE;
-      re2.lastIndex = 0;
-      return host.replace(re2, (ch) => HOST_DELIMS[ch]);
-    }
-    function normalizePercentEncoding(input, decodeUnreserved = false) {
-      if (input.indexOf("%") === -1) {
-        return input;
+    function normalizeComponentEncoding(components, esc) {
+      const func = esc !== true ? escape : unescape;
+      if (components.scheme !== void 0) {
+        components.scheme = func(components.scheme);
       }
-      let output = "";
-      for (let i = 0; i < input.length; i++) {
-        if (input[i] === "%" && i + 2 < input.length) {
-          const hex = input.slice(i + 1, i + 3);
-          if (isHexPair(hex)) {
-            const normalizedHex = hex.toUpperCase();
-            const decoded = String.fromCharCode(parseInt(normalizedHex, 16));
-            if (decodeUnreserved && isUnreserved(decoded)) {
-              output += decoded;
-            } else {
-              output += "%" + normalizedHex;
-            }
-            i += 2;
-            continue;
-          }
-        }
-        output += input[i];
+      if (components.userinfo !== void 0) {
+        components.userinfo = func(components.userinfo);
       }
-      return output;
-    }
-    function normalizePathEncoding(input) {
-      let output = "";
-      for (let i = 0; i < input.length; i++) {
-        if (input[i] === "%" && i + 2 < input.length) {
-          const hex = input.slice(i + 1, i + 3);
-          if (isHexPair(hex)) {
-            const normalizedHex = hex.toUpperCase();
-            const decoded = String.fromCharCode(parseInt(normalizedHex, 16));
-            if (decoded !== "." && isUnreserved(decoded)) {
-              output += decoded;
-            } else {
-              output += "%" + normalizedHex;
-            }
-            i += 2;
-            continue;
-          }
-        }
-        if (isPathCharacter(input[i])) {
-          output += input[i];
-        } else {
-          output += escape(input[i]);
-        }
+      if (components.host !== void 0) {
+        components.host = func(components.host);
       }
-      return output;
-    }
-    function escapePreservingEscapes(input) {
-      let output = "";
-      for (let i = 0; i < input.length; i++) {
-        if (input[i] === "%" && i + 2 < input.length) {
-          const hex = input.slice(i + 1, i + 3);
-          if (isHexPair(hex)) {
-            output += "%" + hex.toUpperCase();
-            i += 2;
-            continue;
-          }
-        }
-        output += escape(input[i]);
+      if (components.path !== void 0) {
+        components.path = func(components.path);
       }
-      return output;
+      if (components.query !== void 0) {
+        components.query = func(components.query);
+      }
+      if (components.fragment !== void 0) {
+        components.fragment = func(components.fragment);
+      }
+      return components;
     }
-    function recomposeAuthority(component) {
+    function recomposeAuthority(components) {
       const uriTokens = [];
-      if (component.userinfo !== void 0) {
-        uriTokens.push(component.userinfo);
+      if (components.userinfo !== void 0) {
+        uriTokens.push(components.userinfo);
         uriTokens.push("@");
       }
-      if (component.host !== void 0) {
-        let host = unescape(component.host);
-        if (!isIPv4(host)) {
-          const ipV6res = normalizeIPv6(host);
+      if (components.host !== void 0) {
+        let host = unescape(components.host);
+        const ipV4res = normalizeIPv4(host);
+        if (ipV4res.isIPV4) {
+          host = ipV4res.host;
+        } else {
+          const ipV6res = normalizeIPv6(ipV4res.host);
           if (ipV6res.isIPV6 === true) {
             host = `[${ipV6res.escapedHost}]`;
           } else {
-            host = reescapeHostDelimiters(host, false);
+            host = components.host;
           }
         }
         uriTokens.push(host);
       }
-      if (typeof component.port === "number" || typeof component.port === "string") {
+      if (typeof components.port === "number" || typeof components.port === "string") {
         uriTokens.push(":");
-        uriTokens.push(String(component.port));
+        uriTokens.push(String(components.port));
       }
       return uriTokens.length ? uriTokens.join("") : void 0;
     }
     module2.exports = {
-      nonSimpleDomain,
       recomposeAuthority,
-      reescapeHostDelimiters,
-      normalizePercentEncoding,
-      normalizePathEncoding,
-      escapePreservingEscapes,
+      normalizeComponentEncoding,
       removeDotSegments,
-      isIPv4,
-      isUUID,
+      normalizeIPv4,
       normalizeIPv6,
       stringArrayToHexStripped
     };
@@ -59056,209 +59003,145 @@ var require_utils5 = __commonJS({
 var require_schemes = __commonJS({
   "node_modules/fast-uri/lib/schemes.js"(exports2, module2) {
     "use strict";
-    var { isUUID } = require_utils5();
+    var UUID_REG = /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iu;
     var URN_REG = /([\da-z][\d\-a-z]{0,31}):((?:[\w!$'()*+,\-.:;=@]|%[\da-f]{2})+)/iu;
-    var supportedSchemeNames = (
-      /** @type {const} */
-      [
-        "http",
-        "https",
-        "ws",
-        "wss",
-        "urn",
-        "urn:uuid"
-      ]
-    );
-    function isValidSchemeName(name) {
-      return supportedSchemeNames.indexOf(
-        /** @type {*} */
-        name
-      ) !== -1;
+    function isSecure(wsComponents) {
+      return typeof wsComponents.secure === "boolean" ? wsComponents.secure : String(wsComponents.scheme).toLowerCase() === "wss";
     }
-    function wsIsSecure(wsComponent) {
-      if (wsComponent.secure === true) {
-        return true;
-      } else if (wsComponent.secure === false) {
-        return false;
-      } else if (wsComponent.scheme) {
-        return wsComponent.scheme.length === 3 && (wsComponent.scheme[0] === "w" || wsComponent.scheme[0] === "W") && (wsComponent.scheme[1] === "s" || wsComponent.scheme[1] === "S") && (wsComponent.scheme[2] === "s" || wsComponent.scheme[2] === "S");
-      } else {
-        return false;
+    function httpParse(components) {
+      if (!components.host) {
+        components.error = components.error || "HTTP URIs must have a host.";
       }
+      return components;
     }
-    function httpParse(component) {
-      if (!component.host) {
-        component.error = component.error || "HTTP URIs must have a host.";
+    function httpSerialize(components) {
+      const secure = String(components.scheme).toLowerCase() === "https";
+      if (components.port === (secure ? 443 : 80) || components.port === "") {
+        components.port = void 0;
       }
-      return component;
+      if (!components.path) {
+        components.path = "/";
+      }
+      return components;
     }
-    function httpSerialize(component) {
-      const secure = String(component.scheme).toLowerCase() === "https";
-      if (component.port === (secure ? 443 : 80) || component.port === "") {
-        component.port = void 0;
-      }
-      if (!component.path) {
-        component.path = "/";
-      }
-      return component;
+    function wsParse(wsComponents) {
+      wsComponents.secure = isSecure(wsComponents);
+      wsComponents.resourceName = (wsComponents.path || "/") + (wsComponents.query ? "?" + wsComponents.query : "");
+      wsComponents.path = void 0;
+      wsComponents.query = void 0;
+      return wsComponents;
     }
-    function wsParse(wsComponent) {
-      wsComponent.secure = wsIsSecure(wsComponent);
-      wsComponent.resourceName = (wsComponent.path || "/") + (wsComponent.query ? "?" + wsComponent.query : "");
-      wsComponent.path = void 0;
-      wsComponent.query = void 0;
-      return wsComponent;
+    function wsSerialize(wsComponents) {
+      if (wsComponents.port === (isSecure(wsComponents) ? 443 : 80) || wsComponents.port === "") {
+        wsComponents.port = void 0;
+      }
+      if (typeof wsComponents.secure === "boolean") {
+        wsComponents.scheme = wsComponents.secure ? "wss" : "ws";
+        wsComponents.secure = void 0;
+      }
+      if (wsComponents.resourceName) {
+        const [path2, query] = wsComponents.resourceName.split("?");
+        wsComponents.path = path2 && path2 !== "/" ? path2 : void 0;
+        wsComponents.query = query;
+        wsComponents.resourceName = void 0;
+      }
+      wsComponents.fragment = void 0;
+      return wsComponents;
     }
-    function wsSerialize(wsComponent) {
-      if (wsComponent.port === (wsIsSecure(wsComponent) ? 443 : 80) || wsComponent.port === "") {
-        wsComponent.port = void 0;
+    function urnParse(urnComponents, options) {
+      if (!urnComponents.path) {
+        urnComponents.error = "URN can not be parsed";
+        return urnComponents;
       }
-      if (typeof wsComponent.secure === "boolean") {
-        wsComponent.scheme = wsComponent.secure ? "wss" : "ws";
-        wsComponent.secure = void 0;
-      }
-      if (wsComponent.resourceName) {
-        const [path2, query] = wsComponent.resourceName.split("?");
-        wsComponent.path = path2 && path2 !== "/" ? path2 : void 0;
-        wsComponent.query = query;
-        wsComponent.resourceName = void 0;
-      }
-      wsComponent.fragment = void 0;
-      return wsComponent;
-    }
-    function urnParse(urnComponent, options) {
-      if (!urnComponent.path) {
-        urnComponent.error = "URN can not be parsed";
-        return urnComponent;
-      }
-      const matches = urnComponent.path.match(URN_REG);
+      const matches = urnComponents.path.match(URN_REG);
       if (matches) {
-        const scheme = options.scheme || urnComponent.scheme || "urn";
-        urnComponent.nid = matches[1].toLowerCase();
-        urnComponent.nss = matches[2];
-        const urnScheme = `${scheme}:${options.nid || urnComponent.nid}`;
-        const schemeHandler = getSchemeHandler(urnScheme);
-        urnComponent.path = void 0;
+        const scheme = options.scheme || urnComponents.scheme || "urn";
+        urnComponents.nid = matches[1].toLowerCase();
+        urnComponents.nss = matches[2];
+        const urnScheme = `${scheme}:${options.nid || urnComponents.nid}`;
+        const schemeHandler = SCHEMES[urnScheme];
+        urnComponents.path = void 0;
         if (schemeHandler) {
-          urnComponent = schemeHandler.parse(urnComponent, options);
+          urnComponents = schemeHandler.parse(urnComponents, options);
         }
       } else {
-        urnComponent.error = urnComponent.error || "URN can not be parsed.";
+        urnComponents.error = urnComponents.error || "URN can not be parsed.";
       }
-      return urnComponent;
+      return urnComponents;
     }
-    function urnSerialize(urnComponent, options) {
-      if (urnComponent.nid === void 0) {
-        throw new Error("URN without nid cannot be serialized");
-      }
-      const scheme = options.scheme || urnComponent.scheme || "urn";
-      const nid = urnComponent.nid.toLowerCase();
+    function urnSerialize(urnComponents, options) {
+      const scheme = options.scheme || urnComponents.scheme || "urn";
+      const nid = urnComponents.nid.toLowerCase();
       const urnScheme = `${scheme}:${options.nid || nid}`;
-      const schemeHandler = getSchemeHandler(urnScheme);
+      const schemeHandler = SCHEMES[urnScheme];
       if (schemeHandler) {
-        urnComponent = schemeHandler.serialize(urnComponent, options);
+        urnComponents = schemeHandler.serialize(urnComponents, options);
       }
-      const uriComponent = urnComponent;
-      const nss = urnComponent.nss;
-      uriComponent.path = `${nid || options.nid}:${nss}`;
+      const uriComponents = urnComponents;
+      const nss = urnComponents.nss;
+      uriComponents.path = `${nid || options.nid}:${nss}`;
       options.skipEscape = true;
-      return uriComponent;
+      return uriComponents;
     }
-    function urnuuidParse(urnComponent, options) {
-      const uuidComponent = urnComponent;
-      uuidComponent.uuid = uuidComponent.nss;
-      uuidComponent.nss = void 0;
-      if (!options.tolerant && (!uuidComponent.uuid || !isUUID(uuidComponent.uuid))) {
-        uuidComponent.error = uuidComponent.error || "UUID is not valid.";
+    function urnuuidParse(urnComponents, options) {
+      const uuidComponents = urnComponents;
+      uuidComponents.uuid = uuidComponents.nss;
+      uuidComponents.nss = void 0;
+      if (!options.tolerant && (!uuidComponents.uuid || !UUID_REG.test(uuidComponents.uuid))) {
+        uuidComponents.error = uuidComponents.error || "UUID is not valid.";
       }
-      return uuidComponent;
+      return uuidComponents;
     }
-    function urnuuidSerialize(uuidComponent) {
-      const urnComponent = uuidComponent;
-      urnComponent.nss = (uuidComponent.uuid || "").toLowerCase();
-      return urnComponent;
+    function urnuuidSerialize(uuidComponents) {
+      const urnComponents = uuidComponents;
+      urnComponents.nss = (uuidComponents.uuid || "").toLowerCase();
+      return urnComponents;
     }
-    var http = (
-      /** @type {SchemeHandler} */
-      {
-        scheme: "http",
-        domainHost: true,
-        parse: httpParse,
-        serialize: httpSerialize
-      }
-    );
-    var https = (
-      /** @type {SchemeHandler} */
-      {
-        scheme: "https",
-        domainHost: http.domainHost,
-        parse: httpParse,
-        serialize: httpSerialize
-      }
-    );
-    var ws = (
-      /** @type {SchemeHandler} */
-      {
-        scheme: "ws",
-        domainHost: true,
-        parse: wsParse,
-        serialize: wsSerialize
-      }
-    );
-    var wss = (
-      /** @type {SchemeHandler} */
-      {
-        scheme: "wss",
-        domainHost: ws.domainHost,
-        parse: ws.parse,
-        serialize: ws.serialize
-      }
-    );
-    var urn = (
-      /** @type {SchemeHandler} */
-      {
-        scheme: "urn",
-        parse: urnParse,
-        serialize: urnSerialize,
-        skipNormalize: true
-      }
-    );
-    var urnuuid = (
-      /** @type {SchemeHandler} */
-      {
-        scheme: "urn:uuid",
-        parse: urnuuidParse,
-        serialize: urnuuidSerialize,
-        skipNormalize: true
-      }
-    );
-    var SCHEMES = (
-      /** @type {Record<SchemeName, SchemeHandler>} */
-      {
-        http,
-        https,
-        ws,
-        wss,
-        urn,
-        "urn:uuid": urnuuid
-      }
-    );
-    Object.setPrototypeOf(SCHEMES, null);
-    function getSchemeHandler(scheme) {
-      return scheme && (SCHEMES[
-        /** @type {SchemeName} */
-        scheme
-      ] || SCHEMES[
-        /** @type {SchemeName} */
-        scheme.toLowerCase()
-      ]) || void 0;
-    }
-    module2.exports = {
-      wsIsSecure,
-      SCHEMES,
-      isValidSchemeName,
-      getSchemeHandler
+    var http = {
+      scheme: "http",
+      domainHost: true,
+      parse: httpParse,
+      serialize: httpSerialize
     };
+    var https = {
+      scheme: "https",
+      domainHost: http.domainHost,
+      parse: httpParse,
+      serialize: httpSerialize
+    };
+    var ws = {
+      scheme: "ws",
+      domainHost: true,
+      parse: wsParse,
+      serialize: wsSerialize
+    };
+    var wss = {
+      scheme: "wss",
+      domainHost: ws.domainHost,
+      parse: ws.parse,
+      serialize: ws.serialize
+    };
+    var urn = {
+      scheme: "urn",
+      parse: urnParse,
+      serialize: urnSerialize,
+      skipNormalize: true
+    };
+    var urnuuid = {
+      scheme: "urn:uuid",
+      parse: urnuuidParse,
+      serialize: urnuuidSerialize,
+      skipNormalize: true
+    };
+    var SCHEMES = {
+      http,
+      https,
+      ws,
+      wss,
+      urn,
+      "urn:uuid": urnuuid
+    };
+    module2.exports = SCHEMES;
   }
 });
 
@@ -59266,25 +59149,22 @@ var require_schemes = __commonJS({
 var require_fast_uri = __commonJS({
   "node_modules/fast-uri/index.js"(exports2, module2) {
     "use strict";
-    var { normalizeIPv6, removeDotSegments, recomposeAuthority, normalizePercentEncoding, normalizePathEncoding, escapePreservingEscapes, reescapeHostDelimiters, isIPv4, nonSimpleDomain } = require_utils5();
-    var { SCHEMES, getSchemeHandler } = require_schemes();
+    var { normalizeIPv6, normalizeIPv4, removeDotSegments, recomposeAuthority, normalizeComponentEncoding } = require_utils5();
+    var SCHEMES = require_schemes();
     function normalize2(uri, options) {
       if (typeof uri === "string") {
-        uri = /** @type {T} */
-        normalizeString(uri, options);
+        uri = serialize(parse2(uri, options), options);
       } else if (typeof uri === "object") {
-        uri = /** @type {T} */
-        parse2(serialize(uri, options), options);
+        uri = parse2(serialize(uri, options), options);
       }
       return uri;
     }
     function resolve2(baseURI, relativeURI, options) {
-      const schemelessOptions = options ? Object.assign({ scheme: "null" }, options) : { scheme: "null" };
-      const resolved = resolveComponent(parse2(baseURI, schemelessOptions), parse2(relativeURI, schemelessOptions), schemelessOptions, true);
-      schemelessOptions.skipEscape = true;
-      return serialize(resolved, schemelessOptions);
+      const schemelessOptions = Object.assign({ scheme: "null" }, options);
+      const resolved = resolveComponents(parse2(baseURI, schemelessOptions), parse2(relativeURI, schemelessOptions), schemelessOptions, true);
+      return serialize(resolved, { ...schemelessOptions, skipEscape: true });
     }
-    function resolveComponent(base, relative2, options, skipNormalization) {
+    function resolveComponents(base, relative2, options, skipNormalization) {
       const target = {};
       if (!skipNormalization) {
         base = parse2(serialize(base, options), options);
@@ -59314,7 +59194,7 @@ var require_fast_uri = __commonJS({
               target.query = base.query;
             }
           } else {
-            if (relative2.path[0] === "/") {
+            if (relative2.path.charAt(0) === "/") {
               target.path = removeDotSegments(relative2.path);
             } else {
               if ((base.userinfo !== void 0 || base.host !== void 0 || base.port !== void 0) && !base.path) {
@@ -59338,12 +59218,22 @@ var require_fast_uri = __commonJS({
       return target;
     }
     function equal2(uriA, uriB, options) {
-      const normalizedA = normalizeComparableURI(uriA, options);
-      const normalizedB = normalizeComparableURI(uriB, options);
-      return normalizedA !== void 0 && normalizedB !== void 0 && normalizedA.toLowerCase() === normalizedB.toLowerCase();
+      if (typeof uriA === "string") {
+        uriA = unescape(uriA);
+        uriA = serialize(normalizeComponentEncoding(parse2(uriA, options), true), { ...options, skipEscape: true });
+      } else if (typeof uriA === "object") {
+        uriA = serialize(normalizeComponentEncoding(uriA, true), { ...options, skipEscape: true });
+      }
+      if (typeof uriB === "string") {
+        uriB = unescape(uriB);
+        uriB = serialize(normalizeComponentEncoding(parse2(uriB, options), true), { ...options, skipEscape: true });
+      } else if (typeof uriB === "object") {
+        uriB = serialize(normalizeComponentEncoding(uriB, true), { ...options, skipEscape: true });
+      }
+      return uriA.toLowerCase() === uriB.toLowerCase();
     }
     function serialize(cmpts, opts) {
-      const component = {
+      const components = {
         host: cmpts.host,
         scheme: cmpts.scheme,
         userinfo: cmpts.userinfo,
@@ -59361,60 +59251,62 @@ var require_fast_uri = __commonJS({
       };
       const options = Object.assign({}, opts);
       const uriTokens = [];
-      const schemeHandler = getSchemeHandler(options.scheme || component.scheme);
-      if (schemeHandler && schemeHandler.serialize) schemeHandler.serialize(component, options);
-      if (component.path !== void 0) {
+      const schemeHandler = SCHEMES[(options.scheme || components.scheme || "").toLowerCase()];
+      if (schemeHandler && schemeHandler.serialize) schemeHandler.serialize(components, options);
+      if (components.path !== void 0) {
         if (!options.skipEscape) {
-          component.path = escapePreservingEscapes(component.path);
-          if (component.scheme !== void 0) {
-            component.path = component.path.split("%3A").join(":");
+          components.path = escape(components.path);
+          if (components.scheme !== void 0) {
+            components.path = components.path.split("%3A").join(":");
           }
         } else {
-          component.path = normalizePercentEncoding(component.path);
+          components.path = unescape(components.path);
         }
       }
-      if (options.reference !== "suffix" && component.scheme) {
-        uriTokens.push(component.scheme, ":");
+      if (options.reference !== "suffix" && components.scheme) {
+        uriTokens.push(components.scheme, ":");
       }
-      const authority = recomposeAuthority(component);
+      const authority = recomposeAuthority(components);
       if (authority !== void 0) {
         if (options.reference !== "suffix") {
           uriTokens.push("//");
         }
         uriTokens.push(authority);
-        if (component.path && component.path[0] !== "/") {
+        if (components.path && components.path.charAt(0) !== "/") {
           uriTokens.push("/");
         }
       }
-      if (component.path !== void 0) {
-        let s = component.path;
+      if (components.path !== void 0) {
+        let s = components.path;
         if (!options.absolutePath && (!schemeHandler || !schemeHandler.absolutePath)) {
           s = removeDotSegments(s);
         }
-        if (authority === void 0 && s[0] === "/" && s[1] === "/") {
-          s = "/%2F" + s.slice(2);
+        if (authority === void 0) {
+          s = s.replace(/^\/\//u, "/%2F");
         }
         uriTokens.push(s);
       }
-      if (component.query !== void 0) {
-        uriTokens.push("?", component.query);
+      if (components.query !== void 0) {
+        uriTokens.push("?", components.query);
       }
-      if (component.fragment !== void 0) {
-        uriTokens.push("#", component.fragment);
+      if (components.fragment !== void 0) {
+        uriTokens.push("#", components.fragment);
       }
       return uriTokens.join("");
     }
-    var URI_PARSE = /^(?:([^#/:?]+):)?(?:\/\/((?:([^#/?@]*)@)?(\[[^#/?\]]+\]|[^#/:?]*)(?::(\d*))?))?([^#?]*)(?:\?([^#]*))?(?:#((?:.|[\n\r])*))?/u;
-    function getParseError(parsed, matches) {
-      if (matches[2] !== void 0 && parsed.path && parsed.path[0] !== "/") {
-        return 'URI path must start with "/" when authority is present.';
+    var hexLookUp = Array.from({ length: 127 }, (_v, k) => /[^!"$&'()*+,\-.;=_`a-z{}~]/u.test(String.fromCharCode(k)));
+    function nonSimpleDomain(value) {
+      let code = 0;
+      for (let i = 0, len = value.length; i < len; ++i) {
+        code = value.charCodeAt(i);
+        if (code > 126 || hexLookUp[code]) {
+          return true;
+        }
       }
-      if (typeof parsed.port === "number" && (parsed.port < 0 || parsed.port > 65535)) {
-        return "URI port is malformed.";
-      }
-      return void 0;
+      return false;
     }
-    function parseWithStatus(uri, opts) {
+    var URI_PARSE = /^(?:([^#/:?]+):)?(?:\/\/((?:([^#/?@]*)@)?(\[[^#/?\]]+\]|[^#/:?]*)(?::(\d*))?))?([^#?]*)(?:\?([^#]*))?(?:#((?:.|[\n\r])*))?/u;
+    function parse2(uri, opts) {
       const options = Object.assign({}, opts);
       const parsed = {
         scheme: void 0,
@@ -59425,15 +59317,9 @@ var require_fast_uri = __commonJS({
         query: void 0,
         fragment: void 0
       };
-      let malformedAuthorityOrPort = false;
+      const gotEncoding = uri.indexOf("%") !== -1;
       let isIP = false;
-      if (options.reference === "suffix") {
-        if (options.scheme) {
-          uri = options.scheme + ":" + uri;
-        } else {
-          uri = "//" + uri;
-        }
-      }
+      if (options.reference === "suffix") uri = (options.scheme ? options.scheme + ":" : "") + "//" + uri;
       const matches = uri.match(URI_PARSE);
       if (matches) {
         parsed.scheme = matches[1];
@@ -59446,18 +59332,14 @@ var require_fast_uri = __commonJS({
         if (isNaN(parsed.port)) {
           parsed.port = matches[5];
         }
-        const parseError = getParseError(parsed, matches);
-        if (parseError !== void 0) {
-          parsed.error = parsed.error || parseError;
-          malformedAuthorityOrPort = true;
-        }
         if (parsed.host) {
-          const ipv4result = isIPv4(parsed.host);
-          if (ipv4result === false) {
-            const ipv6result = normalizeIPv6(parsed.host);
+          const ipv4result = normalizeIPv4(parsed.host);
+          if (ipv4result.isIPV4 === false) {
+            const ipv6result = normalizeIPv6(ipv4result.host);
             parsed.host = ipv6result.host.toLowerCase();
             isIP = ipv6result.isIPV6;
           } else {
+            parsed.host = ipv4result.host;
             isIP = true;
           }
         }
@@ -59473,7 +59355,7 @@ var require_fast_uri = __commonJS({
         if (options.reference && options.reference !== "suffix" && options.reference !== parsed.reference) {
           parsed.error = parsed.error || "URI is not a " + options.reference + " reference.";
         }
-        const schemeHandler = getSchemeHandler(options.scheme || parsed.scheme);
+        const schemeHandler = SCHEMES[(options.scheme || parsed.scheme || "").toLowerCase()];
         if (!options.unicodeSupport && (!schemeHandler || !schemeHandler.unicodeSupport)) {
           if (parsed.host && (options.domainHost || schemeHandler && schemeHandler.domainHost) && isIP === false && nonSimpleDomain(parsed.host)) {
             try {
@@ -59484,23 +59366,17 @@ var require_fast_uri = __commonJS({
           }
         }
         if (!schemeHandler || schemeHandler && !schemeHandler.skipNormalize) {
-          if (uri.indexOf("%") !== -1) {
-            if (parsed.scheme !== void 0) {
-              parsed.scheme = unescape(parsed.scheme);
-            }
-            if (parsed.host !== void 0) {
-              parsed.host = reescapeHostDelimiters(unescape(parsed.host), isIP);
-            }
+          if (gotEncoding && parsed.scheme !== void 0) {
+            parsed.scheme = unescape(parsed.scheme);
+          }
+          if (gotEncoding && parsed.host !== void 0) {
+            parsed.host = unescape(parsed.host);
           }
           if (parsed.path) {
-            parsed.path = normalizePathEncoding(parsed.path);
+            parsed.path = escape(unescape(parsed.path));
           }
           if (parsed.fragment) {
-            try {
-              parsed.fragment = encodeURI(decodeURIComponent(parsed.fragment));
-            } catch {
-              parsed.error = parsed.error || "URI malformed";
-            }
+            parsed.fragment = encodeURI(decodeURIComponent(parsed.fragment));
           }
         }
         if (schemeHandler && schemeHandler.parse) {
@@ -59509,35 +59385,13 @@ var require_fast_uri = __commonJS({
       } else {
         parsed.error = parsed.error || "URI can not be parsed.";
       }
-      return { parsed, malformedAuthorityOrPort };
-    }
-    function parse2(uri, opts) {
-      return parseWithStatus(uri, opts).parsed;
-    }
-    function normalizeString(uri, opts) {
-      return normalizeStringWithStatus(uri, opts).normalized;
-    }
-    function normalizeStringWithStatus(uri, opts) {
-      const { parsed, malformedAuthorityOrPort } = parseWithStatus(uri, opts);
-      return {
-        normalized: malformedAuthorityOrPort ? uri : serialize(parsed, opts),
-        malformedAuthorityOrPort
-      };
-    }
-    function normalizeComparableURI(uri, opts) {
-      if (typeof uri === "string") {
-        const { normalized, malformedAuthorityOrPort } = normalizeStringWithStatus(uri, opts);
-        return malformedAuthorityOrPort ? void 0 : normalized;
-      }
-      if (typeof uri === "object") {
-        return serialize(uri, opts);
-      }
+      return parsed;
     }
     var fastUri = {
       SCHEMES,
       normalize: normalize2,
       resolve: resolve2,
-      resolveComponent,
+      resolveComponents,
       equal: equal2,
       serialize,
       parse: parse2
@@ -60040,11 +59894,11 @@ var require_core = __commonJS({
     Ajv2.ValidationError = validation_error_1.default;
     Ajv2.MissingRefError = ref_error_1.default;
     exports2.default = Ajv2;
-    function checkOptions(checkOpts, options, msg, log = "error") {
+    function checkOptions(checkOpts, options, msg, log2 = "error") {
       for (const key in checkOpts) {
         const opt = key;
         if (opt in options)
-          this.logger[log](`${msg}: option ${key}. ${checkOpts[opt]}`);
+          this.logger[log2](`${msg}: option ${key}. ${checkOpts[opt]}`);
       }
     }
     function getSchEnv(keyRef) {
@@ -65055,7 +64909,7 @@ async function fetchWrapper(requestOptions) {
       "fetch is not set. Please pass a fetch implementation as new Octokit({ request: { fetch }}). Learn more at https://github.com/octokit/octokit.js/#fetch-missing"
     );
   }
-  const log = requestOptions.request?.log || console;
+  const log2 = requestOptions.request?.log || console;
   const parseSuccessResponseBody = requestOptions.request?.parseSuccessResponseBody !== false;
   const body = isPlainObject2(requestOptions.body) || Array.isArray(requestOptions.body) ? JSONStringify(requestOptions.body) : requestOptions.body;
   const requestHeaders = Object.fromEntries(
@@ -65113,7 +64967,7 @@ async function fetchWrapper(requestOptions) {
   if ("deprecation" in responseHeaders) {
     const matches = responseHeaders.link && responseHeaders.link.match(/<([^<>]+)>; rel="deprecation"/);
     const deprecationLink = matches && matches.pop();
-    log.warn(
+    log2.warn(
       `[@octokit/request] "${requestOptions.method} ${requestOptions.url}" is deprecated. It is scheduled to be removed on ${responseHeaders.sunset}${deprecationLink ? `. See ${deprecationLink}` : ""}`
     );
   }
@@ -69378,6 +69232,29 @@ var LogTag;
   LogTag2["Default"] = "Default";
   LogTag2["Notify"] = "Notify";
 })(LogTag || (LogTag = {}));
+var log = (message, logAsJson, code = Status.Ok, stack, ...tags) => {
+  if (logAsJson) {
+    return logJson(message, code, stack, ...tags);
+  }
+  return logPlain(message, code, stack, ...tags);
+};
+var logPlain = (message, code = Status.Ok, stack, ...tags) => {
+  const tagsString = tags.map((tag) => `, #${tag}`).join("");
+  const logString = `[${code}, ${(/* @__PURE__ */ new Date()).toISOString()}${tagsString}]: ${message}${has(stack) ? "\n" + stack : ""}`;
+  console.log(logString);
+  return logString;
+};
+var logJson = (message, code = Status.Ok, stack, ...tags) => {
+  const logJson2 = JSON.stringify({
+    date: (/* @__PURE__ */ new Date()).toISOString(),
+    stack,
+    message,
+    code,
+    tags
+  });
+  console.log(logJson2);
+  return logJson2;
+};
 
 // packages/utils/common/lib/logger.js
 var LogLevel;
@@ -69670,6 +69547,17 @@ var toError = (e) => {
     return e;
   }
   return new InvalidError(isString(e) ? e : pp`${e}`);
+};
+var catchErrorAsync = async (func, kind = Error) => {
+  try {
+    return await func();
+  } catch (err) {
+    const e = toError(err);
+    if (e instanceof kind) {
+      return e;
+    }
+    throw e;
+  }
 };
 var replaceException = (e, ...filter) => {
   filter.forEach(([trigger, replacement]) => {
@@ -71754,11 +71642,6 @@ var toHasAccessArgs = toObject({
   ...workspaceServiceArgs,
   role: toRole
 });
-var toHasAccessForUserArgs = toObject({
-  ...workspaceServiceArgs,
-  userId: toNonNegativeInteger,
-  role: toRole
-});
 
 // packages/deployment-service/common/lib/model/WorkspaceStatus.js
 var WorkspaceStatus;
@@ -71917,8 +71800,7 @@ var AVAILABLE_INTERNAL_FLAGS = [
   "time-sameDc",
   "vcluster",
   "virtual-machines",
-  "vpn",
-  "workspace-ssh"
+  "vpn"
 ];
 var availableInternalFlags = [...AVAILABLE_INTERNAL_FLAGS];
 var AVAILABLE_ALPHA_FLAGS = [
@@ -72672,6 +72554,290 @@ WorkspaceDeploymentStub = __decorate4([
 // packages/ide/common/lib/api/config.js
 var import_inversify4 = __toESM(require_inversify(), 1);
 
+// packages/utils/common/lib/preconditions.js
+var checkHas = (x, description = "") => {
+  if (has(x)) {
+    return x;
+  }
+  throw new TypeError(`Argument ${description} must not be null or undefined.`);
+};
+
+// packages/utils/common/lib/copy.js
+var copy = (src) => {
+  if (!has(src)) {
+    return src;
+  }
+  const type = typeof src;
+  if (type === "string" || type === "number" || type === "boolean" || type === "symbol") {
+    return src;
+  }
+  if (type === "function") {
+    throw new Error("copy of a function is not yet implemented");
+  }
+  if (Array.isArray(src)) {
+    return src.slice();
+  }
+  if (src instanceof Date) {
+    return new Date(src.getTime());
+  }
+  return Object.assign(Object.create(Object.getPrototypeOf(src)), src);
+};
+
+// packages/utils/common/lib/deepCopy.js
+var deepCopy = (src) => {
+  if (!has(src)) {
+    return src;
+  }
+  const type = typeof src;
+  if (type === "string" || type === "number" || type === "boolean" || type === "symbol") {
+    return src;
+  }
+  if (type === "function") {
+    throw new Error("deepCopy of a function is not yet implemented");
+  }
+  const result = copy(src);
+  if (src instanceof Date) {
+    return result;
+  }
+  for (const propName in result) {
+    result[propName] = deepCopy(result[propName]);
+  }
+  return result;
+};
+
+// packages/utils/common/lib/hasAll.js
+var hasAll = (...objects) => objects.every(has);
+
+// packages/reply/common/lib/Reply.js
+var UnexpectedOkError = class extends Error {
+  constructor() {
+    super("A reply with StatusCode.OK does not store an errorMessage. Did you mean .getValue()?");
+  }
+};
+var UnexpectedNotOkError = class extends Error {
+  constructor(errorMessage) {
+    super(`A reply with StatusCode.ERROR is not intended to hold any data. Did you mean .getMessage()?Error message: ${errorMessage}`);
+  }
+};
+var UnparsableReply = class extends Exception {
+  constructor(reply) {
+    super(`The reply could not be parsed: ${reply}`);
+  }
+};
+var Reply = class _Reply {
+  static all(...replies) {
+    for (const reply of replies) {
+      if (reply.notOk()) {
+        return _Reply.collectErrors(...replies);
+      }
+    }
+    return _Reply.getOk();
+  }
+  static okReply(data) {
+    return new _Reply({
+      code: Status.Ok,
+      data
+    }, void 0);
+  }
+  static okStatus(message) {
+    return new _Reply({
+      code: Status.Ok,
+      data: message
+    }, void 0);
+  }
+  static errStatus(message, stack, errScope = "internal") {
+    if (typeof message === "string") {
+      return new _Reply({
+        code: Status.Error,
+        errName: Error.name,
+        errMessage: message
+      }, stack ?? new Error().stack, errScope);
+    }
+    return _Reply.createFromError(message);
+  }
+  static getOk() {
+    return _Reply.OK;
+  }
+  static createFromSerializedReply(reply) {
+    if (!has(reply) || !(has(reply.code) && reply.code in Status) && (!has(reply.data) || !has(reply.errMessage))) {
+      return _Reply.getUnparseable(JSON.stringify(reply));
+    }
+    return new _Reply(reply, reply.code === Status.Ok ? void 0 : new Error().stack);
+  }
+  static createFromError(err) {
+    if (!has(err) || !hasAll(err.message, err.stack)) {
+      return _Reply.getUnparseable(JSON.stringify(err));
+    }
+    return new _Reply({
+      code: Status.Error,
+      errName: err.name,
+      errMessage: err.message
+    }, err.stack ?? new Error().stack, err instanceof Exception ? err.scope : "internal");
+  }
+  static setLogAsJson(logAsJson) {
+    _Reply.logAsJson = logAsJson;
+  }
+  static collectErrors(...replies) {
+    const failedReplys = replies.filter((reply) => reply.notOk());
+    const message = failedReplys.map((reply) => reply.getErrorMessage()).join("\n");
+    const stack = failedReplys.map((reply) => reply.stack).join("\n\n");
+    return failedReplys.length === 0 ? _Reply.getOk() : _Reply.errStatus(message, stack);
+  }
+  static getUnparseable(reply) {
+    return _Reply.createFromError(new UnparsableReply(reply));
+  }
+  constructor(reply, stack, errScope = "internal") {
+    this.errScope = errScope;
+    this.serializedReply = reply;
+    this.stack = stack;
+  }
+  ok() {
+    return this.serializedReply.code === Status.Ok;
+  }
+  notOk() {
+    return !this.ok();
+  }
+  toSerializedReply() {
+    return deepCopy(this.serializedReply);
+  }
+  and(otherReply) {
+    return _Reply.all(this, otherReply);
+  }
+  getErrorName() {
+    if (this.ok()) {
+      throw new UnexpectedOkError();
+    }
+    return this.serializedReply.errName;
+  }
+  getErrorMessage() {
+    if (this.ok()) {
+      throw new UnexpectedOkError();
+    }
+    return this.serializedReply.errMessage;
+  }
+  getValue() {
+    if (this.notOk()) {
+      throw new UnexpectedNotOkError(this.serializedReply.errMessage);
+    }
+    return this.serializedReply.data;
+  }
+  log(...tags) {
+    if (this.notOk()) {
+      log(this.getErrorMessage(), _Reply.logAsJson, Status.Error, this.stack, ...tags);
+    } else {
+      log(JSON.stringify(this.getValue()), _Reply.logAsJson, this.serializedReply.code, this.stack, ...tags);
+    }
+    return this;
+  }
+  logIfError() {
+    if (this.notOk()) {
+      this.log();
+    }
+    return this;
+  }
+  throwIfError() {
+    if (this.ok()) {
+      return this;
+    }
+    const err = new Error(this.getErrorMessage());
+    err.name = this.getErrorName() ?? Error.name;
+    if (has(this.stack)) {
+      err.stack = this.stack;
+    }
+    throw err;
+  }
+};
+Reply.OK = new Reply({
+  code: Status.Ok
+}, void 0);
+Reply.logAsJson = false;
+var okStatus = Reply.okStatus;
+var errStatus = Reply.errStatus;
+var okReply = Reply.okReply;
+var getOk = Reply.getOk;
+
+// packages/reply/common/lib/utils/exceptions.js
+var ReplyException = class extends Exception {
+  constructor(reply, opts) {
+    super(reply.getErrorMessage(), opts);
+    this.reply = reply;
+  }
+};
+
+// packages/reply/common/lib/compat.js
+var voidReply = Reply.getOk();
+var fromReply = (r) => {
+  if (r.notOk()) {
+    throw new ReplyException(r, { scope: r.errScope });
+  }
+  return r.getValue();
+};
+var fromReplyRethrowing = async (fn, ...throwers) => {
+  const isThrower = (i) => !Array.isArray(i);
+  const rethrowers = throwers.slice(0, -1);
+  const thrower = throwers.slice(-1)[0];
+  if (!has(thrower) || !isThrower(thrower) || rethrowers.some((x) => isThrower(x))) {
+    throw new InvalidArgument3("Expected an array of rethrowers with a thrower as a last argument");
+  }
+  try {
+    return fromReply(await fn());
+  } catch (e) {
+    const re2 = e;
+    checkHas(re2.reply, "replyException.reply");
+    const rethrower = rethrowers.find(([error]) => error.name === re2.reply.getErrorName());
+    if (has(rethrower)) {
+      throw rethrower[1](re2);
+    }
+    throw thrower(re2);
+  }
+};
+var valueOrErrorToReply = (v) => {
+  return v instanceof Error ? Reply.createFromError(v) : Reply.okReply(v);
+};
+var toReplyAsync = async (func) => {
+  return valueOrErrorToReply(await catchErrorAsync(func));
+};
+
+// packages/streamy/common/lib/extensions/compat.js
+var createReplyStubSubClass = (spec, base) => {
+  class Klass extends base {
+  }
+  const p = Klass.prototype;
+  for (const [name, m] of Object.entries(spec.methods)) {
+    switch (m.kind) {
+      case "rpc":
+        p[name] = async function(req, opts) {
+          const finalOpts = m.defaultOptions || opts ? { ...m.defaultOptions, ...opts } : void 0;
+          return await toReplyAsync(async () => m.response(await this.client.call({
+            service: spec.name,
+            method: name,
+            data: req,
+            context: this.context,
+            opts: finalOpts
+          })));
+        };
+        break;
+      case "stream":
+        p[name] = function() {
+          return this.client.stream({
+            service: spec.name,
+            method: name,
+            toQuery: m.request,
+            toResponse: m.response,
+            context: this.context
+          });
+        };
+        break;
+    }
+  }
+  return Klass;
+};
+var createAuthnReplyStubClass = (name, spec) => {
+  const klass = createReplyStubSubClass(spec, AuthnStub);
+  klass.ID = serviceId(name);
+  return klass;
+};
+
 // packages/auth/common/lib/oauth.js
 var baseOAuthProviders = [
   "bitbucket",
@@ -72845,6 +73011,11 @@ var ConfigStub = class ConfigStub2 extends createAuthnStubClass("ConfigStub", co
 ConfigStub = __decorate5([
   (0, import_inversify4.injectable)()
 ], ConfigStub);
+var ConfigReplyStub = class ConfigReplyStub2 extends createAuthnReplyStubClass("configReplyStub", configService) {
+};
+ConfigReplyStub = __decorate5([
+  (0, import_inversify4.injectable)()
+], ConfigReplyStub);
 
 // packages/ide/common/lib/api/gitAuth.js
 var import_inversify5 = __toESM(require_inversify(), 1);
@@ -74710,11 +74881,8 @@ var doCreateStubUtils = (opts) => {
 
 // node_modules/ws/wrapper.mjs
 var import_stream2 = __toESM(require_stream(), 1);
-var import_extension = __toESM(require_extension(), 1);
-var import_permessage_deflate = __toESM(require_permessage_deflate3(), 1);
 var import_receiver = __toESM(require_receiver3(), 1);
 var import_sender = __toESM(require_sender3(), 1);
-var import_subprotocol = __toESM(require_subprotocol(), 1);
 var import_websocket2 = __toESM(require_websocket3(), 1);
 var import_websocket_server = __toESM(require_websocket_server(), 1);
 var wrapper_default = import_websocket2.default;
@@ -75736,49 +75904,6 @@ var listWorkspacePlans = async (db) => {
   });
 };
 
-// packages/utils/common/lib/copy.js
-var copy = (src) => {
-  if (!has(src)) {
-    return src;
-  }
-  const type = typeof src;
-  if (type === "string" || type === "number" || type === "boolean" || type === "symbol") {
-    return src;
-  }
-  if (type === "function") {
-    throw new Error("copy of a function is not yet implemented");
-  }
-  if (Array.isArray(src)) {
-    return src.slice();
-  }
-  if (src instanceof Date) {
-    return new Date(src.getTime());
-  }
-  return Object.assign(Object.create(Object.getPrototypeOf(src)), src);
-};
-
-// packages/utils/common/lib/deepCopy.js
-var deepCopy = (src) => {
-  if (!has(src)) {
-    return src;
-  }
-  const type = typeof src;
-  if (type === "string" || type === "number" || type === "boolean" || type === "symbol") {
-    return src;
-  }
-  if (type === "function") {
-    throw new Error("deepCopy of a function is not yet implemented");
-  }
-  const result = copy(src);
-  if (src instanceof Date) {
-    return result;
-  }
-  for (const propName in result) {
-    result[propName] = deepCopy(result[propName]);
-  }
-  return result;
-};
-
 // packages/utils/common/lib/equal.js
 var equal = (value, other) => {
   if (value === other) {
@@ -75849,14 +75974,6 @@ var cached = (timeout, f) => {
     lastFinishedMs = void 0;
   };
   return cached2;
-};
-
-// packages/utils/common/lib/preconditions.js
-var checkHas = (x, description = "") => {
-  if (has(x)) {
-    return x;
-  }
-  throw new TypeError(`Argument ${description} must not be null or undefined.`);
 };
 
 // packages/payment-service/node/lib/data-access/Products.js
@@ -76452,11 +76569,6 @@ var teamServiceArgs = {
   teamId: readOnly(toNonNegativeInteger)
 };
 var toTeamServiceArgs = toObject(teamServiceArgs);
-var teamServiceForUserArgs = {
-  teamId: readOnly(toNonNegativeInteger),
-  userId: readOnly(toNonNegativeInteger)
-};
-var toTeamServiceForUserArgs = toObject(teamServiceForUserArgs);
 var toCreateTeamArgs = toObject({
   name: readOnly(toNonEmptyStringWithMaxLength(MAX_TEAM_NAME_LENGTH)),
   dc: toUndefOr(toNumber),
@@ -76536,10 +76648,6 @@ var workspacesService = {
     }),
     hasAccess: rpc({
       request: toHasAccessArgs,
-      response: toVoid
-    }),
-    hasAccessForUser: rpc({
-      request: toHasAccessForUserArgs,
       response: toVoid
     }),
     isSameDataCenter: rpc({
@@ -77392,7 +77500,7 @@ var startLogStream = (pipeline, workspaceId, stage, step) => restreamOnError(() 
   });
   while (true) {
     const logs = await s.recv();
-    logs.forEach((log) => logI(`[Pipeline ${stage}[${step}]] ${log.data}`));
+    logs.forEach((log2) => logI(`[Pipeline ${stage}[${step}]] ${log2.data}`));
   }
 });
 var waitForWorkspaceStatus = async (replicaStub, workspaceId, fulfillsCondition) => {
@@ -77637,10 +77745,6 @@ var teamService = {
       request: toTeamServiceArgs,
       response: toBoolean
     }),
-    hasAdminAccessForUser: rpc({
-      request: toTeamServiceForUserArgs,
-      response: toBoolean
-    }),
     reactivateDeletedUserTeams: rpc({
       request: toVoid,
       response: toArray(toTeamWithRole),
@@ -77648,10 +77752,6 @@ var teamService = {
     }),
     hasMemberAccess: rpc({
       request: toTeamServiceArgs,
-      response: toBoolean
-    }),
-    hasMemberAccessForUser: rpc({
-      request: toTeamServiceForUserArgs,
       response: toBoolean
     }),
     changeRole: rpc({
@@ -78578,6 +78678,11 @@ LandscapeStub = __decorate21([
 var DEFAULT_PLAN_TITLE = "Boost";
 var deploymentLinkTypes = ["dev-domain", "preview"];
 var toDeploymentLinkType = toUndefOr(toNullOr(toLiteralUnion("DeploymentLinkType", deploymentLinkTypes)));
+var GetBrowserConfigFailed = class extends Exception {
+  constructor(msg) {
+    super(msg);
+  }
+};
 var codesphereWorkspaceUrl = (apiUrl, w) => {
   return new URL(import_path3.default.posix.join(apiUrl.pathname, `/ide/teams/${w.teamId}/workspaces/${w.id}`), apiUrl);
 };
@@ -78651,7 +78756,7 @@ var withStubs = async (dataCenterId, creds, serviceUrlDc, fn) => {
       workspaces: await createStub("workspace-service", WorkspacesStub),
       products: await createStub("payment-service", ProductsStub),
       process: await createStub("workspace-proxy", ProcessProxyStub),
-      config: await createStub("ide-service", ConfigStub),
+      config: await createStub("ide-service", ConfigReplyStub),
       git: await createStub("ide-service", GitAuthStub)
     });
   } finally {
@@ -78803,7 +78908,7 @@ var getEnvironmentUrl = async (c, w, config) => {
   if (c.deploymentLinkType === "preview") {
     return codespherePreviewUrl(c.apiUrl, w).toString();
   }
-  const { workspaceHostingBaseDomain } = await config.getBrowserConfig();
+  const { workspaceHostingBaseDomain } = await fromReplyRethrowing(() => config.getBrowserConfig(), (e) => new GetBrowserConfigFailed(e.message));
   return `https://${workspaceDevDomain(w.id, workspaceHostingBaseDomain)}`;
 };
 var isProviderSupported = async (repo, gitStub) => {
