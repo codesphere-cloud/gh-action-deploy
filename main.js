@@ -20581,7 +20581,7 @@ var require_permessage_deflate = __commonJS({
     var kBuffer = /* @__PURE__ */ Symbol("kBuffer");
     var kLength = /* @__PURE__ */ Symbol("kLength");
     var kDefaultMaxDecompressedSize = 4 * 1024 * 1024;
-    var PerMessageDeflate = class {
+    var PerMessageDeflate2 = class {
       /** @type {import('node:zlib').InflateRaw} */
       #inflate;
       #options = {};
@@ -20659,7 +20659,7 @@ var require_permessage_deflate = __commonJS({
         });
       }
     };
-    module2.exports = { PerMessageDeflate };
+    module2.exports = { PerMessageDeflate: PerMessageDeflate2 };
   }
 });
 
@@ -20684,7 +20684,7 @@ var require_receiver = __commonJS({
     } = require_util8();
     var { WebsocketFrameSend } = require_frame();
     var { closeWebSocketConnection } = require_connection();
-    var { PerMessageDeflate } = require_permessage_deflate();
+    var { PerMessageDeflate: PerMessageDeflate2 } = require_permessage_deflate();
     var ByteParser = class extends Writable {
       #buffers = [];
       #byteOffset = 0;
@@ -20703,7 +20703,7 @@ var require_receiver = __commonJS({
         this.ws = ws;
         this.#extensions = extensions == null ? /* @__PURE__ */ new Map() : extensions;
         if (this.#extensions.has("permessage-deflate")) {
-          this.#extensions.set("permessage-deflate", new PerMessageDeflate(extensions));
+          this.#extensions.set("permessage-deflate", new PerMessageDeflate2(extensions));
         }
       }
       /**
@@ -38983,7 +38983,7 @@ var require_permessage_deflate2 = __commonJS({
     var kBuffer = /* @__PURE__ */ Symbol("kBuffer");
     var kLength = /* @__PURE__ */ Symbol("kLength");
     var kDefaultMaxDecompressedSize = 4 * 1024 * 1024;
-    var PerMessageDeflate = class {
+    var PerMessageDeflate2 = class {
       /** @type {import('node:zlib').InflateRaw} */
       #inflate;
       #options = {};
@@ -39061,7 +39061,7 @@ var require_permessage_deflate2 = __commonJS({
         });
       }
     };
-    module2.exports = { PerMessageDeflate };
+    module2.exports = { PerMessageDeflate: PerMessageDeflate2 };
   }
 });
 
@@ -39086,7 +39086,7 @@ var require_receiver2 = __commonJS({
     } = require_util16();
     var { WebsocketFrameSend } = require_frame2();
     var { closeWebSocketConnection } = require_connection2();
-    var { PerMessageDeflate } = require_permessage_deflate2();
+    var { PerMessageDeflate: PerMessageDeflate2 } = require_permessage_deflate2();
     var ByteParser = class extends Writable {
       #buffers = [];
       #byteOffset = 0;
@@ -39105,7 +39105,7 @@ var require_receiver2 = __commonJS({
         this.ws = ws;
         this.#extensions = extensions == null ? /* @__PURE__ */ new Map() : extensions;
         if (this.#extensions.has("permessage-deflate")) {
-          this.#extensions.set("permessage-deflate", new PerMessageDeflate(extensions));
+          this.#extensions.set("permessage-deflate", new PerMessageDeflate2(extensions));
         }
       }
       /**
@@ -46191,7 +46191,7 @@ var require_permessage_deflate3 = __commonJS({
     var kBuffers = /* @__PURE__ */ Symbol("buffers");
     var kError = /* @__PURE__ */ Symbol("error");
     var zlibLimiter;
-    var PerMessageDeflate = class {
+    var PerMessageDeflate2 = class {
       /**
        * Creates a PerMessageDeflate instance.
        *
@@ -46202,6 +46202,9 @@ var require_permessage_deflate3 = __commonJS({
        *     acknowledge disabling of client context takeover
        * @param {Number} [options.concurrencyLimit=10] The number of concurrent
        *     calls to zlib
+       * @param {Boolean} [options.isServer=false] Create the instance in either
+       *     server or client mode
+       * @param {Number} [options.maxPayload=0] The maximum allowed message length
        * @param {(Boolean|Number)} [options.serverMaxWindowBits] Request/confirm the
        *     use of a custom server window size
        * @param {Boolean} [options.serverNoContextTakeover=false] Request/accept
@@ -46212,15 +46215,12 @@ var require_permessage_deflate3 = __commonJS({
        *     deflate
        * @param {Object} [options.zlibInflateOptions] Options to pass to zlib on
        *     inflate
-       * @param {Boolean} [isServer=false] Create the instance in either server or
-       *     client mode
-       * @param {Number} [maxPayload=0] The maximum allowed message length
        */
-      constructor(options, isServer, maxPayload) {
-        this._maxPayload = maxPayload | 0;
+      constructor(options) {
         this._options = options || {};
         this._threshold = this._options.threshold !== void 0 ? this._options.threshold : 1024;
-        this._isServer = !!isServer;
+        this._maxPayload = this._options.maxPayload | 0;
+        this._isServer = !!this._options.isServer;
         this._deflate = null;
         this._inflate = null;
         this.params = null;
@@ -46529,7 +46529,7 @@ var require_permessage_deflate3 = __commonJS({
         });
       }
     };
-    module2.exports = PerMessageDeflate;
+    module2.exports = PerMessageDeflate2;
     function deflateOnData(chunk) {
       this[kBuffers].push(chunk);
       this[kTotalLength] += chunk.length;
@@ -46764,7 +46764,7 @@ var require_receiver3 = __commonJS({
   "node_modules/ws/lib/receiver.js"(exports2, module2) {
     "use strict";
     var { Writable } = require("stream");
-    var PerMessageDeflate = require_permessage_deflate3();
+    var PerMessageDeflate2 = require_permessage_deflate3();
     var {
       BINARY_TYPES,
       EMPTY_BUFFER,
@@ -46931,7 +46931,7 @@ var require_receiver3 = __commonJS({
           return;
         }
         const compressed = (buf[0] & 64) === 64;
-        if (compressed && !this._extensions[PerMessageDeflate.extensionName]) {
+        if (compressed && !this._extensions[PerMessageDeflate2.extensionName]) {
           const error = this.createError(
             RangeError,
             "RSV1 must be clear",
@@ -47175,7 +47175,7 @@ var require_receiver3 = __commonJS({
        * @private
        */
       decompress(data, cb) {
-        const perMessageDeflate = this._extensions[PerMessageDeflate.extensionName];
+        const perMessageDeflate = this._extensions[PerMessageDeflate2.extensionName];
         perMessageDeflate.decompress(data, this._fin, (err, buf) => {
           if (err) return cb(err);
           if (buf.length) {
@@ -47357,7 +47357,10 @@ var require_sender3 = __commonJS({
     "use strict";
     var { Duplex } = require("stream");
     var { randomFillSync } = require("crypto");
-    var PerMessageDeflate = require_permessage_deflate3();
+    var {
+      types: { isUint8Array }
+    } = require("util");
+    var PerMessageDeflate2 = require_permessage_deflate3();
     var { EMPTY_BUFFER, kWebSocket, NOOP } = require_constants12();
     var { isBlob, isValidStatusCode } = require_validation();
     var { mask: applyMask, toBuffer } = require_buffer_util();
@@ -47510,8 +47513,10 @@ var require_sender3 = __commonJS({
           buf.writeUInt16BE(code, 0);
           if (typeof data === "string") {
             buf.write(data, 2);
-          } else {
+          } else if (isUint8Array(data)) {
             buf.set(data, 2);
+          } else {
+            throw new TypeError("Second argument must be a string or a Uint8Array");
           }
         }
         const options = {
@@ -47641,7 +47646,7 @@ var require_sender3 = __commonJS({
        * @public
        */
       send(data, options, cb) {
-        const perMessageDeflate = this._extensions[PerMessageDeflate.extensionName];
+        const perMessageDeflate = this._extensions[PerMessageDeflate2.extensionName];
         let opcode = options.binary ? 2 : 1;
         let rsv1 = options.compress;
         let byteLength;
@@ -47765,7 +47770,7 @@ var require_sender3 = __commonJS({
           this.sendFrame(_Sender.frame(data, options), cb);
           return;
         }
-        const perMessageDeflate = this._extensions[PerMessageDeflate.extensionName];
+        const perMessageDeflate = this._extensions[PerMessageDeflate2.extensionName];
         this._bufferedBytes += options[kByteLength];
         this._state = DEFLATING;
         perMessageDeflate.compress(data, options.fin, (_, buf) => {
@@ -48203,11 +48208,11 @@ var require_extension = __commonJS({
       return offers;
     }
     function format(extensions) {
-      return Object.keys(extensions).map((extension) => {
-        let configurations = extensions[extension];
+      return Object.keys(extensions).map((extension2) => {
+        let configurations = extensions[extension2];
         if (!Array.isArray(configurations)) configurations = [configurations];
         return configurations.map((params) => {
-          return [extension].concat(
+          return [extension2].concat(
             Object.keys(params).map((k) => {
               let values = params[k];
               if (!Array.isArray(values)) values = [values];
@@ -48233,7 +48238,7 @@ var require_websocket3 = __commonJS({
     var { randomBytes, createHash } = require("crypto");
     var { Duplex, Readable } = require("stream");
     var { URL: URL2 } = require("url");
-    var PerMessageDeflate = require_permessage_deflate3();
+    var PerMessageDeflate2 = require_permessage_deflate3();
     var Receiver2 = require_receiver3();
     var Sender2 = require_sender3();
     var { isBlob } = require_validation();
@@ -48441,8 +48446,8 @@ var require_websocket3 = __commonJS({
           this.emit("close", this._closeCode, this._closeMessage);
           return;
         }
-        if (this._extensions[PerMessageDeflate.extensionName]) {
-          this._extensions[PerMessageDeflate.extensionName].cleanup();
+        if (this._extensions[PerMessageDeflate2.extensionName]) {
+          this._extensions[PerMessageDeflate2.extensionName].cleanup();
         }
         this._receiver.removeAllListeners();
         this._readyState = _WebSocket.CLOSED;
@@ -48604,7 +48609,7 @@ var require_websocket3 = __commonJS({
           fin: true,
           ...options
         };
-        if (!this._extensions[PerMessageDeflate.extensionName]) {
+        if (!this._extensions[PerMessageDeflate2.extensionName]) {
           opts.compress = false;
         }
         this._sender.send(data || EMPTY_BUFFER, opts, cb);
@@ -48730,7 +48735,7 @@ var require_websocket3 = __commonJS({
       } else {
         try {
           parsedUrl = new URL2(address);
-        } catch (e) {
+        } catch {
           throw new SyntaxError(`Invalid URL: ${address}`);
         }
       }
@@ -48778,13 +48783,13 @@ var require_websocket3 = __commonJS({
       opts.path = parsedUrl.pathname + parsedUrl.search;
       opts.timeout = opts.handshakeTimeout;
       if (opts.perMessageDeflate) {
-        perMessageDeflate = new PerMessageDeflate(
-          opts.perMessageDeflate !== true ? opts.perMessageDeflate : {},
-          false,
-          opts.maxPayload
-        );
+        perMessageDeflate = new PerMessageDeflate2({
+          ...opts.perMessageDeflate,
+          isServer: false,
+          maxPayload: opts.maxPayload
+        });
         opts.headers["Sec-WebSocket-Extensions"] = format({
-          [PerMessageDeflate.extensionName]: perMessageDeflate.offer()
+          [PerMessageDeflate2.extensionName]: perMessageDeflate.offer()
         });
       }
       if (protocols.length) {
@@ -48927,19 +48932,19 @@ var require_websocket3 = __commonJS({
             return;
           }
           const extensionNames = Object.keys(extensions);
-          if (extensionNames.length !== 1 || extensionNames[0] !== PerMessageDeflate.extensionName) {
+          if (extensionNames.length !== 1 || extensionNames[0] !== PerMessageDeflate2.extensionName) {
             const message = "Server indicated an extension that was not requested";
             abortHandshake(websocket, socket, message);
             return;
           }
           try {
-            perMessageDeflate.accept(extensions[PerMessageDeflate.extensionName]);
+            perMessageDeflate.accept(extensions[PerMessageDeflate2.extensionName]);
           } catch (err) {
             const message = "Invalid Sec-WebSocket-Extensions header";
             abortHandshake(websocket, socket, message);
             return;
           }
-          websocket._extensions[PerMessageDeflate.extensionName] = perMessageDeflate;
+          websocket._extensions[PerMessageDeflate2.extensionName] = perMessageDeflate;
         }
         websocket.setSocket(socket, head, {
           allowSynchronousEvents: opts.allowSynchronousEvents,
@@ -49258,9 +49263,9 @@ var require_websocket_server = __commonJS({
     var http = require("http");
     var { Duplex } = require("stream");
     var { createHash } = require("crypto");
-    var extension = require_extension();
-    var PerMessageDeflate = require_permessage_deflate3();
-    var subprotocol = require_subprotocol();
+    var extension2 = require_extension();
+    var PerMessageDeflate2 = require_permessage_deflate3();
+    var subprotocol2 = require_subprotocol();
     var WebSocket2 = require_websocket3();
     var { CLOSE_TIMEOUT, GUID, kWebSocket } = require_constants12();
     var keyRegex = /^[+/0-9A-Za-z]{22}==$/;
@@ -49483,7 +49488,7 @@ var require_websocket_server = __commonJS({
         let protocols = /* @__PURE__ */ new Set();
         if (secWebSocketProtocol !== void 0) {
           try {
-            protocols = subprotocol.parse(secWebSocketProtocol);
+            protocols = subprotocol2.parse(secWebSocketProtocol);
           } catch (err) {
             const message = "Invalid Sec-WebSocket-Protocol header";
             abortHandshakeOrEmitwsClientError(this, req, socket, 400, message);
@@ -49493,16 +49498,16 @@ var require_websocket_server = __commonJS({
         const secWebSocketExtensions = req.headers["sec-websocket-extensions"];
         const extensions = {};
         if (this.options.perMessageDeflate && secWebSocketExtensions !== void 0) {
-          const perMessageDeflate = new PerMessageDeflate(
-            this.options.perMessageDeflate,
-            true,
-            this.options.maxPayload
-          );
+          const perMessageDeflate = new PerMessageDeflate2({
+            ...this.options.perMessageDeflate,
+            isServer: true,
+            maxPayload: this.options.maxPayload
+          });
           try {
-            const offers = extension.parse(secWebSocketExtensions);
-            if (offers[PerMessageDeflate.extensionName]) {
-              perMessageDeflate.accept(offers[PerMessageDeflate.extensionName]);
-              extensions[PerMessageDeflate.extensionName] = perMessageDeflate;
+            const offers = extension2.parse(secWebSocketExtensions);
+            if (offers[PerMessageDeflate2.extensionName]) {
+              perMessageDeflate.accept(offers[PerMessageDeflate2.extensionName]);
+              extensions[PerMessageDeflate2.extensionName] = perMessageDeflate;
             }
           } catch (err) {
             const message = "Invalid or unacceptable Sec-WebSocket-Extensions header";
@@ -49573,10 +49578,10 @@ var require_websocket_server = __commonJS({
             ws._protocol = protocol;
           }
         }
-        if (extensions[PerMessageDeflate.extensionName]) {
-          const params = extensions[PerMessageDeflate.extensionName].params;
-          const value = extension.format({
-            [PerMessageDeflate.extensionName]: [params]
+        if (extensions[PerMessageDeflate2.extensionName]) {
+          const params = extensions[PerMessageDeflate2.extensionName].params;
+          const value = extension2.format({
+            [PerMessageDeflate2.extensionName]: [params]
           });
           headers.push(`Sec-WebSocket-Extensions: ${value}`);
           ws._extensions = extensions;
@@ -59894,11 +59899,11 @@ var require_core = __commonJS({
     Ajv2.ValidationError = validation_error_1.default;
     Ajv2.MissingRefError = ref_error_1.default;
     exports2.default = Ajv2;
-    function checkOptions(checkOpts, options, msg, log2 = "error") {
+    function checkOptions(checkOpts, options, msg, log = "error") {
       for (const key in checkOpts) {
         const opt = key;
         if (opt in options)
-          this.logger[log2](`${msg}: option ${key}. ${checkOpts[opt]}`);
+          this.logger[log](`${msg}: option ${key}. ${checkOpts[opt]}`);
       }
     }
     function getSchEnv(keyRef) {
@@ -64909,7 +64914,7 @@ async function fetchWrapper(requestOptions) {
       "fetch is not set. Please pass a fetch implementation as new Octokit({ request: { fetch }}). Learn more at https://github.com/octokit/octokit.js/#fetch-missing"
     );
   }
-  const log2 = requestOptions.request?.log || console;
+  const log = requestOptions.request?.log || console;
   const parseSuccessResponseBody = requestOptions.request?.parseSuccessResponseBody !== false;
   const body = isPlainObject2(requestOptions.body) || Array.isArray(requestOptions.body) ? JSONStringify(requestOptions.body) : requestOptions.body;
   const requestHeaders = Object.fromEntries(
@@ -64967,7 +64972,7 @@ async function fetchWrapper(requestOptions) {
   if ("deprecation" in responseHeaders) {
     const matches = responseHeaders.link && responseHeaders.link.match(/<([^<>]+)>; rel="deprecation"/);
     const deprecationLink = matches && matches.pop();
-    log2.warn(
+    log.warn(
       `[@octokit/request] "${requestOptions.method} ${requestOptions.url}" is deprecated. It is scheduled to be removed on ${responseHeaders.sunset}${deprecationLink ? `. See ${deprecationLink}` : ""}`
     );
   }
@@ -69232,29 +69237,6 @@ var LogTag;
   LogTag2["Default"] = "Default";
   LogTag2["Notify"] = "Notify";
 })(LogTag || (LogTag = {}));
-var log = (message, logAsJson, code = Status.Ok, stack, ...tags) => {
-  if (logAsJson) {
-    return logJson(message, code, stack, ...tags);
-  }
-  return logPlain(message, code, stack, ...tags);
-};
-var logPlain = (message, code = Status.Ok, stack, ...tags) => {
-  const tagsString = tags.map((tag) => `, #${tag}`).join("");
-  const logString = `[${code}, ${(/* @__PURE__ */ new Date()).toISOString()}${tagsString}]: ${message}${has(stack) ? "\n" + stack : ""}`;
-  console.log(logString);
-  return logString;
-};
-var logJson = (message, code = Status.Ok, stack, ...tags) => {
-  const logJson2 = JSON.stringify({
-    date: (/* @__PURE__ */ new Date()).toISOString(),
-    stack,
-    message,
-    code,
-    tags
-  });
-  console.log(logJson2);
-  return logJson2;
-};
 
 // packages/utils/common/lib/logger.js
 var LogLevel;
@@ -69547,17 +69529,6 @@ var toError = (e) => {
     return e;
   }
   return new InvalidError(isString(e) ? e : pp`${e}`);
-};
-var catchErrorAsync = async (func, kind = Error) => {
-  try {
-    return await func();
-  } catch (err) {
-    const e = toError(err);
-    if (e instanceof kind) {
-      return e;
-    }
-    throw e;
-  }
 };
 var replaceException = (e, ...filter) => {
   filter.forEach(([trigger, replacement]) => {
@@ -71642,6 +71613,11 @@ var toHasAccessArgs = toObject({
   ...workspaceServiceArgs,
   role: toRole
 });
+var toHasAccessForUserArgs = toObject({
+  ...workspaceServiceArgs,
+  userId: toNonNegativeInteger,
+  role: toRole
+});
 
 // packages/deployment-service/common/lib/model/WorkspaceStatus.js
 var WorkspaceStatus;
@@ -71800,7 +71776,8 @@ var AVAILABLE_INTERNAL_FLAGS = [
   "time-sameDc",
   "vcluster",
   "virtual-machines",
-  "vpn"
+  "vpn",
+  "workspace-ssh"
 ];
 var availableInternalFlags = [...AVAILABLE_INTERNAL_FLAGS];
 var AVAILABLE_ALPHA_FLAGS = [
@@ -72554,290 +72531,6 @@ WorkspaceDeploymentStub = __decorate4([
 // packages/ide/common/lib/api/config.js
 var import_inversify4 = __toESM(require_inversify(), 1);
 
-// packages/utils/common/lib/preconditions.js
-var checkHas = (x, description = "") => {
-  if (has(x)) {
-    return x;
-  }
-  throw new TypeError(`Argument ${description} must not be null or undefined.`);
-};
-
-// packages/utils/common/lib/copy.js
-var copy = (src) => {
-  if (!has(src)) {
-    return src;
-  }
-  const type = typeof src;
-  if (type === "string" || type === "number" || type === "boolean" || type === "symbol") {
-    return src;
-  }
-  if (type === "function") {
-    throw new Error("copy of a function is not yet implemented");
-  }
-  if (Array.isArray(src)) {
-    return src.slice();
-  }
-  if (src instanceof Date) {
-    return new Date(src.getTime());
-  }
-  return Object.assign(Object.create(Object.getPrototypeOf(src)), src);
-};
-
-// packages/utils/common/lib/deepCopy.js
-var deepCopy = (src) => {
-  if (!has(src)) {
-    return src;
-  }
-  const type = typeof src;
-  if (type === "string" || type === "number" || type === "boolean" || type === "symbol") {
-    return src;
-  }
-  if (type === "function") {
-    throw new Error("deepCopy of a function is not yet implemented");
-  }
-  const result = copy(src);
-  if (src instanceof Date) {
-    return result;
-  }
-  for (const propName in result) {
-    result[propName] = deepCopy(result[propName]);
-  }
-  return result;
-};
-
-// packages/utils/common/lib/hasAll.js
-var hasAll = (...objects) => objects.every(has);
-
-// packages/reply/common/lib/Reply.js
-var UnexpectedOkError = class extends Error {
-  constructor() {
-    super("A reply with StatusCode.OK does not store an errorMessage. Did you mean .getValue()?");
-  }
-};
-var UnexpectedNotOkError = class extends Error {
-  constructor(errorMessage) {
-    super(`A reply with StatusCode.ERROR is not intended to hold any data. Did you mean .getMessage()?Error message: ${errorMessage}`);
-  }
-};
-var UnparsableReply = class extends Exception {
-  constructor(reply) {
-    super(`The reply could not be parsed: ${reply}`);
-  }
-};
-var Reply = class _Reply {
-  static all(...replies) {
-    for (const reply of replies) {
-      if (reply.notOk()) {
-        return _Reply.collectErrors(...replies);
-      }
-    }
-    return _Reply.getOk();
-  }
-  static okReply(data) {
-    return new _Reply({
-      code: Status.Ok,
-      data
-    }, void 0);
-  }
-  static okStatus(message) {
-    return new _Reply({
-      code: Status.Ok,
-      data: message
-    }, void 0);
-  }
-  static errStatus(message, stack, errScope = "internal") {
-    if (typeof message === "string") {
-      return new _Reply({
-        code: Status.Error,
-        errName: Error.name,
-        errMessage: message
-      }, stack ?? new Error().stack, errScope);
-    }
-    return _Reply.createFromError(message);
-  }
-  static getOk() {
-    return _Reply.OK;
-  }
-  static createFromSerializedReply(reply) {
-    if (!has(reply) || !(has(reply.code) && reply.code in Status) && (!has(reply.data) || !has(reply.errMessage))) {
-      return _Reply.getUnparseable(JSON.stringify(reply));
-    }
-    return new _Reply(reply, reply.code === Status.Ok ? void 0 : new Error().stack);
-  }
-  static createFromError(err) {
-    if (!has(err) || !hasAll(err.message, err.stack)) {
-      return _Reply.getUnparseable(JSON.stringify(err));
-    }
-    return new _Reply({
-      code: Status.Error,
-      errName: err.name,
-      errMessage: err.message
-    }, err.stack ?? new Error().stack, err instanceof Exception ? err.scope : "internal");
-  }
-  static setLogAsJson(logAsJson) {
-    _Reply.logAsJson = logAsJson;
-  }
-  static collectErrors(...replies) {
-    const failedReplys = replies.filter((reply) => reply.notOk());
-    const message = failedReplys.map((reply) => reply.getErrorMessage()).join("\n");
-    const stack = failedReplys.map((reply) => reply.stack).join("\n\n");
-    return failedReplys.length === 0 ? _Reply.getOk() : _Reply.errStatus(message, stack);
-  }
-  static getUnparseable(reply) {
-    return _Reply.createFromError(new UnparsableReply(reply));
-  }
-  constructor(reply, stack, errScope = "internal") {
-    this.errScope = errScope;
-    this.serializedReply = reply;
-    this.stack = stack;
-  }
-  ok() {
-    return this.serializedReply.code === Status.Ok;
-  }
-  notOk() {
-    return !this.ok();
-  }
-  toSerializedReply() {
-    return deepCopy(this.serializedReply);
-  }
-  and(otherReply) {
-    return _Reply.all(this, otherReply);
-  }
-  getErrorName() {
-    if (this.ok()) {
-      throw new UnexpectedOkError();
-    }
-    return this.serializedReply.errName;
-  }
-  getErrorMessage() {
-    if (this.ok()) {
-      throw new UnexpectedOkError();
-    }
-    return this.serializedReply.errMessage;
-  }
-  getValue() {
-    if (this.notOk()) {
-      throw new UnexpectedNotOkError(this.serializedReply.errMessage);
-    }
-    return this.serializedReply.data;
-  }
-  log(...tags) {
-    if (this.notOk()) {
-      log(this.getErrorMessage(), _Reply.logAsJson, Status.Error, this.stack, ...tags);
-    } else {
-      log(JSON.stringify(this.getValue()), _Reply.logAsJson, this.serializedReply.code, this.stack, ...tags);
-    }
-    return this;
-  }
-  logIfError() {
-    if (this.notOk()) {
-      this.log();
-    }
-    return this;
-  }
-  throwIfError() {
-    if (this.ok()) {
-      return this;
-    }
-    const err = new Error(this.getErrorMessage());
-    err.name = this.getErrorName() ?? Error.name;
-    if (has(this.stack)) {
-      err.stack = this.stack;
-    }
-    throw err;
-  }
-};
-Reply.OK = new Reply({
-  code: Status.Ok
-}, void 0);
-Reply.logAsJson = false;
-var okStatus = Reply.okStatus;
-var errStatus = Reply.errStatus;
-var okReply = Reply.okReply;
-var getOk = Reply.getOk;
-
-// packages/reply/common/lib/utils/exceptions.js
-var ReplyException = class extends Exception {
-  constructor(reply, opts) {
-    super(reply.getErrorMessage(), opts);
-    this.reply = reply;
-  }
-};
-
-// packages/reply/common/lib/compat.js
-var voidReply = Reply.getOk();
-var fromReply = (r) => {
-  if (r.notOk()) {
-    throw new ReplyException(r, { scope: r.errScope });
-  }
-  return r.getValue();
-};
-var fromReplyRethrowing = async (fn, ...throwers) => {
-  const isThrower = (i) => !Array.isArray(i);
-  const rethrowers = throwers.slice(0, -1);
-  const thrower = throwers.slice(-1)[0];
-  if (!has(thrower) || !isThrower(thrower) || rethrowers.some((x) => isThrower(x))) {
-    throw new InvalidArgument3("Expected an array of rethrowers with a thrower as a last argument");
-  }
-  try {
-    return fromReply(await fn());
-  } catch (e) {
-    const re2 = e;
-    checkHas(re2.reply, "replyException.reply");
-    const rethrower = rethrowers.find(([error]) => error.name === re2.reply.getErrorName());
-    if (has(rethrower)) {
-      throw rethrower[1](re2);
-    }
-    throw thrower(re2);
-  }
-};
-var valueOrErrorToReply = (v) => {
-  return v instanceof Error ? Reply.createFromError(v) : Reply.okReply(v);
-};
-var toReplyAsync = async (func) => {
-  return valueOrErrorToReply(await catchErrorAsync(func));
-};
-
-// packages/streamy/common/lib/extensions/compat.js
-var createReplyStubSubClass = (spec, base) => {
-  class Klass extends base {
-  }
-  const p = Klass.prototype;
-  for (const [name, m] of Object.entries(spec.methods)) {
-    switch (m.kind) {
-      case "rpc":
-        p[name] = async function(req, opts) {
-          const finalOpts = m.defaultOptions || opts ? { ...m.defaultOptions, ...opts } : void 0;
-          return await toReplyAsync(async () => m.response(await this.client.call({
-            service: spec.name,
-            method: name,
-            data: req,
-            context: this.context,
-            opts: finalOpts
-          })));
-        };
-        break;
-      case "stream":
-        p[name] = function() {
-          return this.client.stream({
-            service: spec.name,
-            method: name,
-            toQuery: m.request,
-            toResponse: m.response,
-            context: this.context
-          });
-        };
-        break;
-    }
-  }
-  return Klass;
-};
-var createAuthnReplyStubClass = (name, spec) => {
-  const klass = createReplyStubSubClass(spec, AuthnStub);
-  klass.ID = serviceId(name);
-  return klass;
-};
-
 // packages/auth/common/lib/oauth.js
 var baseOAuthProviders = [
   "bitbucket",
@@ -73011,11 +72704,6 @@ var ConfigStub = class ConfigStub2 extends createAuthnStubClass("ConfigStub", co
 ConfigStub = __decorate5([
   (0, import_inversify4.injectable)()
 ], ConfigStub);
-var ConfigReplyStub = class ConfigReplyStub2 extends createAuthnReplyStubClass("configReplyStub", configService) {
-};
-ConfigReplyStub = __decorate5([
-  (0, import_inversify4.injectable)()
-], ConfigReplyStub);
 
 // packages/ide/common/lib/api/gitAuth.js
 var import_inversify5 = __toESM(require_inversify(), 1);
@@ -74881,8 +74569,11 @@ var doCreateStubUtils = (opts) => {
 
 // node_modules/ws/wrapper.mjs
 var import_stream2 = __toESM(require_stream(), 1);
+var import_extension = __toESM(require_extension(), 1);
+var import_permessage_deflate = __toESM(require_permessage_deflate3(), 1);
 var import_receiver = __toESM(require_receiver3(), 1);
 var import_sender = __toESM(require_sender3(), 1);
+var import_subprotocol = __toESM(require_subprotocol(), 1);
 var import_websocket2 = __toESM(require_websocket3(), 1);
 var import_websocket_server = __toESM(require_websocket_server(), 1);
 var wrapper_default = import_websocket2.default;
@@ -75904,6 +75595,49 @@ var listWorkspacePlans = async (db) => {
   });
 };
 
+// packages/utils/common/lib/copy.js
+var copy = (src) => {
+  if (!has(src)) {
+    return src;
+  }
+  const type = typeof src;
+  if (type === "string" || type === "number" || type === "boolean" || type === "symbol") {
+    return src;
+  }
+  if (type === "function") {
+    throw new Error("copy of a function is not yet implemented");
+  }
+  if (Array.isArray(src)) {
+    return src.slice();
+  }
+  if (src instanceof Date) {
+    return new Date(src.getTime());
+  }
+  return Object.assign(Object.create(Object.getPrototypeOf(src)), src);
+};
+
+// packages/utils/common/lib/deepCopy.js
+var deepCopy = (src) => {
+  if (!has(src)) {
+    return src;
+  }
+  const type = typeof src;
+  if (type === "string" || type === "number" || type === "boolean" || type === "symbol") {
+    return src;
+  }
+  if (type === "function") {
+    throw new Error("deepCopy of a function is not yet implemented");
+  }
+  const result = copy(src);
+  if (src instanceof Date) {
+    return result;
+  }
+  for (const propName in result) {
+    result[propName] = deepCopy(result[propName]);
+  }
+  return result;
+};
+
 // packages/utils/common/lib/equal.js
 var equal = (value, other) => {
   if (value === other) {
@@ -75974,6 +75708,14 @@ var cached = (timeout, f) => {
     lastFinishedMs = void 0;
   };
   return cached2;
+};
+
+// packages/utils/common/lib/preconditions.js
+var checkHas = (x, description = "") => {
+  if (has(x)) {
+    return x;
+  }
+  throw new TypeError(`Argument ${description} must not be null or undefined.`);
 };
 
 // packages/payment-service/node/lib/data-access/Products.js
@@ -76569,6 +76311,11 @@ var teamServiceArgs = {
   teamId: readOnly(toNonNegativeInteger)
 };
 var toTeamServiceArgs = toObject(teamServiceArgs);
+var teamServiceForUserArgs = {
+  teamId: readOnly(toNonNegativeInteger),
+  userId: readOnly(toNonNegativeInteger)
+};
+var toTeamServiceForUserArgs = toObject(teamServiceForUserArgs);
 var toCreateTeamArgs = toObject({
   name: readOnly(toNonEmptyStringWithMaxLength(MAX_TEAM_NAME_LENGTH)),
   dc: toUndefOr(toNumber),
@@ -76648,6 +76395,10 @@ var workspacesService = {
     }),
     hasAccess: rpc({
       request: toHasAccessArgs,
+      response: toVoid
+    }),
+    hasAccessForUser: rpc({
+      request: toHasAccessForUserArgs,
       response: toVoid
     }),
     isSameDataCenter: rpc({
@@ -77500,7 +77251,7 @@ var startLogStream = (pipeline, workspaceId, stage, step) => restreamOnError(() 
   });
   while (true) {
     const logs = await s.recv();
-    logs.forEach((log2) => logI(`[Pipeline ${stage}[${step}]] ${log2.data}`));
+    logs.forEach((log) => logI(`[Pipeline ${stage}[${step}]] ${log.data}`));
   }
 });
 var waitForWorkspaceStatus = async (replicaStub, workspaceId, fulfillsCondition) => {
@@ -77745,6 +77496,10 @@ var teamService = {
       request: toTeamServiceArgs,
       response: toBoolean
     }),
+    hasAdminAccessForUser: rpc({
+      request: toTeamServiceForUserArgs,
+      response: toBoolean
+    }),
     reactivateDeletedUserTeams: rpc({
       request: toVoid,
       response: toArray(toTeamWithRole),
@@ -77752,6 +77507,10 @@ var teamService = {
     }),
     hasMemberAccess: rpc({
       request: toTeamServiceArgs,
+      response: toBoolean
+    }),
+    hasMemberAccessForUser: rpc({
+      request: toTeamServiceForUserArgs,
       response: toBoolean
     }),
     changeRole: rpc({
@@ -78678,11 +78437,6 @@ LandscapeStub = __decorate21([
 var DEFAULT_PLAN_TITLE = "Boost";
 var deploymentLinkTypes = ["dev-domain", "preview"];
 var toDeploymentLinkType = toUndefOr(toNullOr(toLiteralUnion("DeploymentLinkType", deploymentLinkTypes)));
-var GetBrowserConfigFailed = class extends Exception {
-  constructor(msg) {
-    super(msg);
-  }
-};
 var codesphereWorkspaceUrl = (apiUrl, w) => {
   return new URL(import_path3.default.posix.join(apiUrl.pathname, `/ide/teams/${w.teamId}/workspaces/${w.id}`), apiUrl);
 };
@@ -78756,7 +78510,7 @@ var withStubs = async (dataCenterId, creds, serviceUrlDc, fn) => {
       workspaces: await createStub("workspace-service", WorkspacesStub),
       products: await createStub("payment-service", ProductsStub),
       process: await createStub("workspace-proxy", ProcessProxyStub),
-      config: await createStub("ide-service", ConfigReplyStub),
+      config: await createStub("ide-service", ConfigStub),
       git: await createStub("ide-service", GitAuthStub)
     });
   } finally {
@@ -78908,7 +78662,7 @@ var getEnvironmentUrl = async (c, w, config) => {
   if (c.deploymentLinkType === "preview") {
     return codespherePreviewUrl(c.apiUrl, w).toString();
   }
-  const { workspaceHostingBaseDomain } = await fromReplyRethrowing(() => config.getBrowserConfig(), (e) => new GetBrowserConfigFailed(e.message));
+  const { workspaceHostingBaseDomain } = await config.getBrowserConfig();
   return `https://${workspaceDevDomain(w.id, workspaceHostingBaseDomain)}`;
 };
 var isProviderSupported = async (repo, gitStub) => {
