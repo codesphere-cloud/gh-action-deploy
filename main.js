@@ -3347,14 +3347,14 @@ var require_templates = __commonJS({
       return results;
     }
     function buildStyle(chalk2, styles) {
-      const enabled3 = {};
+      const enabled = {};
       for (const layer of styles) {
         for (const style of layer.styles) {
-          enabled3[style[0]] = layer.inverse ? null : style.slice(1);
+          enabled[style[0]] = layer.inverse ? null : style.slice(1);
         }
       }
       let current = chalk2;
-      for (const [styleName, styles2] of Object.entries(enabled3)) {
+      for (const [styleName, styles2] of Object.entries(enabled)) {
         if (!Array.isArray(styles2)) {
           continue;
         }
@@ -20581,7 +20581,7 @@ var require_permessage_deflate = __commonJS({
     var kBuffer = /* @__PURE__ */ Symbol("kBuffer");
     var kLength = /* @__PURE__ */ Symbol("kLength");
     var kDefaultMaxDecompressedSize = 4 * 1024 * 1024;
-    var PerMessageDeflate = class {
+    var PerMessageDeflate2 = class {
       /** @type {import('node:zlib').InflateRaw} */
       #inflate;
       #options = {};
@@ -20659,7 +20659,7 @@ var require_permessage_deflate = __commonJS({
         });
       }
     };
-    module2.exports = { PerMessageDeflate };
+    module2.exports = { PerMessageDeflate: PerMessageDeflate2 };
   }
 });
 
@@ -20684,7 +20684,7 @@ var require_receiver = __commonJS({
     } = require_util8();
     var { WebsocketFrameSend } = require_frame();
     var { closeWebSocketConnection } = require_connection();
-    var { PerMessageDeflate } = require_permessage_deflate();
+    var { PerMessageDeflate: PerMessageDeflate2 } = require_permessage_deflate();
     var ByteParser = class extends Writable {
       #buffers = [];
       #byteOffset = 0;
@@ -20703,7 +20703,7 @@ var require_receiver = __commonJS({
         this.ws = ws;
         this.#extensions = extensions == null ? /* @__PURE__ */ new Map() : extensions;
         if (this.#extensions.has("permessage-deflate")) {
-          this.#extensions.set("permessage-deflate", new PerMessageDeflate(extensions));
+          this.#extensions.set("permessage-deflate", new PerMessageDeflate2(extensions));
         }
       }
       /**
@@ -38983,7 +38983,7 @@ var require_permessage_deflate2 = __commonJS({
     var kBuffer = /* @__PURE__ */ Symbol("kBuffer");
     var kLength = /* @__PURE__ */ Symbol("kLength");
     var kDefaultMaxDecompressedSize = 4 * 1024 * 1024;
-    var PerMessageDeflate = class {
+    var PerMessageDeflate2 = class {
       /** @type {import('node:zlib').InflateRaw} */
       #inflate;
       #options = {};
@@ -39061,7 +39061,7 @@ var require_permessage_deflate2 = __commonJS({
         });
       }
     };
-    module2.exports = { PerMessageDeflate };
+    module2.exports = { PerMessageDeflate: PerMessageDeflate2 };
   }
 });
 
@@ -39086,7 +39086,7 @@ var require_receiver2 = __commonJS({
     } = require_util16();
     var { WebsocketFrameSend } = require_frame2();
     var { closeWebSocketConnection } = require_connection2();
-    var { PerMessageDeflate } = require_permessage_deflate2();
+    var { PerMessageDeflate: PerMessageDeflate2 } = require_permessage_deflate2();
     var ByteParser = class extends Writable {
       #buffers = [];
       #byteOffset = 0;
@@ -39105,7 +39105,7 @@ var require_receiver2 = __commonJS({
         this.ws = ws;
         this.#extensions = extensions == null ? /* @__PURE__ */ new Map() : extensions;
         if (this.#extensions.has("permessage-deflate")) {
-          this.#extensions.set("permessage-deflate", new PerMessageDeflate(extensions));
+          this.#extensions.set("permessage-deflate", new PerMessageDeflate2(extensions));
         }
       }
       /**
@@ -40648,10 +40648,10 @@ var require_lib = __commonJS({
       Headers4["Accept"] = "accept";
       Headers4["ContentType"] = "content-type";
     })(Headers3 || (exports2.Headers = Headers3 = {}));
-    var MediaTypes2;
-    (function(MediaTypes3) {
-      MediaTypes3["ApplicationJson"] = "application/json";
-    })(MediaTypes2 || (exports2.MediaTypes = MediaTypes2 = {}));
+    var MediaTypes3;
+    (function(MediaTypes4) {
+      MediaTypes4["ApplicationJson"] = "application/json";
+    })(MediaTypes3 || (exports2.MediaTypes = MediaTypes3 = {}));
     function getProxyUrl2(serverUrl) {
       const proxyUrl = pm.getProxyUrl(new URL(serverUrl));
       return proxyUrl ? proxyUrl.href : "";
@@ -40800,7 +40800,7 @@ var require_lib = __commonJS({
        */
       getJson(requestUrl_1) {
         return __awaiter3(this, arguments, void 0, function* (requestUrl, additionalHeaders = {}) {
-          additionalHeaders[Headers3.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers3.Accept, MediaTypes2.ApplicationJson);
+          additionalHeaders[Headers3.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers3.Accept, MediaTypes3.ApplicationJson);
           const res = yield this.get(requestUrl, additionalHeaders);
           return this._processResponse(res, this.requestOptions);
         });
@@ -40808,8 +40808,8 @@ var require_lib = __commonJS({
       postJson(requestUrl_1, obj_1) {
         return __awaiter3(this, arguments, void 0, function* (requestUrl, obj, additionalHeaders = {}) {
           const data = JSON.stringify(obj, null, 2);
-          additionalHeaders[Headers3.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers3.Accept, MediaTypes2.ApplicationJson);
-          additionalHeaders[Headers3.ContentType] = this._getExistingOrDefaultContentTypeHeader(additionalHeaders, MediaTypes2.ApplicationJson);
+          additionalHeaders[Headers3.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers3.Accept, MediaTypes3.ApplicationJson);
+          additionalHeaders[Headers3.ContentType] = this._getExistingOrDefaultContentTypeHeader(additionalHeaders, MediaTypes3.ApplicationJson);
           const res = yield this.post(requestUrl, data, additionalHeaders);
           return this._processResponse(res, this.requestOptions);
         });
@@ -40817,8 +40817,8 @@ var require_lib = __commonJS({
       putJson(requestUrl_1, obj_1) {
         return __awaiter3(this, arguments, void 0, function* (requestUrl, obj, additionalHeaders = {}) {
           const data = JSON.stringify(obj, null, 2);
-          additionalHeaders[Headers3.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers3.Accept, MediaTypes2.ApplicationJson);
-          additionalHeaders[Headers3.ContentType] = this._getExistingOrDefaultContentTypeHeader(additionalHeaders, MediaTypes2.ApplicationJson);
+          additionalHeaders[Headers3.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers3.Accept, MediaTypes3.ApplicationJson);
+          additionalHeaders[Headers3.ContentType] = this._getExistingOrDefaultContentTypeHeader(additionalHeaders, MediaTypes3.ApplicationJson);
           const res = yield this.put(requestUrl, data, additionalHeaders);
           return this._processResponse(res, this.requestOptions);
         });
@@ -40826,8 +40826,8 @@ var require_lib = __commonJS({
       patchJson(requestUrl_1, obj_1) {
         return __awaiter3(this, arguments, void 0, function* (requestUrl, obj, additionalHeaders = {}) {
           const data = JSON.stringify(obj, null, 2);
-          additionalHeaders[Headers3.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers3.Accept, MediaTypes2.ApplicationJson);
-          additionalHeaders[Headers3.ContentType] = this._getExistingOrDefaultContentTypeHeader(additionalHeaders, MediaTypes2.ApplicationJson);
+          additionalHeaders[Headers3.Accept] = this._getExistingOrDefaultHeader(additionalHeaders, Headers3.Accept, MediaTypes3.ApplicationJson);
+          additionalHeaders[Headers3.ContentType] = this._getExistingOrDefaultContentTypeHeader(additionalHeaders, MediaTypes3.ApplicationJson);
           const res = yield this.patch(requestUrl, data, additionalHeaders);
           return this._processResponse(res, this.requestOptions);
         });
@@ -46191,7 +46191,7 @@ var require_permessage_deflate3 = __commonJS({
     var kBuffers = /* @__PURE__ */ Symbol("buffers");
     var kError = /* @__PURE__ */ Symbol("error");
     var zlibLimiter;
-    var PerMessageDeflate = class {
+    var PerMessageDeflate2 = class {
       /**
        * Creates a PerMessageDeflate instance.
        *
@@ -46202,6 +46202,9 @@ var require_permessage_deflate3 = __commonJS({
        *     acknowledge disabling of client context takeover
        * @param {Number} [options.concurrencyLimit=10] The number of concurrent
        *     calls to zlib
+       * @param {Boolean} [options.isServer=false] Create the instance in either
+       *     server or client mode
+       * @param {Number} [options.maxPayload=0] The maximum allowed message length
        * @param {(Boolean|Number)} [options.serverMaxWindowBits] Request/confirm the
        *     use of a custom server window size
        * @param {Boolean} [options.serverNoContextTakeover=false] Request/accept
@@ -46212,15 +46215,12 @@ var require_permessage_deflate3 = __commonJS({
        *     deflate
        * @param {Object} [options.zlibInflateOptions] Options to pass to zlib on
        *     inflate
-       * @param {Boolean} [isServer=false] Create the instance in either server or
-       *     client mode
-       * @param {Number} [maxPayload=0] The maximum allowed message length
        */
-      constructor(options, isServer, maxPayload) {
-        this._maxPayload = maxPayload | 0;
+      constructor(options) {
         this._options = options || {};
         this._threshold = this._options.threshold !== void 0 ? this._options.threshold : 1024;
-        this._isServer = !!isServer;
+        this._maxPayload = this._options.maxPayload | 0;
+        this._isServer = !!this._options.isServer;
         this._deflate = null;
         this._inflate = null;
         this.params = null;
@@ -46529,7 +46529,7 @@ var require_permessage_deflate3 = __commonJS({
         });
       }
     };
-    module2.exports = PerMessageDeflate;
+    module2.exports = PerMessageDeflate2;
     function deflateOnData(chunk) {
       this[kBuffers].push(chunk);
       this[kTotalLength] += chunk.length;
@@ -46764,7 +46764,7 @@ var require_receiver3 = __commonJS({
   "node_modules/ws/lib/receiver.js"(exports2, module2) {
     "use strict";
     var { Writable } = require("stream");
-    var PerMessageDeflate = require_permessage_deflate3();
+    var PerMessageDeflate2 = require_permessage_deflate3();
     var {
       BINARY_TYPES,
       EMPTY_BUFFER,
@@ -46931,7 +46931,7 @@ var require_receiver3 = __commonJS({
           return;
         }
         const compressed = (buf[0] & 64) === 64;
-        if (compressed && !this._extensions[PerMessageDeflate.extensionName]) {
+        if (compressed && !this._extensions[PerMessageDeflate2.extensionName]) {
           const error = this.createError(
             RangeError,
             "RSV1 must be clear",
@@ -47175,7 +47175,7 @@ var require_receiver3 = __commonJS({
        * @private
        */
       decompress(data, cb) {
-        const perMessageDeflate = this._extensions[PerMessageDeflate.extensionName];
+        const perMessageDeflate = this._extensions[PerMessageDeflate2.extensionName];
         perMessageDeflate.decompress(data, this._fin, (err, buf) => {
           if (err) return cb(err);
           if (buf.length) {
@@ -47357,7 +47357,10 @@ var require_sender3 = __commonJS({
     "use strict";
     var { Duplex } = require("stream");
     var { randomFillSync } = require("crypto");
-    var PerMessageDeflate = require_permessage_deflate3();
+    var {
+      types: { isUint8Array }
+    } = require("util");
+    var PerMessageDeflate2 = require_permessage_deflate3();
     var { EMPTY_BUFFER, kWebSocket, NOOP } = require_constants12();
     var { isBlob, isValidStatusCode } = require_validation();
     var { mask: applyMask, toBuffer } = require_buffer_util();
@@ -47510,8 +47513,10 @@ var require_sender3 = __commonJS({
           buf.writeUInt16BE(code, 0);
           if (typeof data === "string") {
             buf.write(data, 2);
-          } else {
+          } else if (isUint8Array(data)) {
             buf.set(data, 2);
+          } else {
+            throw new TypeError("Second argument must be a string or a Uint8Array");
           }
         }
         const options = {
@@ -47641,7 +47646,7 @@ var require_sender3 = __commonJS({
        * @public
        */
       send(data, options, cb) {
-        const perMessageDeflate = this._extensions[PerMessageDeflate.extensionName];
+        const perMessageDeflate = this._extensions[PerMessageDeflate2.extensionName];
         let opcode = options.binary ? 2 : 1;
         let rsv1 = options.compress;
         let byteLength;
@@ -47765,7 +47770,7 @@ var require_sender3 = __commonJS({
           this.sendFrame(_Sender.frame(data, options), cb);
           return;
         }
-        const perMessageDeflate = this._extensions[PerMessageDeflate.extensionName];
+        const perMessageDeflate = this._extensions[PerMessageDeflate2.extensionName];
         this._bufferedBytes += options[kByteLength];
         this._state = DEFLATING;
         perMessageDeflate.compress(data, options.fin, (_, buf) => {
@@ -48203,11 +48208,11 @@ var require_extension = __commonJS({
       return offers;
     }
     function format(extensions) {
-      return Object.keys(extensions).map((extension) => {
-        let configurations = extensions[extension];
+      return Object.keys(extensions).map((extension2) => {
+        let configurations = extensions[extension2];
         if (!Array.isArray(configurations)) configurations = [configurations];
         return configurations.map((params) => {
-          return [extension].concat(
+          return [extension2].concat(
             Object.keys(params).map((k) => {
               let values = params[k];
               if (!Array.isArray(values)) values = [values];
@@ -48233,7 +48238,7 @@ var require_websocket3 = __commonJS({
     var { randomBytes, createHash } = require("crypto");
     var { Duplex, Readable } = require("stream");
     var { URL: URL2 } = require("url");
-    var PerMessageDeflate = require_permessage_deflate3();
+    var PerMessageDeflate2 = require_permessage_deflate3();
     var Receiver2 = require_receiver3();
     var Sender2 = require_sender3();
     var { isBlob } = require_validation();
@@ -48441,8 +48446,8 @@ var require_websocket3 = __commonJS({
           this.emit("close", this._closeCode, this._closeMessage);
           return;
         }
-        if (this._extensions[PerMessageDeflate.extensionName]) {
-          this._extensions[PerMessageDeflate.extensionName].cleanup();
+        if (this._extensions[PerMessageDeflate2.extensionName]) {
+          this._extensions[PerMessageDeflate2.extensionName].cleanup();
         }
         this._receiver.removeAllListeners();
         this._readyState = _WebSocket.CLOSED;
@@ -48604,7 +48609,7 @@ var require_websocket3 = __commonJS({
           fin: true,
           ...options
         };
-        if (!this._extensions[PerMessageDeflate.extensionName]) {
+        if (!this._extensions[PerMessageDeflate2.extensionName]) {
           opts.compress = false;
         }
         this._sender.send(data || EMPTY_BUFFER, opts, cb);
@@ -48730,7 +48735,7 @@ var require_websocket3 = __commonJS({
       } else {
         try {
           parsedUrl = new URL2(address);
-        } catch (e) {
+        } catch {
           throw new SyntaxError(`Invalid URL: ${address}`);
         }
       }
@@ -48778,13 +48783,13 @@ var require_websocket3 = __commonJS({
       opts.path = parsedUrl.pathname + parsedUrl.search;
       opts.timeout = opts.handshakeTimeout;
       if (opts.perMessageDeflate) {
-        perMessageDeflate = new PerMessageDeflate(
-          opts.perMessageDeflate !== true ? opts.perMessageDeflate : {},
-          false,
-          opts.maxPayload
-        );
+        perMessageDeflate = new PerMessageDeflate2({
+          ...opts.perMessageDeflate,
+          isServer: false,
+          maxPayload: opts.maxPayload
+        });
         opts.headers["Sec-WebSocket-Extensions"] = format({
-          [PerMessageDeflate.extensionName]: perMessageDeflate.offer()
+          [PerMessageDeflate2.extensionName]: perMessageDeflate.offer()
         });
       }
       if (protocols.length) {
@@ -48927,19 +48932,19 @@ var require_websocket3 = __commonJS({
             return;
           }
           const extensionNames = Object.keys(extensions);
-          if (extensionNames.length !== 1 || extensionNames[0] !== PerMessageDeflate.extensionName) {
+          if (extensionNames.length !== 1 || extensionNames[0] !== PerMessageDeflate2.extensionName) {
             const message = "Server indicated an extension that was not requested";
             abortHandshake(websocket, socket, message);
             return;
           }
           try {
-            perMessageDeflate.accept(extensions[PerMessageDeflate.extensionName]);
+            perMessageDeflate.accept(extensions[PerMessageDeflate2.extensionName]);
           } catch (err) {
             const message = "Invalid Sec-WebSocket-Extensions header";
             abortHandshake(websocket, socket, message);
             return;
           }
-          websocket._extensions[PerMessageDeflate.extensionName] = perMessageDeflate;
+          websocket._extensions[PerMessageDeflate2.extensionName] = perMessageDeflate;
         }
         websocket.setSocket(socket, head, {
           allowSynchronousEvents: opts.allowSynchronousEvents,
@@ -49258,9 +49263,9 @@ var require_websocket_server = __commonJS({
     var http = require("http");
     var { Duplex } = require("stream");
     var { createHash } = require("crypto");
-    var extension = require_extension();
-    var PerMessageDeflate = require_permessage_deflate3();
-    var subprotocol = require_subprotocol();
+    var extension2 = require_extension();
+    var PerMessageDeflate2 = require_permessage_deflate3();
+    var subprotocol2 = require_subprotocol();
     var WebSocket2 = require_websocket3();
     var { CLOSE_TIMEOUT, GUID, kWebSocket } = require_constants12();
     var keyRegex = /^[+/0-9A-Za-z]{22}==$/;
@@ -49483,7 +49488,7 @@ var require_websocket_server = __commonJS({
         let protocols = /* @__PURE__ */ new Set();
         if (secWebSocketProtocol !== void 0) {
           try {
-            protocols = subprotocol.parse(secWebSocketProtocol);
+            protocols = subprotocol2.parse(secWebSocketProtocol);
           } catch (err) {
             const message = "Invalid Sec-WebSocket-Protocol header";
             abortHandshakeOrEmitwsClientError(this, req, socket, 400, message);
@@ -49493,16 +49498,16 @@ var require_websocket_server = __commonJS({
         const secWebSocketExtensions = req.headers["sec-websocket-extensions"];
         const extensions = {};
         if (this.options.perMessageDeflate && secWebSocketExtensions !== void 0) {
-          const perMessageDeflate = new PerMessageDeflate(
-            this.options.perMessageDeflate,
-            true,
-            this.options.maxPayload
-          );
+          const perMessageDeflate = new PerMessageDeflate2({
+            ...this.options.perMessageDeflate,
+            isServer: true,
+            maxPayload: this.options.maxPayload
+          });
           try {
-            const offers = extension.parse(secWebSocketExtensions);
-            if (offers[PerMessageDeflate.extensionName]) {
-              perMessageDeflate.accept(offers[PerMessageDeflate.extensionName]);
-              extensions[PerMessageDeflate.extensionName] = perMessageDeflate;
+            const offers = extension2.parse(secWebSocketExtensions);
+            if (offers[PerMessageDeflate2.extensionName]) {
+              perMessageDeflate.accept(offers[PerMessageDeflate2.extensionName]);
+              extensions[PerMessageDeflate2.extensionName] = perMessageDeflate;
             }
           } catch (err) {
             const message = "Invalid or unacceptable Sec-WebSocket-Extensions header";
@@ -49573,10 +49578,10 @@ var require_websocket_server = __commonJS({
             ws._protocol = protocol;
           }
         }
-        if (extensions[PerMessageDeflate.extensionName]) {
-          const params = extensions[PerMessageDeflate.extensionName].params;
-          const value = extension.format({
-            [PerMessageDeflate.extensionName]: [params]
+        if (extensions[PerMessageDeflate2.extensionName]) {
+          const params = extensions[PerMessageDeflate2.extensionName].params;
+          const value = extension2.format({
+            [PerMessageDeflate2.extensionName]: [params]
           });
           headers.push(`Sec-WebSocket-Extensions: ${value}`);
           ws._extensions = extensions;
@@ -54832,8 +54837,8 @@ var require_pg_pool = __commonJS({
           }
           return this._remove(client, this._pulseQueue.bind(this));
         }
-        const isExpired = this._expired.has(client);
-        if (isExpired) {
+        const isExpired2 = this._expired.has(client);
+        if (isExpired2) {
           this.log("remove expired client");
           this._expired.delete(client);
           return this._remove(client, this._pulseQueue.bind(this));
@@ -58734,92 +58739,65 @@ var require_data = __commonJS({
   }
 });
 
-// node_modules/fast-uri/lib/scopedChars.js
-var require_scopedChars = __commonJS({
-  "node_modules/fast-uri/lib/scopedChars.js"(exports2, module2) {
-    "use strict";
-    var HEX = {
-      0: 0,
-      1: 1,
-      2: 2,
-      3: 3,
-      4: 4,
-      5: 5,
-      6: 6,
-      7: 7,
-      8: 8,
-      9: 9,
-      a: 10,
-      A: 10,
-      b: 11,
-      B: 11,
-      c: 12,
-      C: 12,
-      d: 13,
-      D: 13,
-      e: 14,
-      E: 14,
-      f: 15,
-      F: 15
-    };
-    module2.exports = {
-      HEX
-    };
-  }
-});
-
 // node_modules/fast-uri/lib/utils.js
 var require_utils5 = __commonJS({
   "node_modules/fast-uri/lib/utils.js"(exports2, module2) {
     "use strict";
-    var { HEX } = require_scopedChars();
-    var IPV4_REG = /^(?:(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)$/u;
-    function normalizeIPv4(host) {
-      if (findToken(host, ".") < 3) {
-        return { host, isIPV4: false };
-      }
-      const matches = host.match(IPV4_REG) || [];
-      const [address] = matches;
-      if (address) {
-        return { host: stripLeadingZeros(address, "."), isIPV4: true };
-      } else {
-        return { host, isIPV4: false };
-      }
-    }
-    function stringArrayToHexStripped(input, keepZero = false) {
+    var isUUID = RegExp.prototype.test.bind(/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iu);
+    var isIPv4 = RegExp.prototype.test.bind(/^(?:(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)$/u);
+    var isHexPair = RegExp.prototype.test.bind(/^[\da-f]{2}$/iu);
+    var isUnreserved = RegExp.prototype.test.bind(/^[\da-z\-._~]$/iu);
+    var isPathCharacter = RegExp.prototype.test.bind(/^[\da-z\-._~!$&'()*+,;=:@/]$/iu);
+    function stringArrayToHexStripped(input) {
       let acc = "";
-      let strip = true;
-      for (const c of input) {
-        if (HEX[c] === void 0) return void 0;
-        if (c !== "0" && strip === true) strip = false;
-        if (!strip) acc += c;
+      let code = 0;
+      let i = 0;
+      for (i = 0; i < input.length; i++) {
+        code = input[i].charCodeAt(0);
+        if (code === 48) {
+          continue;
+        }
+        if (!(code >= 48 && code <= 57 || code >= 65 && code <= 70 || code >= 97 && code <= 102)) {
+          return "";
+        }
+        acc += input[i];
+        break;
       }
-      if (keepZero && acc.length === 0) acc = "0";
+      for (i += 1; i < input.length; i++) {
+        code = input[i].charCodeAt(0);
+        if (!(code >= 48 && code <= 57 || code >= 65 && code <= 70 || code >= 97 && code <= 102)) {
+          return "";
+        }
+        acc += input[i];
+      }
       return acc;
+    }
+    var nonSimpleDomain = RegExp.prototype.test.bind(/[^!"$&'()*+,\-.;=_`a-z{}~]/u);
+    function consumeIsZone(buffer) {
+      buffer.length = 0;
+      return true;
+    }
+    function consumeHextets(buffer, address, output) {
+      if (buffer.length) {
+        const hex = stringArrayToHexStripped(buffer);
+        if (hex !== "") {
+          address.push(hex);
+        } else {
+          output.error = true;
+          return false;
+        }
+        buffer.length = 0;
+      }
+      return true;
     }
     function getIPV6(input) {
       let tokenCount = 0;
       const output = { error: false, address: "", zone: "" };
       const address = [];
       const buffer = [];
-      let isZone = false;
       let endipv6Encountered = false;
       let endIpv6 = false;
-      function consume() {
-        if (buffer.length) {
-          if (isZone === false) {
-            const hex = stringArrayToHexStripped(buffer);
-            if (hex !== void 0) {
-              address.push(hex);
-            } else {
-              output.error = true;
-              return false;
-            }
-          }
-          buffer.length = 0;
-        }
-        return true;
-      }
+      let consume = consumeHextets;
       for (let i = 0; i < input.length; i++) {
         const cursor = input[i];
         if (cursor === "[" || cursor === "]") {
@@ -58829,31 +58807,30 @@ var require_utils5 = __commonJS({
           if (endipv6Encountered === true) {
             endIpv6 = true;
           }
-          if (!consume()) {
+          if (!consume(buffer, address, output)) {
             break;
           }
-          tokenCount++;
-          address.push(":");
-          if (tokenCount > 7) {
+          if (++tokenCount > 7) {
             output.error = true;
             break;
           }
-          if (i - 1 >= 0 && input[i - 1] === ":") {
+          if (i > 0 && input[i - 1] === ":") {
             endipv6Encountered = true;
           }
+          address.push(":");
           continue;
         } else if (cursor === "%") {
-          if (!consume()) {
+          if (!consume(buffer, address, output)) {
             break;
           }
-          isZone = true;
+          consume = consumeIsZone;
         } else {
           buffer.push(cursor);
           continue;
         }
       }
       if (buffer.length) {
-        if (isZone) {
+        if (consume === consumeIsZone) {
           output.zone = buffer.join("");
         } else if (endIpv6) {
           address.push(buffer.join(""));
@@ -58876,32 +58853,10 @@ var require_utils5 = __commonJS({
           newHost += "%" + ipv6.zone;
           escapedHost += "%25" + ipv6.zone;
         }
-        return { host: newHost, escapedHost, isIPV6: true };
+        return { host: newHost, isIPV6: true, escapedHost };
       } else {
         return { host, isIPV6: false };
       }
-    }
-    function stripLeadingZeros(str, token) {
-      let out = "";
-      let skip = true;
-      const l = str.length;
-      for (let i = 0; i < l; i++) {
-        const c = str[i];
-        if (c === "0" && skip) {
-          if (i + 1 <= l && str[i + 1] === token || i + 1 === l) {
-            out += c;
-            skip = false;
-          }
-        } else {
-          if (c === token) {
-            skip = true;
-          } else {
-            skip = false;
-          }
-          out += c;
-        }
-      }
-      return out;
     }
     function findToken(str, token) {
       let ind = 0;
@@ -58910,89 +58865,187 @@ var require_utils5 = __commonJS({
       }
       return ind;
     }
-    var RDS1 = /^\.\.?\//u;
-    var RDS2 = /^\/\.(?:\/|$)/u;
-    var RDS3 = /^\/\.\.(?:\/|$)/u;
-    var RDS5 = /^\/?(?:.|\n)*?(?=\/|$)/u;
-    function removeDotSegments(input) {
+    function removeDotSegments(path2) {
+      let input = path2;
       const output = [];
-      while (input.length) {
-        if (input.match(RDS1)) {
-          input = input.replace(RDS1, "");
-        } else if (input.match(RDS2)) {
-          input = input.replace(RDS2, "/");
-        } else if (input.match(RDS3)) {
-          input = input.replace(RDS3, "/");
-          output.pop();
-        } else if (input === "." || input === "..") {
-          input = "";
-        } else {
-          const im = input.match(RDS5);
-          if (im) {
-            const s = im[0];
-            input = input.slice(s.length);
-            output.push(s);
+      let nextSlash = -1;
+      let len = 0;
+      while (len = input.length) {
+        if (len === 1) {
+          if (input === ".") {
+            break;
+          } else if (input === "/") {
+            output.push("/");
+            break;
           } else {
-            throw new Error("Unexpected dot segment condition");
+            output.push(input);
+            break;
           }
+        } else if (len === 2) {
+          if (input[0] === ".") {
+            if (input[1] === ".") {
+              break;
+            } else if (input[1] === "/") {
+              input = input.slice(2);
+              continue;
+            }
+          } else if (input[0] === "/") {
+            if (input[1] === "." || input[1] === "/") {
+              output.push("/");
+              break;
+            }
+          }
+        } else if (len === 3) {
+          if (input === "/..") {
+            if (output.length !== 0) {
+              output.pop();
+            }
+            output.push("/");
+            break;
+          }
+        }
+        if (input[0] === ".") {
+          if (input[1] === ".") {
+            if (input[2] === "/") {
+              input = input.slice(3);
+              continue;
+            }
+          } else if (input[1] === "/") {
+            input = input.slice(2);
+            continue;
+          }
+        } else if (input[0] === "/") {
+          if (input[1] === ".") {
+            if (input[2] === "/") {
+              input = input.slice(2);
+              continue;
+            } else if (input[2] === ".") {
+              if (input[3] === "/") {
+                input = input.slice(3);
+                if (output.length !== 0) {
+                  output.pop();
+                }
+                continue;
+              }
+            }
+          }
+        }
+        if ((nextSlash = input.indexOf("/", 1)) === -1) {
+          output.push(input);
+          break;
+        } else {
+          output.push(input.slice(0, nextSlash));
+          input = input.slice(nextSlash);
         }
       }
       return output.join("");
     }
-    function normalizeComponentEncoding(components, esc) {
-      const func = esc !== true ? escape : unescape;
-      if (components.scheme !== void 0) {
-        components.scheme = func(components.scheme);
-      }
-      if (components.userinfo !== void 0) {
-        components.userinfo = func(components.userinfo);
-      }
-      if (components.host !== void 0) {
-        components.host = func(components.host);
-      }
-      if (components.path !== void 0) {
-        components.path = func(components.path);
-      }
-      if (components.query !== void 0) {
-        components.query = func(components.query);
-      }
-      if (components.fragment !== void 0) {
-        components.fragment = func(components.fragment);
-      }
-      return components;
+    var HOST_DELIMS = { "@": "%40", "/": "%2F", "?": "%3F", "#": "%23", ":": "%3A" };
+    var HOST_DELIM_RE = /[@/?#:]/g;
+    var HOST_DELIM_NO_COLON_RE = /[@/?#]/g;
+    function reescapeHostDelimiters(host, isIP) {
+      const re2 = isIP ? HOST_DELIM_NO_COLON_RE : HOST_DELIM_RE;
+      re2.lastIndex = 0;
+      return host.replace(re2, (ch) => HOST_DELIMS[ch]);
     }
-    function recomposeAuthority(components) {
+    function normalizePercentEncoding(input, decodeUnreserved = false) {
+      if (input.indexOf("%") === -1) {
+        return input;
+      }
+      let output = "";
+      for (let i = 0; i < input.length; i++) {
+        if (input[i] === "%" && i + 2 < input.length) {
+          const hex = input.slice(i + 1, i + 3);
+          if (isHexPair(hex)) {
+            const normalizedHex = hex.toUpperCase();
+            const decoded = String.fromCharCode(parseInt(normalizedHex, 16));
+            if (decodeUnreserved && isUnreserved(decoded)) {
+              output += decoded;
+            } else {
+              output += "%" + normalizedHex;
+            }
+            i += 2;
+            continue;
+          }
+        }
+        output += input[i];
+      }
+      return output;
+    }
+    function normalizePathEncoding(input) {
+      let output = "";
+      for (let i = 0; i < input.length; i++) {
+        if (input[i] === "%" && i + 2 < input.length) {
+          const hex = input.slice(i + 1, i + 3);
+          if (isHexPair(hex)) {
+            const normalizedHex = hex.toUpperCase();
+            const decoded = String.fromCharCode(parseInt(normalizedHex, 16));
+            if (decoded !== "." && isUnreserved(decoded)) {
+              output += decoded;
+            } else {
+              output += "%" + normalizedHex;
+            }
+            i += 2;
+            continue;
+          }
+        }
+        if (isPathCharacter(input[i])) {
+          output += input[i];
+        } else {
+          output += escape(input[i]);
+        }
+      }
+      return output;
+    }
+    function escapePreservingEscapes(input) {
+      let output = "";
+      for (let i = 0; i < input.length; i++) {
+        if (input[i] === "%" && i + 2 < input.length) {
+          const hex = input.slice(i + 1, i + 3);
+          if (isHexPair(hex)) {
+            output += "%" + hex.toUpperCase();
+            i += 2;
+            continue;
+          }
+        }
+        output += escape(input[i]);
+      }
+      return output;
+    }
+    function recomposeAuthority(component) {
       const uriTokens = [];
-      if (components.userinfo !== void 0) {
-        uriTokens.push(components.userinfo);
+      if (component.userinfo !== void 0) {
+        uriTokens.push(component.userinfo);
         uriTokens.push("@");
       }
-      if (components.host !== void 0) {
-        let host = unescape(components.host);
-        const ipV4res = normalizeIPv4(host);
-        if (ipV4res.isIPV4) {
-          host = ipV4res.host;
-        } else {
-          const ipV6res = normalizeIPv6(ipV4res.host);
+      if (component.host !== void 0) {
+        let host = unescape(component.host);
+        if (!isIPv4(host)) {
+          const ipV6res = normalizeIPv6(host);
           if (ipV6res.isIPV6 === true) {
             host = `[${ipV6res.escapedHost}]`;
           } else {
-            host = components.host;
+            host = reescapeHostDelimiters(host, false);
           }
         }
         uriTokens.push(host);
       }
-      if (typeof components.port === "number" || typeof components.port === "string") {
+      if (typeof component.port === "number" || typeof component.port === "string") {
         uriTokens.push(":");
-        uriTokens.push(String(components.port));
+        uriTokens.push(String(component.port));
       }
       return uriTokens.length ? uriTokens.join("") : void 0;
     }
     module2.exports = {
+      nonSimpleDomain,
       recomposeAuthority,
-      normalizeComponentEncoding,
+      reescapeHostDelimiters,
+      normalizePercentEncoding,
+      normalizePathEncoding,
+      escapePreservingEscapes,
       removeDotSegments,
-      normalizeIPv4,
+      isIPv4,
+      isUUID,
       normalizeIPv6,
       stringArrayToHexStripped
     };
@@ -59003,145 +59056,209 @@ var require_utils5 = __commonJS({
 var require_schemes = __commonJS({
   "node_modules/fast-uri/lib/schemes.js"(exports2, module2) {
     "use strict";
-    var UUID_REG = /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iu;
+    var { isUUID } = require_utils5();
     var URN_REG = /([\da-z][\d\-a-z]{0,31}):((?:[\w!$'()*+,\-.:;=@]|%[\da-f]{2})+)/iu;
-    function isSecure(wsComponents) {
-      return typeof wsComponents.secure === "boolean" ? wsComponents.secure : String(wsComponents.scheme).toLowerCase() === "wss";
+    var supportedSchemeNames = (
+      /** @type {const} */
+      [
+        "http",
+        "https",
+        "ws",
+        "wss",
+        "urn",
+        "urn:uuid"
+      ]
+    );
+    function isValidSchemeName(name) {
+      return supportedSchemeNames.indexOf(
+        /** @type {*} */
+        name
+      ) !== -1;
     }
-    function httpParse(components) {
-      if (!components.host) {
-        components.error = components.error || "HTTP URIs must have a host.";
+    function wsIsSecure(wsComponent) {
+      if (wsComponent.secure === true) {
+        return true;
+      } else if (wsComponent.secure === false) {
+        return false;
+      } else if (wsComponent.scheme) {
+        return wsComponent.scheme.length === 3 && (wsComponent.scheme[0] === "w" || wsComponent.scheme[0] === "W") && (wsComponent.scheme[1] === "s" || wsComponent.scheme[1] === "S") && (wsComponent.scheme[2] === "s" || wsComponent.scheme[2] === "S");
+      } else {
+        return false;
       }
-      return components;
     }
-    function httpSerialize(components) {
-      const secure = String(components.scheme).toLowerCase() === "https";
-      if (components.port === (secure ? 443 : 80) || components.port === "") {
-        components.port = void 0;
+    function httpParse(component) {
+      if (!component.host) {
+        component.error = component.error || "HTTP URIs must have a host.";
       }
-      if (!components.path) {
-        components.path = "/";
-      }
-      return components;
+      return component;
     }
-    function wsParse(wsComponents) {
-      wsComponents.secure = isSecure(wsComponents);
-      wsComponents.resourceName = (wsComponents.path || "/") + (wsComponents.query ? "?" + wsComponents.query : "");
-      wsComponents.path = void 0;
-      wsComponents.query = void 0;
-      return wsComponents;
+    function httpSerialize(component) {
+      const secure = String(component.scheme).toLowerCase() === "https";
+      if (component.port === (secure ? 443 : 80) || component.port === "") {
+        component.port = void 0;
+      }
+      if (!component.path) {
+        component.path = "/";
+      }
+      return component;
     }
-    function wsSerialize(wsComponents) {
-      if (wsComponents.port === (isSecure(wsComponents) ? 443 : 80) || wsComponents.port === "") {
-        wsComponents.port = void 0;
-      }
-      if (typeof wsComponents.secure === "boolean") {
-        wsComponents.scheme = wsComponents.secure ? "wss" : "ws";
-        wsComponents.secure = void 0;
-      }
-      if (wsComponents.resourceName) {
-        const [path2, query] = wsComponents.resourceName.split("?");
-        wsComponents.path = path2 && path2 !== "/" ? path2 : void 0;
-        wsComponents.query = query;
-        wsComponents.resourceName = void 0;
-      }
-      wsComponents.fragment = void 0;
-      return wsComponents;
+    function wsParse(wsComponent) {
+      wsComponent.secure = wsIsSecure(wsComponent);
+      wsComponent.resourceName = (wsComponent.path || "/") + (wsComponent.query ? "?" + wsComponent.query : "");
+      wsComponent.path = void 0;
+      wsComponent.query = void 0;
+      return wsComponent;
     }
-    function urnParse(urnComponents, options) {
-      if (!urnComponents.path) {
-        urnComponents.error = "URN can not be parsed";
-        return urnComponents;
+    function wsSerialize(wsComponent) {
+      if (wsComponent.port === (wsIsSecure(wsComponent) ? 443 : 80) || wsComponent.port === "") {
+        wsComponent.port = void 0;
       }
-      const matches = urnComponents.path.match(URN_REG);
+      if (typeof wsComponent.secure === "boolean") {
+        wsComponent.scheme = wsComponent.secure ? "wss" : "ws";
+        wsComponent.secure = void 0;
+      }
+      if (wsComponent.resourceName) {
+        const [path2, query] = wsComponent.resourceName.split("?");
+        wsComponent.path = path2 && path2 !== "/" ? path2 : void 0;
+        wsComponent.query = query;
+        wsComponent.resourceName = void 0;
+      }
+      wsComponent.fragment = void 0;
+      return wsComponent;
+    }
+    function urnParse(urnComponent, options) {
+      if (!urnComponent.path) {
+        urnComponent.error = "URN can not be parsed";
+        return urnComponent;
+      }
+      const matches = urnComponent.path.match(URN_REG);
       if (matches) {
-        const scheme = options.scheme || urnComponents.scheme || "urn";
-        urnComponents.nid = matches[1].toLowerCase();
-        urnComponents.nss = matches[2];
-        const urnScheme = `${scheme}:${options.nid || urnComponents.nid}`;
-        const schemeHandler = SCHEMES[urnScheme];
-        urnComponents.path = void 0;
+        const scheme = options.scheme || urnComponent.scheme || "urn";
+        urnComponent.nid = matches[1].toLowerCase();
+        urnComponent.nss = matches[2];
+        const urnScheme = `${scheme}:${options.nid || urnComponent.nid}`;
+        const schemeHandler = getSchemeHandler(urnScheme);
+        urnComponent.path = void 0;
         if (schemeHandler) {
-          urnComponents = schemeHandler.parse(urnComponents, options);
+          urnComponent = schemeHandler.parse(urnComponent, options);
         }
       } else {
-        urnComponents.error = urnComponents.error || "URN can not be parsed.";
+        urnComponent.error = urnComponent.error || "URN can not be parsed.";
       }
-      return urnComponents;
+      return urnComponent;
     }
-    function urnSerialize(urnComponents, options) {
-      const scheme = options.scheme || urnComponents.scheme || "urn";
-      const nid = urnComponents.nid.toLowerCase();
+    function urnSerialize(urnComponent, options) {
+      if (urnComponent.nid === void 0) {
+        throw new Error("URN without nid cannot be serialized");
+      }
+      const scheme = options.scheme || urnComponent.scheme || "urn";
+      const nid = urnComponent.nid.toLowerCase();
       const urnScheme = `${scheme}:${options.nid || nid}`;
-      const schemeHandler = SCHEMES[urnScheme];
+      const schemeHandler = getSchemeHandler(urnScheme);
       if (schemeHandler) {
-        urnComponents = schemeHandler.serialize(urnComponents, options);
+        urnComponent = schemeHandler.serialize(urnComponent, options);
       }
-      const uriComponents = urnComponents;
-      const nss = urnComponents.nss;
-      uriComponents.path = `${nid || options.nid}:${nss}`;
+      const uriComponent = urnComponent;
+      const nss = urnComponent.nss;
+      uriComponent.path = `${nid || options.nid}:${nss}`;
       options.skipEscape = true;
-      return uriComponents;
+      return uriComponent;
     }
-    function urnuuidParse(urnComponents, options) {
-      const uuidComponents = urnComponents;
-      uuidComponents.uuid = uuidComponents.nss;
-      uuidComponents.nss = void 0;
-      if (!options.tolerant && (!uuidComponents.uuid || !UUID_REG.test(uuidComponents.uuid))) {
-        uuidComponents.error = uuidComponents.error || "UUID is not valid.";
+    function urnuuidParse(urnComponent, options) {
+      const uuidComponent = urnComponent;
+      uuidComponent.uuid = uuidComponent.nss;
+      uuidComponent.nss = void 0;
+      if (!options.tolerant && (!uuidComponent.uuid || !isUUID(uuidComponent.uuid))) {
+        uuidComponent.error = uuidComponent.error || "UUID is not valid.";
       }
-      return uuidComponents;
+      return uuidComponent;
     }
-    function urnuuidSerialize(uuidComponents) {
-      const urnComponents = uuidComponents;
-      urnComponents.nss = (uuidComponents.uuid || "").toLowerCase();
-      return urnComponents;
+    function urnuuidSerialize(uuidComponent) {
+      const urnComponent = uuidComponent;
+      urnComponent.nss = (uuidComponent.uuid || "").toLowerCase();
+      return urnComponent;
     }
-    var http = {
-      scheme: "http",
-      domainHost: true,
-      parse: httpParse,
-      serialize: httpSerialize
+    var http = (
+      /** @type {SchemeHandler} */
+      {
+        scheme: "http",
+        domainHost: true,
+        parse: httpParse,
+        serialize: httpSerialize
+      }
+    );
+    var https = (
+      /** @type {SchemeHandler} */
+      {
+        scheme: "https",
+        domainHost: http.domainHost,
+        parse: httpParse,
+        serialize: httpSerialize
+      }
+    );
+    var ws = (
+      /** @type {SchemeHandler} */
+      {
+        scheme: "ws",
+        domainHost: true,
+        parse: wsParse,
+        serialize: wsSerialize
+      }
+    );
+    var wss = (
+      /** @type {SchemeHandler} */
+      {
+        scheme: "wss",
+        domainHost: ws.domainHost,
+        parse: ws.parse,
+        serialize: ws.serialize
+      }
+    );
+    var urn = (
+      /** @type {SchemeHandler} */
+      {
+        scheme: "urn",
+        parse: urnParse,
+        serialize: urnSerialize,
+        skipNormalize: true
+      }
+    );
+    var urnuuid = (
+      /** @type {SchemeHandler} */
+      {
+        scheme: "urn:uuid",
+        parse: urnuuidParse,
+        serialize: urnuuidSerialize,
+        skipNormalize: true
+      }
+    );
+    var SCHEMES = (
+      /** @type {Record<SchemeName, SchemeHandler>} */
+      {
+        http,
+        https,
+        ws,
+        wss,
+        urn,
+        "urn:uuid": urnuuid
+      }
+    );
+    Object.setPrototypeOf(SCHEMES, null);
+    function getSchemeHandler(scheme) {
+      return scheme && (SCHEMES[
+        /** @type {SchemeName} */
+        scheme
+      ] || SCHEMES[
+        /** @type {SchemeName} */
+        scheme.toLowerCase()
+      ]) || void 0;
+    }
+    module2.exports = {
+      wsIsSecure,
+      SCHEMES,
+      isValidSchemeName,
+      getSchemeHandler
     };
-    var https = {
-      scheme: "https",
-      domainHost: http.domainHost,
-      parse: httpParse,
-      serialize: httpSerialize
-    };
-    var ws = {
-      scheme: "ws",
-      domainHost: true,
-      parse: wsParse,
-      serialize: wsSerialize
-    };
-    var wss = {
-      scheme: "wss",
-      domainHost: ws.domainHost,
-      parse: ws.parse,
-      serialize: ws.serialize
-    };
-    var urn = {
-      scheme: "urn",
-      parse: urnParse,
-      serialize: urnSerialize,
-      skipNormalize: true
-    };
-    var urnuuid = {
-      scheme: "urn:uuid",
-      parse: urnuuidParse,
-      serialize: urnuuidSerialize,
-      skipNormalize: true
-    };
-    var SCHEMES = {
-      http,
-      https,
-      ws,
-      wss,
-      urn,
-      "urn:uuid": urnuuid
-    };
-    module2.exports = SCHEMES;
   }
 });
 
@@ -59149,22 +59266,25 @@ var require_schemes = __commonJS({
 var require_fast_uri = __commonJS({
   "node_modules/fast-uri/index.js"(exports2, module2) {
     "use strict";
-    var { normalizeIPv6, normalizeIPv4, removeDotSegments, recomposeAuthority, normalizeComponentEncoding } = require_utils5();
-    var SCHEMES = require_schemes();
+    var { normalizeIPv6, removeDotSegments, recomposeAuthority, normalizePercentEncoding, normalizePathEncoding, escapePreservingEscapes, reescapeHostDelimiters, isIPv4, nonSimpleDomain } = require_utils5();
+    var { SCHEMES, getSchemeHandler } = require_schemes();
     function normalize2(uri, options) {
       if (typeof uri === "string") {
-        uri = serialize(parse2(uri, options), options);
+        uri = /** @type {T} */
+        normalizeString(uri, options);
       } else if (typeof uri === "object") {
-        uri = parse2(serialize(uri, options), options);
+        uri = /** @type {T} */
+        parse2(serialize(uri, options), options);
       }
       return uri;
     }
     function resolve2(baseURI, relativeURI, options) {
-      const schemelessOptions = Object.assign({ scheme: "null" }, options);
-      const resolved = resolveComponents(parse2(baseURI, schemelessOptions), parse2(relativeURI, schemelessOptions), schemelessOptions, true);
-      return serialize(resolved, { ...schemelessOptions, skipEscape: true });
+      const schemelessOptions = options ? Object.assign({ scheme: "null" }, options) : { scheme: "null" };
+      const resolved = resolveComponent(parse2(baseURI, schemelessOptions), parse2(relativeURI, schemelessOptions), schemelessOptions, true);
+      schemelessOptions.skipEscape = true;
+      return serialize(resolved, schemelessOptions);
     }
-    function resolveComponents(base, relative2, options, skipNormalization) {
+    function resolveComponent(base, relative2, options, skipNormalization) {
       const target = {};
       if (!skipNormalization) {
         base = parse2(serialize(base, options), options);
@@ -59194,7 +59314,7 @@ var require_fast_uri = __commonJS({
               target.query = base.query;
             }
           } else {
-            if (relative2.path.charAt(0) === "/") {
+            if (relative2.path[0] === "/") {
               target.path = removeDotSegments(relative2.path);
             } else {
               if ((base.userinfo !== void 0 || base.host !== void 0 || base.port !== void 0) && !base.path) {
@@ -59218,22 +59338,12 @@ var require_fast_uri = __commonJS({
       return target;
     }
     function equal2(uriA, uriB, options) {
-      if (typeof uriA === "string") {
-        uriA = unescape(uriA);
-        uriA = serialize(normalizeComponentEncoding(parse2(uriA, options), true), { ...options, skipEscape: true });
-      } else if (typeof uriA === "object") {
-        uriA = serialize(normalizeComponentEncoding(uriA, true), { ...options, skipEscape: true });
-      }
-      if (typeof uriB === "string") {
-        uriB = unescape(uriB);
-        uriB = serialize(normalizeComponentEncoding(parse2(uriB, options), true), { ...options, skipEscape: true });
-      } else if (typeof uriB === "object") {
-        uriB = serialize(normalizeComponentEncoding(uriB, true), { ...options, skipEscape: true });
-      }
-      return uriA.toLowerCase() === uriB.toLowerCase();
+      const normalizedA = normalizeComparableURI(uriA, options);
+      const normalizedB = normalizeComparableURI(uriB, options);
+      return normalizedA !== void 0 && normalizedB !== void 0 && normalizedA.toLowerCase() === normalizedB.toLowerCase();
     }
     function serialize(cmpts, opts) {
-      const components = {
+      const component = {
         host: cmpts.host,
         scheme: cmpts.scheme,
         userinfo: cmpts.userinfo,
@@ -59251,62 +59361,60 @@ var require_fast_uri = __commonJS({
       };
       const options = Object.assign({}, opts);
       const uriTokens = [];
-      const schemeHandler = SCHEMES[(options.scheme || components.scheme || "").toLowerCase()];
-      if (schemeHandler && schemeHandler.serialize) schemeHandler.serialize(components, options);
-      if (components.path !== void 0) {
+      const schemeHandler = getSchemeHandler(options.scheme || component.scheme);
+      if (schemeHandler && schemeHandler.serialize) schemeHandler.serialize(component, options);
+      if (component.path !== void 0) {
         if (!options.skipEscape) {
-          components.path = escape(components.path);
-          if (components.scheme !== void 0) {
-            components.path = components.path.split("%3A").join(":");
+          component.path = escapePreservingEscapes(component.path);
+          if (component.scheme !== void 0) {
+            component.path = component.path.split("%3A").join(":");
           }
         } else {
-          components.path = unescape(components.path);
+          component.path = normalizePercentEncoding(component.path);
         }
       }
-      if (options.reference !== "suffix" && components.scheme) {
-        uriTokens.push(components.scheme, ":");
+      if (options.reference !== "suffix" && component.scheme) {
+        uriTokens.push(component.scheme, ":");
       }
-      const authority = recomposeAuthority(components);
+      const authority = recomposeAuthority(component);
       if (authority !== void 0) {
         if (options.reference !== "suffix") {
           uriTokens.push("//");
         }
         uriTokens.push(authority);
-        if (components.path && components.path.charAt(0) !== "/") {
+        if (component.path && component.path[0] !== "/") {
           uriTokens.push("/");
         }
       }
-      if (components.path !== void 0) {
-        let s = components.path;
+      if (component.path !== void 0) {
+        let s = component.path;
         if (!options.absolutePath && (!schemeHandler || !schemeHandler.absolutePath)) {
           s = removeDotSegments(s);
         }
-        if (authority === void 0) {
-          s = s.replace(/^\/\//u, "/%2F");
+        if (authority === void 0 && s[0] === "/" && s[1] === "/") {
+          s = "/%2F" + s.slice(2);
         }
         uriTokens.push(s);
       }
-      if (components.query !== void 0) {
-        uriTokens.push("?", components.query);
+      if (component.query !== void 0) {
+        uriTokens.push("?", component.query);
       }
-      if (components.fragment !== void 0) {
-        uriTokens.push("#", components.fragment);
+      if (component.fragment !== void 0) {
+        uriTokens.push("#", component.fragment);
       }
       return uriTokens.join("");
     }
-    var hexLookUp = Array.from({ length: 127 }, (_v, k) => /[^!"$&'()*+,\-.;=_`a-z{}~]/u.test(String.fromCharCode(k)));
-    function nonSimpleDomain(value) {
-      let code = 0;
-      for (let i = 0, len = value.length; i < len; ++i) {
-        code = value.charCodeAt(i);
-        if (code > 126 || hexLookUp[code]) {
-          return true;
-        }
-      }
-      return false;
-    }
     var URI_PARSE = /^(?:([^#/:?]+):)?(?:\/\/((?:([^#/?@]*)@)?(\[[^#/?\]]+\]|[^#/:?]*)(?::(\d*))?))?([^#?]*)(?:\?([^#]*))?(?:#((?:.|[\n\r])*))?/u;
-    function parse2(uri, opts) {
+    function getParseError(parsed, matches) {
+      if (matches[2] !== void 0 && parsed.path && parsed.path[0] !== "/") {
+        return 'URI path must start with "/" when authority is present.';
+      }
+      if (typeof parsed.port === "number" && (parsed.port < 0 || parsed.port > 65535)) {
+        return "URI port is malformed.";
+      }
+      return void 0;
+    }
+    function parseWithStatus(uri, opts) {
       const options = Object.assign({}, opts);
       const parsed = {
         scheme: void 0,
@@ -59317,9 +59425,15 @@ var require_fast_uri = __commonJS({
         query: void 0,
         fragment: void 0
       };
-      const gotEncoding = uri.indexOf("%") !== -1;
+      let malformedAuthorityOrPort = false;
       let isIP = false;
-      if (options.reference === "suffix") uri = (options.scheme ? options.scheme + ":" : "") + "//" + uri;
+      if (options.reference === "suffix") {
+        if (options.scheme) {
+          uri = options.scheme + ":" + uri;
+        } else {
+          uri = "//" + uri;
+        }
+      }
       const matches = uri.match(URI_PARSE);
       if (matches) {
         parsed.scheme = matches[1];
@@ -59332,14 +59446,18 @@ var require_fast_uri = __commonJS({
         if (isNaN(parsed.port)) {
           parsed.port = matches[5];
         }
+        const parseError = getParseError(parsed, matches);
+        if (parseError !== void 0) {
+          parsed.error = parsed.error || parseError;
+          malformedAuthorityOrPort = true;
+        }
         if (parsed.host) {
-          const ipv4result = normalizeIPv4(parsed.host);
-          if (ipv4result.isIPV4 === false) {
-            const ipv6result = normalizeIPv6(ipv4result.host);
+          const ipv4result = isIPv4(parsed.host);
+          if (ipv4result === false) {
+            const ipv6result = normalizeIPv6(parsed.host);
             parsed.host = ipv6result.host.toLowerCase();
             isIP = ipv6result.isIPV6;
           } else {
-            parsed.host = ipv4result.host;
             isIP = true;
           }
         }
@@ -59355,7 +59473,7 @@ var require_fast_uri = __commonJS({
         if (options.reference && options.reference !== "suffix" && options.reference !== parsed.reference) {
           parsed.error = parsed.error || "URI is not a " + options.reference + " reference.";
         }
-        const schemeHandler = SCHEMES[(options.scheme || parsed.scheme || "").toLowerCase()];
+        const schemeHandler = getSchemeHandler(options.scheme || parsed.scheme);
         if (!options.unicodeSupport && (!schemeHandler || !schemeHandler.unicodeSupport)) {
           if (parsed.host && (options.domainHost || schemeHandler && schemeHandler.domainHost) && isIP === false && nonSimpleDomain(parsed.host)) {
             try {
@@ -59366,17 +59484,23 @@ var require_fast_uri = __commonJS({
           }
         }
         if (!schemeHandler || schemeHandler && !schemeHandler.skipNormalize) {
-          if (gotEncoding && parsed.scheme !== void 0) {
-            parsed.scheme = unescape(parsed.scheme);
-          }
-          if (gotEncoding && parsed.host !== void 0) {
-            parsed.host = unescape(parsed.host);
+          if (uri.indexOf("%") !== -1) {
+            if (parsed.scheme !== void 0) {
+              parsed.scheme = unescape(parsed.scheme);
+            }
+            if (parsed.host !== void 0) {
+              parsed.host = reescapeHostDelimiters(unescape(parsed.host), isIP);
+            }
           }
           if (parsed.path) {
-            parsed.path = escape(unescape(parsed.path));
+            parsed.path = normalizePathEncoding(parsed.path);
           }
           if (parsed.fragment) {
-            parsed.fragment = encodeURI(decodeURIComponent(parsed.fragment));
+            try {
+              parsed.fragment = encodeURI(decodeURIComponent(parsed.fragment));
+            } catch {
+              parsed.error = parsed.error || "URI malformed";
+            }
           }
         }
         if (schemeHandler && schemeHandler.parse) {
@@ -59385,13 +59509,35 @@ var require_fast_uri = __commonJS({
       } else {
         parsed.error = parsed.error || "URI can not be parsed.";
       }
-      return parsed;
+      return { parsed, malformedAuthorityOrPort };
+    }
+    function parse2(uri, opts) {
+      return parseWithStatus(uri, opts).parsed;
+    }
+    function normalizeString(uri, opts) {
+      return normalizeStringWithStatus(uri, opts).normalized;
+    }
+    function normalizeStringWithStatus(uri, opts) {
+      const { parsed, malformedAuthorityOrPort } = parseWithStatus(uri, opts);
+      return {
+        normalized: malformedAuthorityOrPort ? uri : serialize(parsed, opts),
+        malformedAuthorityOrPort
+      };
+    }
+    function normalizeComparableURI(uri, opts) {
+      if (typeof uri === "string") {
+        const { normalized, malformedAuthorityOrPort } = normalizeStringWithStatus(uri, opts);
+        return malformedAuthorityOrPort ? void 0 : normalized;
+      }
+      if (typeof uri === "object") {
+        return serialize(uri, opts);
+      }
     }
     var fastUri = {
       SCHEMES,
       normalize: normalize2,
       resolve: resolve2,
-      resolveComponents,
+      resolveComponent,
       equal: equal2,
       serialize,
       parse: parse2
@@ -59894,11 +60040,11 @@ var require_core = __commonJS({
     Ajv2.ValidationError = validation_error_1.default;
     Ajv2.MissingRefError = ref_error_1.default;
     exports2.default = Ajv2;
-    function checkOptions(checkOpts, options, msg, log2 = "error") {
+    function checkOptions(checkOpts, options, msg, log = "error") {
       for (const key in checkOpts) {
         const opt = key;
         if (opt in options)
-          this.logger[log2](`${msg}: option ${key}. ${checkOpts[opt]}`);
+          this.logger[log](`${msg}: option ${key}. ${checkOpts[opt]}`);
       }
     }
     function getSchEnv(keyRef) {
@@ -64909,7 +65055,7 @@ async function fetchWrapper(requestOptions) {
       "fetch is not set. Please pass a fetch implementation as new Octokit({ request: { fetch }}). Learn more at https://github.com/octokit/octokit.js/#fetch-missing"
     );
   }
-  const log2 = requestOptions.request?.log || console;
+  const log = requestOptions.request?.log || console;
   const parseSuccessResponseBody = requestOptions.request?.parseSuccessResponseBody !== false;
   const body = isPlainObject2(requestOptions.body) || Array.isArray(requestOptions.body) ? JSONStringify(requestOptions.body) : requestOptions.body;
   const requestHeaders = Object.fromEntries(
@@ -64967,7 +65113,7 @@ async function fetchWrapper(requestOptions) {
   if ("deprecation" in responseHeaders) {
     const matches = responseHeaders.link && responseHeaders.link.match(/<([^<>]+)>; rel="deprecation"/);
     const deprecationLink = matches && matches.pop();
-    log2.warn(
+    log.warn(
       `[@octokit/request] "${requestOptions.method} ${requestOptions.url}" is deprecated. It is scheduled to be removed on ${responseHeaders.sunset}${deprecationLink ? `. See ${deprecationLink}` : ""}`
     );
   }
@@ -69232,29 +69378,6 @@ var LogTag;
   LogTag2["Default"] = "Default";
   LogTag2["Notify"] = "Notify";
 })(LogTag || (LogTag = {}));
-var log = (message, logAsJson, code = Status.Ok, stack, ...tags) => {
-  if (logAsJson) {
-    return logJson(message, code, stack, ...tags);
-  }
-  return logPlain(message, code, stack, ...tags);
-};
-var logPlain = (message, code = Status.Ok, stack, ...tags) => {
-  const tagsString = tags.map((tag) => `, #${tag}`).join("");
-  const logString = `[${code}, ${(/* @__PURE__ */ new Date()).toISOString()}${tagsString}]: ${message}${has(stack) ? "\n" + stack : ""}`;
-  console.log(logString);
-  return logString;
-};
-var logJson = (message, code = Status.Ok, stack, ...tags) => {
-  const logJson2 = JSON.stringify({
-    date: (/* @__PURE__ */ new Date()).toISOString(),
-    stack,
-    message,
-    code,
-    tags
-  });
-  console.log(logJson2);
-  return logJson2;
-};
 
 // packages/utils/common/lib/logger.js
 var LogLevel;
@@ -69547,17 +69670,6 @@ var toError = (e) => {
     return e;
   }
   return new InvalidError(isString(e) ? e : pp`${e}`);
-};
-var catchErrorAsync = async (func, kind = Error) => {
-  try {
-    return await func();
-  } catch (err) {
-    const e = toError(err);
-    if (e instanceof kind) {
-      return e;
-    }
-    throw e;
-  }
 };
 var replaceException = (e, ...filter) => {
   filter.forEach(([trigger, replacement]) => {
@@ -70275,8 +70387,8 @@ var Headers2;
   Headers3["ContentType"] = "content-type";
 })(Headers2 || (Headers2 = {}));
 var MediaTypes;
-(function(MediaTypes2) {
-  MediaTypes2["ApplicationJson"] = "application/json";
+(function(MediaTypes3) {
+  MediaTypes3["ApplicationJson"] = "application/json";
 })(MediaTypes || (MediaTypes = {}));
 var HttpRedirectCodes = [
   HttpCodes.MovedPermanently,
@@ -71026,8 +71138,135 @@ var StreamClosed = class extends Exception {
   }
 };
 
-// packages/streamy/common/lib/protocol/client.js
-var import_fast_deep_equal = __toESM(require_fast_deep_equal(), 1);
+// packages/streamy/common/lib/spec.js
+var rpc = (spec) => ({ ...spec, kind: "rpc" });
+var stream = (spec) => ({ ...spec, kind: "stream" });
+var BaseStub = class {
+  constructor(client) {
+    this.client = client;
+  }
+  setContext(context4) {
+    this.context = context4;
+  }
+};
+var createStubSubClass = ({ spec, base, call, stream: stream2 }) => {
+  class Klass extends base {
+  }
+  const p = Klass.prototype;
+  for (const [name, m] of Object.entries(spec.methods)) {
+    switch (m.kind) {
+      case "rpc":
+        p[name] = async function(req, opts) {
+          const finalOpts = m.defaultOptions || opts ? { ...m.defaultOptions, ...opts } : void 0;
+          return call({
+            stub: this,
+            client: this.client,
+            context: () => this.context,
+            methodName: name,
+            methodSpec: m,
+            reqData: req,
+            finalOpts
+          });
+        };
+        break;
+      case "stream":
+        p[name] = async function() {
+          return stream2({
+            stub: this,
+            client: this.client,
+            context: () => this.context,
+            methodName: name,
+            methodSpec: m
+          });
+        };
+        break;
+    }
+  }
+  return Klass;
+};
+
+// packages/streamy/common/lib/extensions/spec.js
+var refreshTokenContainer = {
+  refreshToken: readOnly(toString)
+};
+var toRefreshTokenContainer = toObject(refreshTokenContainer);
+var accessTokenContainer = {
+  accessToken: readOnly(toString)
+};
+var toAccessTokenContainer = toObject(accessTokenContainer);
+var toCredentials = toObject({
+  ...refreshTokenContainer,
+  ...accessTokenContainer
+});
+var AuthnStub = class extends BaseStub {
+  async authenticate(creds) {
+    this.context = {
+      requestHeaders: {
+        Authorization: `Bearer ${creds.accessToken}`
+      },
+      responseHeaders: {},
+      httpStatusCode: 200
+    };
+  }
+  setRefreshTokenOpts(refreshTokenOpts) {
+    this.refreshTokenOpts = refreshTokenOpts;
+  }
+};
+var isTokenExpired = (e, expiredException) => {
+  if (e instanceof expiredException) {
+    return true;
+  }
+  if (e instanceof StreamClosed && e.cause instanceof expiredException) {
+    return true;
+  }
+  return false;
+};
+var callAndMaybeRefreshToken = async (f, refreshOpts) => {
+  const refreshTokenOpts = refreshOpts();
+  if (!refreshTokenOpts) {
+    return f();
+  }
+  try {
+    return await f();
+  } catch (e) {
+    if (isTokenExpired(e, refreshTokenOpts.expiredException)) {
+      const creds = await refreshTokenOpts.refreshToken();
+      await refreshTokenOpts.authenticate(creds);
+      logD("AutnStub: Refreshed access token. Now retrying call.");
+      return f();
+    }
+    throw e;
+  }
+};
+var createAuthnStubSubClass = (spec, base) => createStubSubClass({
+  spec,
+  base,
+  call: async ({ stub, client, context: context4, methodSpec, methodName, reqData: data, finalOpts }) => callAndMaybeRefreshToken(async () => methodSpec.response(await client.call({
+    service: spec.name,
+    method: methodName,
+    data,
+    context: context4(),
+    opts: finalOpts
+  })), () => !!stub.refreshTokenOpts ? {
+    ...stub.refreshTokenOpts,
+    authenticate: stub.authenticate.bind(stub)
+  } : void 0),
+  stream: ({ stub, client, context: context4, methodSpec, methodName }) => callAndMaybeRefreshToken(() => client.stream({
+    service: spec.name,
+    method: methodName,
+    toQuery: methodSpec.request,
+    toResponse: methodSpec.response,
+    context: context4()
+  }), () => !!stub.refreshTokenOpts ? {
+    ...stub.refreshTokenOpts,
+    authenticate: stub.authenticate.bind(stub)
+  } : void 0)
+});
+var createAuthnStubClass = (name, spec) => {
+  const klass = createAuthnStubSubClass(spec, AuthnStub);
+  klass.ID = serviceId(name);
+  return klass;
+};
 
 // packages/streamy/common/lib/extensions/typing.js
 var toStringOrArray = toOr(toString, toArray(toString));
@@ -71046,16 +71285,6 @@ var toHttpContext = (x) => {
     ctx.responseHeaders[k.toLocaleLowerCase()] = v;
   }
   return ctx;
-};
-
-// packages/streamy/common/lib/json.js
-var JsonSerializer = class {
-  decode(data) {
-    return JSON.parse(data);
-  }
-  encode(obj) {
-    return JSON.stringify(obj);
-  }
 };
 
 // packages/utils/common/lib/keys.js
@@ -71222,6 +71451,2352 @@ var areValidArgs = (args) => {
 };
 var isValidBinaryUints = (args) => Object.keys(args).every((a) => a.endsWith("i"));
 var isValidDecimalUints = (args) => Object.keys(args).every((a) => !a.endsWith("i"));
+
+// packages/payment-service/common/lib/Plan.js
+var PlanId;
+(function(PlanId2) {
+  PlanId2[PlanId2["Basic"] = 1] = "Basic";
+  PlanId2[PlanId2["DeprecatedAwake"] = 2] = "DeprecatedAwake";
+  PlanId2[PlanId2["DeprecatedBoost"] = 3] = "DeprecatedBoost";
+  PlanId2[PlanId2["Micro"] = 8] = "Micro";
+  PlanId2[PlanId2["Boost"] = 9] = "Boost";
+  PlanId2[PlanId2["Pro"] = 10] = "Pro";
+  PlanId2[PlanId2["MicroOnDemand"] = 20] = "MicroOnDemand";
+  PlanId2[PlanId2["Gpu"] = 27] = "Gpu";
+})(PlanId || (PlanId = {}));
+var toPlanId = toNonNegativeInteger;
+var basicPlan = {
+  title: "Free",
+  priceUsd: 0,
+  id: PlanId.Basic,
+  characteristics: {
+    id: PlanId.Basic,
+    CPU: 0.5,
+    GPU: 0,
+    RAM: GiB(1),
+    SSD: MiB(500),
+    TempStorage: MiB(1500),
+    onDemand: true
+  },
+  deprecated: false,
+  maxReplicas: 1
+};
+var awakePlanDeprecated = {
+  title: "Awake",
+  priceUsd: 2,
+  id: PlanId.DeprecatedAwake,
+  characteristics: {
+    id: PlanId.DeprecatedAwake,
+    CPU: 0.5,
+    GPU: 0,
+    RAM: MiB(600),
+    SSD: MiB(500),
+    TempStorage: MiB(1500),
+    onDemand: false
+  },
+  deprecated: true,
+  maxReplicas: 1
+};
+var boostPlanDeprecated = {
+  title: "Boost",
+  priceUsd: 8,
+  id: PlanId.DeprecatedBoost,
+  characteristics: {
+    id: PlanId.DeprecatedBoost,
+    CPU: 2,
+    GPU: 0,
+    RAM: GiB(6),
+    SSD: GiB(10),
+    TempStorage: MiB(2500),
+    onDemand: false
+  },
+  deprecated: true,
+  maxReplicas: 1
+};
+var microPlan = {
+  title: "Micro",
+  priceUsd: 5,
+  id: PlanId.Micro,
+  characteristics: {
+    id: PlanId.Micro,
+    CPU: 0.5,
+    GPU: 0,
+    RAM: GiB(1),
+    SSD: GiB(1),
+    TempStorage: MiB(1500),
+    onDemand: false
+  },
+  deprecated: false,
+  maxReplicas: 10
+};
+var boostPlan = {
+  title: "Boost",
+  priceUsd: 20,
+  id: PlanId.Boost,
+  characteristics: {
+    id: PlanId.Boost,
+    CPU: 2,
+    GPU: 0,
+    RAM: GiB(4),
+    SSD: GiB(25),
+    TempStorage: MiB(2500),
+    onDemand: false
+  },
+  deprecated: false,
+  maxReplicas: 7
+};
+var proPlan = {
+  title: "Pro",
+  priceUsd: 80,
+  id: PlanId.Pro,
+  characteristics: {
+    id: PlanId.Pro,
+    CPU: 8,
+    GPU: 0,
+    RAM: GiB(16),
+    SSD: GiB(100),
+    TempStorage: MiB(2500),
+    onDemand: false
+  },
+  deprecated: false,
+  maxReplicas: 5
+};
+var gpuPlan = {
+  title: "Gpu",
+  priceUsd: 0,
+  id: PlanId.Gpu,
+  characteristics: {
+    id: 11,
+    CPU: 1,
+    GPU: 1,
+    RAM: GiB(10),
+    SSD: GiB(10),
+    TempStorage: MiB(1500),
+    onDemand: true
+  },
+  deprecated: false,
+  maxReplicas: 1
+};
+var planMap = {
+  [PlanId.Basic]: basicPlan,
+  [PlanId.DeprecatedAwake]: awakePlanDeprecated,
+  [PlanId.DeprecatedBoost]: boostPlanDeprecated,
+  [PlanId.Micro]: microPlan,
+  [PlanId.Boost]: boostPlan,
+  [PlanId.Pro]: proPlan,
+  [PlanId.MicroOnDemand]: {
+    ...microPlan,
+    characteristics: { ...microPlan.characteristics, onDemand: true },
+    priceUsd: 1
+  },
+  [PlanId.Gpu]: gpuPlan
+};
+
+// packages/team-service/common/lib/model/TeamServiceTypes.js
+var Role;
+(function(Role2) {
+  Role2[Role2["Admin"] = 0] = "Admin";
+  Role2[Role2["Member"] = 1] = "Member";
+})(Role || (Role = {}));
+var toRole = toNumericEnum("Role", Role);
+var team = {
+  id: readOnly(toNonNegativeInteger),
+  defaultDataCenterId: readOnly(toNumber),
+  name: readOnly(toString),
+  description: readOnly(toUndefOr(toNullOr(toString))),
+  avatarId: readOnly(toUndefOr(toNullOr(toString))),
+  avatarUrl: toUndefOr(toNullOr(toString)),
+  isFirst: toUndefOr(toBoolean),
+  deletionPending: toUndefOr(toBoolean),
+  createdAt: toUndefOr(toDate),
+  organizationId: toUndefOr(toUuid)
+};
+var toTeam = toObject(team);
+var toTeamWithRole = toObject({
+  ...team,
+  role: readOnly(toRole)
+});
+var toTeamMember = toObject({
+  userId: readOnly(toNonNegativeInteger),
+  teamId: readOnly(toNonNegativeInteger),
+  role: readOnly(toRole),
+  pending: readOnly(toBoolean),
+  createdAt: readOnly(toDate),
+  name: toUndefOr(toNullOr(toString)),
+  email: toUndefOr(toNullOr(toString)),
+  avatarUrl: toUndefOr(toNullOr(toString)),
+  deletedAt: toUndefOr(toDate)
+});
+var toTeamWithMembers = toObject({
+  ...team,
+  members: toArray(toTeamMember)
+});
+
+// packages/workspace-service/common/lib/api/envVars.js
+var import_inversify = __toESM(require_inversify(), 1);
+
+// packages/utils/common/lib/envVars.js
+var isEnvVarName = (value) => envVarNamePattern.test(value);
+var envVarNamePattern = /^[A-Za-z_][A-Za-z0-9_.-]*$/;
+var toEnvVarName = (x) => {
+  const s = toString(x);
+  if (isEnvVarName(s)) {
+    return s;
+  }
+  throw new TypeConversionFailure("EnvVarName", x);
+};
+var toEnvironmentVariable = toObject({
+  name: toEnvVarName,
+  value: toString
+});
+
+// packages/workspace-service/common/lib/api/envVars.js
+var __decorate2 = function(decorators, target, key, desc) {
+  var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+  if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+  else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+  return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var toWorkspaceServiceArgs = toObject({
+  workspaceId: toNumber
+});
+var toEnvVars = (x) => {
+  if (!isObject(x)) {
+    throw new TypeConversionFailure("record", x);
+  }
+  return Object.fromEntries(Object.entries(x).map(([k, v]) => [toEnvVarName(k), toString(v)]));
+};
+var toUpdateEnvVarsArgs = toObject({
+  workspaceId: toNonNegativeInteger,
+  envVars: toEnvVars
+});
+var toCopyEnvVarArgs = toObject({
+  sourceWorkspaceId: toNonNegativeInteger,
+  targetWorkspaceId: toNonNegativeInteger
+});
+var envVarsService = {
+  name: "EnvVars",
+  context: toHttpContext,
+  methods: {
+    listEnvironmentVariables: rpc({
+      request: toWorkspaceServiceArgs,
+      response: toArray(toEnvironmentVariable)
+    }),
+    updateEnvironmentVariables: rpc({
+      request: toUpdateEnvVarsArgs,
+      response: toVoid,
+      defaultOptions: { timeout: { seconds: 30 } }
+    }),
+    copyEnvVars: rpc({
+      request: toCopyEnvVarArgs,
+      response: toVoid
+    }),
+    envVarsStream: stream({
+      response: toArray(toEnvironmentVariable),
+      request: toWorkspaceServiceArgs
+    })
+  }
+};
+var envVarsStub = createAuthnStubClass("EnvVarsStub", envVarsService);
+var EnvVarsStub = class EnvVarsStub2 extends envVarsStub {
+};
+EnvVarsStub = __decorate2([
+  (0, import_inversify.injectable)()
+], EnvVarsStub);
+
+// packages/workspace-service/common/lib/serviceArgs.js
+var workspaceServiceArgs = {
+  workspaceId: toNonNegativeInteger
+};
+var toWorkspaceServiceArgs2 = toObject(workspaceServiceArgs);
+var toStartWorkspaceServiceParams = toObject({
+  workspaceId: toNonNegativeInteger,
+  updateIfOutdated: toUndefOr(toBoolean)
+});
+var toGetWorkspaceServiceArgs = toObject({
+  id: toNonNegativeInteger
+});
+var toGetByManagedServiceArgs = toObject({
+  id: toUuid
+});
+var toCreateWorkspaceServiceArgs = toObject({
+  teamId: toNonNegativeInteger,
+  name: toString,
+  planId: toPlanId,
+  baseImage: toUndefOr(toString),
+  isPrivateRepo: toBoolean,
+  gitUrl: toNullOr(toString),
+  initialBranch: toNullOr(toString),
+  cloneDepth: toUndefOr(toPositiveInteger),
+  skipLfs: toUndefOr(toBoolean),
+  recurseSubmodules: toUndefOr(toBoolean),
+  sourceWorkspaceId: toNullOr(toNonNegativeInteger),
+  welcomeMessage: toNullOr(toString),
+  replicas: toPositiveInteger,
+  vpnConfig: toNullOr(toString),
+  restricted: toUndefOr(toBoolean),
+  env: toUndefOr(toEnvVars),
+  managedServiceId: toUndefOr(toUuid),
+  storageMib: toUndefOr(toPositiveInteger)
+});
+var toUpdateWorkspaceServiceArgs = toObject({
+  workspaceId: toNonNegativeInteger,
+  teamId: toUndefOr(toNonNegativeInteger),
+  planId: toUndefOr(toPlanId),
+  baseImage: toUndefOr(toString),
+  name: toUndefOr(toString),
+  replicas: toUndefOr(toPositiveInteger),
+  vpnConfig: toUndefOr(toNullOr(toString)),
+  restricted: toUndefOr(toBoolean),
+  storageMib: toUndefOr(toNullOr(toPositiveInteger))
+});
+var toHasAccessArgs = toObject({
+  ...workspaceServiceArgs,
+  role: toRole
+});
+var toHasAccessForUserArgs = toObject({
+  ...workspaceServiceArgs,
+  userId: toNonNegativeInteger,
+  role: toRole
+});
+
+// packages/deployment-service/common/lib/model/WorkspaceStatus.js
+var WorkspaceStatus;
+(function(WorkspaceStatus2) {
+  WorkspaceStatus2["Pending"] = "Workspace provisioning pending";
+  WorkspaceStatus2["StartDeployment"] = "Received deployment request";
+  WorkspaceStatus2["ConfiguringStorage"] = "Configuring storage";
+  WorkspaceStatus2["CopyCeph"] = "Copy data from source workspace";
+  WorkspaceStatus2["Deploying"] = "Deploying resources";
+  WorkspaceStatus2["InstanceDeployed"] = "Resources are deployed";
+  WorkspaceStatus2["ProvisioningStarted"] = "Provisioning workspace";
+  WorkspaceStatus2["SettingUpTerminal"] = "Configuring Terminal";
+  WorkspaceStatus2["TerminalSetup"] = "Completed terminal configuration";
+  WorkspaceStatus2["CloningRepository"] = "Cloning repository";
+  WorkspaceStatus2["RepositoryCloned"] = "Completed cloning repository";
+  WorkspaceStatus2["Mounting"] = "Mounting volume";
+  WorkspaceStatus2["Mounted"] = "Completed mounting volume";
+  WorkspaceStatus2["Running"] = "Workspace is running";
+  WorkspaceStatus2["Free"] = "Shutting down workspace";
+  WorkspaceStatus2["Failed"] = "Workspace start failed";
+  WorkspaceStatus2["ConnectionFailed"] = "Connection to workspace failed";
+  WorkspaceStatus2["AgentRestart"] = "Workspace encountered an error. Restarting";
+  WorkspaceStatus2["Unknown"] = "Waiting for workspace status";
+})(WorkspaceStatus || (WorkspaceStatus = {}));
+var toWorkspaceStatus = toStringEnum("WorkspaceStatus", WorkspaceStatus);
+var LandscapeStatus;
+(function(LandscapeStatus2) {
+  LandscapeStatus2["StartServers"] = "Received deployment request";
+  LandscapeStatus2["TearDownServers"] = "Received teardown request";
+  LandscapeStatus2["Free"] = "Servers shut down";
+  LandscapeStatus2["Deploying"] = "Deploying servers";
+  LandscapeStatus2["ServersDeployed"] = "Servers are deployed";
+  LandscapeStatus2["Scaled"] = "Servers are scaled";
+  LandscapeStatus2["Failed"] = "Landscape deploy failed";
+  LandscapeStatus2["Redeploying"] = "Received redeployment request";
+})(LandscapeStatus || (LandscapeStatus = {}));
+var toLandscapeStatus = toStringEnum("LandscapeStatus", LandscapeStatus);
+
+// packages/deployment-service/common/lib/WorkspaceInfo.js
+var workspaceStatusRoles = ["service"];
+var workspaceErrorRoles = ["service"];
+var landscapeStatusRoles = ["landscape"];
+var landscapeErrorRoles = ["landscape"];
+var replicaStatusRoles = ["leader", "follower"];
+var errorStatus = {
+  name: toString,
+  message: toString
+};
+var toErrorStatus = toObject(errorStatus);
+var toWorkspaceInfo = toObject({
+  status: toWorkspaceStatus,
+  role: toLiteralUnion("role", workspaceStatusRoles)
+});
+var toWorkspaceErrorStatus = toObject({
+  status: toObject(errorStatus),
+  role: toLiteralUnion("role", workspaceErrorRoles),
+  hostname: toUndefOr(toString)
+});
+var toReplicaErrorStatus = toObject({
+  status: toObject(errorStatus),
+  role: toLiteralUnion("role", replicaStatusRoles),
+  hostname: toString,
+  server: toUndefOr(toString)
+});
+var toReplicaInfo = toObject({
+  status: toWorkspaceStatus,
+  hostname: toString,
+  role: toLiteralUnion("role", replicaStatusRoles),
+  server: toUndefOr(toString)
+});
+var isReplicaInfo = (e) => isOfType(e, toReplicaInfo);
+var toReplicaInfoOrErrorStatus = toOr(toReplicaInfo, toReplicaErrorStatus);
+var toLandscapeInfo = toObject({
+  status: toLandscapeStatus,
+  role: toLiteralUnion("role", landscapeStatusRoles)
+});
+var toLandscapeErrorStatus = toObject({
+  status: toObject(errorStatus),
+  role: toLiteralUnion("role", landscapeErrorRoles)
+});
+var toWorkspaceInfoOrErrorStatus = toOr(toWorkspaceInfo, toWorkspaceErrorStatus, toLandscapeInfo, toLandscapeErrorStatus, toReplicaInfo, toReplicaErrorStatus);
+
+// packages/deployment-service/common/lib/api/replica.js
+var __decorate3 = function(decorators, target, key, desc) {
+  var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+  if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+  else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+  return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var replicaService = {
+  name: "Replica",
+  context: toHttpContext,
+  methods: {
+    electLeader: rpc({
+      response: toString,
+      request: toWorkspaceServiceArgs2
+    }),
+    listHealthy: rpc({
+      response: toArray(toObject({
+        replica: toString,
+        server: toString
+      })),
+      request: toWorkspaceServiceArgs2
+    }),
+    listReady: rpc({
+      response: toArray(toObject({
+        replica: toString,
+        server: toString
+      })),
+      request: toWorkspaceServiceArgs2
+    }),
+    info: stream({
+      response: toWorkspaceInfoOrErrorStatus,
+      request: toWorkspaceServiceArgs2
+    })
+  }
+};
+var ReplicaStub = class ReplicaStub2 extends createAuthnStubClass("ReplicaStub", replicaService) {
+};
+ReplicaStub = __decorate3([
+  (0, import_inversify2.injectable)()
+], ReplicaStub);
+
+// packages/deployment-service/common/lib/api/workspaceDeployment.js
+var import_inversify3 = __toESM(require_inversify(), 1);
+
+// packages/utils/common/lib/flags.js
+var MAINTENANCE_MODE_INTERNAL_FLAG_NAME = "maintenance-mode";
+var AVAILABLE_INTERNAL_FLAGS = [
+  "allow-legacy-ci",
+  "cimg-private-registry",
+  "custom-service-image",
+  "gateway-domains",
+  "git-panel",
+  "gpu-plan",
+  "hermetic",
+  "headless-services",
+  "language-server",
+  "legacy-marketplace",
+  "managed-services",
+  MAINTENANCE_MODE_INTERNAL_FLAG_NAME,
+  "ms-in-ls",
+  "msd",
+  "o11y",
+  "openfga-authz",
+  "organizations",
+  "overview-react",
+  "persistent-logs",
+  "persistent-nix",
+  "preview-comments",
+  "react-create-ws",
+  "recaptcha-v3",
+  "recursive-watcher",
+  "single-workspace-mode",
+  "selectable-resources",
+  "time-sameDc",
+  "vcluster",
+  "virtual-machines",
+  "vpn",
+  "workspace-ssh"
+];
+var availableInternalFlags = [...AVAILABLE_INTERNAL_FLAGS];
+var AVAILABLE_ALPHA_FLAGS = [
+  "privileged-ports",
+  "secret-management",
+  "sub-path-mount",
+  "tcp-udp",
+  "ws-vscode-server"
+];
+var availableAlphaFlags = [...AVAILABLE_ALPHA_FLAGS];
+var AVAILABLE_FEATURES = [
+  "billing",
+  "avatar-upload",
+  "dev-domains-port",
+  "email-signup",
+  "email-signin",
+  "run-as-root-insecure",
+  "standalone-teams"
+];
+var availableFeatures = [...AVAILABLE_FEATURES];
+var allAvailableFlags = [
+  ...AVAILABLE_INTERNAL_FLAGS,
+  ...AVAILABLE_ALPHA_FLAGS,
+  ...AVAILABLE_FEATURES
+];
+var toInternalFlagName = toLiteralUnion("InternalFlagName", availableInternalFlags);
+var toAlphaFlagName = toLiteralUnion("AlphaFlagName", availableAlphaFlags);
+var toFlagName = toLiteralUnion("FlagName", allAvailableFlags);
+var toFeatureName = toLiteralUnion("FeatureName", availableFeatures);
+var toFlags = toObject({
+  internal: toObject({
+    available: toReadOnly(toArray(toInternalFlagName)),
+    enabled: toReadOnly(toArray(toInternalFlagName))
+  }),
+  alpha: toObject({
+    available: toReadOnly(toArray(toAlphaFlagName)),
+    enabled: toReadOnly(toArray(toAlphaFlagName))
+  }),
+  features: toObject({
+    available: toReadOnly(toArray(toFeatureName)),
+    enabled: toReadOnly(toArray(toFeatureName))
+  })
+});
+var enabledFlags;
+var isEnabled = (name) => {
+  if (!enabledFlags) {
+    throw new Uninitialized("initFlags() was not called");
+  }
+  return enabledFlags.has(name);
+};
+var allEnabled = () => {
+  if (!enabledFlags) {
+    throw new Uninitialized("initFlags() was not called");
+  }
+  const enabledFlagList = [...enabledFlags];
+  const enabledInternal = enabledFlagList.filter((x) => availableInternalFlags.includes(x));
+  const enabledAlpha = enabledFlagList.filter((x) => availableAlphaFlags.includes(x));
+  const featureFlags = enabledFlagList.filter((x) => availableFeatures.includes(x));
+  return {
+    internal: {
+      available: Object.freeze([...availableInternalFlags]),
+      enabled: Object.freeze(enabledInternal)
+    },
+    alpha: {
+      available: Object.freeze([...availableAlphaFlags]),
+      enabled: Object.freeze(enabledAlpha)
+    },
+    features: {
+      available: Object.freeze([...availableFeatures]),
+      enabled: Object.freeze(featureFlags)
+    }
+  };
+};
+var splitInternalConfig = (internal) => {
+  const knownInternal = internal.filter((x) => availableInternalFlags.includes(x));
+  const knownAlpha = internal.filter((x) => availableAlphaFlags.includes(x));
+  const knownFeatures = internal.filter((x) => availableFeatures.includes(x));
+  const unknown = internal.filter((x) => !availableInternalFlags.includes(x) && !availableAlphaFlags.includes(x) && !availableFeatures.includes(x));
+  return {
+    unknown,
+    knownInternal,
+    knownAlpha,
+    knownFeatures
+  };
+};
+var splitAlphaConfig = (alpha) => {
+  const knownAlpha = alpha.filter((x) => availableAlphaFlags.includes(x));
+  const knownFeatures = alpha.filter((x) => availableFeatures.includes(x));
+  const unknown = alpha.filter((x) => !availableAlphaFlags.includes(x) && !availableFeatures.includes(x));
+  return {
+    unknown,
+    knownAlpha,
+    knownFeatures
+  };
+};
+var setEnabledFlags = ({ internal, alpha, features }) => {
+  const { unknown, knownInternal, knownAlpha: knownAlphaFromInternal, knownFeatures: knownFeaturesFromInternal } = splitInternalConfig(internal ?? []);
+  if (0 !== unknown.length) {
+    logW(jj`unknown internal flags provided: ${unknown}`);
+  }
+  if (0 !== knownAlphaFromInternal.length) {
+    logW(jj`alpha flags provided in internal config, please move to alpha: ${knownAlphaFromInternal}`);
+  }
+  if (0 !== knownFeaturesFromInternal.length) {
+    logW(jj`feature flags provided in internal config, please move to features: ${knownFeaturesFromInternal}`);
+  }
+  const { unknown: unknownAlpha, knownAlpha, knownFeatures: knownFeaturesFromAlpha } = splitAlphaConfig(alpha ?? []);
+  if (0 !== unknownAlpha.length) {
+    logW(jj`unknown alpha flags provided: ${unknownAlpha}`);
+  }
+  if (0 !== knownFeaturesFromAlpha.length) {
+    logW(jj`feature flags provided in alpha config, please move to features: ${knownFeaturesFromAlpha}`);
+  }
+  const [unknownFeatures, knownFeatures] = filterSplit(features ?? [], (x) => availableFeatures.includes(x));
+  if (0 !== unknownFeatures.length) {
+    logW(jj`unknown features provided: ${unknownFeatures}`);
+  }
+  const currentFlags = [...enabledFlags?.values() ?? []];
+  const keptInternal = internal === void 0 ? currentFlags.filter((x) => availableInternalFlags.includes(x)) : [];
+  const keptAlpha = alpha === void 0 ? currentFlags.filter((x) => availableAlphaFlags.includes(x)) : [];
+  const keptFeatures = features === void 0 ? currentFlags.filter((x) => availableFeatures.includes(x)) : [];
+  enabledFlags = /* @__PURE__ */ new Set([
+    ...keptInternal,
+    ...keptAlpha,
+    ...keptFeatures,
+    ...knownInternal,
+    ...knownAlphaFromInternal,
+    ...knownAlpha,
+    ...knownFeaturesFromInternal,
+    ...knownFeaturesFromAlpha,
+    ...knownFeatures
+  ]);
+  return allEnabled();
+};
+
+// packages/utils/common/lib/features.js
+var toFeatures = toObject({
+  available: toReadOnly(toArray(toFeatureName)),
+  enabled: toReadOnly(toArray(toFeatureName))
+});
+var isFeatureEnabled = (name) => {
+  return isEnabled(name);
+};
+var initFeatures = (features = []) => {
+  const result = setEnabledFlags({ features });
+  return {
+    available: result.features.available,
+    enabled: result.features.enabled
+  };
+};
+
+// packages/utils/common/lib/typing/url.js
+var prepareUrlPathRegex = () => {
+  const unReservedCharsGroup = "-._~a-zA-Z0-9";
+  const subDelims = "!$&'()*+,;=";
+  const other = ":@";
+  const pathDelimiter = "/";
+  const singleCharsClass = [
+    "[",
+    unReservedCharsGroup,
+    subDelims,
+    other,
+    pathDelimiter,
+    "]"
+  ].join("");
+  const regexp = [
+    "^\\/",
+    "(?:",
+    singleCharsClass,
+    "|",
+    "%[0-9A-F]{2}",
+    ")*$"
+  ].join("");
+  return new RegExp(regexp);
+};
+var validUrlPathRegex = prepareUrlPathRegex();
+var toUrlPath = toStringMatchingRegex("UrlPath", validUrlPathRegex);
+var prepareFullUrlRegex = () => {
+  const unReservedCharsGroup = "-._~a-zA-Z0-9";
+  const subDelims = "!$&'()*+,;=";
+  const other = ":@";
+  const dot = "\\.";
+  const labelInner = `[a-zA-Z0-9-]`;
+  const labelEdge = `[a-zA-Z0-9]`;
+  const label = `${labelEdge}(?:${labelInner}*${labelEdge})?`;
+  const pathSegmentCharsClass = [
+    "[",
+    unReservedCharsGroup,
+    subDelims,
+    other,
+    ".?]"
+  ].join("");
+  const knownProtocols = "https?|ftps?|wss?";
+  const regexp = [
+    `^(?:${knownProtocols})://`,
+    `${label}`,
+    `(?:${dot}${label})*`,
+    "(?::\\d+)?",
+    `(?:/(?:${pathSegmentCharsClass}+(?:/${pathSegmentCharsClass}+)*/?)?)?`,
+    "$"
+  ].join("");
+  return new RegExp(regexp);
+};
+var validFullUrlRegex = prepareFullUrlRegex();
+var toFullUrlByRegex = toStringMatchingRegex("FullUrl", validFullUrlRegex);
+var toFullUrl = (x) => {
+  try {
+    const url = new URL(toFullUrlByRegex(x));
+    return toString(x);
+  } catch {
+    throw new TypeConversionFailure("URL string", x);
+  }
+};
+
+// packages/utils/common/lib/url.js
+var devDomainRegex = /^(?:ide-|preview-)?(?<wsId>\d+)(?:-(?<port>\d+))?(?<server>-[a-z0-9-]*)?\./;
+var csInCsDomains = [
+  ".dev.5.codesphere.com",
+  ".cloud.codesphere.com",
+  ".2.codesphere.com",
+  ".dev-codesphere.com"
+];
+var isWorkspaceDomainWithWsId = (host) => {
+  const hostname = host.split(":")[0];
+  return devDomainRegex.test(hostname) && csInCsDomains.some((d) => hostname.endsWith(d));
+};
+var isLocalHost = (host) => host.split(":")[0] === "localhost" || host.split(":")[0] === "127.0.0.1";
+var isDevHost = (host) => [
+  ".dev.codesphere.com",
+  "3.codesphere.com",
+  "5.codesphere.com",
+  ".dev-codesphere.com"
+].some((s) => host.endsWith(s));
+var isQaHost = (host) => host.endsWith("qa.dev-codesphere.com");
+var createBaseUrl = (protocol, host, dc) => {
+  if (host.includes("://")) {
+    throw new InvalidArgument3("Host should not contain protocol.");
+  }
+  const p = isLocalHost(host) ? protocol : `${protocol}s`;
+  const prefix = !has(dc) || isLocalHost(host) || host.startsWith(`${dc}.`) || isWorkspaceDomainWithWsId(host) ? "" : `${dc}${isDevHost(host) && !isQaHost(host) ? "-" : "."}`;
+  return new URL(`${p}://${prefix}${host}`);
+};
+var createServiceUrl = (protocol, host, servicePath, dc) => {
+  const u = createBaseUrl(protocol, host, dc);
+  u.pathname = servicePath;
+  return u;
+};
+var joinPath = (...segments) => {
+  return [
+    segments[0] === "/" ? "" : segments[0],
+    ...segments.slice(1).map((s) => trimPrefix(s, "/"))
+  ].join("/");
+};
+
+// packages/utils/common/lib/path.js
+var import_path = require("path");
+var POSIX_PATH_REGEX = new RegExp("^/?(?:[^/\0]+/?)*$");
+var toPosixPath2 = (p) => {
+  const s = toString(p);
+  if (!POSIX_PATH_REGEX.test(s)) {
+    throw new TypeConversionFailure("POSIX path", p);
+  }
+  return s;
+};
+var toPathWithoutTraversal = (p) => {
+  const s = toPosixPath2(p);
+  if (s.split(import_path.sep).includes("..")) {
+    throw new TypeConversionFailure("path without ..", p);
+  }
+  return s;
+};
+
+// packages/workspace-agent/common/lib/pipeline/types.js
+var singleRunningStageKinds = ["prepare", "test"];
+var multiRunningStageKinds = ["run"];
+var stageKinds = [
+  ...singleRunningStageKinds,
+  ...multiRunningStageKinds
+];
+var toStageKind = toLiteralUnion("stageKind", stageKinds);
+var toStep = toObject({
+  name: toUndefOr(toString),
+  command: toString
+});
+var toUrl = (x) => {
+  if (x instanceof URL) {
+    return x;
+  }
+  try {
+    return new URL(toString(x));
+  } catch {
+    throw new TypeConversionFailure("URL string", x);
+  }
+};
+var toStage = toObject({
+  steps: toArray(toStep),
+  healthEndpoint: toUndefOr(toUrl)
+});
+var toEnvValue = toOr(toString, toNumber);
+var toEnv = toRecord(toEnvValue);
+var toSimpleNetworkConfig = toObject({
+  path: toUrlPath,
+  stripPath: toUndefOr(toBoolean)
+});
+var toPortConfig = toObject({
+  port: toPositiveInteger,
+  isPublic: toBoolean
+});
+var toPathConfig = toObject({
+  port: toPositiveInteger,
+  path: toUrlPath,
+  stripPath: toUndefOr(toBoolean)
+});
+var toAdvancedNetworkConfig = toObject({
+  ports: toNonEmptyArray(toPortConfig),
+  paths: toArray(toPathConfig)
+});
+var toNetworkConfig = toOr(toSimpleNetworkConfig, toAdvancedNetworkConfig);
+var MAX_USER_GROUP_ID = 2 ** 31 - 1;
+var toUserGroupId = ({ forceAllowRoot = false } = {}) => toRestrictedNumber("toUserGroupId", (n) => {
+  const allowRoot = forceAllowRoot || isFeatureEnabled("run-as-root-insecure");
+  return n >= (allowRoot ? 0 : 1) && n <= MAX_USER_GROUP_ID;
+});
+var toVolumeMounts = toArray(toObject({
+  name: toLiteral("_workspace"),
+  mountPath: toString,
+  workspacePath: toPathWithoutTraversal
+}));
+var toDeployStageServerCommonFields = {
+  healthEndpoint: toUndefOr(toUrl),
+  plan: toUndefOr(toPlanId),
+  replicas: toUndefOr(toPositiveInteger),
+  isPublic: toUndefOr(toBoolean),
+  network: toUndefOr(toOr(toSimpleNetworkConfig, toAdvancedNetworkConfig)),
+  env: toUndefOr(toEnv),
+  runAsUser: toUndefOr(toUserGroupId({ forceAllowRoot: true })),
+  runAsGroup: toUndefOr(toUserGroupId({ forceAllowRoot: true })),
+  volumeMounts: toUndefOr(toVolumeMounts)
+};
+var toDeployStageServerReactive = toObject({
+  ...toDeployStageServerCommonFields,
+  steps: toArray(toStep),
+  image: toUndefOr(toNonEmptyString)
+});
+var toDeployStageServerContainerRuntime = toObject({
+  ...toDeployStageServerCommonFields,
+  steps: toUndef,
+  image: toNonEmptyString,
+  command: toUndefOr(toArray(toString))
+});
+var toDeployStageServer = toOr(toDeployStageServerReactive, toDeployStageServerContainerRuntime);
+var isDeployStageServer = (x) => isOfType(x, toDeployStageServer);
+var toManagedServiceConfigFields = {
+  provider: toObject({
+    name: toString,
+    version: toString
+  }),
+  plan: toObject({
+    id: toNonNegativeInteger,
+    parameters: toRecord(toInteger)
+  }),
+  config: toRecord(toUnknown),
+  secrets: toRecord(toUnknown)
+};
+var toManagedServiceConfig = toObject(toManagedServiceConfigFields);
+var toHeadlessPath = toObject({
+  path: toUrlPath,
+  stripPath: toBoolean,
+  target: toString
+});
+var toHeadlessServiceConfig = toObject({
+  network: toObject({
+    paths: toArray(toHeadlessPath)
+  })
+});
+var toDeployStage = toRecord(toOr(toDeployStageServer, toManagedServiceConfig, toHeadlessServiceConfig));
+var isDeployStage = (x) => isOfType(x, toDeployStage);
+var toPipelineConfigV01 = toObject({
+  prepare: toStage,
+  test: toStage,
+  run: toStage
+});
+var toPipelineConfigV02 = toObject({
+  schemaVersion: toLiteral("v0.2"),
+  prepare: toStage,
+  test: toStage,
+  run: toDeployStage
+});
+var toPipelineConfig = toOr(toPipelineConfigV02, toPipelineConfigV01);
+var pipelineProcessingStates = [
+  "waiting",
+  "running",
+  "success",
+  "failure",
+  "aborted"
+];
+var executionInfo = {
+  state: toLiteralUnion("state", pipelineProcessingStates),
+  startedAt: toUndefOr(toDate),
+  finishedAt: toUndefOr(toDate)
+};
+var toExecutionInfo = toObject(executionInfo);
+var stageExecutionInfo = {
+  ...executionInfo,
+  steps: toArray(toExecutionInfo)
+};
+var toStageExecutionInfo = toObject(stageExecutionInfo);
+var isAdvancedNetworkConfig = (c) => isOfType(c, toAdvancedNetworkConfig);
+
+// packages/workspace-service/common/lib/Workspace.js
+var GitProvider;
+(function(GitProvider2) {
+  GitProvider2["GitHub"] = "github";
+  GitProvider2["GitLab"] = "gitlab";
+  GitProvider2["Bitbucket"] = "bitbucket";
+})(GitProvider || (GitProvider = {}));
+var toGitProvider = toStringEnum("GitProvider", GitProvider);
+var workspace = {
+  id: readOnly(toNonNegativeInteger),
+  dataCenterId: readOnly(toNumber),
+  userId: readOnly(toInteger),
+  teamId: readOnly(toNonNegativeInteger),
+  name: toString,
+  gitUrl: readOnly(toNullOr(toString)),
+  isPrivateRepo: readOnly(toBoolean),
+  welcomeMessage: readOnly(toNullOr(toString)),
+  initialBranch: readOnly(toNullOr(toString)),
+  cloneDepth: toUndefOr(toPositiveInteger),
+  skipLfs: toUndefOr(toBoolean),
+  recurseSubmodules: toUndefOr(toBoolean),
+  sourceWorkspaceId: readOnly(toNullOr(toNonNegativeInteger)),
+  planId: toPlanId,
+  replicas: toPositiveInteger,
+  vpnConfig: toNullOr(toString),
+  collectTraces: toBoolean,
+  restricted: toBoolean,
+  baseImage: toUndefOr(toString),
+  persistentLogs: toBoolean,
+  createdAt: toDate,
+  managedServiceId: toUndefOr(toUuid),
+  storageMib: toUndefOr(toPositiveInteger)
+};
+var toWorkspace = toObject(workspace);
+var validServerNameRegex = new RegExp("^(?:[a-z]|[a-z][-a-z0-9]{0,30}[a-z0-9])$");
+var toMsdServerName = toStringMatchingRegex("MsdServerName", validServerNameRegex);
+var toServerPath = toObject({
+  port: toPositiveInteger,
+  path: toUrlPath,
+  stripPath: toBoolean
+});
+var toServerPort = toObject({
+  port: toPositiveInteger,
+  isPublic: toBoolean
+});
+var toServerNetwork = toObject({
+  ports: toNonEmptyArray(toServerPort),
+  paths: toArray(toServerPath)
+});
+var server = {
+  name: readOnly(toMsdServerName),
+  planId: toPlanId,
+  replicas: toPositiveInteger,
+  network: toServerNetwork,
+  baseImage: toUndefOr(toString),
+  env: toUndefOr(toEnv),
+  runAsUser: toUndefOr(toNonNegativeInteger),
+  runAsGroup: toUndefOr(toNonNegativeInteger),
+  volumeMounts: toUndefOr(toVolumeMounts)
+};
+var toServer = toObject(server);
+var toHeadlessService = toObject({
+  name: toString,
+  network: toArray(toObject({
+    path: toUrlPath,
+    target: toString,
+    stripPath: toBoolean
+  }))
+});
+var serverV1 = {
+  name: readOnly(toMsdServerName),
+  planId: toPlanId,
+  replicas: toPositiveInteger,
+  stripPath: toBoolean,
+  isPublic: toUndefOr(toBoolean),
+  network: toUndefOr(toObject({
+    path: toUrlPath
+  }))
+};
+var toServerV1 = toObject(serverV1);
+var uniqueServerId = ({ workspaceId, name }) => `${workspaceId}-${name}`;
+var IDE_SERVER_NAME = "codesphere-ide";
+var DEFAULT_PORT = 3e3;
+var workspaceDevDomain = (workspaceId, workspaceHostingBaseDomain) => `${workspaceId}${isFeatureEnabled("dev-domains-port") ? `-${DEFAULT_PORT}` : ""}.${workspaceHostingBaseDomain}`;
+var simpleNetworkToServerNetwork = (networkConfig, isPublic) => ({
+  ports: [
+    {
+      port: DEFAULT_PORT,
+      isPublic: isPublic ?? true
+    }
+  ],
+  paths: !networkConfig || !(isPublic ?? true) ? [] : [
+    {
+      port: DEFAULT_PORT,
+      path: networkConfig.path,
+      stripPath: networkConfig.stripPath ?? false
+    }
+  ]
+});
+var advancedNetworkToServerNetwork = (networkConfig) => ({
+  ...networkConfig,
+  paths: networkConfig.paths.map((p) => ({ stripPath: false, ...p }))
+});
+var configToLandscape = (config) => {
+  return Object.entries(config).map(([k, v]) => {
+    if (!isDeployStageServer(v)) {
+      return;
+    }
+    return deployStageServerToLandscape(k, v);
+  }).filter((x) => x !== void 0);
+};
+var deployStageServerToLandscape = (name, config) => toServer({
+  name,
+  planId: config.plan,
+  replicas: config.replicas ?? 1,
+  env: config.env,
+  baseImage: config.image,
+  runAsUser: config.runAsUser ?? void 0,
+  runAsGroup: config.runAsGroup ?? void 0,
+  volumeMounts: config.volumeMounts,
+  network: config.network && isAdvancedNetworkConfig(config.network) ? advancedNetworkToServerNetwork(config.network) : simpleNetworkToServerNetwork(config.network, config.isPublic)
+});
+
+// packages/deployment-service/common/lib/PrometheusResponse.js
+var toUnixTimeAndValueTuple = toTuple(toNumber, toOr(toString, toNumber));
+var toRangeVectorResultEntry = toObject({
+  metric: toRecord(toString),
+  values: toArray(toUnixTimeAndValueTuple)
+});
+var toRangeVectorResultData = toObject({
+  resultType: toLiteral("matrix"),
+  result: toArray(toRangeVectorResultEntry)
+});
+var toPrometheusResponseSuccess = toObject({
+  status: toLiteral("success"),
+  data: toRangeVectorResultData,
+  warnings: toUndefOr(toArray(toString))
+});
+var toPrometheusResponseError = toObject({
+  status: toLiteral("error"),
+  errorType: toString,
+  error: toString
+});
+var toPrometheusResponse = toOr(toPrometheusResponseSuccess, toPrometheusResponseError);
+
+// packages/deployment-service/common/lib/serviceArgs.js
+var ResourceType;
+(function(ResourceType2) {
+  ResourceType2["CPU"] = "cpu";
+  ResourceType2["Memory"] = "memory";
+})(ResourceType || (ResourceType = {}));
+var toWorkspaceResourceUtilizationArgs = toObject({
+  ...workspaceServiceArgs,
+  intervalStart: toReadOnly(toPositiveInteger),
+  intervalEnd: toReadOnly(toPositiveInteger),
+  resourceType: toReadOnly(toStringEnum("ResourceType", ResourceType)),
+  replica: toUndefOr(toString)
+});
+
+// packages/deployment-service/common/lib/status.js
+var StartWorkspaceStatus;
+(function(StartWorkspaceStatus2) {
+  StartWorkspaceStatus2["WorkspaceUpdate"] = "Restarting updated Workspace.";
+  StartWorkspaceStatus2["NewWorkspaceDeployment"] = "Deploying new workspace";
+  StartWorkspaceStatus2["WorkspaceAlreadyDeployed"] = "Workspace already deployed";
+  StartWorkspaceStatus2["WorkspaceDeploying"] = "Your workspace will be ready soon";
+})(StartWorkspaceStatus || (StartWorkspaceStatus = {}));
+var toStartWorkspaceStatus = toStringEnum("StartWorkspaceStatus", StartWorkspaceStatus);
+var RouterStatusEnum;
+(function(RouterStatusEnum2) {
+  RouterStatusEnum2[RouterStatusEnum2["Available"] = 0] = "Available";
+  RouterStatusEnum2[RouterStatusEnum2["PartiallyAvailable"] = 1] = "PartiallyAvailable";
+  RouterStatusEnum2[RouterStatusEnum2["Unavailable"] = 2] = "Unavailable";
+})(RouterStatusEnum || (RouterStatusEnum = {}));
+var toRouterStatusEnum = toNumericEnum("RouterStatus", RouterStatusEnum);
+var toRouterStatus = toObject({
+  status: toRouterStatusEnum,
+  readyReplicas: toNonNegativeInteger,
+  desiredReplicas: toUndefOr(toNonNegativeInteger)
+});
+
+// packages/deployment-service/common/lib/api/workspaceDeployment.js
+var __decorate4 = function(decorators, target, key, desc) {
+  var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+  if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+  else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+  return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var baseImage = {
+  name: toString,
+  supportedUntil: toDate,
+  default: toUndefOr(toBoolean)
+};
+var toBaseImage = toObject(baseImage);
+var toFlavorConfig = toObject({
+  image: toString,
+  pool: toRecord(toNumber)
+});
+var toImageConfig = toObject({
+  ...baseImage,
+  flavors: toObject({
+    default: toFlavorConfig,
+    gpu: toUndefOr(toFlavorConfig)
+  })
+});
+var toDeployConfig = toObject({
+  images: toRecord(toImageConfig)
+});
+var toRemovePvcArgs = toObject({
+  workspaceId: toNonNegativeInteger,
+  sourceWorkspaceId: toNullOr(toNonNegativeInteger)
+});
+var toWorkspaceHost = toObject({
+  agent: toString,
+  server: toString,
+  vpn: toString
+});
+var toGetWorkspaceHostArgs = toObject({
+  workspaceId: toNonNegativeInteger,
+  replica: toUndefOr(toString),
+  server: toUndefOr(toString)
+});
+var toMarkWorkspaceUsedArgs = toObject({
+  workspaceId: toNonNegativeInteger
+});
+var toGetWorkspaceLastUsedArgs = toObject({
+  workspaceId: toNonNegativeInteger
+});
+var toConfigUpdateArgs = toObject({
+  ...workspaceServiceArgs,
+  envVars: toRecord(toString)
+});
+var toHasCapacityArgs = toObject({
+  productId: toNonNegativeInteger,
+  replicas: toPositiveInteger
+});
+var toRestartArgs = toObject({
+  workspaceId: toNonNegativeInteger,
+  podName: toUndefOr(toString)
+});
+var toReplicaResourceUtilization = toObject({
+  replica: toString,
+  server: toString,
+  planId: toPlanId,
+  usage: toArray(toUnixTimeAndValueTuple)
+});
+var LandscapeServerReadinessStatus;
+(function(LandscapeServerReadinessStatus2) {
+  LandscapeServerReadinessStatus2["Ready"] = "Ready";
+  LandscapeServerReadinessStatus2["Reachable"] = "Reachable";
+  LandscapeServerReadinessStatus2["NotReady"] = "NotReady";
+})(LandscapeServerReadinessStatus || (LandscapeServerReadinessStatus = {}));
+var toLandscapeServerReadinessInfo = toObject({
+  status: toStringEnum("LandscapeServerReadinessStatus", LandscapeServerReadinessStatus),
+  server: toMsdServerName
+});
+var workspaceDeploymentService = {
+  name: "Workspace",
+  context: toHttpContext,
+  methods: {
+    listAvailableBaseImages: rpc({
+      response: toRecord(toBaseImage),
+      request: toVoid
+    }),
+    workspaceIsOutdated: rpc({
+      response: toBoolean,
+      request: toWorkspaceServiceArgs2,
+      defaultOptions: { timeout: { seconds: 10 } }
+    }),
+    hasCapacity: rpc({
+      response: toBoolean,
+      request: toHasCapacityArgs
+    }),
+    hasFreeWsCapacity: rpc({
+      response: toBoolean,
+      request: toPlanId
+    }),
+    startDomain: rpc({
+      response: toVoid,
+      request: toString
+    }),
+    restart: rpc({
+      response: toVoid,
+      request: toRestartArgs
+    }),
+    updateConfig: rpc({
+      response: toVoid,
+      request: toConfigUpdateArgs,
+      defaultOptions: { timeout: duration({ seconds: 10 }) }
+    }),
+    getAllWorkspaceResourceUtilization: rpc({
+      response: toArray(toReplicaResourceUtilization),
+      request: toWorkspaceResourceUtilizationArgs,
+      defaultOptions: { timeout: duration({ seconds: 20 }) }
+    }),
+    getWorkspaceHost: rpc({
+      response: toWorkspaceHost,
+      request: toGetWorkspaceHostArgs,
+      defaultOptions: { timeout: duration({ seconds: 30 }) }
+    }),
+    markWorkspaceUsed: rpc({
+      response: toVoid,
+      request: toMarkWorkspaceUsedArgs,
+      defaultOptions: { timeout: duration({ seconds: 10 }) }
+    }),
+    getWorkspaceLastUsed: rpc({
+      response: toDate,
+      request: toGetWorkspaceLastUsedArgs,
+      defaultOptions: { timeout: duration({ seconds: 10 }) }
+    }),
+    removePvc: rpc({
+      response: toVoid,
+      request: toRemovePvcArgs
+    }),
+    uninstallDeployment: rpc({
+      response: toVoid,
+      request: toWorkspaceServiceArgs2,
+      defaultOptions: { timeout: duration({ seconds: 25 }) }
+    }),
+    startWorkspace: rpc({
+      response: toStartWorkspaceStatus,
+      request: toStartWorkspaceServiceParams,
+      defaultOptions: { timeout: duration({ seconds: 20 }) }
+    }),
+    landscapeServerReadinessStream: stream({
+      response: toLandscapeServerReadinessInfo,
+      request: toWorkspaceServiceArgs2
+    })
+  }
+};
+var workspaceDeploymentStub = createAuthnStubClass("WorkspaceDeploymentStub", {
+  name: "Workspace",
+  context: toHttpContext,
+  methods: workspaceDeploymentService.methods
+});
+var WorkspaceDeploymentStub = class WorkspaceDeploymentStub2 extends workspaceDeploymentStub {
+};
+WorkspaceDeploymentStub = __decorate4([
+  (0, import_inversify3.injectable)()
+], WorkspaceDeploymentStub);
+
+// packages/ide/common/lib/api/config.js
+var import_inversify4 = __toESM(require_inversify(), 1);
+
+// packages/auth/common/lib/oauth.js
+var baseOAuthProviders = [
+  "bitbucket",
+  "github",
+  "gitlab",
+  "google",
+  "facebook"
+];
+var toBaseOAuthProviderId = toLiteralUnion("BaseOauthProviders", baseOAuthProviders);
+var ALL_OAUTH_PROVIDER_IDS = [...baseOAuthProviders, "oidc"];
+var toOAuthProviderId = toLiteralUnion("OauthProviderId", ALL_OAUTH_PROVIDER_IDS);
+
+// packages/auth-service/common/lib/session/types.js
+var toSessionId = toObject({
+  id: toUndefOr(readOnly(toString))
+});
+var toCreds = toObject({
+  sessionId: readOnly(toString),
+  accessToken: readOnly(toString)
+});
+var toSessionString = readOnly(toString);
+
+// packages/auth-service/common/lib/Authentication.js
+var oAuthProviderConfigBase = {
+  name: toString,
+  clientId: toString,
+  authorizationUrl: toString,
+  scopes: toUndefOr(toArray(toString))
+};
+var toPublicOAuthProviderConfig = toObject({
+  ...oAuthProviderConfigBase,
+  type: toOAuthProviderId
+});
+var toPrivateOAuthProviderConfig = toObject({
+  ...oAuthProviderConfigBase,
+  type: toBaseOAuthProviderId,
+  clientSecret: toString
+});
+var toOidcOAuthProviderConfig = toObject({
+  type: toLiteral("oidc"),
+  name: toString,
+  clientId: toString,
+  clientSecret: toString,
+  issuerUrl: toString,
+  scopes: withDefault(toArray(toString), () => [
+    "openid",
+    "email",
+    "profile"
+  ])
+});
+var toPublicOAuthConfig = toObject({
+  redirectUri: toString,
+  providers: withDefaultIfNull(toArray(toPublicOAuthProviderConfig), () => [])
+});
+var toPrivateOAuthConfig = toObject({
+  redirectUri: toString,
+  providers: withDefaultIfNull(toArray(toOr(toPrivateOAuthProviderConfig, toOidcOAuthProviderConfig)), () => [])
+});
+var toOAuthAuthentication = toObject({
+  provider: toOAuthProviderId,
+  isNewUser: toBoolean,
+  sessionId: toSessionString
+});
+var toOAuthCallbackParams = toObject({
+  code: toString,
+  iss: toUndefOr(toString)
+});
+
+// packages/utils/common/lib/codesphereEnv.js
+var CodesphereEnv;
+(function(CodesphereEnv2) {
+  CodesphereEnv2["Prod"] = "prod";
+  CodesphereEnv2["Dev"] = "dev";
+  CodesphereEnv2["Local"] = "local";
+  CodesphereEnv2["Test"] = "test";
+  CodesphereEnv2["LocalTest"] = "local-test";
+  CodesphereEnv2["PrivateCloud"] = "private-cloud";
+  CodesphereEnv2["TelioDev"] = "telio-dev";
+})(CodesphereEnv || (CodesphereEnv = {}));
+var codesphereEnvId = serviceId("CodesphereEnv");
+var toCodesphereEnv = toStringEnum("CodesphereEnv", CodesphereEnv);
+
+// packages/utils/common/lib/datacenters.js
+var toDataCenter = toObject({
+  id: toNumber,
+  name: toString,
+  city: toString,
+  countryCode: toString
+});
+var toDataCenterConfig = toObject({
+  availableDcs: toArray(toDataCenter),
+  currentDc: toNumber
+});
+var toDataCenterIp = toObject({
+  id: toNumber,
+  gatewayIp: toUndefOr(toString)
+});
+var toDataCenterIpsConfig = toObject({
+  dataCenters: toArray(toDataCenterIp)
+});
+var StaticDataCenterId;
+(function(StaticDataCenterId2) {
+  StaticDataCenterId2[StaticDataCenterId2["GKE"] = 0] = "GKE";
+  StaticDataCenterId2[StaticDataCenterId2["PlusServerCologne"] = 1] = "PlusServerCologne";
+  StaticDataCenterId2[StaticDataCenterId2["EquinixFrankfurt"] = 2] = "EquinixFrankfurt";
+  StaticDataCenterId2[StaticDataCenterId2["PlusServerDevCologne"] = 3] = "PlusServerDevCologne";
+  StaticDataCenterId2[StaticDataCenterId2["GcpUsEast4"] = 4] = "GcpUsEast4";
+  StaticDataCenterId2[StaticDataCenterId2["GcpEuWestDev"] = 5] = "GcpEuWestDev";
+})(StaticDataCenterId || (StaticDataCenterId = {}));
+
+// packages/ide/common/lib/BrowserConfig.js
+var toExperiments = toObject({
+  available: toReadOnly(toArray(toString)),
+  enabled: toReadOnly(toArray(toString))
+});
+var toFeatures2 = toObject({
+  available: toReadOnly(toArray(toString)),
+  enabled: toReadOnly(toArray(toString))
+});
+var toBrowserConfig = toObject({
+  version: toString,
+  env: toCodesphereEnv,
+  workspaceHostingBaseDomain: toString,
+  availableDcs: toArray(toDataCenter),
+  defaultDc: toNumber,
+  docsUrl: toString,
+  pipelineExampleUrl: toString,
+  tosUrl: toString,
+  brandTitle: toString,
+  brandLogoUrl: toString,
+  brandLogoNoTextUrl: toString,
+  brandLogoIconUrl: toString,
+  brandFaviconUrl: toString,
+  stripePublishableKey: toString,
+  recaptchaKey: toString,
+  supportEmail: toString,
+  incidentReportAddressConfigured: toUndefOr(toBoolean),
+  oAuth: toPublicOAuthConfig,
+  oAuthRedirectUri: toString,
+  bitbucketClientId: toString,
+  facebookClientId: toString,
+  googleClientId: toString,
+  gitHubClientId: toString,
+  gitLabClientId: toString,
+  experiments: toUndefOr(toExperiments),
+  freeWorkspaceTeamLimit: toNonNegativeInteger,
+  freeGpuWsTeamLimit: toNonNegativeInteger,
+  showPromotions: toBoolean
+});
+var browserConfigId = serviceId("BrowserConfig");
+
+// packages/ide/common/lib/api/config.js
+var __decorate5 = function(decorators, target, key, desc) {
+  var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+  if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+  else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+  return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var configService = {
+  name: "Config",
+  context: toHttpContext,
+  methods: {
+    getBrowserConfig: rpc({
+      response: toBrowserConfig,
+      request: toVoid
+    })
+  }
+};
+var ConfigStub = class ConfigStub2 extends createAuthnStubClass("ConfigStub", configService) {
+};
+ConfigStub = __decorate5([
+  (0, import_inversify4.injectable)()
+], ConfigStub);
+
+// packages/ide/common/lib/api/gitAuth.js
+var import_inversify5 = __toESM(require_inversify(), 1);
+
+// packages/utils/common/lib/git.js
+var GitProviderKind;
+(function(GitProviderKind2) {
+  GitProviderKind2["GitHub"] = "github";
+  GitProviderKind2["GitLab"] = "gitlab";
+  GitProviderKind2["Bitbucket"] = "bitbucket";
+  GitProviderKind2["ScmManager"] = "scm-manager";
+  GitProviderKind2["AzureDevOps"] = "azure-dev-ops";
+})(GitProviderKind || (GitProviderKind = {}));
+var toGitProviderKind = toStringEnum("GitProviderKind", GitProviderKind);
+var gitProviderDisplayName = {
+  [GitProviderKind.GitHub]: "GitHub",
+  [GitProviderKind.GitLab]: "GitLab",
+  [GitProviderKind.Bitbucket]: "Bitbucket",
+  [GitProviderKind.ScmManager]: "SCM Manager",
+  [GitProviderKind.AzureDevOps]: "Azure DevOps"
+};
+
+// packages/ide/common/lib/GitProvider.js
+var gitProvider = {
+  url: toString,
+  kind: toGitProviderKind
+};
+var toGitProvider2 = toObject(gitProvider);
+var authMethods = [
+  "client_secret_basic",
+  "client_secret_post",
+  "client_secret_jwt",
+  "private_key_jwt",
+  "tls_client_auth",
+  "self_signed_tls_client_auth",
+  "none"
+];
+var toClientAuthMethod = toLiteralUnion("clientAuthMethod", authMethods);
+var toGitOAuthConfig = toObject({
+  issuer: toString,
+  authorizationEndpoint: toString,
+  tokenEndpoint: toString,
+  clientId: toString,
+  clientSecret: toString,
+  redirectUri: toUndefOr(toString),
+  scope: toUndefOr(toString),
+  installationUri: toUndefOr(toString),
+  clientAuthMethod: toUndefOr(toClientAuthMethod)
+});
+var gitProviderWithApi = {
+  ...gitProvider,
+  api: toObject({
+    baseUrl: toString
+  })
+};
+var toGitProviderWithApi = toObject(gitProviderWithApi);
+var toGitProviderWithOAuth = toObject({
+  ...gitProviderWithApi,
+  oauth: toGitOAuthConfig
+});
+var toGitProviderWithTokenAuth = toObject({
+  ...gitProviderWithApi
+});
+var SUPPORTED_GIT_PROVIDERS = [
+  {
+    url: "https://github.com",
+    kind: GitProviderKind.GitHub,
+    auth: "oauth"
+  },
+  {
+    url: "https://gitlab.com",
+    kind: GitProviderKind.GitLab,
+    auth: "oauth"
+  },
+  {
+    url: "https://bitbucket.org",
+    kind: GitProviderKind.Bitbucket,
+    auth: "oauth"
+  },
+  {
+    url: "https://bitbucket.example.com/scm",
+    kind: GitProviderKind.Bitbucket,
+    auth: "oauth"
+  },
+  {
+    url: "https://bitbucket.example.com",
+    kind: GitProviderKind.Bitbucket,
+    auth: "oauth"
+  },
+  {
+    url: "https://dev.azure.com",
+    kind: GitProviderKind.AzureDevOps,
+    auth: "oauth"
+  },
+  {
+    url: "https://my-scm-manager.internal",
+    kind: GitProviderKind.ScmManager,
+    auth: "api"
+  }
+];
+
+// packages/ide/common/lib/api/gitAuth.js
+var __decorate6 = function(decorators, target, key, desc) {
+  var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+  if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+  else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+  return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var NotConnectedToProvider = class NotConnectedToProvider2 extends SimpleSerializableException {
+  static create(provider, opts) {
+    const providerName = Object.entries(GitProviderKind).find(([, v]) => v === provider)?.[0];
+    return new this(`Not connected to git provider: ${providerName}. Connect to the provider in User Settings`, opts);
+  }
+};
+NotConnectedToProvider = __decorate6([
+  registerError()
+], NotConnectedToProvider);
+var toAuthCode = readOnly(toObject({
+  code: toString,
+  provider: toGitProviderKind
+}));
+var toGitProviders = readOnly(toArray(toGitProvider2));
+var toGitAuthUrls = readOnly(toArray(toObject({
+  provider: toGitProvider2,
+  auth: toString,
+  configure: toUndefOr(toString)
+})));
+var toAccessToken = readOnly(toObject({
+  token: toString,
+  expiresAt: toDate
+}));
+var toSetUpProviderViaTokenParams = readOnly(toObject({
+  accessToken: toString,
+  accessTokenExpiresAt: toDate,
+  refreshToken: toUndefOr(toString),
+  provider: toGitProviderKind
+}));
+var toGetAccessTokenForUserParams = toObject({
+  provider: toGitProviderKind,
+  userId: toNumber
+});
+var toGitProviderOrAll = toOr(toGitProviderKind, toLiteral("all"));
+var gitAuthService = {
+  name: "gitAuth",
+  context: toHttpContext,
+  methods: {
+    createTokens: rpc({
+      response: toAccessToken,
+      request: toAuthCode
+    }),
+    setUpProviderViaToken: rpc({
+      response: toVoid,
+      request: toSetUpProviderViaTokenParams
+    }),
+    deleteAllTokensInternal: rpc({
+      response: toVoid,
+      request: toObject({ userId: toNumber })
+    }),
+    deleteTokens: rpc({
+      response: toVoid,
+      request: toGitProviderOrAll
+    }),
+    getAccessToken: rpc({
+      response: toAccessToken,
+      request: toGitProviderKind
+    }),
+    getAccessTokenForUser: rpc({
+      response: toAccessToken,
+      request: toGetAccessTokenForUserParams
+    }),
+    getSupportedGitProviders: rpc({
+      response: toGitProviders,
+      request: toVoid
+    }),
+    listAuthUrls: rpc({
+      response: toGitAuthUrls,
+      request: toVoid
+    })
+  }
+};
+var gitAuthStub = createAuthnStubClass("GitAuthStub", gitAuthService);
+var GitAuthStub = class GitAuthStub2 extends gitAuthStub {
+};
+GitAuthStub = __decorate6([
+  (0, import_inversify5.injectable)()
+], GitAuthStub);
+
+// packages/payment-service/common/lib/Product.js
+var __decorate7 = function(decorators, target, key, desc) {
+  var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+  if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+  else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+  return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var ProductId;
+(function(ProductId2) {
+  ProductId2[ProductId2["HostingBasic"] = 1] = "HostingBasic";
+  ProductId2[ProductId2["HostingAwakeDeprecated"] = 2] = "HostingAwakeDeprecated";
+  ProductId2[ProductId2["HostingBoostDeprecated"] = 3] = "HostingBoostDeprecated";
+  ProductId2[ProductId2["HostingMicro"] = 8] = "HostingMicro";
+  ProductId2[ProductId2["HostingBoost"] = 9] = "HostingBoost";
+  ProductId2[ProductId2["HostingPro"] = 10] = "HostingPro";
+})(ProductId || (ProductId = {}));
+var product = {
+  id: toNumber,
+  priceUsd: toNumber,
+  title: toString,
+  deprecated: toBoolean
+};
+var toProduct = toObject(product);
+var productWithPricePerHour = {
+  ...product,
+  pricePerHour: toNumber
+};
+var toProductWithPricePerHour = toObject(productWithPricePerHour);
+var databaseCharacteristics = {
+  cpu: toNumber,
+  memory: Bytes.fromUnknown,
+  disk: Bytes.fromUnknown,
+  allowsStandbyNodes: toBoolean,
+  engines: toArray(toString)
+};
+var toDatabasePlanWithPricePerHour = toReadOnly(toObject({
+  ...productWithPricePerHour,
+  ...databaseCharacteristics
+}));
+var toDatabasePlan = toReadOnly(toObject({
+  ...product,
+  ...databaseCharacteristics
+}));
+var dockerCharacteristics = {
+  cpu: toNumber,
+  memory: Bytes.fromUnknown
+};
+var toDockerImageHostingPlanWithPricePerHour = toReadOnly(toObject({
+  ...productWithPricePerHour,
+  ...dockerCharacteristics
+}));
+var toDockerImageHostingPlan = toReadOnly(toObject({
+  ...product,
+  ...dockerCharacteristics
+}));
+var toPlanCharacteristic = toReadOnly(toObject({
+  id: toNonNegativeInteger,
+  CPU: toNumber,
+  GPU: toNumber,
+  RAM: Bytes.fromUnknown,
+  SSD: Bytes.fromUnknown,
+  TempStorage: Bytes.fromUnknown,
+  onDemand: toBoolean
+}));
+var workspacePlanWithPricePerHour = {
+  ...productWithPricePerHour,
+  characteristics: toReadOnly(toPlanCharacteristic),
+  maxReplicas: toPositiveInteger
+};
+var toWorkspacePlanWithPricePerHour = toObject(workspacePlanWithPricePerHour);
+var workspacePlan = {
+  ...product,
+  characteristics: toReadOnly(toPlanCharacteristic),
+  maxReplicas: toPositiveInteger
+};
+var toWorkspacePlan = toObject(workspacePlan);
+var wsO11yComponent = {
+  cpu: toPositiveNumber,
+  ramGiB: toPositiveNumber,
+  replicas: toPositiveInteger
+};
+var toWsO11yComponent = toObject(wsO11yComponent);
+var toWsO11yComponentWithStorage = toObject({
+  ...wsO11yComponent,
+  storage: toObject({
+    replication: toUndefOr(toNonNegativeInteger)
+  })
+});
+var toWsO11yPlanCharacteristic = toObject({
+  title: toString,
+  priceUsd: toUndefOr(toPositiveNumber),
+  datastore: toWsO11yComponentWithStorage,
+  collector: toWsO11yComponent,
+  suggestedLoadPerSecond: toUndefOr(toObject({
+    logs: toPositiveInteger,
+    traces: toPositiveInteger,
+    metrics: toPositiveInteger
+  }))
+});
+var toWsO11yConfig = toObject({
+  minStorageGiB: toPositiveNumber,
+  maxStorageGiB: toPositiveNumber,
+  defaultStorageGiB: toPositiveNumber,
+  storagePriceUsdPerGiB: toUndefOr(toPositiveNumber),
+  plans: toRecord(toWsO11yPlanCharacteristic)
+});
+var WsO11yPlanNotFound = class WsO11yPlanNotFound2 extends SimpleSerializableException {
+};
+WsO11yPlanNotFound = __decorate7([
+  registerError()
+], WsO11yPlanNotFound);
+
+// packages/payment-service/common/lib/api/products.js
+var productsService = {
+  name: "Products",
+  context: toHttpContext,
+  methods: {
+    listHostingPlans: rpc({
+      response: toArray(toWorkspacePlan),
+      request: toVoid
+    }),
+    listDatabasePlans: rpc({
+      response: toArray(toDatabasePlan),
+      request: toVoid
+    }),
+    listDockerImageHostingPlans: rpc({
+      response: toArray(toDockerImageHostingPlan),
+      request: toVoid
+    }),
+    listWorkspacePlansWithPricePerHour: rpc({
+      response: toArray(toWorkspacePlanWithPricePerHour),
+      request: toVoid
+    }),
+    listDatabasePlansWithPricePerHour: rpc({
+      response: toArray(toDatabasePlanWithPricePerHour),
+      request: toVoid
+    }),
+    listDockerImageHostingPlansWithPricePerHour: rpc({
+      response: toArray(toDockerImageHostingPlanWithPricePerHour),
+      request: toVoid
+    }),
+    getWsO11yConfig: rpc({
+      response: toWsO11yConfig,
+      request: toVoid
+    })
+  }
+};
+var productsStub = createAuthnStubClass("ProductsStub", productsService);
+var ProductsStub = class extends productsStub {
+};
+
+// packages/auth-service/common/lib/api/auth.js
+var import_inversify6 = __toESM(require_inversify(), 1);
+
+// packages/auth-service/common/lib/ChangePasswordServiceArgs.js
+var toChangePasswordServiceArgs = toObject({
+  password: readOnly(toString),
+  newPassword: readOnly(toString)
+});
+
+// packages/auth-service/common/lib/EmailContainer.js
+var emailContainer = {
+  email: readOnly(toString)
+};
+var toEmailContainer = toObject(emailContainer);
+
+// packages/auth-service/common/lib/EmailAndPassword.js
+var emailAndPassword = {
+  ...emailContainer,
+  password: readOnly(toString)
+};
+var toEmailAndPassword = toObject(emailAndPassword);
+
+// packages/auth-service/common/lib/OAuthServiceArgs.js
+var toOAuthServiceArgs = toObject({
+  code: readOnly(toString),
+  iss: toUndefOr(toString),
+  recaptchaToken: toUndefOr(toString),
+  recaptchaAction: toUndefOr(toString)
+});
+
+// packages/auth-service/common/lib/PerformPasswordResetArgs.js
+var toPerformPasswordResetArgs = toObject({
+  passwordResetRequestId: readOnly(toUuid),
+  newPassword: readOnly(toString)
+});
+
+// packages/auth-service/common/lib/SignUpArgs.js
+var toSignUpArgs = toObject({
+  ...emailAndPassword,
+  recaptchaToken: readOnly(toString),
+  recaptchaAction: toUndefOr(toString)
+});
+
+// packages/auth-service/common/lib/types.js
+var EMAIL_CONFIRMATION_TIMEOUT = duration({ minutes: 1 });
+var emailConfirmation = {
+  id: readOnly(toUuid),
+  email: readOnly(toString),
+  pending: readOnly(toBoolean),
+  createdAt: readOnly(toDate)
+};
+var toEmailConfirmationArgs = toObject(emailConfirmation);
+var toConfirmEmailArgs = toObject({
+  emailConfirmation: emailConfirmation["id"]
+});
+var toSessionInfo = toObject({
+  sessionId: toSessionString,
+  firstSignin: readOnly(toBoolean)
+});
+var toDeactivateUserInfo = toObject({
+  teamsNeedAdmin: readOnly(toArray(toTeam)),
+  teamsWithManagedResources: readOnly(toArray(toTeam))
+});
+var toDeactivateUserArgs = toObject({
+  dryRun: toBoolean
+});
+
+// packages/auth-service/common/lib/UpdateProfileArgs.js
+var toUpdateProfileArgs = toObject({
+  firstName: readOnly(toString),
+  lastName: readOnly(toString)
+});
+
+// packages/auth-service/common/lib/UploadFileArgs.js
+var toUploadFileArgs = toObject({
+  type: readOnly(toString),
+  file: readOnly(toString)
+});
+
+// packages/auth-service/common/lib/api/auth.js
+var __decorate8 = function(decorators, target, key, desc) {
+  var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+  if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+  else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+  return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata2 = function(k, v) {
+  if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var PasswordResetExpired_1;
+var DeactivateUserFailed_1;
+var InvalidCredentials = class InvalidCredentials2 extends SimpleSerializableException {
+  static create(opts) {
+    return new this("Invalid credentials", opts);
+  }
+};
+InvalidCredentials = __decorate8([
+  registerError()
+], InvalidCredentials);
+var UserDeleted = class UserDeleted2 extends SimpleSerializableException {
+  static create(opts) {
+    return new this("User is deleted", opts);
+  }
+};
+UserDeleted = __decorate8([
+  registerError()
+], UserDeleted);
+var RecaptchaCheckFailed = class RecaptchaCheckFailed2 extends SimpleSerializableException {
+  constructor(msg, opts) {
+    super(msg, opts);
+  }
+};
+RecaptchaCheckFailed = __decorate8([
+  registerError(),
+  __metadata2("design:paramtypes", [String, Object])
+], RecaptchaCheckFailed);
+var UserCreationFailed = class UserCreationFailed2 extends SimpleSerializableException {
+  constructor(msg, opts) {
+    super(msg, opts);
+  }
+};
+UserCreationFailed = __decorate8([
+  registerError(),
+  __metadata2("design:paramtypes", [String, Object])
+], UserCreationFailed);
+var PasswordResetExpired = PasswordResetExpired_1 = class PasswordResetExpired2 extends SimpleSerializableException {
+  static create(opts) {
+    return new PasswordResetExpired_1("Password reset request expired", opts);
+  }
+};
+PasswordResetExpired = PasswordResetExpired_1 = __decorate8([
+  registerError()
+], PasswordResetExpired);
+var customDomainAuthRequest = {
+  appToken: toString,
+  sessionId: toString
+};
+var toCustomDomainAuthRequest = toObject(customDomainAuthRequest);
+var devDomainAuthRequest = {
+  workspaceId: toNumber,
+  sessionId: toString
+};
+var toDevDomainAuthRequest = toObject(devDomainAuthRequest);
+var customDomainAuthResponse = {
+  userToken: toString,
+  domain: toString
+};
+var toCustomDomainAuthResponse = toObject(customDomainAuthResponse);
+var devDomainAuthResponse = {
+  userToken: toString
+};
+var toDevDomainAuthResponse = toObject(devDomainAuthResponse);
+var DeactivateUserFailed = DeactivateUserFailed_1 = class DeactivateUserFailed2 extends SimpleSerializableException {
+  static create(opts) {
+    return new DeactivateUserFailed_1("Failed to delete the user preliminarily. You still have teams which are not ready to be shut down.", opts);
+  }
+};
+DeactivateUserFailed = DeactivateUserFailed_1 = __decorate8([
+  registerError()
+], DeactivateUserFailed);
+var authService = {
+  name: "Auth",
+  context: toHttpContext,
+  methods: {
+    deactivateUser: rpc({
+      request: toDeactivateUserArgs,
+      response: toDeactivateUserInfo,
+      defaultOptions: { timeout: { seconds: 60 } }
+    }),
+    updateProfile: rpc({
+      request: toUpdateProfileArgs,
+      response: toVoid
+    }),
+    getAvatarUrl: rpc({
+      request: toOr(toArray(toPositiveInteger), toPositiveInteger),
+      response: toOr(toArray(toNullOr(toString)), toUndefOr(toString))
+    }),
+    restoreUser: rpc({
+      request: toEmailAndPassword,
+      response: toVoid,
+      defaultOptions: { timeout: { seconds: 60 } }
+    }),
+    signIn: rpc({
+      request: toEmailAndPassword,
+      response: toSessionInfo
+    }),
+    authorizeWithOAuth: rpc({
+      request: toOAuthServiceArgs,
+      response: toOAuthAuthentication,
+      defaultOptions: { timeout: duration({ seconds: 10 }) }
+    }),
+    uploadAvatar: rpc({
+      request: toUploadFileArgs,
+      response: toVoid
+    }),
+    signUp: rpc({
+      request: toSignUpArgs,
+      response: toVoid,
+      defaultOptions: { timeout: duration({ seconds: 10 }) }
+    }),
+    changePassword: rpc({
+      request: toChangePasswordServiceArgs,
+      response: toVoid
+    }),
+    requestPasswordReset: rpc({
+      request: toEmailContainer,
+      response: toVoid
+    }),
+    performPasswordReset: rpc({
+      request: toPerformPasswordResetArgs,
+      response: toVoid
+    }),
+    acceptTos: rpc({
+      request: toVoid,
+      response: toVoid
+    }),
+    authForCustomDomain: rpc({
+      request: toCustomDomainAuthRequest,
+      response: toCustomDomainAuthResponse
+    }),
+    authForDevDomain: rpc({
+      request: toDevDomainAuthRequest,
+      response: toDevDomainAuthResponse
+    })
+  }
+};
+var AuthStub = class AuthStub2 extends createAuthnStubClass("AuthStub", authService) {
+};
+AuthStub = __decorate8([
+  (0, import_inversify6.injectable)()
+], AuthStub);
+
+// packages/auth-service/common/lib/session/api.js
+var import_inversify7 = __toESM(require_inversify(), 1);
+var __decorate9 = function(decorators, target, key, desc) {
+  var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+  if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+  else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+  return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata3 = function(k, v) {
+  if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var SessionStub_1;
+var InvalidSessionId = class extends NotFound {
+  constructor(sessionId) {
+    super(!sessionId ? "Invalid SessionId, please sign in" : `The sessionId: ${sessionId} is not valid, please sign in.`);
+    this.sessionId = sessionId;
+  }
+};
+var REFRESH_COOKIE_NAME = "sessionId";
+var NoRefreshCookie = class extends NotFound {
+  constructor() {
+    super(`Could not find cookie: ${REFRESH_COOKIE_NAME}`);
+  }
+};
+var SignoutFailed = class extends Exception {
+  constructor(message) {
+    super(message);
+  }
+};
+var TokenGenerationFailed = class extends Exception {
+  constructor(message, details) {
+    super(message);
+    this.details = details;
+  }
+};
+var sessionService = {
+  name: "Session",
+  context: toHttpContext,
+  methods: {
+    genAccessToken: rpc({
+      response: toCreds,
+      request: toSessionId
+    }),
+    signOut: rpc({
+      response: toVoid,
+      request: toAny
+    })
+  }
+};
+var sessionEndpointsV1 = {
+  genAccessToken: "/session/v1/gen-access-token",
+  signOut: "/session/v1/sign-out"
+};
+var SessionStub = SessionStub_1 = class SessionStub2 {
+  constructor(url) {
+    this.url = url;
+  }
+  static bindForInjection(c, url) {
+    c.bind(SessionStub_1.ID).toConstantValue(new SessionStub_1(url));
+  }
+  headers() {
+    return {};
+  }
+  endpointUrl(method) {
+    return this.url instanceof URL ? new URL(joinPath(this.url.pathname, method), this.url) : joinPath(this.url, method);
+  }
+  async genAccessToken(args) {
+    try {
+      return await fetchJson(this.endpointUrl(sessionEndpointsV1.genAccessToken), {
+        method: "POST",
+        cache: "no-cache",
+        credentials: "same-origin",
+        redirect: "follow",
+        referrerPolicy: "no-referrer",
+        headers: {
+          "content-type": "application/json",
+          ...this.headers()
+        },
+        body: JSON.stringify(args),
+        converter: toCreds
+      });
+    } catch (e) {
+      if (e instanceof HttpException) {
+        if (HttpStatusCode.Unauthorized === e.code) {
+          throw new InvalidSessionId();
+        }
+        if (HttpStatusCode.BadRequest === e.code) {
+          throw new NoRefreshCookie();
+        }
+      }
+      throw new TokenGenerationFailed("Access token generation failed", toError(e).message);
+    }
+  }
+  async signOut() {
+    try {
+      await fetchJson(this.endpointUrl(sessionEndpointsV1.signOut), {
+        method: "POST",
+        cache: "no-cache",
+        credentials: "same-origin",
+        redirect: "follow",
+        referrerPolicy: "no-referrer",
+        headers: {
+          "content-type": "application/json",
+          ...this.headers()
+        },
+        converter: toVoid
+      });
+    } catch (e) {
+      if (e instanceof HttpException) {
+        if (HttpStatusCode.Unauthorized === e.code) {
+          throw new InvalidSessionId();
+        }
+        if (HttpStatusCode.BadRequest === e.code) {
+          throw new NoRefreshCookie();
+        }
+      }
+      throw new SignoutFailed(toError(e).message);
+    }
+  }
+};
+SessionStub.ID = serviceId("SessionStub");
+SessionStub = SessionStub_1 = __decorate9([
+  (0, import_inversify7.injectable)(),
+  __metadata3("design:paramtypes", [Object])
+], SessionStub);
+
+// packages/streamy/common/lib/stream.js
+var isStreamClosed = (stream2, e) => {
+  return e instanceof StreamClosed && e.isFor(stream2);
+};
+var closeStreamOnError = async (stream2, e) => {
+  if (isStreamClosed(stream2, e)) {
+    if (e.wasNormal) {
+      return;
+    }
+    throw e;
+  }
+  try {
+    await stream2.close();
+  } catch (ec) {
+    logW(`${stream2}.close() threw`, { cause: ec });
+  }
+  throw e;
+};
+var restreamOnError = (connect, process2, retryOpts = {
+  initialWait: { milliseconds: 10 },
+  factor: 2,
+  maxWait: { minutes: 1 }
+}) => {
+  let reconnect = true;
+  let sP = null;
+  const done = awaitLater((() => retryWithBackoff(async () => {
+    if (!reconnect) {
+      return true;
+    }
+    sP = connect();
+    const s = await sP;
+    try {
+      await process2(s);
+      sP = null;
+      await s.close();
+      return true;
+    } catch (e) {
+      sP = null;
+      try {
+        await closeStreamOnError(s, e);
+        return true;
+      } catch (ce) {
+        logW("stream disconnected", { cause: e });
+      }
+      if (!isStreamClosed(s, e)) {
+        throw e;
+      }
+      return false;
+    }
+  }, {
+    ...retryOpts,
+    timeout: { milliseconds: 2 ** 31 - 1 }
+  }))());
+  const close = async () => {
+    reconnect = false;
+    await logErrorAsync(async () => await (await sP)?.close());
+    await done;
+  };
+  close.done = done;
+  return close;
+};
+
+// packages/streamy/common/lib/protocol/client.js
+var import_fast_deep_equal = __toESM(require_fast_deep_equal(), 1);
+
+// packages/streamy/common/lib/protocol/protocol.js
+var MediaTypes2;
+(function(MediaTypes3) {
+  MediaTypes3["ApplicationJson"] = "application/json";
+})(MediaTypes2 || (MediaTypes2 = {}));
+var ProtocolVersion;
+(function(ProtocolVersion2) {
+  ProtocolVersion2[ProtocolVersion2["Legacy"] = 0] = "Legacy";
+  ProtocolVersion2[ProtocolVersion2["Streamy"] = 1] = "Streamy";
+})(ProtocolVersion || (ProtocolVersion = {}));
+var toProtocolVersion = toNumericEnum("ProtocolVersion", ProtocolVersion);
+var MessageKind;
+(function(MessageKind2) {
+  MessageKind2[MessageKind2["Init"] = 1] = "Init";
+  MessageKind2[MessageKind2["Context"] = 2] = "Context";
+  MessageKind2[MessageKind2["ProcedureRequest"] = 11] = "ProcedureRequest";
+  MessageKind2[MessageKind2["ProcedureResponse"] = 12] = "ProcedureResponse";
+  MessageKind2[MessageKind2["ProcedureError"] = 13] = "ProcedureError";
+})(MessageKind || (MessageKind = {}));
+var toProcedureRequest = toObject({
+  kind: toLiteral(MessageKind.ProcedureRequest),
+  id: toNonNegativeInteger,
+  service: toString,
+  method: toString,
+  context: toUndefOr(toUnknown),
+  data: toUndefOr(toUnknown)
+});
+var toProcedureDataResponse = toObject({
+  kind: toLiteral(MessageKind.ProcedureResponse),
+  id: toNonNegativeInteger,
+  data: toUndefOr(toUnknown)
+});
+var toErrorData = toObject({ name: toString, data: toUnknown });
+var toLegacyError = toObject({ name: toString, message: toString });
+var toError2 = (x) => {
+  if (isOfType(x, toLegacyError)) {
+    return { name: x.name, data: x.message };
+  }
+  return toErrorData(x);
+};
+var toProcedureErrorResponse = toObject({
+  kind: toLiteral(MessageKind.ProcedureError),
+  id: toNonNegativeInteger,
+  error: toError2
+});
+var toNewProcedureResponse = toOr(toProcedureDataResponse, toProcedureErrorResponse);
+var toProcedureResponse = (x, ver) => {
+  switch (ver) {
+    case ProtocolVersion.Legacy:
+      return procedureResponseFromLegacy(x);
+    case ProtocolVersion.Streamy:
+      return toNewProcedureResponse(x);
+  }
+  return ignoreError(() => toNewProcedureResponse(x)) ?? procedureResponseFromLegacy(x);
+};
+var toDataRequest = toObject({
+  streamId: toNonNegativeInteger,
+  method: toUndefOr(toString),
+  data: toUndefOr(toUnknown)
+});
+var toOpenRequest = toObject({
+  streamId: toNonNegativeInteger,
+  service: toString,
+  method: toString,
+  context: toUndefOr(toUnknown),
+  protocolVersion: toUndefOr(toProtocolVersion)
+});
+var toCloseRequest = toObject({
+  streamId: toNonNegativeInteger,
+  close: toLiteral(true)
+});
+var toErrorRequest = toObject({
+  streamId: toNonNegativeInteger,
+  error: toError2
+});
+var toDataResponse = toObject({
+  streamId: toNonNegativeInteger,
+  data: toUndefOr(toUnknown)
+});
+var toCloseResponse = toCloseRequest;
+var toErrorResponse = toObject({
+  streamId: toNonNegativeInteger,
+  error: toError2
+});
+var toStreamRequest = toOr(toCloseRequest, toOpenRequest, toErrorRequest, toDataRequest);
+var toStreamResponse = toOr(toCloseResponse, toErrorResponse, toDataResponse);
+var isDataRequest = (msg) => isOfType(msg, toDataRequest);
+var isErrorRequest = (msg) => "error" in msg;
+var isOpenRequest = (msg) => "service" in msg;
+var isDataResponse = (msg) => "data" in msg;
+var isErrorResponse = (msg) => "error" in msg;
+var InvalidFormat = class extends Exception {
+};
+var procedureRequestToLegacy = (msg) => {
+  if (msg.service) {
+    throw new InvalidFormat(pp`legacy requests don't support services: ${msg}`);
+  }
+  return {
+    endpointId: msg.id,
+    method: msg.method,
+    args: msg.data
+  };
+};
+var procedureRequestToWire = (msg, ver) => {
+  switch (ver) {
+    case ProtocolVersion.Legacy:
+      return procedureRequestToLegacy(msg);
+    case ProtocolVersion.Streamy:
+      return msg;
+  }
+};
+var procedureResponseFromLegacy = (msg) => {
+  const replyMsg = msg;
+  const isOk = Status2.Ok === (replyMsg.reply?.code ?? Status2.Ok);
+  const r = replyMsg.reply;
+  const id = toNonNegativeInteger(replyMsg.endpointId);
+  return isOk ? {
+    kind: MessageKind.ProcedureResponse,
+    id,
+    data: r.data
+  } : {
+    kind: MessageKind.ProcedureError,
+    id,
+    error: {
+      name: `${r.errName}`,
+      data: `${r.errMessage}`
+    }
+  };
+};
+var streamRequestToLegacy = (r) => {
+  if (isOpenRequest(r)) {
+    throw new InvalidOperation(`open request (method: ${r.method}) cannot be converted to legacy.`);
+  }
+  return isErrorRequest(r) ? {
+    endpointId: r.streamId,
+    reply: {
+      code: Status2.Error,
+      errName: r.error.name,
+      errMessage: `${r.error.data}`
+    }
+  } : isDataRequest(r) ? {
+    endpointId: r.streamId,
+    method: r.method,
+    args: r.data
+  } : {
+    endpointId: r.streamId,
+    complete: true,
+    args: { code: Status2.Ok, data: null }
+  };
+};
+var streamRequestToWire = (msg, ver) => {
+  switch (ver ?? ProtocolVersion.Legacy) {
+    case ProtocolVersion.Legacy:
+      return streamRequestToLegacy(msg);
+    case ProtocolVersion.Streamy:
+      return msg;
+  }
+  throw new Error(`BUG: invalid protocol version: ${ver}`);
+};
+var streamResponseFromLegacy = (msg) => {
+  if (!isObject(msg)) {
+    throw new InvalidFormat(`expected a Message object, got: ${msg}`);
+  }
+  const replyMsg = msg;
+  const isOk = Status2.Ok === (replyMsg.reply?.code ?? Status2.Ok);
+  const r = replyMsg.reply;
+  return {
+    streamId: toNonNegativeInteger(replyMsg.endpointId),
+    ...isOk ? replyMsg.complete ? { close: true } : { data: r ?? null } : { error: { name: `${r.errName}`, data: `${r.errMessage}` } }
+  };
+};
+var Status2;
+(function(Status3) {
+  Status3["Ok"] = "Ok";
+  Status3["Error"] = "Error";
+})(Status2 || (Status2 = {}));
+
+// packages/streamy/common/lib/json.js
+var JsonSerializer = class {
+  constructor() {
+    this.mediaType = {
+      http: MediaTypes2.ApplicationJson
+    };
+  }
+  decode(data) {
+    return JSON.parse(data);
+  }
+  encode(obj) {
+    return JSON.stringify(obj);
+  }
+};
 
 // packages/streamy/common/lib/errors.js
 var errorString = (e) => `[${e.name}]: ${e.message}`;
@@ -71462,179 +74037,6 @@ var init = (factory) => {
 var connectWebSocketTransport = async (address) => {
   return await WebSocketTransport.connect(createWebSocket(address));
 };
-
-// packages/streamy/common/lib/protocol/protocol.js
-var ProtocolVersion;
-(function(ProtocolVersion2) {
-  ProtocolVersion2[ProtocolVersion2["Legacy"] = 0] = "Legacy";
-  ProtocolVersion2[ProtocolVersion2["Streamy"] = 1] = "Streamy";
-})(ProtocolVersion || (ProtocolVersion = {}));
-var toProtocolVersion = toNumericEnum("ProtocolVersion", ProtocolVersion);
-var MessageKind;
-(function(MessageKind2) {
-  MessageKind2[MessageKind2["Init"] = 1] = "Init";
-  MessageKind2[MessageKind2["Context"] = 2] = "Context";
-  MessageKind2[MessageKind2["ProcedureRequest"] = 11] = "ProcedureRequest";
-  MessageKind2[MessageKind2["ProcedureResponse"] = 12] = "ProcedureResponse";
-  MessageKind2[MessageKind2["ProcedureError"] = 13] = "ProcedureError";
-})(MessageKind || (MessageKind = {}));
-var toProcedureRequest = toObject({
-  kind: toLiteral(MessageKind.ProcedureRequest),
-  id: toNonNegativeInteger,
-  service: toString,
-  method: toString,
-  context: toUndefOr(toUnknown),
-  data: toUndefOr(toUnknown)
-});
-var toProcedureDataResponse = toObject({
-  kind: toLiteral(MessageKind.ProcedureResponse),
-  id: toNonNegativeInteger,
-  data: toUndefOr(toUnknown)
-});
-var toErrorData = toObject({ name: toString, data: toUnknown });
-var toLegacyError = toObject({ name: toString, message: toString });
-var toError2 = (x) => {
-  if (isOfType(x, toLegacyError)) {
-    return { name: x.name, data: x.message };
-  }
-  return toErrorData(x);
-};
-var toProcedureErrorResponse = toObject({
-  kind: toLiteral(MessageKind.ProcedureError),
-  id: toNonNegativeInteger,
-  error: toError2
-});
-var toNewProcedureResponse = toOr(toProcedureDataResponse, toProcedureErrorResponse);
-var toProcedureResponse = (x, ver) => {
-  switch (ver) {
-    case ProtocolVersion.Legacy:
-      return procedureResponseFromLegacy(x);
-    case ProtocolVersion.Streamy:
-      return toNewProcedureResponse(x);
-  }
-  return ignoreError(() => toNewProcedureResponse(x)) ?? procedureResponseFromLegacy(x);
-};
-var toDataRequest = toObject({
-  streamId: toNonNegativeInteger,
-  method: toUndefOr(toString),
-  data: toUndefOr(toUnknown)
-});
-var toOpenRequest = toObject({
-  streamId: toNonNegativeInteger,
-  service: toString,
-  method: toString,
-  context: toUndefOr(toUnknown),
-  protocolVersion: toUndefOr(toProtocolVersion)
-});
-var toCloseRequest = toObject({
-  streamId: toNonNegativeInteger,
-  close: toLiteral(true)
-});
-var toErrorRequest = toObject({
-  streamId: toNonNegativeInteger,
-  error: toError2
-});
-var toDataResponse = toObject({
-  streamId: toNonNegativeInteger,
-  data: toUndefOr(toUnknown)
-});
-var toCloseResponse = toCloseRequest;
-var toErrorResponse = toObject({
-  streamId: toNonNegativeInteger,
-  error: toError2
-});
-var toStreamRequest = toOr(toCloseRequest, toOpenRequest, toErrorRequest, toDataRequest);
-var toStreamResponse = toOr(toCloseResponse, toErrorResponse, toDataResponse);
-var isDataRequest = (msg) => isOfType(msg, toDataRequest);
-var isErrorRequest = (msg) => "error" in msg;
-var isOpenRequest = (msg) => "service" in msg;
-var isDataResponse = (msg) => "data" in msg;
-var isErrorResponse = (msg) => "error" in msg;
-var InvalidFormat = class extends Exception {
-};
-var procedureRequestToLegacy = (msg) => {
-  if (msg.service) {
-    throw new InvalidFormat(pp`legacy requests don't support services: ${msg}`);
-  }
-  return {
-    endpointId: msg.id,
-    method: msg.method,
-    args: msg.data
-  };
-};
-var procedureRequestToWire = (msg, ver) => {
-  switch (ver) {
-    case ProtocolVersion.Legacy:
-      return procedureRequestToLegacy(msg);
-    case ProtocolVersion.Streamy:
-      return msg;
-  }
-};
-var procedureResponseFromLegacy = (msg) => {
-  const replyMsg = msg;
-  const isOk = Status2.Ok === (replyMsg.reply?.code ?? Status2.Ok);
-  const r = replyMsg.reply;
-  const id = toNonNegativeInteger(replyMsg.endpointId);
-  return isOk ? {
-    kind: MessageKind.ProcedureResponse,
-    id,
-    data: r.data
-  } : {
-    kind: MessageKind.ProcedureError,
-    id,
-    error: {
-      name: `${r.errName}`,
-      data: `${r.errMessage}`
-    }
-  };
-};
-var streamRequestToLegacy = (r) => {
-  if (isOpenRequest(r)) {
-    throw new InvalidOperation(`open request (method: ${r.method}) cannot be converted to legacy.`);
-  }
-  return isErrorRequest(r) ? {
-    endpointId: r.streamId,
-    reply: {
-      code: Status2.Error,
-      errName: r.error.name,
-      errMessage: `${r.error.data}`
-    }
-  } : isDataRequest(r) ? {
-    endpointId: r.streamId,
-    method: r.method,
-    args: r.data
-  } : {
-    endpointId: r.streamId,
-    complete: true,
-    args: { code: Status2.Ok, data: null }
-  };
-};
-var streamRequestToWire = (msg, ver) => {
-  switch (ver ?? ProtocolVersion.Legacy) {
-    case ProtocolVersion.Legacy:
-      return streamRequestToLegacy(msg);
-    case ProtocolVersion.Streamy:
-      return msg;
-  }
-  throw new Error(`BUG: invalid protocol version: ${ver}`);
-};
-var streamResponseFromLegacy = (msg) => {
-  if (!isObject(msg)) {
-    throw new InvalidFormat(`expected a Message object, got: ${msg}`);
-  }
-  const replyMsg = msg;
-  const isOk = Status2.Ok === (replyMsg.reply?.code ?? Status2.Ok);
-  const r = replyMsg.reply;
-  return {
-    streamId: toNonNegativeInteger(replyMsg.endpointId),
-    ...isOk ? replyMsg.complete ? { close: true } : { data: r ?? null } : { error: { name: `${r.errName}`, data: `${r.errMessage}` } }
-  };
-};
-var Status2;
-(function(Status3) {
-  Status3["Ok"] = "Ok";
-  Status3["Error"] = "Error";
-})(Status2 || (Status2 = {}));
 
 // packages/streamy/common/lib/protocol/stream.js
 var StreamSide = class {
@@ -72278,2470 +74680,6 @@ var SharedSimpleStreamyClientProvider = class {
   }
 };
 
-// packages/streamy/common/lib/spec.js
-var rpc = (spec) => ({ ...spec, kind: "rpc" });
-var stream = (spec) => ({ ...spec, kind: "stream" });
-var BaseStub = class {
-  constructor(client) {
-    this.client = client;
-  }
-  setContext(context4) {
-    this.context = context4;
-  }
-};
-var createStubSubClass = ({ spec, base, call, stream: stream2 }) => {
-  class Klass extends base {
-  }
-  const p = Klass.prototype;
-  for (const [name, m] of Object.entries(spec.methods)) {
-    switch (m.kind) {
-      case "rpc":
-        p[name] = async function(req, opts) {
-          const finalOpts = m.defaultOptions || opts ? { ...m.defaultOptions, ...opts } : void 0;
-          return call({
-            stub: this,
-            client: this.client,
-            context: () => this.context,
-            methodName: name,
-            methodSpec: m,
-            reqData: req,
-            finalOpts
-          });
-        };
-        break;
-      case "stream":
-        p[name] = async function() {
-          return stream2({
-            stub: this,
-            client: this.client,
-            context: () => this.context,
-            methodName: name,
-            methodSpec: m
-          });
-        };
-        break;
-    }
-  }
-  return Klass;
-};
-
-// packages/streamy/common/lib/extensions/spec.js
-var refreshTokenContainer = {
-  refreshToken: readOnly(toString)
-};
-var toRefreshTokenContainer = toObject(refreshTokenContainer);
-var accessTokenContainer = {
-  accessToken: readOnly(toString)
-};
-var toAccessTokenContainer = toObject(accessTokenContainer);
-var toCredentials = toObject({
-  ...refreshTokenContainer,
-  ...accessTokenContainer
-});
-var AuthnStub = class extends BaseStub {
-  async authenticate(creds) {
-    this.context = {
-      requestHeaders: {
-        Authorization: `Bearer ${creds.accessToken}`
-      },
-      responseHeaders: {},
-      httpStatusCode: 200
-    };
-    if (this.client instanceof StreamyClient) {
-      return;
-    }
-    return await this.client.setContext(this.context);
-  }
-  setRefreshTokenOpts(refreshTokenOpts) {
-    this.refreshTokenOpts = refreshTokenOpts;
-  }
-};
-var isTokenExpired = (e, expiredException) => {
-  if (e instanceof expiredException) {
-    return true;
-  }
-  if (e instanceof StreamClosed && e.cause instanceof expiredException) {
-    return true;
-  }
-  return false;
-};
-var callAndMaybeRefreshToken = async (f, refreshOpts) => {
-  const refreshTokenOpts = refreshOpts();
-  if (!refreshTokenOpts) {
-    return f();
-  }
-  try {
-    return await f();
-  } catch (e) {
-    if (isTokenExpired(e, refreshTokenOpts.expiredException)) {
-      const creds = await refreshTokenOpts.refreshToken();
-      await refreshTokenOpts.authenticate(creds);
-      logD("AutnStub: Refreshed access token. Now retrying call.");
-      return f();
-    }
-    throw e;
-  }
-};
-var createAuthnStubSubClass = (spec, base) => createStubSubClass({
-  spec,
-  base,
-  call: async ({ stub, client, context: context4, methodSpec, methodName, reqData: data, finalOpts }) => callAndMaybeRefreshToken(async () => methodSpec.response(client instanceof StreamyClient ? await client.call({
-    service: spec.name,
-    method: methodName,
-    data,
-    context: context4(),
-    opts: finalOpts
-  }) : await client.call(methodName, data, finalOpts)), () => !!stub.refreshTokenOpts ? {
-    ...stub.refreshTokenOpts,
-    authenticate: stub.authenticate.bind(stub)
-  } : void 0),
-  stream: ({ stub, client, context: context4, methodSpec, methodName }) => callAndMaybeRefreshToken(() => client instanceof StreamyClient ? client.stream({
-    service: spec.name,
-    method: methodName,
-    toQuery: methodSpec.request,
-    toResponse: methodSpec.response,
-    context: context4()
-  }) : client.stream(methodName, methodSpec.response), () => !!stub.refreshTokenOpts ? {
-    ...stub.refreshTokenOpts,
-    authenticate: stub.authenticate.bind(stub)
-  } : void 0)
-});
-var createAuthnStubClass = (name, spec) => {
-  const klass = createAuthnStubSubClass(spec, AuthnStub);
-  klass.ID = serviceId(name);
-  return klass;
-};
-
-// packages/payment-service/common/lib/Plan.js
-var PlanId;
-(function(PlanId2) {
-  PlanId2[PlanId2["Basic"] = 1] = "Basic";
-  PlanId2[PlanId2["DeprecatedAwake"] = 2] = "DeprecatedAwake";
-  PlanId2[PlanId2["DeprecatedBoost"] = 3] = "DeprecatedBoost";
-  PlanId2[PlanId2["Micro"] = 8] = "Micro";
-  PlanId2[PlanId2["Boost"] = 9] = "Boost";
-  PlanId2[PlanId2["Pro"] = 10] = "Pro";
-  PlanId2[PlanId2["MicroOnDemand"] = 20] = "MicroOnDemand";
-  PlanId2[PlanId2["Gpu"] = 27] = "Gpu";
-})(PlanId || (PlanId = {}));
-var toPlanId = toNonNegativeInteger;
-var basicPlan = {
-  title: "Free",
-  priceUsd: 0,
-  id: PlanId.Basic,
-  characteristics: {
-    id: PlanId.Basic,
-    CPU: 0.5,
-    GPU: 0,
-    RAM: GiB(1),
-    SSD: MiB(500),
-    TempStorage: MiB(1500),
-    onDemand: true
-  },
-  deprecated: false,
-  maxReplicas: 1
-};
-var awakePlanDeprecated = {
-  title: "Awake",
-  priceUsd: 2,
-  id: PlanId.DeprecatedAwake,
-  characteristics: {
-    id: PlanId.DeprecatedAwake,
-    CPU: 0.5,
-    GPU: 0,
-    RAM: MiB(600),
-    SSD: MiB(500),
-    TempStorage: MiB(1500),
-    onDemand: false
-  },
-  deprecated: true,
-  maxReplicas: 1
-};
-var boostPlanDeprecated = {
-  title: "Boost",
-  priceUsd: 8,
-  id: PlanId.DeprecatedBoost,
-  characteristics: {
-    id: PlanId.DeprecatedBoost,
-    CPU: 2,
-    GPU: 0,
-    RAM: GiB(6),
-    SSD: GiB(10),
-    TempStorage: MiB(2500),
-    onDemand: false
-  },
-  deprecated: true,
-  maxReplicas: 1
-};
-var microPlan = {
-  title: "Micro",
-  priceUsd: 5,
-  id: PlanId.Micro,
-  characteristics: {
-    id: PlanId.Micro,
-    CPU: 0.5,
-    GPU: 0,
-    RAM: GiB(1),
-    SSD: GiB(1),
-    TempStorage: MiB(1500),
-    onDemand: false
-  },
-  deprecated: false,
-  maxReplicas: 10
-};
-var boostPlan = {
-  title: "Boost",
-  priceUsd: 20,
-  id: PlanId.Boost,
-  characteristics: {
-    id: PlanId.Boost,
-    CPU: 2,
-    GPU: 0,
-    RAM: GiB(4),
-    SSD: GiB(25),
-    TempStorage: MiB(2500),
-    onDemand: false
-  },
-  deprecated: false,
-  maxReplicas: 7
-};
-var proPlan = {
-  title: "Pro",
-  priceUsd: 80,
-  id: PlanId.Pro,
-  characteristics: {
-    id: PlanId.Pro,
-    CPU: 8,
-    GPU: 0,
-    RAM: GiB(16),
-    SSD: GiB(100),
-    TempStorage: MiB(2500),
-    onDemand: false
-  },
-  deprecated: false,
-  maxReplicas: 5
-};
-var gpuPlan = {
-  title: "Gpu",
-  priceUsd: 0,
-  id: PlanId.Gpu,
-  characteristics: {
-    id: 11,
-    CPU: 1,
-    GPU: 1,
-    RAM: GiB(10),
-    SSD: GiB(10),
-    TempStorage: MiB(1500),
-    onDemand: true
-  },
-  deprecated: false,
-  maxReplicas: 1
-};
-var planMap = {
-  [PlanId.Basic]: basicPlan,
-  [PlanId.DeprecatedAwake]: awakePlanDeprecated,
-  [PlanId.DeprecatedBoost]: boostPlanDeprecated,
-  [PlanId.Micro]: microPlan,
-  [PlanId.Boost]: boostPlan,
-  [PlanId.Pro]: proPlan,
-  [PlanId.MicroOnDemand]: {
-    ...microPlan,
-    characteristics: { ...microPlan.characteristics, onDemand: true },
-    priceUsd: 1
-  },
-  [PlanId.Gpu]: gpuPlan
-};
-
-// packages/team-service/common/lib/model/TeamServiceTypes.js
-var Role;
-(function(Role2) {
-  Role2[Role2["Admin"] = 0] = "Admin";
-  Role2[Role2["Member"] = 1] = "Member";
-})(Role || (Role = {}));
-var toRole = toNumericEnum("Role", Role);
-var team = {
-  id: readOnly(toNonNegativeInteger),
-  defaultDataCenterId: readOnly(toNumber),
-  name: readOnly(toString),
-  description: readOnly(toUndefOr(toNullOr(toString))),
-  avatarId: readOnly(toUndefOr(toNullOr(toString))),
-  avatarUrl: toUndefOr(toNullOr(toString)),
-  isFirst: toUndefOr(toBoolean),
-  deletionPending: toUndefOr(toBoolean),
-  createdAt: toUndefOr(toDate),
-  organizationId: toUndefOr(toUuid)
-};
-var toTeam = toObject(team);
-var toTeamWithRole = toObject({
-  ...team,
-  role: readOnly(toRole)
-});
-var toTeamMember = toObject({
-  userId: readOnly(toNonNegativeInteger),
-  teamId: readOnly(toNonNegativeInteger),
-  role: readOnly(toRole),
-  pending: readOnly(toBoolean),
-  createdAt: readOnly(toDate),
-  name: toUndefOr(toNullOr(toString)),
-  email: toUndefOr(toNullOr(toString)),
-  avatarUrl: toUndefOr(toNullOr(toString)),
-  deletedAt: toUndefOr(toDate)
-});
-var toTeamWithMembers = toObject({
-  ...team,
-  members: toArray(toTeamMember)
-});
-
-// packages/workspace-service/common/lib/api/envVars.js
-var import_inversify = __toESM(require_inversify(), 1);
-
-// packages/utils/common/lib/envVars.js
-var isEnvVarName = (value) => envVarNamePattern.test(value);
-var envVarNamePattern = /^[A-Za-z_][A-Za-z0-9_.-]*$/;
-var toEnvVarName = (x) => {
-  const s = toString(x);
-  if (isEnvVarName(s)) {
-    return s;
-  }
-  throw new TypeConversionFailure("EnvVarName", x);
-};
-var toEnvironmentVariable = toObject({
-  name: toEnvVarName,
-  value: toString
-});
-
-// packages/workspace-service/common/lib/api/envVars.js
-var __decorate2 = function(decorators, target, key, desc) {
-  var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-  if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-  else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-  return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var toWorkspaceServiceArgs = toObject({
-  workspaceId: toNumber
-});
-var toEnvVars = (x) => {
-  if (!isObject(x)) {
-    throw new TypeConversionFailure("record", x);
-  }
-  return Object.fromEntries(Object.entries(x).map(([k, v]) => [toEnvVarName(k), toString(v)]));
-};
-var toUpdateEnvVarsArgs = toObject({
-  workspaceId: toNonNegativeInteger,
-  envVars: toEnvVars
-});
-var toCopyEnvVarArgs = toObject({
-  sourceWorkspaceId: toNonNegativeInteger,
-  targetWorkspaceId: toNonNegativeInteger
-});
-var envVarsService = {
-  name: "EnvVars",
-  context: toHttpContext,
-  methods: {
-    listEnvironmentVariables: rpc({
-      access: "public",
-      request: toWorkspaceServiceArgs,
-      response: toArray(toEnvironmentVariable)
-    }),
-    updateEnvironmentVariables: rpc({
-      access: "public",
-      request: toUpdateEnvVarsArgs,
-      response: toVoid,
-      defaultOptions: { timeout: { seconds: 30 } }
-    }),
-    copyEnvVars: rpc({
-      access: "public",
-      request: toCopyEnvVarArgs,
-      response: toVoid
-    }),
-    envVarsStream: stream({
-      access: "public",
-      response: toArray(toEnvironmentVariable),
-      request: toWorkspaceServiceArgs
-    })
-  }
-};
-var envVarsStub = createAuthnStubClass("EnvVarsStub", envVarsService);
-var EnvVarsStub = class EnvVarsStub2 extends envVarsStub {
-};
-EnvVarsStub = __decorate2([
-  (0, import_inversify.injectable)()
-], EnvVarsStub);
-
-// packages/workspace-service/common/lib/serviceArgs.js
-var workspaceServiceArgs = {
-  workspaceId: toNonNegativeInteger
-};
-var toWorkspaceServiceArgs2 = toObject(workspaceServiceArgs);
-var toStartWorkspaceServiceParams = toObject({
-  workspaceId: toNonNegativeInteger,
-  updateIfOutdated: toUndefOr(toBoolean)
-});
-var toGetWorkspaceServiceArgs = toObject({
-  id: toNonNegativeInteger
-});
-var toGetByManagedServiceArgs = toObject({
-  id: toUuid
-});
-var toCreateWorkspaceServiceArgs = toObject({
-  teamId: toNonNegativeInteger,
-  name: toString,
-  planId: toPlanId,
-  baseImage: toUndefOr(toString),
-  isPrivateRepo: toBoolean,
-  gitUrl: toNullOr(toString),
-  initialBranch: toNullOr(toString),
-  cloneDepth: toUndefOr(toPositiveInteger),
-  skipLfs: toUndefOr(toBoolean),
-  recurseSubmodules: toUndefOr(toBoolean),
-  sourceWorkspaceId: toNullOr(toNonNegativeInteger),
-  welcomeMessage: toNullOr(toString),
-  replicas: toPositiveInteger,
-  vpnConfig: toNullOr(toString),
-  restricted: toUndefOr(toBoolean),
-  env: toUndefOr(toEnvVars),
-  managedServiceId: toUndefOr(toUuid)
-});
-var toUpdateWorkspaceServiceArgs = toObject({
-  workspaceId: toNonNegativeInteger,
-  teamId: toUndefOr(toNonNegativeInteger),
-  planId: toUndefOr(toPlanId),
-  baseImage: toUndefOr(toString),
-  name: toUndefOr(toString),
-  replicas: toUndefOr(toPositiveInteger),
-  vpnConfig: toUndefOr(toNullOr(toString)),
-  restricted: toUndefOr(toBoolean)
-});
-var toHasAccessArgs = toObject({
-  ...workspaceServiceArgs,
-  role: toRole
-});
-
-// packages/deployment-service/common/lib/model/WorkspaceStatus.js
-var WorkspaceStatus;
-(function(WorkspaceStatus2) {
-  WorkspaceStatus2["Pending"] = "Workspace provisioning pending";
-  WorkspaceStatus2["StartDeployment"] = "Received deployment request";
-  WorkspaceStatus2["ConfiguringStorage"] = "Configuring storage";
-  WorkspaceStatus2["CopyCeph"] = "Copy data from source workspace";
-  WorkspaceStatus2["Deploying"] = "Deploying resources";
-  WorkspaceStatus2["InstanceDeployed"] = "Resources are deployed";
-  WorkspaceStatus2["ProvisioningStarted"] = "Provisioning workspace";
-  WorkspaceStatus2["SettingUpTerminal"] = "Configuring Terminal";
-  WorkspaceStatus2["TerminalSetup"] = "Completed terminal configuration";
-  WorkspaceStatus2["CloningRepository"] = "Cloning repository";
-  WorkspaceStatus2["RepositoryCloned"] = "Completed cloning repository";
-  WorkspaceStatus2["Mounting"] = "Mounting volume";
-  WorkspaceStatus2["Mounted"] = "Completed mounting volume";
-  WorkspaceStatus2["Running"] = "Workspace is running";
-  WorkspaceStatus2["Free"] = "Shutting down workspace";
-  WorkspaceStatus2["Failed"] = "Workspace start failed";
-  WorkspaceStatus2["ConnectionFailed"] = "Connection to workspace failed";
-  WorkspaceStatus2["AgentRestart"] = "Workspace encountered an error. Restarting";
-  WorkspaceStatus2["Unknown"] = "Waiting for workspace status";
-})(WorkspaceStatus || (WorkspaceStatus = {}));
-var toWorkspaceStatus = toStringEnum("WorkspaceStatus", WorkspaceStatus);
-var LandscapeStatus;
-(function(LandscapeStatus2) {
-  LandscapeStatus2["StartServers"] = "Received deployment request";
-  LandscapeStatus2["TearDownServers"] = "Received teardown request";
-  LandscapeStatus2["Free"] = "Servers shut down";
-  LandscapeStatus2["Deploying"] = "Deploying servers";
-  LandscapeStatus2["ServersDeployed"] = "Servers are deployed";
-  LandscapeStatus2["Scaled"] = "Servers are scaled";
-  LandscapeStatus2["Failed"] = "Landscape deploy failed";
-  LandscapeStatus2["Redeploying"] = "Received redeployment request";
-})(LandscapeStatus || (LandscapeStatus = {}));
-var toLandscapeStatus = toStringEnum("LandscapeStatus", LandscapeStatus);
-
-// packages/deployment-service/common/lib/WorkspaceInfo.js
-var workspaceStatusRoles = ["service"];
-var workspaceErrorRoles = ["service"];
-var landscapeStatusRoles = ["landscape"];
-var landscapeErrorRoles = ["landscape"];
-var replicaStatusRoles = ["leader", "follower"];
-var errorStatus = {
-  name: toString,
-  message: toString
-};
-var toErrorStatus = toObject(errorStatus);
-var toWorkspaceInfo = toObject({
-  status: toWorkspaceStatus,
-  role: toLiteralUnion("role", workspaceStatusRoles)
-});
-var toWorkspaceErrorStatus = toObject({
-  status: toObject(errorStatus),
-  role: toLiteralUnion("role", workspaceErrorRoles),
-  hostname: toUndefOr(toString)
-});
-var toReplicaErrorStatus = toObject({
-  status: toObject(errorStatus),
-  role: toLiteralUnion("role", replicaStatusRoles),
-  hostname: toString,
-  server: toUndefOr(toString)
-});
-var toReplicaInfo = toObject({
-  status: toWorkspaceStatus,
-  hostname: toString,
-  role: toLiteralUnion("role", replicaStatusRoles),
-  server: toUndefOr(toString)
-});
-var isReplicaInfo = (e) => isOfType(e, toReplicaInfo);
-var toReplicaInfoOrErrorStatus = toOr(toReplicaInfo, toReplicaErrorStatus);
-var toLandscapeInfo = toObject({
-  status: toLandscapeStatus,
-  role: toLiteralUnion("role", landscapeStatusRoles)
-});
-var toLandscapeErrorStatus = toObject({
-  status: toObject(errorStatus),
-  role: toLiteralUnion("role", landscapeErrorRoles)
-});
-var toWorkspaceInfoOrErrorStatus = toOr(toWorkspaceInfo, toWorkspaceErrorStatus, toLandscapeInfo, toLandscapeErrorStatus, toReplicaInfo, toReplicaErrorStatus);
-
-// packages/deployment-service/common/lib/api/replica.js
-var __decorate3 = function(decorators, target, key, desc) {
-  var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-  if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-  else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-  return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var replicaService = {
-  name: "Replica",
-  context: toHttpContext,
-  methods: {
-    electLeader: rpc({
-      access: "public",
-      response: toString,
-      request: toWorkspaceServiceArgs2
-    }),
-    listHealthy: rpc({
-      access: "public",
-      response: toArray(toObject({
-        replica: toString,
-        server: toString
-      })),
-      request: toWorkspaceServiceArgs2
-    }),
-    listReady: rpc({
-      access: "public",
-      response: toArray(toObject({
-        replica: toString,
-        server: toString
-      })),
-      request: toWorkspaceServiceArgs2
-    }),
-    info: stream({
-      access: "public",
-      response: toWorkspaceInfoOrErrorStatus,
-      request: toWorkspaceServiceArgs2
-    })
-  }
-};
-var ReplicaStub = class ReplicaStub2 extends createAuthnStubClass("ReplicaStub", replicaService) {
-};
-ReplicaStub = __decorate3([
-  (0, import_inversify2.injectable)()
-], ReplicaStub);
-
-// packages/deployment-service/common/lib/api/workspaceDeployment.js
-var import_inversify3 = __toESM(require_inversify(), 1);
-
-// packages/utils/common/lib/features.js
-var AVAILABLE_FEATURES = [
-  "billing",
-  "dev-domains-port",
-  "email-signup",
-  "email-signin",
-  "run-as-root-insecure",
-  "standalone-teams"
-];
-var availableFeatures = [...AVAILABLE_FEATURES];
-var toFeatureName = toLiteralUnion("FeatureName", availableFeatures);
-var toFeatures = toObject({
-  available: toReadOnly(toArray(toFeatureName)),
-  enabled: toReadOnly(toArray(toFeatureName))
-});
-var enabled;
-var isFeatureEnabled = (name) => {
-  if (!enabled) {
-    throw new Uninitialized("initFeatures() was not called");
-  }
-  return enabled.has(name);
-};
-var setEnabledFeatures = (features) => {
-  const [unknown, known] = filterSplit(features, (x) => availableFeatures.includes(x));
-  if (0 !== unknown.length) {
-    logW(jj`unknown experiments provided: ${unknown}`);
-  }
-  enabled = new Set(known);
-  return {
-    available: Object.freeze([...availableFeatures]),
-    enabled: Object.freeze(known)
-  };
-};
-var initFeatures = (features = []) => {
-  return setEnabledFeatures(features);
-};
-
-// packages/utils/common/lib/typing/url.js
-var prepareUrlPathRegex = () => {
-  const unReservedCharsGroup = "-._~a-zA-Z0-9";
-  const subDelims = "!$&'()*+,;=";
-  const other = ":@";
-  const pathDelimiter = "/";
-  const singleCharsClass = [
-    "[",
-    unReservedCharsGroup,
-    subDelims,
-    other,
-    pathDelimiter,
-    "]"
-  ].join("");
-  const regexp = [
-    "^\\/",
-    "(?:",
-    singleCharsClass,
-    "|",
-    "%[0-9A-F]{2}",
-    ")*$"
-  ].join("");
-  return new RegExp(regexp);
-};
-var validUrlPathRegex = prepareUrlPathRegex();
-var toUrlPath = toStringMatchingRegex("UrlPath", validUrlPathRegex);
-var prepareFullUrlRegex = () => {
-  const unReservedCharsGroup = "-._~a-zA-Z0-9";
-  const subDelims = "!$&'()*+,;=";
-  const other = ":@";
-  const dot = "\\.";
-  const labelInner = `[a-zA-Z0-9-]`;
-  const labelEdge = `[a-zA-Z0-9]`;
-  const label = `${labelEdge}(?:${labelInner}*${labelEdge})?`;
-  const pathSegmentCharsClass = [
-    "[",
-    unReservedCharsGroup,
-    subDelims,
-    other,
-    ".?]"
-  ].join("");
-  const knownProtocols = "https?|ftps?|wss?";
-  const regexp = [
-    `^(?:${knownProtocols})://`,
-    `${label}`,
-    `(?:${dot}${label})*`,
-    "(?::\\d+)?",
-    `(?:/(?:${pathSegmentCharsClass}+(?:/${pathSegmentCharsClass}+)*/?)?)?`,
-    "$"
-  ].join("");
-  return new RegExp(regexp);
-};
-var validFullUrlRegex = prepareFullUrlRegex();
-var toFullUrlByRegex = toStringMatchingRegex("FullUrl", validFullUrlRegex);
-var toFullUrl = (x) => {
-  try {
-    const url = new URL(toFullUrlByRegex(x));
-    return toString(x);
-  } catch {
-    throw new TypeConversionFailure("URL string", x);
-  }
-};
-
-// packages/utils/common/lib/url.js
-var devDomainRegex = /^(?:ide-|preview-)?(?<wsId>\d+)(?:-(?<port>\d+))?(?<server>-[a-z0-9-]*)?\./;
-var csInCsDomains = [
-  ".dev.5.codesphere.com",
-  ".cloud.codesphere.com",
-  ".2.codesphere.com",
-  ".dev-codesphere.com"
-];
-var isWorkspaceDomainWithWsId = (host) => {
-  const hostname = host.split(":")[0];
-  return devDomainRegex.test(hostname) && csInCsDomains.some((d) => hostname.endsWith(d));
-};
-var isLocalHost = (host) => host.split(":")[0] === "localhost" || host.split(":")[0] === "127.0.0.1";
-var isDevHost = (host) => [
-  ".dev.codesphere.com",
-  "3.codesphere.com",
-  "5.codesphere.com",
-  ".dev-codesphere.com"
-].some((s) => host.endsWith(s));
-var isQaHost = (host) => host.endsWith("qa.dev-codesphere.com");
-var createBaseUrl = (protocol, host, dc) => {
-  if (host.includes("://")) {
-    throw new InvalidArgument3("Host should not contain protocol.");
-  }
-  const p = isLocalHost(host) ? protocol : `${protocol}s`;
-  const prefix = !has(dc) || isLocalHost(host) || host.startsWith(`${dc}.`) || isWorkspaceDomainWithWsId(host) ? "" : `${dc}${isDevHost(host) && !isQaHost(host) ? "-" : "."}`;
-  return new URL(`${p}://${prefix}${host}`);
-};
-var createServiceUrl = (protocol, host, servicePath, dc) => {
-  const u = createBaseUrl(protocol, host, dc);
-  u.pathname = servicePath;
-  return u;
-};
-var joinPath = (...segments) => {
-  return [
-    segments[0] === "/" ? "" : segments[0],
-    ...segments.slice(1).map((s) => trimPrefix(s, "/"))
-  ].join("/");
-};
-
-// packages/utils/common/lib/path.js
-var import_path = require("path");
-var POSIX_PATH_REGEX = new RegExp("^/?(?:[^/\0]+/?)*$");
-var toPosixPath2 = (p) => {
-  const s = toString(p);
-  if (!POSIX_PATH_REGEX.test(s)) {
-    throw new TypeConversionFailure("POSIX path", p);
-  }
-  return s;
-};
-var toPathWithoutTraversal = (p) => {
-  const s = toPosixPath2(p);
-  if (s.split(import_path.sep).includes("..")) {
-    throw new TypeConversionFailure("path without ..", p);
-  }
-  return s;
-};
-
-// packages/workspace-agent/common/lib/pipeline/types.js
-var singleRunningStageKinds = ["prepare", "test"];
-var multiRunningStageKinds = ["run"];
-var stageKinds = [
-  ...singleRunningStageKinds,
-  ...multiRunningStageKinds
-];
-var toStageKind = toLiteralUnion("stageKind", stageKinds);
-var toStep = toObject({
-  name: toUndefOr(toString),
-  command: toString
-});
-var toUrl = (x) => {
-  if (x instanceof URL) {
-    return x;
-  }
-  try {
-    return new URL(toString(x));
-  } catch {
-    throw new TypeConversionFailure("URL string", x);
-  }
-};
-var toStage = toObject({
-  steps: toArray(toStep),
-  healthEndpoint: toUndefOr(toUrl)
-});
-var toEnvValue = toOr(toString, toNumber);
-var toEnv = toRecord(toEnvValue);
-var toSimpleNetworkConfig = toObject({
-  path: toUrlPath,
-  stripPath: toUndefOr(toBoolean)
-});
-var toPortConfig = toObject({
-  port: toPositiveInteger,
-  isPublic: toBoolean
-});
-var toPathConfig = toObject({
-  port: toPositiveInteger,
-  path: toUrlPath,
-  stripPath: toUndefOr(toBoolean)
-});
-var toAdvancedNetworkConfig = toObject({
-  ports: toNonEmptyArray(toPortConfig),
-  paths: toArray(toPathConfig)
-});
-var toNetworkConfig = toOr(toSimpleNetworkConfig, toAdvancedNetworkConfig);
-var MAX_USER_GROUP_ID = 2 ** 31 - 1;
-var toUserGroupId = ({ forceAllowRoot = false } = {}) => toRestrictedNumber("toUserGroupId", (n) => {
-  const allowRoot = forceAllowRoot || isFeatureEnabled("run-as-root-insecure");
-  return n >= (allowRoot ? 0 : 1) && n <= MAX_USER_GROUP_ID;
-});
-var toVolumeMounts = toArray(toObject({
-  name: toLiteral("_workspace"),
-  mountPath: toString,
-  workspacePath: toPathWithoutTraversal
-}));
-var toDeployStageServerCommonFields = {
-  healthEndpoint: toUndefOr(toUrl),
-  plan: toUndefOr(toPlanId),
-  replicas: toUndefOr(toPositiveInteger),
-  isPublic: toUndefOr(toBoolean),
-  network: toUndefOr(toOr(toSimpleNetworkConfig, toAdvancedNetworkConfig)),
-  env: toUndefOr(toEnv),
-  runAsUser: toUndefOr(toUserGroupId({ forceAllowRoot: true })),
-  runAsGroup: toUndefOr(toUserGroupId({ forceAllowRoot: true })),
-  volumeMounts: toUndefOr(toVolumeMounts)
-};
-var toDeployStageServerReactive = toObject({
-  ...toDeployStageServerCommonFields,
-  steps: toArray(toStep),
-  image: toUndefOr(toNonEmptyString)
-});
-var toDeployStageServerContainerRuntime = toObject({
-  ...toDeployStageServerCommonFields,
-  steps: toUndef,
-  image: toNonEmptyString,
-  command: toUndefOr(toArray(toString))
-});
-var toDeployStageServer = toOr(toDeployStageServerReactive, toDeployStageServerContainerRuntime);
-var isDeployStageServer = (x) => isOfType(x, toDeployStageServer);
-var toManagedServiceConfigFields = {
-  provider: toObject({
-    name: toString,
-    version: toString
-  }),
-  plan: toObject({
-    id: toNonNegativeInteger,
-    parameters: toRecord(toInteger)
-  }),
-  config: toRecord(toUnknown),
-  secrets: toRecord(toUnknown)
-};
-var toManagedServiceConfig = toObject(toManagedServiceConfigFields);
-var toHeadlessPath = toObject({
-  path: toUrlPath,
-  stripPath: toBoolean,
-  target: toString
-});
-var toHeadlessServiceConfig = toObject({
-  network: toObject({
-    paths: toArray(toHeadlessPath)
-  })
-});
-var toDeployStage = toRecord(toOr(toDeployStageServer, toManagedServiceConfig, toHeadlessServiceConfig));
-var isDeployStage = (x) => isOfType(x, toDeployStage);
-var toPipelineConfigV01 = toObject({
-  prepare: toStage,
-  test: toStage,
-  run: toStage
-});
-var toPipelineConfigV02 = toObject({
-  schemaVersion: toLiteral("v0.2"),
-  prepare: toStage,
-  test: toStage,
-  run: toDeployStage
-});
-var toPipelineConfig = toOr(toPipelineConfigV02, toPipelineConfigV01);
-var pipelineProcessingStates = [
-  "waiting",
-  "running",
-  "success",
-  "failure",
-  "aborted"
-];
-var executionInfo = {
-  state: toLiteralUnion("state", pipelineProcessingStates),
-  startedAt: toUndefOr(toDate),
-  finishedAt: toUndefOr(toDate)
-};
-var toExecutionInfo = toObject(executionInfo);
-var stageExecutionInfo = {
-  ...executionInfo,
-  steps: toArray(toExecutionInfo)
-};
-var toStageExecutionInfo = toObject(stageExecutionInfo);
-var isAdvancedNetworkConfig = (c) => isOfType(c, toAdvancedNetworkConfig);
-
-// packages/workspace-service/common/lib/Workspace.js
-var GitProvider;
-(function(GitProvider2) {
-  GitProvider2["GitHub"] = "github";
-  GitProvider2["GitLab"] = "gitlab";
-  GitProvider2["Bitbucket"] = "bitbucket";
-})(GitProvider || (GitProvider = {}));
-var toGitProvider = toStringEnum("GitProvider", GitProvider);
-var workspace = {
-  id: readOnly(toNonNegativeInteger),
-  dataCenterId: readOnly(toNumber),
-  userId: readOnly(toInteger),
-  teamId: readOnly(toNonNegativeInteger),
-  name: toString,
-  gitUrl: readOnly(toNullOr(toString)),
-  isPrivateRepo: readOnly(toBoolean),
-  welcomeMessage: readOnly(toNullOr(toString)),
-  initialBranch: readOnly(toNullOr(toString)),
-  cloneDepth: toUndefOr(toPositiveInteger),
-  skipLfs: toUndefOr(toBoolean),
-  recurseSubmodules: toUndefOr(toBoolean),
-  sourceWorkspaceId: readOnly(toNullOr(toNonNegativeInteger)),
-  planId: toPlanId,
-  replicas: toPositiveInteger,
-  vpnConfig: toNullOr(toString),
-  collectTraces: toBoolean,
-  restricted: toBoolean,
-  baseImage: toUndefOr(toString),
-  persistentLogs: toBoolean,
-  createdAt: toDate,
-  managedServiceId: toUndefOr(toUuid)
-};
-var toWorkspace = toObject(workspace);
-var validServerNameRegex = new RegExp("^(?:[a-z]|[a-z][-a-z0-9]{0,30}[a-z0-9])$");
-var toMsdServerName = toStringMatchingRegex("MsdServerName", validServerNameRegex);
-var toServerPath = toObject({
-  port: toPositiveInteger,
-  path: toUrlPath,
-  stripPath: toBoolean
-});
-var toServerPort = toObject({
-  port: toPositiveInteger,
-  isPublic: toBoolean
-});
-var toServerNetwork = toObject({
-  ports: toNonEmptyArray(toServerPort),
-  paths: toArray(toServerPath)
-});
-var server = {
-  name: readOnly(toMsdServerName),
-  planId: toPlanId,
-  replicas: toPositiveInteger,
-  network: toServerNetwork,
-  baseImage: toUndefOr(toString),
-  env: toUndefOr(toEnv),
-  runAsUser: toUndefOr(toNonNegativeInteger),
-  runAsGroup: toUndefOr(toNonNegativeInteger),
-  volumeMounts: toUndefOr(toVolumeMounts)
-};
-var toServer = toObject(server);
-var toHeadlessService = toObject({
-  name: toString,
-  network: toArray(toObject({
-    path: toUrlPath,
-    target: toString,
-    stripPath: toBoolean
-  }))
-});
-var serverV1 = {
-  name: readOnly(toMsdServerName),
-  planId: toPlanId,
-  replicas: toPositiveInteger,
-  stripPath: toBoolean,
-  isPublic: toUndefOr(toBoolean),
-  network: toUndefOr(toObject({
-    path: toUrlPath
-  }))
-};
-var toServerV1 = toObject(serverV1);
-var uniqueServerId = ({ workspaceId, name }) => `${workspaceId}-${name}`;
-var IDE_SERVER_NAME = "codesphere-ide";
-var DEFAULT_PORT = 3e3;
-var workspaceDevDomain = (workspaceId, workspaceHostingBaseDomain) => `${workspaceId}${isFeatureEnabled("dev-domains-port") ? `-${DEFAULT_PORT}` : ""}.${workspaceHostingBaseDomain}`;
-var simpleNetworkToServerNetwork = (networkConfig, isPublic) => ({
-  ports: [
-    {
-      port: DEFAULT_PORT,
-      isPublic: isPublic ?? true
-    }
-  ],
-  paths: !networkConfig || !(isPublic ?? true) ? [] : [
-    {
-      port: DEFAULT_PORT,
-      path: networkConfig.path,
-      stripPath: networkConfig.stripPath ?? false
-    }
-  ]
-});
-var advancedNetworkToServerNetwork = (networkConfig) => ({
-  ...networkConfig,
-  paths: networkConfig.paths.map((p) => ({ stripPath: false, ...p }))
-});
-var configToLandscape = (config) => {
-  return Object.entries(config).map(([k, v]) => {
-    if (!isDeployStageServer(v)) {
-      return;
-    }
-    return deployStageServerToLandscape(k, v);
-  }).filter((x) => x !== void 0);
-};
-var deployStageServerToLandscape = (name, config) => toServer({
-  name,
-  planId: config.plan,
-  replicas: config.replicas ?? 1,
-  env: config.env,
-  baseImage: config.image,
-  runAsUser: config.runAsUser ?? void 0,
-  runAsGroup: config.runAsGroup ?? void 0,
-  volumeMounts: config.volumeMounts,
-  network: config.network && isAdvancedNetworkConfig(config.network) ? advancedNetworkToServerNetwork(config.network) : simpleNetworkToServerNetwork(config.network, config.isPublic)
-});
-
-// packages/deployment-service/common/lib/PrometheusResponse.js
-var toUnixTimeAndValueTuple = toTuple(toNumber, toOr(toString, toNumber));
-var toRangeVectorResultEntry = toObject({
-  metric: toRecord(toString),
-  values: toArray(toUnixTimeAndValueTuple)
-});
-var toRangeVectorResultData = toObject({
-  resultType: toLiteral("matrix"),
-  result: toArray(toRangeVectorResultEntry)
-});
-var toPrometheusResponseSuccess = toObject({
-  status: toLiteral("success"),
-  data: toRangeVectorResultData,
-  warnings: toUndefOr(toArray(toString))
-});
-var toPrometheusResponseError = toObject({
-  status: toLiteral("error"),
-  errorType: toString,
-  error: toString
-});
-var toPrometheusResponse = toOr(toPrometheusResponseSuccess, toPrometheusResponseError);
-
-// packages/deployment-service/common/lib/serviceArgs.js
-var ResourceType;
-(function(ResourceType2) {
-  ResourceType2["CPU"] = "cpu";
-  ResourceType2["Memory"] = "memory";
-})(ResourceType || (ResourceType = {}));
-var toWorkspaceResourceUtilizationArgs = toObject({
-  ...workspaceServiceArgs,
-  intervalStart: toReadOnly(toPositiveInteger),
-  intervalEnd: toReadOnly(toPositiveInteger),
-  resourceType: toReadOnly(toStringEnum("ResourceType", ResourceType)),
-  replica: toUndefOr(toString)
-});
-
-// packages/deployment-service/common/lib/status.js
-var StartWorkspaceStatus;
-(function(StartWorkspaceStatus2) {
-  StartWorkspaceStatus2["WorkspaceUpdate"] = "Restarting updated Workspace.";
-  StartWorkspaceStatus2["NewWorkspaceDeployment"] = "Deploying new workspace";
-  StartWorkspaceStatus2["WorkspaceAlreadyDeployed"] = "Workspace already deployed";
-  StartWorkspaceStatus2["WorkspaceDeploying"] = "Your workspace will be ready soon";
-})(StartWorkspaceStatus || (StartWorkspaceStatus = {}));
-var toStartWorkspaceStatus = toStringEnum("StartWorkspaceStatus", StartWorkspaceStatus);
-var RouterStatusEnum;
-(function(RouterStatusEnum2) {
-  RouterStatusEnum2[RouterStatusEnum2["Available"] = 0] = "Available";
-  RouterStatusEnum2[RouterStatusEnum2["PartiallyAvailable"] = 1] = "PartiallyAvailable";
-  RouterStatusEnum2[RouterStatusEnum2["Unavailable"] = 2] = "Unavailable";
-})(RouterStatusEnum || (RouterStatusEnum = {}));
-var toRouterStatusEnum = toNumericEnum("RouterStatus", RouterStatusEnum);
-var toRouterStatus = toObject({
-  status: toRouterStatusEnum,
-  readyReplicas: toNonNegativeInteger,
-  desiredReplicas: toUndefOr(toNonNegativeInteger)
-});
-
-// packages/deployment-service/common/lib/api/workspaceDeployment.js
-var __decorate4 = function(decorators, target, key, desc) {
-  var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-  if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-  else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-  return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var baseImage = {
-  name: toString,
-  supportedUntil: toDate,
-  default: toUndefOr(toBoolean)
-};
-var toBaseImage = toObject(baseImage);
-var toFlavorConfig = toObject({
-  image: toString,
-  pool: toRecord(toNumber)
-});
-var toImageConfig = toObject({
-  ...baseImage,
-  flavors: toObject({
-    default: toFlavorConfig,
-    gpu: toUndefOr(toFlavorConfig)
-  })
-});
-var toDeployConfig = toObject({
-  images: toRecord(toImageConfig)
-});
-var toRemovePvcArgs = toObject({
-  workspaceId: toNonNegativeInteger,
-  sourceWorkspaceId: toNullOr(toNonNegativeInteger)
-});
-var toWorkspaceHost = toObject({
-  agent: toString,
-  server: toString,
-  vpn: toString
-});
-var toGetWorkspaceHostArgs = toObject({
-  workspaceId: toNonNegativeInteger,
-  replica: toUndefOr(toString),
-  server: toUndefOr(toString)
-});
-var toMarkWorkspaceUsedArgs = toObject({
-  workspaceId: toNonNegativeInteger
-});
-var toConfigUpdateArgs = toObject({
-  ...workspaceServiceArgs,
-  envVars: toRecord(toString)
-});
-var toHasCapacityArgs = toObject({
-  productId: toNonNegativeInteger,
-  replicas: toPositiveInteger
-});
-var toRestartArgs = toObject({
-  workspaceId: toNonNegativeInteger,
-  podName: toUndefOr(toString)
-});
-var toReplicaResourceUtilization = toObject({
-  replica: toString,
-  server: toString,
-  planId: toPlanId,
-  usage: toArray(toUnixTimeAndValueTuple)
-});
-var LandscapeServerReadinessStatus;
-(function(LandscapeServerReadinessStatus2) {
-  LandscapeServerReadinessStatus2["Ready"] = "Ready";
-  LandscapeServerReadinessStatus2["Reachable"] = "Reachable";
-  LandscapeServerReadinessStatus2["NotReady"] = "NotReady";
-})(LandscapeServerReadinessStatus || (LandscapeServerReadinessStatus = {}));
-var toLandscapeServerReadinessInfo = toObject({
-  status: toStringEnum("LandscapeServerReadinessStatus", LandscapeServerReadinessStatus),
-  server: toMsdServerName
-});
-var workspaceDeploymentService = {
-  name: "Workspace",
-  context: toHttpContext,
-  methods: {
-    listAvailableBaseImages: rpc({
-      access: "public",
-      response: toRecord(toBaseImage),
-      request: toVoid
-    }),
-    workspaceIsOutdated: rpc({
-      access: "public",
-      response: toBoolean,
-      request: toWorkspaceServiceArgs2,
-      defaultOptions: { timeout: { seconds: 10 } }
-    }),
-    hasCapacity: rpc({
-      access: "public",
-      response: toBoolean,
-      request: toHasCapacityArgs
-    }),
-    hasFreeWsCapacity: rpc({
-      access: "public",
-      response: toBoolean,
-      request: toPlanId
-    }),
-    startDomain: rpc({
-      access: "internal",
-      response: toVoid,
-      request: toString
-    }),
-    restart: rpc({
-      access: "internal",
-      response: toVoid,
-      request: toRestartArgs
-    }),
-    updateConfig: rpc({
-      access: "internal",
-      response: toVoid,
-      request: toConfigUpdateArgs,
-      defaultOptions: { timeout: duration({ seconds: 10 }) }
-    }),
-    getAllWorkspaceResourceUtilization: rpc({
-      access: "public",
-      response: toArray(toReplicaResourceUtilization),
-      request: toWorkspaceResourceUtilizationArgs,
-      defaultOptions: { timeout: duration({ seconds: 20 }) }
-    }),
-    getWorkspaceHost: rpc({
-      access: "internal",
-      response: toWorkspaceHost,
-      request: toGetWorkspaceHostArgs,
-      defaultOptions: { timeout: duration({ seconds: 30 }) }
-    }),
-    markWorkspaceUsed: rpc({
-      access: "internal",
-      response: toVoid,
-      request: toMarkWorkspaceUsedArgs,
-      defaultOptions: { timeout: duration({ seconds: 10 }) }
-    }),
-    removePvc: rpc({
-      access: "internal",
-      response: toVoid,
-      request: toRemovePvcArgs
-    }),
-    uninstallDeployment: rpc({
-      access: "internal",
-      response: toVoid,
-      request: toWorkspaceServiceArgs2,
-      defaultOptions: { timeout: duration({ seconds: 25 }) }
-    }),
-    startWorkspace: rpc({
-      access: "public",
-      response: toStartWorkspaceStatus,
-      request: toStartWorkspaceServiceParams,
-      defaultOptions: { timeout: duration({ seconds: 20 }) }
-    }),
-    landscapeServerReadinessStream: stream({
-      access: "public",
-      response: toLandscapeServerReadinessInfo,
-      request: toWorkspaceServiceArgs2
-    })
-  }
-};
-var workspaceDeploymentStub = createAuthnStubClass("WorkspaceDeploymentStub", {
-  name: "Workspace",
-  context: toHttpContext,
-  methods: workspaceDeploymentService.methods
-});
-var WorkspaceDeploymentStub = class WorkspaceDeploymentStub2 extends workspaceDeploymentStub {
-};
-WorkspaceDeploymentStub = __decorate4([
-  (0, import_inversify3.injectable)()
-], WorkspaceDeploymentStub);
-
-// packages/ide/common/lib/api/config.js
-var import_inversify4 = __toESM(require_inversify(), 1);
-
-// packages/utils/common/lib/preconditions.js
-var checkHas = (x, description = "") => {
-  if (has(x)) {
-    return x;
-  }
-  throw new TypeError(`Argument ${description} must not be null or undefined.`);
-};
-
-// packages/utils/common/lib/copy.js
-var copy = (src) => {
-  if (!has(src)) {
-    return src;
-  }
-  const type = typeof src;
-  if (type === "string" || type === "number" || type === "boolean" || type === "symbol") {
-    return src;
-  }
-  if (type === "function") {
-    throw new Error("copy of a function is not yet implemented");
-  }
-  if (Array.isArray(src)) {
-    return src.slice();
-  }
-  if (src instanceof Date) {
-    return new Date(src.getTime());
-  }
-  return Object.assign(Object.create(Object.getPrototypeOf(src)), src);
-};
-
-// packages/utils/common/lib/deepCopy.js
-var deepCopy = (src) => {
-  if (!has(src)) {
-    return src;
-  }
-  const type = typeof src;
-  if (type === "string" || type === "number" || type === "boolean" || type === "symbol") {
-    return src;
-  }
-  if (type === "function") {
-    throw new Error("deepCopy of a function is not yet implemented");
-  }
-  const result = copy(src);
-  if (src instanceof Date) {
-    return result;
-  }
-  for (const propName in result) {
-    result[propName] = deepCopy(result[propName]);
-  }
-  return result;
-};
-
-// packages/utils/common/lib/hasAll.js
-var hasAll = (...objects) => objects.every(has);
-
-// packages/reply/common/lib/Reply.js
-var UnexpectedOkError = class extends Error {
-  constructor() {
-    super("A reply with StatusCode.OK does not store an errorMessage. Did you mean .getValue()?");
-  }
-};
-var UnexpectedNotOkError = class extends Error {
-  constructor(errorMessage) {
-    super(`A reply with StatusCode.ERROR is not intended to hold any data. Did you mean .getMessage()?Error message: ${errorMessage}`);
-  }
-};
-var UnparsableReply = class extends Exception {
-  constructor(reply) {
-    super(`The reply could not be parsed: ${reply}`);
-  }
-};
-var Reply = class _Reply {
-  static all(...replies) {
-    for (const reply of replies) {
-      if (reply.notOk()) {
-        return _Reply.collectErrors(...replies);
-      }
-    }
-    return _Reply.getOk();
-  }
-  static okReply(data) {
-    return new _Reply({
-      code: Status.Ok,
-      data
-    }, void 0);
-  }
-  static okStatus(message) {
-    return new _Reply({
-      code: Status.Ok,
-      data: message
-    }, void 0);
-  }
-  static errStatus(message, stack, errScope = "internal") {
-    if (typeof message === "string") {
-      return new _Reply({
-        code: Status.Error,
-        errName: Error.name,
-        errMessage: message
-      }, stack ?? new Error().stack, errScope);
-    }
-    return _Reply.createFromError(message);
-  }
-  static getOk() {
-    return _Reply.OK;
-  }
-  static createFromSerializedReply(reply) {
-    if (!has(reply) || !(has(reply.code) && reply.code in Status) && (!has(reply.data) || !has(reply.errMessage))) {
-      return _Reply.getUnparseable(JSON.stringify(reply));
-    }
-    return new _Reply(reply, reply.code === Status.Ok ? void 0 : new Error().stack);
-  }
-  static createFromError(err) {
-    if (!has(err) || !hasAll(err.message, err.stack)) {
-      return _Reply.getUnparseable(JSON.stringify(err));
-    }
-    return new _Reply({
-      code: Status.Error,
-      errName: err.name,
-      errMessage: err.message
-    }, err.stack ?? new Error().stack, err instanceof Exception ? err.scope : "internal");
-  }
-  static setLogAsJson(logAsJson) {
-    _Reply.logAsJson = logAsJson;
-  }
-  static collectErrors(...replies) {
-    const failedReplys = replies.filter((reply) => reply.notOk());
-    const message = failedReplys.map((reply) => reply.getErrorMessage()).join("\n");
-    const stack = failedReplys.map((reply) => reply.stack).join("\n\n");
-    return failedReplys.length === 0 ? _Reply.getOk() : _Reply.errStatus(message, stack);
-  }
-  static getUnparseable(reply) {
-    return _Reply.createFromError(new UnparsableReply(reply));
-  }
-  constructor(reply, stack, errScope = "internal") {
-    this.errScope = errScope;
-    this.serializedReply = reply;
-    this.stack = stack;
-  }
-  ok() {
-    return this.serializedReply.code === Status.Ok;
-  }
-  notOk() {
-    return !this.ok();
-  }
-  toSerializedReply() {
-    return deepCopy(this.serializedReply);
-  }
-  and(otherReply) {
-    return _Reply.all(this, otherReply);
-  }
-  getErrorName() {
-    if (this.ok()) {
-      throw new UnexpectedOkError();
-    }
-    return this.serializedReply.errName;
-  }
-  getErrorMessage() {
-    if (this.ok()) {
-      throw new UnexpectedOkError();
-    }
-    return this.serializedReply.errMessage;
-  }
-  getValue() {
-    if (this.notOk()) {
-      throw new UnexpectedNotOkError(this.serializedReply.errMessage);
-    }
-    return this.serializedReply.data;
-  }
-  log(...tags) {
-    if (this.notOk()) {
-      log(this.getErrorMessage(), _Reply.logAsJson, Status.Error, this.stack, ...tags);
-    } else {
-      log(JSON.stringify(this.getValue()), _Reply.logAsJson, this.serializedReply.code, this.stack, ...tags);
-    }
-    return this;
-  }
-  logIfError() {
-    if (this.notOk()) {
-      this.log();
-    }
-    return this;
-  }
-  throwIfError() {
-    if (this.ok()) {
-      return this;
-    }
-    const err = new Error(this.getErrorMessage());
-    err.name = this.getErrorName() ?? Error.name;
-    if (has(this.stack)) {
-      err.stack = this.stack;
-    }
-    throw err;
-  }
-};
-Reply.OK = new Reply({
-  code: Status.Ok
-}, void 0);
-Reply.logAsJson = false;
-var okStatus = Reply.okStatus;
-var errStatus = Reply.errStatus;
-var okReply = Reply.okReply;
-var getOk = Reply.getOk;
-
-// packages/reply/common/lib/utils/exceptions.js
-var ReplyException = class extends Exception {
-  constructor(reply, opts) {
-    super(reply.getErrorMessage(), opts);
-    this.reply = reply;
-  }
-};
-
-// packages/reply/common/lib/compat.js
-var voidReply = Reply.getOk();
-var fromReply = (r) => {
-  if (r.notOk()) {
-    throw new ReplyException(r, { scope: r.errScope });
-  }
-  return r.getValue();
-};
-var fromReplyRethrowing = async (fn, ...throwers) => {
-  const isThrower = (i) => !Array.isArray(i);
-  const rethrowers = throwers.slice(0, -1);
-  const thrower = throwers.slice(-1)[0];
-  if (!has(thrower) || !isThrower(thrower) || rethrowers.some((x) => isThrower(x))) {
-    throw new InvalidArgument3("Expected an array of rethrowers with a thrower as a last argument");
-  }
-  try {
-    return fromReply(await fn());
-  } catch (e) {
-    const re2 = e;
-    checkHas(re2.reply, "replyException.reply");
-    const rethrower = rethrowers.find(([error]) => error.name === re2.reply.getErrorName());
-    if (has(rethrower)) {
-      throw rethrower[1](re2);
-    }
-    throw thrower(re2);
-  }
-};
-var valueOrErrorToReply = (v) => {
-  return v instanceof Error ? Reply.createFromError(v) : Reply.okReply(v);
-};
-var toReplyAsync = async (func) => {
-  return valueOrErrorToReply(await catchErrorAsync(func));
-};
-
-// packages/streamy/common/lib/extensions/compat.js
-var createReplyStubSubClass = (spec, base) => {
-  class Klass extends base {
-  }
-  const p = Klass.prototype;
-  for (const [name, m] of Object.entries(spec.methods)) {
-    switch (m.kind) {
-      case "rpc":
-        p[name] = async function(req, opts) {
-          const finalOpts = m.defaultOptions || opts ? { ...m.defaultOptions, ...opts } : void 0;
-          return await toReplyAsync(async () => m.response(this.client instanceof StreamyClient ? await this.client.call({
-            service: spec.name,
-            method: name,
-            data: req,
-            context: this.context,
-            opts: finalOpts
-          }) : await this.client.call(name, req, finalOpts)));
-        };
-        break;
-      case "stream":
-        p[name] = function() {
-          return this.client instanceof StreamyClient ? this.client.stream({
-            service: spec.name,
-            method: name,
-            toQuery: m.request,
-            toResponse: m.response,
-            context: this.context
-          }) : this.client.stream(name, m.response);
-        };
-        break;
-    }
-  }
-  return Klass;
-};
-var createAuthnReplyStubClass = (name, spec) => {
-  const klass = createReplyStubSubClass(spec, AuthnStub);
-  klass.ID = serviceId(name);
-  return klass;
-};
-
-// packages/auth/common/lib/oauth.js
-var baseOAuthProviders = [
-  "bitbucket",
-  "github",
-  "gitlab",
-  "google",
-  "facebook"
-];
-var toBaseOAuthProviderId = toLiteralUnion("BaseOauthProviders", baseOAuthProviders);
-var ALL_OAUTH_PROVIDER_IDS = [...baseOAuthProviders, "oidc"];
-var toOAuthProviderId = toLiteralUnion("OauthProviderId", ALL_OAUTH_PROVIDER_IDS);
-
-// packages/auth-service/common/lib/session/types.js
-var toSessionId = toObject({
-  id: toUndefOr(readOnly(toString))
-});
-var toCreds = toObject({
-  sessionId: readOnly(toString),
-  accessToken: readOnly(toString)
-});
-var toSessionString = readOnly(toString);
-
-// packages/auth-service/common/lib/Authentication.js
-var oAuthProviderConfigBase = {
-  name: toString,
-  clientId: toString,
-  authorizationUrl: toString,
-  scopes: toUndefOr(toArray(toString))
-};
-var toPublicOAuthProviderConfig = toObject({
-  ...oAuthProviderConfigBase,
-  type: toOAuthProviderId
-});
-var toPrivateOAuthProviderConfig = toObject({
-  ...oAuthProviderConfigBase,
-  type: toBaseOAuthProviderId,
-  clientSecret: toString
-});
-var toOidcOAuthProviderConfig = toObject({
-  type: toLiteral("oidc"),
-  name: toString,
-  clientId: toString,
-  clientSecret: toString,
-  issuerUrl: toString,
-  scopes: withDefault(toArray(toString), () => [
-    "openid",
-    "email",
-    "profile"
-  ])
-});
-var toPublicOAuthConfig = toObject({
-  redirectUri: toString,
-  providers: withDefaultIfNull(toArray(toPublicOAuthProviderConfig), () => [])
-});
-var toPrivateOAuthConfig = toObject({
-  redirectUri: toString,
-  providers: withDefaultIfNull(toArray(toOr(toPrivateOAuthProviderConfig, toOidcOAuthProviderConfig)), () => [])
-});
-var toOAuthAuthentication = toObject({
-  provider: toOAuthProviderId,
-  isNewUser: toBoolean,
-  sessionId: toSessionString
-});
-var toOAuthCallbackParams = toObject({
-  code: toString,
-  iss: toUndefOr(toString)
-});
-
-// packages/utils/common/lib/codesphereEnv.js
-var CodesphereEnv;
-(function(CodesphereEnv2) {
-  CodesphereEnv2["Prod"] = "prod";
-  CodesphereEnv2["Dev"] = "dev";
-  CodesphereEnv2["Local"] = "local";
-  CodesphereEnv2["Test"] = "test";
-  CodesphereEnv2["LocalTest"] = "local-test";
-  CodesphereEnv2["PrivateCloud"] = "private-cloud";
-  CodesphereEnv2["TelioDev"] = "telio-dev";
-})(CodesphereEnv || (CodesphereEnv = {}));
-var codesphereEnvId = serviceId("CodesphereEnv");
-var toCodesphereEnv = toStringEnum("CodesphereEnv", CodesphereEnv);
-
-// packages/utils/common/lib/datacenters.js
-var toDataCenter = toObject({
-  id: toNumber,
-  name: toString,
-  city: toString,
-  countryCode: toString
-});
-var toDataCenterConfig = toObject({
-  availableDcs: toArray(toDataCenter),
-  currentDc: toNumber
-});
-var toDataCenterIp = toObject({
-  id: toNumber,
-  gatewayIp: toUndefOr(toString)
-});
-var toDataCenterIpsConfig = toObject({
-  dataCenters: toArray(toDataCenterIp)
-});
-var StaticDataCenterId;
-(function(StaticDataCenterId2) {
-  StaticDataCenterId2[StaticDataCenterId2["GKE"] = 0] = "GKE";
-  StaticDataCenterId2[StaticDataCenterId2["PlusServerCologne"] = 1] = "PlusServerCologne";
-  StaticDataCenterId2[StaticDataCenterId2["EquinixFrankfurt"] = 2] = "EquinixFrankfurt";
-  StaticDataCenterId2[StaticDataCenterId2["PlusServerDevCologne"] = 3] = "PlusServerDevCologne";
-  StaticDataCenterId2[StaticDataCenterId2["GcpUsEast4"] = 4] = "GcpUsEast4";
-  StaticDataCenterId2[StaticDataCenterId2["GcpEuWestDev"] = 5] = "GcpEuWestDev";
-})(StaticDataCenterId || (StaticDataCenterId = {}));
-
-// packages/ide/common/lib/BrowserConfig.js
-var toExperiments = toObject({
-  available: toReadOnly(toArray(toString)),
-  enabled: toReadOnly(toArray(toString))
-});
-var toFeatures2 = toObject({
-  available: toReadOnly(toArray(toString)),
-  enabled: toReadOnly(toArray(toString))
-});
-var toBrowserConfig = toObject({
-  version: toString,
-  env: toCodesphereEnv,
-  workspaceHostingBaseDomain: toString,
-  availableDcs: toArray(toDataCenter),
-  defaultDc: toNumber,
-  docsUrl: toString,
-  pipelineExampleUrl: toString,
-  tosUrl: toString,
-  brandTitle: toString,
-  brandLogoUrl: toString,
-  brandLogoNoTextUrl: toString,
-  brandLogoIconUrl: toString,
-  brandFaviconUrl: toString,
-  stripePublishableKey: toString,
-  recaptchaKey: toString,
-  supportEmail: toString,
-  incidentReportAddressConfigured: toUndefOr(toBoolean),
-  oAuth: toPublicOAuthConfig,
-  oAuthRedirectUri: toString,
-  bitbucketClientId: toString,
-  facebookClientId: toString,
-  googleClientId: toString,
-  gitHubClientId: toString,
-  gitLabClientId: toString,
-  experiments: toUndefOr(toExperiments),
-  freeWorkspaceTeamLimit: toNonNegativeInteger,
-  freeGpuWsTeamLimit: toNonNegativeInteger,
-  showPromotions: toBoolean
-});
-var browserConfigId = serviceId("BrowserConfig");
-
-// packages/ide/common/lib/api/config.js
-var __decorate5 = function(decorators, target, key, desc) {
-  var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-  if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-  else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-  return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var configService = {
-  name: "Config",
-  context: toHttpContext,
-  methods: {
-    getBrowserConfig: rpc({
-      access: "public",
-      response: toBrowserConfig,
-      request: toVoid
-    })
-  }
-};
-var ConfigStub = class ConfigStub2 extends createAuthnStubClass("ConfigStub", configService) {
-};
-ConfigStub = __decorate5([
-  (0, import_inversify4.injectable)()
-], ConfigStub);
-var ConfigReplyStub = class ConfigReplyStub2 extends createAuthnReplyStubClass("configReplyStub", configService) {
-};
-ConfigReplyStub = __decorate5([
-  (0, import_inversify4.injectable)()
-], ConfigReplyStub);
-
-// packages/ide/common/lib/api/gitAuth.js
-var import_inversify5 = __toESM(require_inversify(), 1);
-
-// packages/utils/common/lib/git.js
-var GitProviderKind;
-(function(GitProviderKind2) {
-  GitProviderKind2["GitHub"] = "github";
-  GitProviderKind2["GitLab"] = "gitlab";
-  GitProviderKind2["Bitbucket"] = "bitbucket";
-  GitProviderKind2["ScmManager"] = "scm-manager";
-  GitProviderKind2["AzureDevOps"] = "azure-dev-ops";
-})(GitProviderKind || (GitProviderKind = {}));
-var toGitProviderKind = toStringEnum("GitProviderKind", GitProviderKind);
-var gitProviderDisplayName = {
-  [GitProviderKind.GitHub]: "GitHub",
-  [GitProviderKind.GitLab]: "GitLab",
-  [GitProviderKind.Bitbucket]: "Bitbucket",
-  [GitProviderKind.ScmManager]: "SCM Manager",
-  [GitProviderKind.AzureDevOps]: "Azure DevOps"
-};
-
-// packages/ide/common/lib/GitProvider.js
-var gitProvider = {
-  url: toString,
-  kind: toGitProviderKind
-};
-var toGitProvider2 = toObject(gitProvider);
-var authMethods = [
-  "client_secret_basic",
-  "client_secret_post",
-  "client_secret_jwt",
-  "private_key_jwt",
-  "tls_client_auth",
-  "self_signed_tls_client_auth",
-  "none"
-];
-var toClientAuthMethod = toLiteralUnion("clientAuthMethod", authMethods);
-var toGitOAuthConfig = toObject({
-  issuer: toString,
-  authorizationEndpoint: toString,
-  tokenEndpoint: toString,
-  clientId: toString,
-  clientSecret: toString,
-  redirectUri: toUndefOr(toString),
-  scope: toUndefOr(toString),
-  installationUri: toUndefOr(toString),
-  clientAuthMethod: toUndefOr(toClientAuthMethod)
-});
-var gitProviderWithApi = {
-  ...gitProvider,
-  api: toObject({
-    baseUrl: toString
-  })
-};
-var toGitProviderWithApi = toObject(gitProviderWithApi);
-var toGitProviderWithOAuth = toObject({
-  ...gitProviderWithApi,
-  oauth: toGitOAuthConfig
-});
-var toGitProviderWithTokenAuth = toObject({
-  ...gitProviderWithApi
-});
-var SUPPORTED_GIT_PROVIDERS = [
-  {
-    url: "https://github.com",
-    kind: GitProviderKind.GitHub,
-    auth: "oauth"
-  },
-  {
-    url: "https://gitlab.com",
-    kind: GitProviderKind.GitLab,
-    auth: "oauth"
-  },
-  {
-    url: "https://bitbucket.org",
-    kind: GitProviderKind.Bitbucket,
-    auth: "oauth"
-  },
-  {
-    url: "https://bitbucket.example.com/scm",
-    kind: GitProviderKind.Bitbucket,
-    auth: "oauth"
-  },
-  {
-    url: "https://bitbucket.example.com",
-    kind: GitProviderKind.Bitbucket,
-    auth: "oauth"
-  },
-  {
-    url: "https://dev.azure.com",
-    kind: GitProviderKind.AzureDevOps,
-    auth: "oauth"
-  },
-  {
-    url: "https://my-scm-manager.internal",
-    kind: GitProviderKind.ScmManager,
-    auth: "api"
-  }
-];
-
-// packages/ide/common/lib/api/gitAuth.js
-var __decorate6 = function(decorators, target, key, desc) {
-  var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-  if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-  else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-  return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var NotConnectedToProvider = class NotConnectedToProvider2 extends SimpleSerializableException {
-  static create(provider, opts) {
-    const providerName = Object.entries(GitProviderKind).find(([, v]) => v === provider)?.[0];
-    return new this(`Not connected to git provider: ${providerName}. Connect to the provider in User Settings`, opts);
-  }
-};
-NotConnectedToProvider = __decorate6([
-  registerError()
-], NotConnectedToProvider);
-var toAuthCode = readOnly(toObject({
-  code: toString,
-  provider: toGitProviderKind
-}));
-var toGitProviders = readOnly(toArray(toGitProvider2));
-var toGitAuthUrls = readOnly(toArray(toObject({
-  provider: toGitProvider2,
-  auth: toString,
-  configure: toUndefOr(toString)
-})));
-var toAccessToken = readOnly(toObject({
-  token: toString,
-  expiresAt: toDate
-}));
-var toSetUpProviderViaTokenParams = readOnly(toObject({
-  accessToken: toString,
-  accessTokenExpiresAt: toDate,
-  refreshToken: toUndefOr(toString),
-  provider: toGitProviderKind
-}));
-var toGetAccessTokenForUserParams = toObject({
-  provider: toGitProviderKind,
-  userId: toNumber
-});
-var toGitProviderOrAll = toOr(toGitProviderKind, toLiteral("all"));
-var gitAuthService = {
-  name: "gitAuth",
-  context: toHttpContext,
-  methods: {
-    createTokens: rpc({
-      access: "public",
-      response: toAccessToken,
-      request: toAuthCode
-    }),
-    setUpProviderViaToken: rpc({
-      access: "public",
-      response: toVoid,
-      request: toSetUpProviderViaTokenParams
-    }),
-    deleteAllTokensInternal: rpc({
-      access: "internal",
-      response: toVoid,
-      request: toObject({ userId: toNumber })
-    }),
-    deleteTokens: rpc({
-      access: "public",
-      response: toVoid,
-      request: toGitProviderOrAll
-    }),
-    getAccessToken: rpc({
-      access: "public",
-      response: toAccessToken,
-      request: toGitProviderKind
-    }),
-    getAccessTokenForUser: rpc({
-      access: "internal",
-      response: toAccessToken,
-      request: toGetAccessTokenForUserParams
-    }),
-    getSupportedGitProviders: rpc({
-      access: "public",
-      response: toGitProviders,
-      request: toVoid
-    }),
-    listAuthUrls: rpc({
-      access: "public",
-      response: toGitAuthUrls,
-      request: toVoid
-    })
-  }
-};
-var gitAuthStub = createAuthnStubClass("GitAuthStub", gitAuthService);
-var GitAuthStub = class GitAuthStub2 extends gitAuthStub {
-};
-GitAuthStub = __decorate6([
-  (0, import_inversify5.injectable)()
-], GitAuthStub);
-
-// packages/payment-service/common/lib/Product.js
-var __decorate7 = function(decorators, target, key, desc) {
-  var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-  if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-  else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-  return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var ProductId;
-(function(ProductId2) {
-  ProductId2[ProductId2["HostingBasic"] = 1] = "HostingBasic";
-  ProductId2[ProductId2["HostingAwakeDeprecated"] = 2] = "HostingAwakeDeprecated";
-  ProductId2[ProductId2["HostingBoostDeprecated"] = 3] = "HostingBoostDeprecated";
-  ProductId2[ProductId2["HostingMicro"] = 8] = "HostingMicro";
-  ProductId2[ProductId2["HostingBoost"] = 9] = "HostingBoost";
-  ProductId2[ProductId2["HostingPro"] = 10] = "HostingPro";
-})(ProductId || (ProductId = {}));
-var product = {
-  id: toNumber,
-  priceUsd: toNumber,
-  title: toString,
-  deprecated: toBoolean
-};
-var toProduct = toObject(product);
-var productWithPricePerHour = {
-  ...product,
-  pricePerHour: toNumber
-};
-var toProductWithPricePerHour = toObject(productWithPricePerHour);
-var databaseCharacteristics = {
-  cpu: toNumber,
-  memory: Bytes.fromUnknown,
-  disk: Bytes.fromUnknown,
-  allowsStandbyNodes: toBoolean,
-  engines: toArray(toString)
-};
-var toDatabasePlanWithPricePerHour = toReadOnly(toObject({
-  ...productWithPricePerHour,
-  ...databaseCharacteristics
-}));
-var toDatabasePlan = toReadOnly(toObject({
-  ...product,
-  ...databaseCharacteristics
-}));
-var dockerCharacteristics = {
-  cpu: toNumber,
-  memory: Bytes.fromUnknown
-};
-var toDockerImageHostingPlanWithPricePerHour = toReadOnly(toObject({
-  ...productWithPricePerHour,
-  ...dockerCharacteristics
-}));
-var toDockerImageHostingPlan = toReadOnly(toObject({
-  ...product,
-  ...dockerCharacteristics
-}));
-var toPlanCharacteristic = toReadOnly(toObject({
-  id: toNonNegativeInteger,
-  CPU: toNumber,
-  GPU: toNumber,
-  RAM: Bytes.fromUnknown,
-  SSD: Bytes.fromUnknown,
-  TempStorage: Bytes.fromUnknown,
-  onDemand: toBoolean
-}));
-var workspacePlanWithPricePerHour = {
-  ...productWithPricePerHour,
-  characteristics: toReadOnly(toPlanCharacteristic),
-  maxReplicas: toPositiveInteger
-};
-var toWorkspacePlanWithPricePerHour = toObject(workspacePlanWithPricePerHour);
-var workspacePlan = {
-  ...product,
-  characteristics: toReadOnly(toPlanCharacteristic),
-  maxReplicas: toPositiveInteger
-};
-var toWorkspacePlan = toObject(workspacePlan);
-var wsO11yComponent = {
-  cpu: toPositiveNumber,
-  ramGiB: toPositiveNumber,
-  replicas: toPositiveInteger
-};
-var toWsO11yComponent = toObject(wsO11yComponent);
-var toWsO11yComponentWithStorage = toObject({
-  ...wsO11yComponent,
-  storage: toObject({
-    replication: toUndefOr(toNonNegativeInteger)
-  })
-});
-var toWsO11yPlanCharacteristic = toObject({
-  title: toString,
-  priceUsd: toUndefOr(toPositiveNumber),
-  datastore: toWsO11yComponentWithStorage,
-  collector: toWsO11yComponent,
-  suggestedLoadPerSecond: toUndefOr(toObject({
-    logs: toPositiveInteger,
-    traces: toPositiveInteger,
-    metrics: toPositiveInteger
-  }))
-});
-var toWsO11yConfig = toObject({
-  minStorageGiB: toPositiveNumber,
-  maxStorageGiB: toPositiveNumber,
-  defaultStorageGiB: toPositiveNumber,
-  storagePriceUsdPerGiB: toUndefOr(toPositiveNumber),
-  plans: toRecord(toWsO11yPlanCharacteristic)
-});
-var WsO11yPlanNotFound = class WsO11yPlanNotFound2 extends SimpleSerializableException {
-};
-WsO11yPlanNotFound = __decorate7([
-  registerError()
-], WsO11yPlanNotFound);
-
-// packages/payment-service/common/lib/api/products.js
-var productsService = {
-  name: "Products",
-  context: toHttpContext,
-  methods: {
-    listHostingPlans: rpc({
-      access: "public",
-      response: toArray(toWorkspacePlan),
-      request: toVoid
-    }),
-    listDatabasePlans: rpc({
-      access: "public",
-      response: toArray(toDatabasePlan),
-      request: toVoid
-    }),
-    listDockerImageHostingPlans: rpc({
-      access: "public",
-      response: toArray(toDockerImageHostingPlan),
-      request: toVoid
-    }),
-    listWorkspacePlansWithPricePerHour: rpc({
-      access: "public",
-      response: toArray(toWorkspacePlanWithPricePerHour),
-      request: toVoid
-    }),
-    listDatabasePlansWithPricePerHour: rpc({
-      access: "public",
-      response: toArray(toDatabasePlanWithPricePerHour),
-      request: toVoid
-    }),
-    listDockerImageHostingPlansWithPricePerHour: rpc({
-      access: "public",
-      response: toArray(toDockerImageHostingPlanWithPricePerHour),
-      request: toVoid
-    }),
-    getWsO11yConfig: rpc({
-      access: "public",
-      response: toWsO11yConfig,
-      request: toVoid
-    })
-  }
-};
-var productsStub = createAuthnStubClass("ProductsStub", productsService);
-var ProductsStub = class extends productsStub {
-};
-
-// packages/auth-service/common/lib/api/auth.js
-var import_inversify6 = __toESM(require_inversify(), 1);
-
-// packages/auth-service/common/lib/ChangePasswordServiceArgs.js
-var toChangePasswordServiceArgs = toObject({
-  password: readOnly(toString),
-  newPassword: readOnly(toString)
-});
-
-// packages/auth-service/common/lib/EmailContainer.js
-var emailContainer = {
-  email: readOnly(toString)
-};
-var toEmailContainer = toObject(emailContainer);
-
-// packages/auth-service/common/lib/EmailAndPassword.js
-var emailAndPassword = {
-  ...emailContainer,
-  password: readOnly(toString)
-};
-var toEmailAndPassword = toObject(emailAndPassword);
-
-// packages/auth-service/common/lib/OAuthServiceArgs.js
-var toOAuthServiceArgs = toObject({
-  code: readOnly(toString),
-  iss: toUndefOr(toString),
-  recaptchaToken: toUndefOr(toString),
-  recaptchaAction: toUndefOr(toString)
-});
-
-// packages/auth-service/common/lib/PerformPasswordResetArgs.js
-var toPerformPasswordResetArgs = toObject({
-  passwordResetRequestId: readOnly(toUuid),
-  newPassword: readOnly(toString)
-});
-
-// packages/auth-service/common/lib/SignUpArgs.js
-var toSignUpArgs = toObject({
-  ...emailAndPassword,
-  recaptchaToken: readOnly(toString),
-  recaptchaAction: toUndefOr(toString)
-});
-
-// packages/auth-service/common/lib/types.js
-var EMAIL_CONFIRMATION_TIMEOUT = duration({ minutes: 1 });
-var emailConfirmation = {
-  id: readOnly(toUuid),
-  email: readOnly(toString),
-  pending: readOnly(toBoolean),
-  createdAt: readOnly(toDate)
-};
-var toEmailConfirmationArgs = toObject(emailConfirmation);
-var toConfirmEmailArgs = toObject({
-  emailConfirmation: emailConfirmation["id"]
-});
-var toSessionInfo = toObject({
-  sessionId: toSessionString,
-  firstSignin: readOnly(toBoolean)
-});
-var toDeactivateUserInfo = toObject({
-  teamsNeedAdmin: readOnly(toArray(toTeam)),
-  teamsWithManagedResources: readOnly(toArray(toTeam))
-});
-var toDeactivateUserArgs = toObject({
-  dryRun: toBoolean
-});
-
-// packages/auth-service/common/lib/UpdateProfileArgs.js
-var toUpdateProfileArgs = toObject({
-  firstName: readOnly(toString),
-  lastName: readOnly(toString)
-});
-
-// packages/auth-service/common/lib/UploadFileArgs.js
-var toUploadFileArgs = toObject({
-  type: readOnly(toString),
-  file: readOnly(toString)
-});
-
-// packages/auth-service/common/lib/api/auth.js
-var __decorate8 = function(decorators, target, key, desc) {
-  var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-  if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-  else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-  return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata2 = function(k, v) {
-  if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var PasswordResetExpired_1;
-var DeactivateUserFailed_1;
-var InvalidCredentials = class InvalidCredentials2 extends SimpleSerializableException {
-  static create(opts) {
-    return new this("Invalid credentials", opts);
-  }
-};
-InvalidCredentials = __decorate8([
-  registerError()
-], InvalidCredentials);
-var UserDeleted = class UserDeleted2 extends SimpleSerializableException {
-  static create(opts) {
-    return new this("User is deleted", opts);
-  }
-};
-UserDeleted = __decorate8([
-  registerError()
-], UserDeleted);
-var RecaptchaCheckFailed = class RecaptchaCheckFailed2 extends SimpleSerializableException {
-  constructor(msg, opts) {
-    super(msg, opts);
-  }
-};
-RecaptchaCheckFailed = __decorate8([
-  registerError(),
-  __metadata2("design:paramtypes", [String, Object])
-], RecaptchaCheckFailed);
-var UserCreationFailed = class UserCreationFailed2 extends SimpleSerializableException {
-  constructor(msg, opts) {
-    super(msg, opts);
-  }
-};
-UserCreationFailed = __decorate8([
-  registerError(),
-  __metadata2("design:paramtypes", [String, Object])
-], UserCreationFailed);
-var PasswordResetExpired = PasswordResetExpired_1 = class PasswordResetExpired2 extends SimpleSerializableException {
-  static create(opts) {
-    return new PasswordResetExpired_1("Password reset request expired", opts);
-  }
-};
-PasswordResetExpired = PasswordResetExpired_1 = __decorate8([
-  registerError()
-], PasswordResetExpired);
-var customDomainAuthRequest = {
-  appToken: toString,
-  sessionId: toString
-};
-var toCustomDomainAuthRequest = toObject(customDomainAuthRequest);
-var devDomainAuthRequest = {
-  workspaceId: toNumber,
-  sessionId: toString
-};
-var toDevDomainAuthRequest = toObject(devDomainAuthRequest);
-var customDomainAuthResponse = {
-  userToken: toString,
-  domain: toString
-};
-var toCustomDomainAuthResponse = toObject(customDomainAuthResponse);
-var devDomainAuthResponse = {
-  userToken: toString
-};
-var toDevDomainAuthResponse = toObject(devDomainAuthResponse);
-var DeactivateUserFailed = DeactivateUserFailed_1 = class DeactivateUserFailed2 extends SimpleSerializableException {
-  static create(opts) {
-    return new DeactivateUserFailed_1("Failed to delete the user preliminarily. You still have teams which are not ready to be shut down.", opts);
-  }
-};
-DeactivateUserFailed = DeactivateUserFailed_1 = __decorate8([
-  registerError()
-], DeactivateUserFailed);
-var authService = {
-  name: "Auth",
-  context: toHttpContext,
-  methods: {
-    deactivateUser: rpc({
-      access: "public",
-      request: toDeactivateUserArgs,
-      response: toDeactivateUserInfo,
-      defaultOptions: { timeout: { seconds: 60 } }
-    }),
-    updateProfile: rpc({
-      access: "public",
-      request: toUpdateProfileArgs,
-      response: toVoid
-    }),
-    getAvatarUrl: rpc({
-      access: "public",
-      request: toOr(toArray(toPositiveInteger), toPositiveInteger),
-      response: toOr(toArray(toNullOr(toString)), toUndefOr(toString))
-    }),
-    restoreUser: rpc({
-      access: "public",
-      request: toEmailAndPassword,
-      response: toVoid,
-      defaultOptions: { timeout: { seconds: 60 } }
-    }),
-    signIn: rpc({
-      access: "public",
-      request: toEmailAndPassword,
-      response: toSessionInfo
-    }),
-    authorizeWithOAuth: rpc({
-      access: "public",
-      request: toOAuthServiceArgs,
-      response: toOAuthAuthentication,
-      defaultOptions: { timeout: duration({ seconds: 10 }) }
-    }),
-    uploadAvatar: rpc({
-      access: "public",
-      request: toUploadFileArgs,
-      response: toVoid
-    }),
-    signUp: rpc({
-      access: "public",
-      request: toSignUpArgs,
-      response: toVoid,
-      defaultOptions: { timeout: duration({ seconds: 10 }) }
-    }),
-    changePassword: rpc({
-      access: "public",
-      request: toChangePasswordServiceArgs,
-      response: toVoid
-    }),
-    requestPasswordReset: rpc({
-      access: "public",
-      request: toEmailContainer,
-      response: toVoid
-    }),
-    performPasswordReset: rpc({
-      access: "public",
-      request: toPerformPasswordResetArgs,
-      response: toVoid
-    }),
-    acceptTos: rpc({
-      access: "public",
-      request: toVoid,
-      response: toVoid
-    }),
-    authForCustomDomain: rpc({
-      access: "public",
-      request: toCustomDomainAuthRequest,
-      response: toCustomDomainAuthResponse
-    }),
-    authForDevDomain: rpc({
-      access: "public",
-      request: toDevDomainAuthRequest,
-      response: toDevDomainAuthResponse
-    })
-  }
-};
-var AuthStub = class AuthStub2 extends createAuthnStubClass("AuthStub", authService) {
-};
-AuthStub = __decorate8([
-  (0, import_inversify6.injectable)()
-], AuthStub);
-
-// packages/auth-service/common/lib/session/api.js
-var import_inversify7 = __toESM(require_inversify(), 1);
-var __decorate9 = function(decorators, target, key, desc) {
-  var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-  if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-  else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-  return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
-var __metadata3 = function(k, v) {
-  if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
-};
-var SessionStub_1;
-var InvalidSessionId = class extends NotFound {
-  constructor(sessionId) {
-    super(!sessionId ? "Invalid SessionId, please sign in" : `The sessionId: ${sessionId} is not valid, please sign in.`);
-    this.sessionId = sessionId;
-  }
-};
-var REFRESH_COOKIE_NAME = "sessionId";
-var NoRefreshCookie = class extends NotFound {
-  constructor() {
-    super(`Could not find cookie: ${REFRESH_COOKIE_NAME}`);
-  }
-};
-var SignoutFailed = class extends Exception {
-  constructor(message) {
-    super(message);
-  }
-};
-var TokenGenerationFailed = class extends Exception {
-  constructor(message, details) {
-    super(message);
-    this.details = details;
-  }
-};
-var sessionService = {
-  name: "Session",
-  context: toHttpContext,
-  methods: {
-    genAccessToken: rpc({
-      access: "TODO",
-      response: toCreds,
-      request: toSessionId
-    }),
-    signOut: rpc({
-      access: "TODO",
-      response: toVoid,
-      request: toAny
-    })
-  }
-};
-var sessionEndpointsV1 = {
-  genAccessToken: "/session/v1/gen-access-token",
-  signOut: "/session/v1/sign-out"
-};
-var SessionStub = SessionStub_1 = class SessionStub2 {
-  constructor(url) {
-    this.url = url;
-  }
-  static bindForInjection(c, url) {
-    c.bind(SessionStub_1.ID).toConstantValue(new SessionStub_1(url));
-  }
-  headers() {
-    return {};
-  }
-  endpointUrl(method) {
-    return this.url instanceof URL ? new URL(joinPath(this.url.pathname, method), this.url) : joinPath(this.url, method);
-  }
-  async genAccessToken(args) {
-    try {
-      return await fetchJson(this.endpointUrl(sessionEndpointsV1.genAccessToken), {
-        method: "POST",
-        cache: "no-cache",
-        credentials: "same-origin",
-        redirect: "follow",
-        referrerPolicy: "no-referrer",
-        headers: {
-          "content-type": "application/json",
-          ...this.headers()
-        },
-        body: JSON.stringify(args),
-        converter: toCreds
-      });
-    } catch (e) {
-      if (e instanceof HttpException) {
-        if (HttpStatusCode.Unauthorized === e.code) {
-          throw new InvalidSessionId();
-        }
-        if (HttpStatusCode.BadRequest === e.code) {
-          throw new NoRefreshCookie();
-        }
-      }
-      throw new TokenGenerationFailed("Access token generation failed", toError(e).message);
-    }
-  }
-  async signOut() {
-    try {
-      await fetchJson(this.endpointUrl(sessionEndpointsV1.signOut), {
-        method: "POST",
-        cache: "no-cache",
-        credentials: "same-origin",
-        redirect: "follow",
-        referrerPolicy: "no-referrer",
-        headers: {
-          "content-type": "application/json",
-          ...this.headers()
-        },
-        converter: toVoid
-      });
-    } catch (e) {
-      if (e instanceof HttpException) {
-        if (HttpStatusCode.Unauthorized === e.code) {
-          throw new InvalidSessionId();
-        }
-        if (HttpStatusCode.BadRequest === e.code) {
-          throw new NoRefreshCookie();
-        }
-      }
-      throw new SignoutFailed(toError(e).message);
-    }
-  }
-};
-SessionStub.ID = serviceId("SessionStub");
-SessionStub = SessionStub_1 = __decorate9([
-  (0, import_inversify7.injectable)(),
-  __metadata3("design:paramtypes", [Object])
-], SessionStub);
-
-// packages/streamy/common/lib/stream.js
-var isStreamClosed = (stream2, e) => {
-  return e instanceof StreamClosed && e.isFor(stream2);
-};
-var closeStreamOnError = async (stream2, e) => {
-  if (isStreamClosed(stream2, e)) {
-    if (e.wasNormal) {
-      return;
-    }
-    throw e;
-  }
-  try {
-    await stream2.close();
-  } catch (ec) {
-    logW(`${stream2}.close() threw`, { cause: ec });
-  }
-  throw e;
-};
-var restreamOnError = (connect, process2, retryOpts = {
-  initialWait: { milliseconds: 10 },
-  factor: 2,
-  maxWait: { minutes: 1 }
-}) => {
-  let reconnect = true;
-  let sP = null;
-  const done = awaitLater((() => retryWithBackoff(async () => {
-    if (!reconnect) {
-      return true;
-    }
-    sP = connect();
-    const s = await sP;
-    try {
-      await process2(s);
-      sP = null;
-      await s.close();
-      return true;
-    } catch (e) {
-      sP = null;
-      try {
-        await closeStreamOnError(s, e);
-        return true;
-      } catch (ce) {
-        logW("stream disconnected", { cause: e });
-      }
-      if (!isStreamClosed(s, e)) {
-        throw e;
-      }
-      return false;
-    }
-  }, {
-    ...retryOpts,
-    timeout: { milliseconds: 2 ** 31 - 1 }
-  }))());
-  const close = async () => {
-    reconnect = false;
-    await logErrorAsync(async () => await (await sP)?.close());
-    await done;
-  };
-  close.done = done;
-  return close;
-};
-
 // packages/streamy/common/lib/extensions/stub.js
 var createStubUtils = (opts) => {
   return doCreateStubUtils(opts);
@@ -74772,8 +74710,11 @@ var doCreateStubUtils = (opts) => {
 
 // node_modules/ws/wrapper.mjs
 var import_stream2 = __toESM(require_stream(), 1);
+var import_extension = __toESM(require_extension(), 1);
+var import_permessage_deflate = __toESM(require_permessage_deflate3(), 1);
 var import_receiver = __toESM(require_receiver3(), 1);
 var import_sender = __toESM(require_sender3(), 1);
+var import_subprotocol = __toESM(require_subprotocol(), 1);
 var import_websocket2 = __toESM(require_websocket3(), 1);
 var import_websocket_server = __toESM(require_websocket_server(), 1);
 var wrapper_default = import_websocket2.default;
@@ -74862,64 +74803,53 @@ var pipelineService = {
   context: toHttpContext,
   methods: {
     init: rpc({
-      access: "internal",
       response: toVoid,
       request: toVoid,
       defaultOptions: { timeout: duration({ seconds: 10 }) }
     }),
     shutdown: rpc({
-      access: "internal",
       response: toVoid,
       request: toVoid,
       defaultOptions: { timeout: duration({ seconds: 15 }) }
     }),
     configStream: stream({
-      access: "internal",
       response: toNullOr(toPipelineConfig),
       request: toUndefOr(toString)
     }),
     setConfig: rpc({
-      access: "internal",
       response: toVoid,
       request: toSetConfigArgs
     }),
     setMetaConfig: rpc({
-      access: "internal",
       response: toVoid,
       request: toPipelineMetaConfig
     }),
     setEnvironmentVariables: rpc({
-      access: "internal",
       response: toVoid,
       request: toRecord(toString),
       defaultOptions: { timeout: duration({ seconds: 15 }) }
     }),
     removeEnvironmentVariables: rpc({
-      access: "internal",
       response: toVoid,
       request: toArray(toString),
       defaultOptions: { timeout: duration({ seconds: 15 }) }
     }),
     start: rpc({
-      access: "internal",
       response: toVoid,
       request: toStartArgs
     }),
     abort: rpc({
-      access: "internal",
       response: toVoid,
       request: toAbortArgs,
       defaultOptions: { timeout: duration({ seconds: 15 }) }
     }),
     getLastExecutedStageConfig: rpc({
-      access: "internal",
       response: toStageExecConfig,
       request: toObject({
         stage: toLiteralUnion("stage", stageKinds)
       })
     }),
     logs: stream({
-      access: "internal",
       response: toArray(toLogEntry),
       request: toObject({
         stage: toLiteralUnion("stage", stageKinds),
@@ -74927,29 +74857,24 @@ var pipelineService = {
       })
     }),
     executionInfo: stream({
-      access: "internal",
       response: toStageExecutionInfo,
       request: toObject({
         stage: toLiteralUnion("stage", stageKinds)
       })
     }),
     pipelineProfiles: stream({
-      access: "internal",
       response: toArray(toString),
       request: toUndef
     }),
     renamePipelineConfig: rpc({
-      access: "internal",
       response: toVoid,
       request: toRenamePipelineConfigParams
     }),
     deletePipelineConfig: rpc({
-      access: "internal",
       response: toVoid,
       request: toDeletePipelineConfigParams
     }),
     configurePersistentLogs: rpc({
-      access: "internal",
       response: toVoid,
       request: toConfigurePersistentLogsParams
     })
@@ -75811,6 +75736,49 @@ var listWorkspacePlans = async (db) => {
   });
 };
 
+// packages/utils/common/lib/copy.js
+var copy = (src) => {
+  if (!has(src)) {
+    return src;
+  }
+  const type = typeof src;
+  if (type === "string" || type === "number" || type === "boolean" || type === "symbol") {
+    return src;
+  }
+  if (type === "function") {
+    throw new Error("copy of a function is not yet implemented");
+  }
+  if (Array.isArray(src)) {
+    return src.slice();
+  }
+  if (src instanceof Date) {
+    return new Date(src.getTime());
+  }
+  return Object.assign(Object.create(Object.getPrototypeOf(src)), src);
+};
+
+// packages/utils/common/lib/deepCopy.js
+var deepCopy = (src) => {
+  if (!has(src)) {
+    return src;
+  }
+  const type = typeof src;
+  if (type === "string" || type === "number" || type === "boolean" || type === "symbol") {
+    return src;
+  }
+  if (type === "function") {
+    throw new Error("deepCopy of a function is not yet implemented");
+  }
+  const result = copy(src);
+  if (src instanceof Date) {
+    return result;
+  }
+  for (const propName in result) {
+    result[propName] = deepCopy(result[propName]);
+  }
+  return result;
+};
+
 // packages/utils/common/lib/equal.js
 var equal = (value, other) => {
   if (value === other) {
@@ -75881,6 +75849,14 @@ var cached = (timeout, f) => {
     lastFinishedMs = void 0;
   };
   return cached2;
+};
+
+// packages/utils/common/lib/preconditions.js
+var checkHas = (x, description = "") => {
+  if (has(x)) {
+    return x;
+  }
+  throw new TypeError(`Argument ${description} must not be null or undefined.`);
 };
 
 // packages/payment-service/node/lib/data-access/Products.js
@@ -76368,37 +76344,30 @@ var usageService = {
   context: toHttpContext,
   methods: {
     listWorkspaceEvents: rpc({
-      access: "public",
       request: toWorkspaceUsageParams,
       response: toPaginatedWorkspaceUsageEvents
     }),
     listServerEvents: rpc({
-      access: "public",
       request: toServerUsageParams,
       response: toPaginatedServerUsageEvents
     }),
     listDatabaseEvents: rpc({
-      access: "public",
       request: toDatabaseUsageParams,
       response: toPaginatedDatabaseUsageEvents
     }),
     listDockerDeploymentEvents: rpc({
-      access: "public",
       request: toDockerDeploymentUsageParams,
       response: toPaginatedDeploymentUsageEvents
     }),
     listSeatEvents: rpc({
-      access: "public",
       request: toUsageParams,
       response: toPaginatedSeatUsageEvents
     }),
     listManagedServiceEvents: rpc({
-      access: "public",
       request: toManagedServiceUsageParams,
       response: toPaginatedManagedServiceUsageEvents
     }),
     listSummaryOfTeam: rpc({
-      access: "public",
       request: toSummaryUsageParams,
       response: toPaginatedUsageSummary
     })
@@ -76483,6 +76452,11 @@ var teamServiceArgs = {
   teamId: readOnly(toNonNegativeInteger)
 };
 var toTeamServiceArgs = toObject(teamServiceArgs);
+var teamServiceForUserArgs = {
+  teamId: readOnly(toNonNegativeInteger),
+  userId: readOnly(toNonNegativeInteger)
+};
+var toTeamServiceForUserArgs = toObject(teamServiceForUserArgs);
 var toCreateTeamArgs = toObject({
   name: readOnly(toNonEmptyStringWithMaxLength(MAX_TEAM_NAME_LENGTH)),
   dc: toUndefOr(toNumber),
@@ -76543,55 +76517,49 @@ var workspacesService = {
   context: toHttpContext,
   methods: {
     createWorkspace: rpc({
-      access: "public",
       request: toCreateWorkspaceServiceArgs,
       response: toWorkspace,
       defaultOptions: { timeout: duration({ seconds: 60 }) }
     }),
     deleteWorkspace: rpc({
-      access: "public",
       request: toWorkspaceServiceArgs2,
       response: toVoid,
       defaultOptions: { timeout: duration({ seconds: 60 }) }
     }),
     getWorkspace: rpc({
-      access: "public",
       request: toGetWorkspaceServiceArgs,
       response: toWorkspace
     }),
     getByManagedService: rpc({
-      access: "internal",
       request: toGetByManagedServiceArgs,
       response: toWorkspace
     }),
     hasAccess: rpc({
-      access: "public",
       request: toHasAccessArgs,
       response: toVoid
     }),
+    hasAccessForUser: rpc({
+      request: toHasAccessForUserArgs,
+      response: toVoid
+    }),
     isSameDataCenter: rpc({
-      access: "public",
       request: toWorkspaceServiceArgs2,
       response: toBoolean
     }),
     listWorkspaces: rpc({
-      access: "public",
       request: toTeamServiceArgs,
       response: toArray(toWorkspace)
     }),
     listManagedServiceWorkspaces: rpc({
-      access: "internal",
       request: toVoid,
       response: toArray(toWorkspace)
     }),
     updateWorkspace: rpc({
-      access: "public",
       request: toUpdateWorkspaceServiceArgs,
       response: toVoid,
       defaultOptions: { timeout: duration({ seconds: 10 }) }
     }),
     workspacesStream: stream({
-      access: "public",
       response: toArray(toWorkspace),
       request: toTeamServiceArgs
     })
@@ -76651,7 +76619,8 @@ var toWorkspaceDbEntry = toObject({
   collectTraces: toBoolean,
   persistentLogs: toBoolean,
   createdAt: toDate,
-  managedServiceId: toUndefOr(toUuid)
+  managedServiceId: toUndefOr(toUuid),
+  storageMib: toUndefOr(toPositiveInteger)
 });
 var unsafeDbRecordToWorkspaceDbEntry = (r) => {
   return {
@@ -76676,7 +76645,8 @@ var unsafeDbRecordToWorkspaceDbEntry = (r) => {
     collectTraces: r.collectTraces,
     persistentLogs: r.persistentLogs,
     managedServiceId: r.managedServiceId,
-    createdAt: r.createdAt
+    createdAt: r.createdAt,
+    storageMib: r.storageMib
   };
 };
 var NO_CONDITION = {};
@@ -76702,7 +76672,8 @@ var LIST_COLS = [
   "collectTraces",
   "persistentLogs",
   "createdAt",
-  "managedServiceId"
+  "managedServiceId",
+  "storageMib"
 ];
 var WorkspacesDAODatabase = class WorkspacesDAODatabase2 {
   constructor(pubSub, db, getWorkspacePlan) {
@@ -76735,7 +76706,7 @@ var WorkspacesDAODatabase = class WorkspacesDAODatabase2 {
   async publish(teamId, workspace2) {
     await this.pubSub.publish(`${teamId}`, workspace2);
   }
-  async create({ ownerUserId, ownerUserEmail, teamId, name, isPrivateRepo, replicas, dataCenterId, planId, gitUrl, welcomeMessage, initialBranch, cloneDepth, skipLfs, recurseSubmodules, sourceWorkspaceId, vpnConfig, initiatorUserId, initiatorUserEmail, restricted, baseImage: baseImage2, env, managedServiceId }) {
+  async create({ ownerUserId, ownerUserEmail, teamId, name, isPrivateRepo, replicas, dataCenterId, planId, gitUrl, welcomeMessage, initialBranch, cloneDepth, skipLfs, recurseSubmodules, sourceWorkspaceId, vpnConfig, initiatorUserId, initiatorUserEmail, restricted, baseImage: baseImage2, env, managedServiceId, storageMib }) {
     return await this.db.transaction(async (tx) => {
       const ws = unsafeDbRecordToWorkspaceDbEntry(await rethrowAsync(() => tx.insert("workspaceService.workspaces", {
         userId: ownerUserId,
@@ -76755,7 +76726,8 @@ var WorkspacesDAODatabase = class WorkspacesDAODatabase2 {
         vpnConfig: vpnConfig ?? void 0,
         restricted,
         baseImage: baseImage2,
-        managedServiceId
+        managedServiceId,
+        storageMib
       }), [
         DbUniquenessViolation,
         () => new InvalidWorkspaceName(ALREADY_EXISTS_ERROR)
@@ -76780,7 +76752,8 @@ var WorkspacesDAODatabase = class WorkspacesDAODatabase2 {
         sourceWorkspaceId: sourceWorkspaceId ?? void 0,
         initialRepoUrl: gitUrl ?? void 0,
         initialBranch: initialBranch ?? void 0,
-        baseImage: baseImage2
+        baseImage: baseImage2,
+        storageMib
       });
       await this.startIdeServerUsage({
         teamId,
@@ -76863,7 +76836,8 @@ var WorkspacesDAODatabase = class WorkspacesDAODatabase2 {
         ...void 0 !== update.replicas ? { replicas: update.replicas ?? void 0 } : {},
         ...void 0 !== update.vpnConfig ? { vpnConfig: update.vpnConfig ?? void 0 } : {},
         ...void 0 !== update.restricted ? { restricted: update.restricted ?? void 0 } : {},
-        ...void 0 !== update.baseImage ? { baseImage: update.baseImage } : {}
+        ...void 0 !== update.baseImage ? { baseImage: update.baseImage } : {},
+        ...void 0 !== update.storageMib ? { storageMib: update.storageMib ?? void 0 } : {}
       }, { id }), [
         DbForeignKeyViolation,
         (m) => {
@@ -76882,7 +76856,7 @@ var WorkspacesDAODatabase = class WorkspacesDAODatabase2 {
   }
   async updateUsageHistory({ id, initiatorUserId, initiatorUserEmail, update }, tx) {
     const updateDate = /* @__PURE__ */ new Date();
-    const { teamId, name, dataCenterId, userId, sourceWorkspaceId, gitUrl, initialBranch, planId, replicas, collectTraces } = await this.get(id, tx);
+    const { teamId, name, dataCenterId, userId, sourceWorkspaceId, gitUrl, initialBranch, planId, replicas, collectTraces, storageMib } = await this.get(id, tx);
     const userEmail = await ignoreErrorAsync(() => this.getUserEmail(userId, tx), [NotFound]);
     if (update.planId || update.replicas) {
       await this.stopIdeServerUsage({
@@ -76926,7 +76900,8 @@ var WorkspacesDAODatabase = class WorkspacesDAODatabase2 {
       sourceWorkspaceId: sourceWorkspaceId ?? void 0,
       initialRepoUrl: gitUrl ?? void 0,
       initialBranch: initialBranch ?? void 0,
-      collectTraces: collectTraces ?? false
+      collectTraces: collectTraces ?? false,
+      storageMib
     });
   }
   async delete({ workspaceId, initiatorUserId, initiatorUserEmail }) {
@@ -77417,7 +77392,7 @@ var startLogStream = (pipeline, workspaceId, stage, step) => restreamOnError(() 
   });
   while (true) {
     const logs = await s.recv();
-    logs.forEach((log2) => logI(`[Pipeline ${stage}[${step}]] ${log2.data}`));
+    logs.forEach((log) => logI(`[Pipeline ${stage}[${step}]] ${log.data}`));
   }
 });
 var waitForWorkspaceStatus = async (replicaStub, workspaceId, fulfillsCondition) => {
@@ -77629,110 +77604,97 @@ var teamService = {
   context: toHttpContext,
   methods: {
     createTeam: rpc({
-      access: "public",
       request: toCreateTeamArgs,
       response: toTeamWithRole,
       defaultOptions: { timeout: duration({ seconds: 10 }) }
     }),
     updateTeam: rpc({
-      access: "public",
       request: toUpdateTeamArgs,
       response: toVoid
     }),
     deleteTeam: rpc({
-      access: "public",
       request: toTeamServiceArgs,
       response: toVoid,
       defaultOptions: { timeout: duration({ minutes: 2 }) }
     }),
     getTeam: rpc({
-      access: "public",
       request: toTeamServiceArgs,
       response: toTeamWithRole
     }),
     listMembers: rpc({
-      access: "public",
       request: toTeamServiceArgs,
       response: toArray(toTeamMember)
     }),
     listTeams: rpc({
-      access: "public",
       request: toVoid,
       response: toArray(toTeamWithRole)
     }),
     getAvatarUrl: rpc({
-      access: "public",
       request: toTeamServiceArgs,
       response: toString
     }),
     hasAdminAccess: rpc({
-      access: "public",
       request: toTeamServiceArgs,
       response: toBoolean
     }),
+    hasAdminAccessForUser: rpc({
+      request: toTeamServiceForUserArgs,
+      response: toBoolean
+    }),
     reactivateDeletedUserTeams: rpc({
-      access: "public",
       request: toVoid,
       response: toArray(toTeamWithRole),
       defaultOptions: { timeout: { seconds: 20 } }
     }),
     hasMemberAccess: rpc({
-      access: "public",
       request: toTeamServiceArgs,
       response: toBoolean
     }),
+    hasMemberAccessForUser: rpc({
+      request: toTeamServiceForUserArgs,
+      response: toBoolean
+    }),
     changeRole: rpc({
-      access: "public",
       request: toChangeRoleArgs,
       response: toVoid
     }),
     sendInvite: rpc({
-      access: "public",
       request: toSendInviteArgs,
       response: toVoid
     }),
     leaveTeam: rpc({
-      access: "public",
       request: toTeamServiceArgs,
       response: toVoid
     }),
     uploadAvatar: rpc({
-      access: "public",
       request: toUploadFileArgs2,
       response: toVoid
     }),
     removeMember: rpc({
-      access: "public",
       request: toRemoveMemberArgs,
       response: toVoid
     }),
     setDeletionPending: rpc({
-      access: "public",
       request: toSetDeletionPendingArgs,
       response: toVoid
     }),
     isDeletionPending: rpc({
-      access: "public",
       request: toTeamServiceArgs,
       response: toBoolean
     }),
     isFirstTeam: rpc({
-      access: "public",
       request: toTeamServiceArgs,
       response: toBoolean
     }),
     acceptInvite: rpc({
-      access: "public",
       request: toTeamServiceArgs,
       response: toVoid
     }),
     deleteAvatar: rpc({
-      access: "public",
       request: toTeamServiceArgs,
       response: toVoid
     }),
     listInvitations: rpc({
-      access: "public",
       request: toVoid,
       response: toArray(toTeamWithRole)
     })
@@ -77746,58 +77708,11 @@ TeamStub = __decorate16([
 ], TeamStub);
 
 // packages/utils/common/lib/experiments.js
-var MAINTENANCE_MODE_EXP_NAME = "maintenance-mode";
-var AVAILABLE_EXPERIMENTS = [
-  "allow-legacy-ci",
-  "custom-service-image",
-  "external-mounter",
-  "gateway-domains",
-  "git-panel",
-  "gpu-plan",
-  "hermetic",
-  "headless-services",
-  "language-server",
-  "legacy-marketplace",
-  "managed-services",
-  MAINTENANCE_MODE_EXP_NAME,
-  "ms-in-ls",
-  "msd",
-  "o11y",
-  "organizations",
-  "overview-react",
-  "persistent-logs",
-  "persistent-nix",
-  "preview-comments",
-  "privileged-ports",
-  "react-create-ws",
-  "recaptcha-v3",
-  "recursive-watcher",
-  "secret-management",
-  "single-workspace-mode",
-  "sub-path-mount",
-  "time-sameDc",
-  "tcp-udp",
-  "vcluster",
-  "virtual-machines",
-  "vpn",
-  "ws-vscode-server"
-];
-var availableExperiments = [...AVAILABLE_EXPERIMENTS];
-var toExperimentName = toLiteralUnion("ExperimentName", availableExperiments);
-var enabled2;
-var setEnabledExperiments = (expts) => {
-  const [unknown, known] = filterSplit(expts, (x) => availableExperiments.includes(x));
-  if (0 !== unknown.length) {
-    logW(jj`unknown experiments provided: ${unknown}`);
-  }
-  enabled2 = new Set(known);
-  return {
-    available: Object.freeze([...availableExperiments]),
-    enabled: Object.freeze(known)
-  };
-};
-var initExperiments = (expts = []) => {
-  setEnabledExperiments(expts);
+var initExperiments = (cfg = []) => {
+  setEnabledFlags(isOfType(cfg, toReadOnly(toArray(toString))) ? {
+    internal: cfg,
+    alpha: []
+  } : cfg);
 };
 
 // packages/workspace-proxy/common/lib/api/pipeline.js
@@ -77865,66 +77780,54 @@ var pipelineProxyService = {
   context: toHttpContext,
   methods: {
     pipelineStream: stream({
-      access: "public",
       response: toNullOr(toPipelineConfig),
       request: toPipelineStreamArgs
     }),
     setPipeline: rpc({
-      access: "public",
       response: toVoid,
       request: toSetConfigArgs2
     }),
     setEnvironmentVariables: rpc({
-      access: "internal",
       response: toVoid,
       request: toSetEnvironmentVariablesArgs,
       defaultOptions: { timeout: duration({ seconds: 15 }) }
     }),
     removeEnvironmentVariables: rpc({
-      access: "internal",
       response: toVoid,
       request: toRemoveEnvironmentVariablesArgs,
       defaultOptions: { timeout: duration({ seconds: 15 }) }
     }),
     startPipeline: rpc({
-      access: "public",
       response: toVoid,
       request: toPipelineArgs,
       defaultOptions: { timeout: duration({ seconds: 10 }) }
     }),
     abortPipeline: rpc({
-      access: "public",
       response: toVoid,
       request: toAbortPipelineArgs,
       defaultOptions: { timeout: duration({ seconds: 15 }) }
     }),
     getLastExecutedStageConfig: rpc({
-      access: "public",
       response: toStageExecConfig,
       request: toPipelineArgs
     }),
     logs: stream({
-      access: "public",
       response: toArray(toLogEntry),
       request: toLogArgs
     }),
     executionInfo: stream({
-      access: "public",
       response: toStageExecutionInfo,
       request: toExecInfoArgs
     }),
     pipelineProfiles: stream({
-      access: "public",
       response: toArray(toString),
       request: toWorkspaceServiceArgs2
     }),
     renamePipelineConfig: rpc({
-      access: "public",
       response: toVoid,
       request: toRenameProfileConfigArgs
     }),
     deletePipelineConfig: rpc({
-      access: "public",
       response: toVoid,
       request: toDeletePipelineConfigArgs
     })
@@ -77989,7 +77892,6 @@ var processService = {
   context: toHttpContext,
   methods: {
     execute: rpc({
-      access: "public",
       response: toFinishedProcess,
       request: toExecuteArgs,
       defaultOptions: {
@@ -78021,7 +77923,6 @@ var processProxyService = {
   context: toHttpContext,
   methods: {
     execute: rpc({
-      access: "public",
       response: toFinishedProcess,
       request: toExecuteArgs2
     })
@@ -78370,7 +78271,8 @@ var managedServiceProviderCommonProperties = {
   iconUrl: toString,
   plans: toArray(toManagedServicePlan),
   version: toProviderVersion,
-  scope: toProviderScope
+  scope: toProviderScope,
+  teamSingleton: toUndefOr(toBoolean)
 };
 var toManagedServiceRestProvider = toObject({
   ...managedServiceProviderCommonProperties,
@@ -78433,6 +78335,7 @@ var managedServiceProviderConfigProperties = {
   detailsSchema: toUndefOr(toSchemaObject),
   plans: toUndefOr(toArray(toManagedServicePlan)),
   scope: toProviderScope,
+  teamSingleton: toUndefOr(toBoolean),
   secretsSchema: toUndefOr(toSchemaObject)
 };
 var toManagedServiceRestProviderConfig = toObject({
@@ -78492,78 +78395,64 @@ var managedServicesService = {
   context: toHttpContext,
   methods: {
     create: rpc({
-      access: "public",
       request: toCreateManagedServiceArgs,
       response: toManagedService,
       defaultOptions: { timeout: { seconds: 20 } }
     }),
     delete: rpc({
-      access: "public",
       request: toUuid,
       response: toVoid
     }),
     getDetails: rpc({
-      access: "public",
       request: toUuid,
       response: toUndefOr(toRecord(toUnknown))
     }),
     scheduleBackup: rpc({
-      access: "public",
       request: toObject({
         id: toUuid
       }),
       response: toBackup
     }),
     update: rpc({
-      access: "public",
       request: toUpdateManagedServiceArgs,
       response: toManagedService
     }),
     list: rpc({
-      access: "public",
       request: toListManagedServiceArgs,
       response: toArray(toManagedService),
       defaultOptions: { timeout: { seconds: 20 } }
     }),
     listByLandscape: rpc({
-      access: "internal",
       request: toListByLandscapeArgs,
       response: toArray(toManagedService),
       defaultOptions: { timeout: { seconds: 20 } }
     }),
     listProviders: rpc({
-      access: "public",
       request: toListProvidersArgs,
       response: toArray(toManagedServiceProvider),
       defaultOptions: { timeout: { seconds: 20 } }
     }),
     createLandscapeProvider: rpc({
-      access: "public",
       request: toCreateLandscapeProviderArgs,
       response: toManagedServiceLandscapeProvider
     }),
     createLandscapeProviderByGit: rpc({
-      access: "public",
       request: toCreateLandscapeProviderByGitArgs,
       response: toManagedServiceLandscapeProvider
     }),
     deleteLandscapeProvider: rpc({
-      access: "public",
       request: toProvider,
       response: toVoid
     }),
     updateLandscapeProvider: rpc({
-      access: "public",
       request: toUpdateLandscapeProviderArgs,
       response: toManagedServiceLandscapeProvider
     }),
     serviceStream: stream({
-      access: "public",
       request: toTeamServiceArgs,
       response: toArray(toManagedService)
     }),
     listEvents: rpc({
-      access: "public",
       request: toListEventsArgs,
       response: toArray(toEvent)
     })
@@ -78627,44 +78516,36 @@ var landscapeService = {
   familiar: "alex",
   methods: {
     landscapeStream: stream({
-      access: "public",
       request: toObject({ workspaceId: toNonNegativeInteger }),
       response: toArray(toServer)
     }),
     stateStream: stream({
-      access: "public",
       request: toObject({ workspaceId: toNonNegativeInteger }),
       response: toStateStreamResponse
     }),
     getLandscape: rpc({
-      access: "public",
       request: toObject({ workspaceId: toNonNegativeInteger }),
       response: toArray(toServer)
     }),
     getLandscapeNetwork: rpc({
-      access: "internal",
       request: toObject({ workspaceId: toNonNegativeInteger }),
       response: toLandscapeNetwork
     }),
     getLandscapeWithResolvedEnv: rpc({
-      access: "internal",
       request: toObject({ workspaceId: toNonNegativeInteger }),
       response: toArray(toServer)
     }),
     tearDownLandscape: rpc({
-      access: "public",
       request: toObject({ workspaceId: toNonNegativeInteger }),
       response: toVoid,
       defaultOptions: { timeout: { minutes: 5 } }
     }),
     updateLandscape: rpc({
-      access: "public",
       request: toUpdateLandscapeArgs,
       response: toVoid,
       defaultOptions: { timeout: { seconds: 10 } }
     }),
     scaleLandscapeServers: rpc({
-      access: "public",
       request: toObject({
         workspaceId: toNonNegativeInteger,
         replicaCountsByServer: toRecord(toPositiveInteger)
@@ -78673,12 +78554,10 @@ var landscapeService = {
       defaultOptions: { timeout: { seconds: 10 } }
     }),
     syncLandscape: rpc({
-      access: "public",
       request: toSyncLandscapeArgs,
       response: toVoid
     }),
     redeployLandscapeServers: rpc({
-      access: "public",
       request: toObject({
         workspaceId: toNonNegativeInteger,
         servers: toArray(toString)
@@ -78699,11 +78578,6 @@ LandscapeStub = __decorate21([
 var DEFAULT_PLAN_TITLE = "Boost";
 var deploymentLinkTypes = ["dev-domain", "preview"];
 var toDeploymentLinkType = toUndefOr(toNullOr(toLiteralUnion("DeploymentLinkType", deploymentLinkTypes)));
-var GetBrowserConfigFailed = class extends Exception {
-  constructor(msg) {
-    super(msg);
-  }
-};
 var codesphereWorkspaceUrl = (apiUrl, w) => {
   return new URL(import_path3.default.posix.join(apiUrl.pathname, `/ide/teams/${w.teamId}/workspaces/${w.id}`), apiUrl);
 };
@@ -78777,7 +78651,7 @@ var withStubs = async (dataCenterId, creds, serviceUrlDc, fn) => {
       workspaces: await createStub("workspace-service", WorkspacesStub),
       products: await createStub("payment-service", ProductsStub),
       process: await createStub("workspace-proxy", ProcessProxyStub),
-      config: await createStub("ide-service", ConfigReplyStub),
+      config: await createStub("ide-service", ConfigStub),
       git: await createStub("ide-service", GitAuthStub)
     });
   } finally {
@@ -78929,7 +78803,7 @@ var getEnvironmentUrl = async (c, w, config) => {
   if (c.deploymentLinkType === "preview") {
     return codespherePreviewUrl(c.apiUrl, w).toString();
   }
-  const { workspaceHostingBaseDomain } = await fromReplyRethrowing(() => config.getBrowserConfig(), (e) => new GetBrowserConfigFailed(e.message));
+  const { workspaceHostingBaseDomain } = await config.getBrowserConfig();
   return `https://${workspaceDevDomain(w.id, workspaceHostingBaseDomain)}`;
 };
 var isProviderSupported = async (repo, gitStub) => {
