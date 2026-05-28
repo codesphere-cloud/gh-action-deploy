@@ -1128,7 +1128,7 @@ var require_fast_content_type_parse = __commonJS({
     var defaultContentType = { type: "", parameters: new NullObject() };
     Object.freeze(defaultContentType.parameters);
     Object.freeze(defaultContentType);
-    function parse2(header) {
+    function parse3(header) {
       if (typeof header !== "string") {
         throw new TypeError("argument header is required and must be a string");
       }
@@ -1204,8 +1204,8 @@ var require_fast_content_type_parse = __commonJS({
       }
       return result;
     }
-    module2.exports.default = { parse: parse2, safeParse: safeParse2 };
-    module2.exports.parse = parse2;
+    module2.exports.default = { parse: parse3, safeParse: safeParse2 };
+    module2.exports.parse = parse3;
     module2.exports.safeParse = safeParse2;
     module2.exports.defaultContentType = defaultContentType;
   }
@@ -1289,7 +1289,7 @@ var require_main = __commonJS({
     var packageJson = require_package();
     var version = packageJson.version;
     var LINE = /(?:^|^)\s*(?:export\s+)?([\w.-]+)(?:\s*=\s*?|:\s+?)(\s*'(?:\\'|[^'])*'|\s*"(?:\\"|[^"])*"|\s*`(?:\\`|[^`])*`|[^#\r\n]+)?\s*(?:#.*)?(?:$|$)/mg;
-    function parse2(src) {
+    function parse3(src) {
       const obj = {};
       let lines = src.toString();
       lines = lines.replace(/\r\n?/mg, "\n");
@@ -1555,7 +1555,7 @@ var require_main = __commonJS({
       _parseVault,
       config,
       decrypt,
-      parse: parse2,
+      parse: parse3,
       populate
     };
     module2.exports.configDotenv = DotenvModule.configDotenv;
@@ -48082,7 +48082,7 @@ var require_extension = __commonJS({
       if (dest[name] === void 0) dest[name] = [elem];
       else dest[name].push(elem);
     }
-    function parse2(header) {
+    function parse3(header) {
       const offers = /* @__PURE__ */ Object.create(null);
       let params = /* @__PURE__ */ Object.create(null);
       let mustUnescape = false;
@@ -48222,7 +48222,7 @@ var require_extension = __commonJS({
         }).join(", ");
       }).join(", ");
     }
-    module2.exports = { format, parse: parse2 };
+    module2.exports = { format, parse: parse3 };
   }
 });
 
@@ -48256,7 +48256,7 @@ var require_websocket3 = __commonJS({
     var {
       EventTarget: { addEventListener, removeEventListener }
     } = require_event_target();
-    var { format, parse: parse2 } = require_extension();
+    var { format, parse: parse3 } = require_extension();
     var { toBuffer } = require_buffer_util();
     var kAborted = /* @__PURE__ */ Symbol("kAborted");
     var protocolVersions = [8, 13];
@@ -48925,7 +48925,7 @@ var require_websocket3 = __commonJS({
           }
           let extensions;
           try {
-            extensions = parse2(secWebSocketExtensions);
+            extensions = parse3(secWebSocketExtensions);
           } catch (err) {
             const message = "Invalid Sec-WebSocket-Extensions header";
             abortHandshake(websocket, socket, message);
@@ -49215,7 +49215,7 @@ var require_subprotocol = __commonJS({
   "node_modules/ws/lib/subprotocol.js"(exports2, module2) {
     "use strict";
     var { tokenChars } = require_validation();
-    function parse2(header) {
+    function parse3(header) {
       const protocols = /* @__PURE__ */ new Set();
       let start = -1;
       let end = -1;
@@ -49251,7 +49251,7 @@ var require_subprotocol = __commonJS({
       protocols.add(protocol);
       return protocols;
     }
-    module2.exports = { parse: parse2 };
+    module2.exports = { parse: parse3 };
   }
 });
 
@@ -50531,7 +50531,7 @@ var require_postgres_interval = __commonJS({
       if (!(this instanceof PostgresInterval)) {
         return new PostgresInterval(raw);
       }
-      extend(this, parse2(raw));
+      extend(this, parse3(raw));
     }
     var properties = ["seconds", "minutes", "hours", "days", "months", "years"];
     PostgresInterval.prototype.toPostgres = function() {
@@ -50592,7 +50592,7 @@ var require_postgres_interval = __commonJS({
       var microseconds = fraction + "000000".slice(fraction.length);
       return parseInt(microseconds, 10) / 1e3;
     }
-    function parse2(interval) {
+    function parse3(interval) {
       if (!interval) return {};
       var matches = INTERVAL.exec(interval);
       var isNegative = matches[8] === "-";
@@ -51078,13 +51078,13 @@ var require_binaryParsers = __commonJS({
           console.log("ERROR: ElementType not implemented: " + elementType2);
         }
       };
-      var parse2 = function(dimension, elementType2) {
+      var parse3 = function(dimension, elementType2) {
         var array = [];
         var i2;
         if (dimension.length > 1) {
           var count = dimension.shift();
           for (i2 = 0; i2 < count; i2++) {
-            array[i2] = parse2(dimension, elementType2);
+            array[i2] = parse3(dimension, elementType2);
           }
           dimension.unshift(count);
         } else {
@@ -51094,7 +51094,7 @@ var require_binaryParsers = __commonJS({
         }
         return array;
       };
-      return parse2(dims, elementType);
+      return parse3(dims, elementType);
     };
     var parseText = function(value) {
       return value.toString("utf8");
@@ -51882,7 +51882,7 @@ var require_type_overrides = __commonJS({
 var require_pg_connection_string = __commonJS({
   "node_modules/pg-connection-string/index.js"(exports2, module2) {
     "use strict";
-    function parse2(str, options = {}) {
+    function parse3(str, options = {}) {
       if (str.charAt(0) === "/") {
         const config2 = str.split(" ");
         return { host: config2[0], database: config2[1] };
@@ -52041,7 +52041,7 @@ var require_pg_connection_string = __commonJS({
       return poolConfig;
     }
     function parseIntoClientConfig(str) {
-      return toClientConfig(parse2(str));
+      return toClientConfig(parse3(str));
     }
     function deprecatedSslModeWarning(sslmode) {
       if (!deprecatedSslModeWarning.warned && typeof process !== "undefined" && process.emitWarning) {
@@ -52056,10 +52056,10 @@ To prepare for this change:
 See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.`);
       }
     }
-    module2.exports = parse2;
-    parse2.parse = parse2;
-    parse2.toClientConfig = toClientConfig;
-    parse2.parseIntoClientConfig = parseIntoClientConfig;
+    module2.exports = parse3;
+    parse3.parse = parse3;
+    parse3.toClientConfig = toClientConfig;
+    parse3.parseIntoClientConfig = parseIntoClientConfig;
   }
 });
 
@@ -52069,7 +52069,7 @@ var require_connection_parameters = __commonJS({
     "use strict";
     var dns = require("dns");
     var defaults3 = require_defaults();
-    var parse2 = require_pg_connection_string().parse;
+    var parse3 = require_pg_connection_string().parse;
     var val = function(key, config, envVar) {
       if (config[key]) {
         return config[key];
@@ -52107,9 +52107,9 @@ var require_connection_parameters = __commonJS({
     };
     var ConnectionParameters = class {
       constructor(config) {
-        config = typeof config === "string" ? parse2(config) : config || {};
+        config = typeof config === "string" ? parse3(config) : config || {};
         if (config.connectionString) {
-          config = Object.assign({}, config, parse2(config.connectionString));
+          config = Object.assign({}, config, parse3(config.connectionString));
         }
         this.user = val("user", config);
         this.database = val("database", config);
@@ -52788,7 +52788,7 @@ var require_serializer = __commonJS({
       );
     };
     var emptyArray = [];
-    var parse2 = (query2) => {
+    var parse3 = (query2) => {
       const name = query2.name || "";
       if (name.length > 63) {
         console.error("Warning! Postgres only supports 63 characters for query names.");
@@ -52938,7 +52938,7 @@ var require_serializer = __commonJS({
       sendSASLInitialResponseMessage,
       sendSCRAMClientFinalMessage,
       query,
-      parse: parse2,
+      parse: parse3,
       bind: bind2,
       execute,
       describe,
@@ -53336,12 +53336,12 @@ var require_dist = __commonJS({
       return serializer_1.serialize;
     } });
     var parser_1 = require_parser();
-    function parse2(stream2, callback) {
+    function parse3(stream2, callback) {
       const parser = new parser_1.Parser();
       stream2.on("data", (buffer) => parser.parse(buffer, callback));
       return new Promise((resolve2) => stream2.on("end", () => resolve2()));
     }
-    exports2.parse = parse2;
+    exports2.parse = parse3;
   }
 });
 
@@ -53425,7 +53425,7 @@ var require_connection3 = __commonJS({
   "node_modules/pg/lib/connection.js"(exports2, module2) {
     "use strict";
     var EventEmitter = require("events").EventEmitter;
-    var { parse: parse2, serialize } = require_dist();
+    var { parse: parse3, serialize } = require_dist();
     var { getStream, getSecureStream } = require_stream2();
     var flushBuffer = serialize.flush();
     var syncBuffer = serialize.sync();
@@ -53511,7 +53511,7 @@ var require_connection3 = __commonJS({
         });
       }
       attachListeners(stream2) {
-        parse2(stream2, (msg) => {
+        parse3(stream2, (msg) => {
           const eventName = msg.name === "error" ? "errorMessage" : msg.name;
           if (this._emitMessage) {
             this.emit("message", msg);
@@ -58739,92 +58739,65 @@ var require_data = __commonJS({
   }
 });
 
-// node_modules/fast-uri/lib/scopedChars.js
-var require_scopedChars = __commonJS({
-  "node_modules/fast-uri/lib/scopedChars.js"(exports2, module2) {
-    "use strict";
-    var HEX = {
-      0: 0,
-      1: 1,
-      2: 2,
-      3: 3,
-      4: 4,
-      5: 5,
-      6: 6,
-      7: 7,
-      8: 8,
-      9: 9,
-      a: 10,
-      A: 10,
-      b: 11,
-      B: 11,
-      c: 12,
-      C: 12,
-      d: 13,
-      D: 13,
-      e: 14,
-      E: 14,
-      f: 15,
-      F: 15
-    };
-    module2.exports = {
-      HEX
-    };
-  }
-});
-
 // node_modules/fast-uri/lib/utils.js
 var require_utils5 = __commonJS({
   "node_modules/fast-uri/lib/utils.js"(exports2, module2) {
     "use strict";
-    var { HEX } = require_scopedChars();
-    var IPV4_REG = /^(?:(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)$/u;
-    function normalizeIPv4(host) {
-      if (findToken(host, ".") < 3) {
-        return { host, isIPV4: false };
-      }
-      const matches = host.match(IPV4_REG) || [];
-      const [address] = matches;
-      if (address) {
-        return { host: stripLeadingZeros(address, "."), isIPV4: true };
-      } else {
-        return { host, isIPV4: false };
-      }
-    }
-    function stringArrayToHexStripped(input, keepZero = false) {
+    var isUUID = RegExp.prototype.test.bind(/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iu);
+    var isIPv4 = RegExp.prototype.test.bind(/^(?:(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)$/u);
+    var isHexPair = RegExp.prototype.test.bind(/^[\da-f]{2}$/iu);
+    var isUnreserved = RegExp.prototype.test.bind(/^[\da-z\-._~]$/iu);
+    var isPathCharacter = RegExp.prototype.test.bind(/^[\da-z\-._~!$&'()*+,;=:@/]$/iu);
+    function stringArrayToHexStripped(input) {
       let acc = "";
-      let strip = true;
-      for (const c of input) {
-        if (HEX[c] === void 0) return void 0;
-        if (c !== "0" && strip === true) strip = false;
-        if (!strip) acc += c;
+      let code = 0;
+      let i = 0;
+      for (i = 0; i < input.length; i++) {
+        code = input[i].charCodeAt(0);
+        if (code === 48) {
+          continue;
+        }
+        if (!(code >= 48 && code <= 57 || code >= 65 && code <= 70 || code >= 97 && code <= 102)) {
+          return "";
+        }
+        acc += input[i];
+        break;
       }
-      if (keepZero && acc.length === 0) acc = "0";
+      for (i += 1; i < input.length; i++) {
+        code = input[i].charCodeAt(0);
+        if (!(code >= 48 && code <= 57 || code >= 65 && code <= 70 || code >= 97 && code <= 102)) {
+          return "";
+        }
+        acc += input[i];
+      }
       return acc;
+    }
+    var nonSimpleDomain = RegExp.prototype.test.bind(/[^!"$&'()*+,\-.;=_`a-z{}~]/u);
+    function consumeIsZone(buffer) {
+      buffer.length = 0;
+      return true;
+    }
+    function consumeHextets(buffer, address, output) {
+      if (buffer.length) {
+        const hex = stringArrayToHexStripped(buffer);
+        if (hex !== "") {
+          address.push(hex);
+        } else {
+          output.error = true;
+          return false;
+        }
+        buffer.length = 0;
+      }
+      return true;
     }
     function getIPV6(input) {
       let tokenCount = 0;
       const output = { error: false, address: "", zone: "" };
       const address = [];
       const buffer = [];
-      let isZone = false;
       let endipv6Encountered = false;
       let endIpv6 = false;
-      function consume() {
-        if (buffer.length) {
-          if (isZone === false) {
-            const hex = stringArrayToHexStripped(buffer);
-            if (hex !== void 0) {
-              address.push(hex);
-            } else {
-              output.error = true;
-              return false;
-            }
-          }
-          buffer.length = 0;
-        }
-        return true;
-      }
+      let consume = consumeHextets;
       for (let i = 0; i < input.length; i++) {
         const cursor = input[i];
         if (cursor === "[" || cursor === "]") {
@@ -58834,31 +58807,30 @@ var require_utils5 = __commonJS({
           if (endipv6Encountered === true) {
             endIpv6 = true;
           }
-          if (!consume()) {
+          if (!consume(buffer, address, output)) {
             break;
           }
-          tokenCount++;
-          address.push(":");
-          if (tokenCount > 7) {
+          if (++tokenCount > 7) {
             output.error = true;
             break;
           }
-          if (i - 1 >= 0 && input[i - 1] === ":") {
+          if (i > 0 && input[i - 1] === ":") {
             endipv6Encountered = true;
           }
+          address.push(":");
           continue;
         } else if (cursor === "%") {
-          if (!consume()) {
+          if (!consume(buffer, address, output)) {
             break;
           }
-          isZone = true;
+          consume = consumeIsZone;
         } else {
           buffer.push(cursor);
           continue;
         }
       }
       if (buffer.length) {
-        if (isZone) {
+        if (consume === consumeIsZone) {
           output.zone = buffer.join("");
         } else if (endIpv6) {
           address.push(buffer.join(""));
@@ -58881,32 +58853,10 @@ var require_utils5 = __commonJS({
           newHost += "%" + ipv6.zone;
           escapedHost += "%25" + ipv6.zone;
         }
-        return { host: newHost, escapedHost, isIPV6: true };
+        return { host: newHost, isIPV6: true, escapedHost };
       } else {
         return { host, isIPV6: false };
       }
-    }
-    function stripLeadingZeros(str, token) {
-      let out = "";
-      let skip = true;
-      const l = str.length;
-      for (let i = 0; i < l; i++) {
-        const c = str[i];
-        if (c === "0" && skip) {
-          if (i + 1 <= l && str[i + 1] === token || i + 1 === l) {
-            out += c;
-            skip = false;
-          }
-        } else {
-          if (c === token) {
-            skip = true;
-          } else {
-            skip = false;
-          }
-          out += c;
-        }
-      }
-      return out;
     }
     function findToken(str, token) {
       let ind = 0;
@@ -58915,89 +58865,187 @@ var require_utils5 = __commonJS({
       }
       return ind;
     }
-    var RDS1 = /^\.\.?\//u;
-    var RDS2 = /^\/\.(?:\/|$)/u;
-    var RDS3 = /^\/\.\.(?:\/|$)/u;
-    var RDS5 = /^\/?(?:.|\n)*?(?=\/|$)/u;
-    function removeDotSegments(input) {
+    function removeDotSegments(path2) {
+      let input = path2;
       const output = [];
-      while (input.length) {
-        if (input.match(RDS1)) {
-          input = input.replace(RDS1, "");
-        } else if (input.match(RDS2)) {
-          input = input.replace(RDS2, "/");
-        } else if (input.match(RDS3)) {
-          input = input.replace(RDS3, "/");
-          output.pop();
-        } else if (input === "." || input === "..") {
-          input = "";
-        } else {
-          const im = input.match(RDS5);
-          if (im) {
-            const s = im[0];
-            input = input.slice(s.length);
-            output.push(s);
+      let nextSlash = -1;
+      let len = 0;
+      while (len = input.length) {
+        if (len === 1) {
+          if (input === ".") {
+            break;
+          } else if (input === "/") {
+            output.push("/");
+            break;
           } else {
-            throw new Error("Unexpected dot segment condition");
+            output.push(input);
+            break;
           }
+        } else if (len === 2) {
+          if (input[0] === ".") {
+            if (input[1] === ".") {
+              break;
+            } else if (input[1] === "/") {
+              input = input.slice(2);
+              continue;
+            }
+          } else if (input[0] === "/") {
+            if (input[1] === "." || input[1] === "/") {
+              output.push("/");
+              break;
+            }
+          }
+        } else if (len === 3) {
+          if (input === "/..") {
+            if (output.length !== 0) {
+              output.pop();
+            }
+            output.push("/");
+            break;
+          }
+        }
+        if (input[0] === ".") {
+          if (input[1] === ".") {
+            if (input[2] === "/") {
+              input = input.slice(3);
+              continue;
+            }
+          } else if (input[1] === "/") {
+            input = input.slice(2);
+            continue;
+          }
+        } else if (input[0] === "/") {
+          if (input[1] === ".") {
+            if (input[2] === "/") {
+              input = input.slice(2);
+              continue;
+            } else if (input[2] === ".") {
+              if (input[3] === "/") {
+                input = input.slice(3);
+                if (output.length !== 0) {
+                  output.pop();
+                }
+                continue;
+              }
+            }
+          }
+        }
+        if ((nextSlash = input.indexOf("/", 1)) === -1) {
+          output.push(input);
+          break;
+        } else {
+          output.push(input.slice(0, nextSlash));
+          input = input.slice(nextSlash);
         }
       }
       return output.join("");
     }
-    function normalizeComponentEncoding(components, esc) {
-      const func = esc !== true ? escape : unescape;
-      if (components.scheme !== void 0) {
-        components.scheme = func(components.scheme);
-      }
-      if (components.userinfo !== void 0) {
-        components.userinfo = func(components.userinfo);
-      }
-      if (components.host !== void 0) {
-        components.host = func(components.host);
-      }
-      if (components.path !== void 0) {
-        components.path = func(components.path);
-      }
-      if (components.query !== void 0) {
-        components.query = func(components.query);
-      }
-      if (components.fragment !== void 0) {
-        components.fragment = func(components.fragment);
-      }
-      return components;
+    var HOST_DELIMS = { "@": "%40", "/": "%2F", "?": "%3F", "#": "%23", ":": "%3A" };
+    var HOST_DELIM_RE = /[@/?#:]/g;
+    var HOST_DELIM_NO_COLON_RE = /[@/?#]/g;
+    function reescapeHostDelimiters(host, isIP) {
+      const re2 = isIP ? HOST_DELIM_NO_COLON_RE : HOST_DELIM_RE;
+      re2.lastIndex = 0;
+      return host.replace(re2, (ch) => HOST_DELIMS[ch]);
     }
-    function recomposeAuthority(components) {
+    function normalizePercentEncoding(input, decodeUnreserved = false) {
+      if (input.indexOf("%") === -1) {
+        return input;
+      }
+      let output = "";
+      for (let i = 0; i < input.length; i++) {
+        if (input[i] === "%" && i + 2 < input.length) {
+          const hex = input.slice(i + 1, i + 3);
+          if (isHexPair(hex)) {
+            const normalizedHex = hex.toUpperCase();
+            const decoded = String.fromCharCode(parseInt(normalizedHex, 16));
+            if (decodeUnreserved && isUnreserved(decoded)) {
+              output += decoded;
+            } else {
+              output += "%" + normalizedHex;
+            }
+            i += 2;
+            continue;
+          }
+        }
+        output += input[i];
+      }
+      return output;
+    }
+    function normalizePathEncoding(input) {
+      let output = "";
+      for (let i = 0; i < input.length; i++) {
+        if (input[i] === "%" && i + 2 < input.length) {
+          const hex = input.slice(i + 1, i + 3);
+          if (isHexPair(hex)) {
+            const normalizedHex = hex.toUpperCase();
+            const decoded = String.fromCharCode(parseInt(normalizedHex, 16));
+            if (decoded !== "." && isUnreserved(decoded)) {
+              output += decoded;
+            } else {
+              output += "%" + normalizedHex;
+            }
+            i += 2;
+            continue;
+          }
+        }
+        if (isPathCharacter(input[i])) {
+          output += input[i];
+        } else {
+          output += escape(input[i]);
+        }
+      }
+      return output;
+    }
+    function escapePreservingEscapes(input) {
+      let output = "";
+      for (let i = 0; i < input.length; i++) {
+        if (input[i] === "%" && i + 2 < input.length) {
+          const hex = input.slice(i + 1, i + 3);
+          if (isHexPair(hex)) {
+            output += "%" + hex.toUpperCase();
+            i += 2;
+            continue;
+          }
+        }
+        output += escape(input[i]);
+      }
+      return output;
+    }
+    function recomposeAuthority(component) {
       const uriTokens = [];
-      if (components.userinfo !== void 0) {
-        uriTokens.push(components.userinfo);
+      if (component.userinfo !== void 0) {
+        uriTokens.push(component.userinfo);
         uriTokens.push("@");
       }
-      if (components.host !== void 0) {
-        let host = unescape(components.host);
-        const ipV4res = normalizeIPv4(host);
-        if (ipV4res.isIPV4) {
-          host = ipV4res.host;
-        } else {
-          const ipV6res = normalizeIPv6(ipV4res.host);
+      if (component.host !== void 0) {
+        let host = unescape(component.host);
+        if (!isIPv4(host)) {
+          const ipV6res = normalizeIPv6(host);
           if (ipV6res.isIPV6 === true) {
             host = `[${ipV6res.escapedHost}]`;
           } else {
-            host = components.host;
+            host = reescapeHostDelimiters(host, false);
           }
         }
         uriTokens.push(host);
       }
-      if (typeof components.port === "number" || typeof components.port === "string") {
+      if (typeof component.port === "number" || typeof component.port === "string") {
         uriTokens.push(":");
-        uriTokens.push(String(components.port));
+        uriTokens.push(String(component.port));
       }
       return uriTokens.length ? uriTokens.join("") : void 0;
     }
     module2.exports = {
+      nonSimpleDomain,
       recomposeAuthority,
-      normalizeComponentEncoding,
+      reescapeHostDelimiters,
+      normalizePercentEncoding,
+      normalizePathEncoding,
+      escapePreservingEscapes,
       removeDotSegments,
-      normalizeIPv4,
+      isIPv4,
+      isUUID,
       normalizeIPv6,
       stringArrayToHexStripped
     };
@@ -59008,145 +59056,209 @@ var require_utils5 = __commonJS({
 var require_schemes = __commonJS({
   "node_modules/fast-uri/lib/schemes.js"(exports2, module2) {
     "use strict";
-    var UUID_REG = /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iu;
+    var { isUUID } = require_utils5();
     var URN_REG = /([\da-z][\d\-a-z]{0,31}):((?:[\w!$'()*+,\-.:;=@]|%[\da-f]{2})+)/iu;
-    function isSecure(wsComponents) {
-      return typeof wsComponents.secure === "boolean" ? wsComponents.secure : String(wsComponents.scheme).toLowerCase() === "wss";
+    var supportedSchemeNames = (
+      /** @type {const} */
+      [
+        "http",
+        "https",
+        "ws",
+        "wss",
+        "urn",
+        "urn:uuid"
+      ]
+    );
+    function isValidSchemeName(name) {
+      return supportedSchemeNames.indexOf(
+        /** @type {*} */
+        name
+      ) !== -1;
     }
-    function httpParse(components) {
-      if (!components.host) {
-        components.error = components.error || "HTTP URIs must have a host.";
+    function wsIsSecure(wsComponent) {
+      if (wsComponent.secure === true) {
+        return true;
+      } else if (wsComponent.secure === false) {
+        return false;
+      } else if (wsComponent.scheme) {
+        return wsComponent.scheme.length === 3 && (wsComponent.scheme[0] === "w" || wsComponent.scheme[0] === "W") && (wsComponent.scheme[1] === "s" || wsComponent.scheme[1] === "S") && (wsComponent.scheme[2] === "s" || wsComponent.scheme[2] === "S");
+      } else {
+        return false;
       }
-      return components;
     }
-    function httpSerialize(components) {
-      const secure = String(components.scheme).toLowerCase() === "https";
-      if (components.port === (secure ? 443 : 80) || components.port === "") {
-        components.port = void 0;
+    function httpParse(component) {
+      if (!component.host) {
+        component.error = component.error || "HTTP URIs must have a host.";
       }
-      if (!components.path) {
-        components.path = "/";
-      }
-      return components;
+      return component;
     }
-    function wsParse(wsComponents) {
-      wsComponents.secure = isSecure(wsComponents);
-      wsComponents.resourceName = (wsComponents.path || "/") + (wsComponents.query ? "?" + wsComponents.query : "");
-      wsComponents.path = void 0;
-      wsComponents.query = void 0;
-      return wsComponents;
+    function httpSerialize(component) {
+      const secure = String(component.scheme).toLowerCase() === "https";
+      if (component.port === (secure ? 443 : 80) || component.port === "") {
+        component.port = void 0;
+      }
+      if (!component.path) {
+        component.path = "/";
+      }
+      return component;
     }
-    function wsSerialize(wsComponents) {
-      if (wsComponents.port === (isSecure(wsComponents) ? 443 : 80) || wsComponents.port === "") {
-        wsComponents.port = void 0;
-      }
-      if (typeof wsComponents.secure === "boolean") {
-        wsComponents.scheme = wsComponents.secure ? "wss" : "ws";
-        wsComponents.secure = void 0;
-      }
-      if (wsComponents.resourceName) {
-        const [path2, query] = wsComponents.resourceName.split("?");
-        wsComponents.path = path2 && path2 !== "/" ? path2 : void 0;
-        wsComponents.query = query;
-        wsComponents.resourceName = void 0;
-      }
-      wsComponents.fragment = void 0;
-      return wsComponents;
+    function wsParse(wsComponent) {
+      wsComponent.secure = wsIsSecure(wsComponent);
+      wsComponent.resourceName = (wsComponent.path || "/") + (wsComponent.query ? "?" + wsComponent.query : "");
+      wsComponent.path = void 0;
+      wsComponent.query = void 0;
+      return wsComponent;
     }
-    function urnParse(urnComponents, options) {
-      if (!urnComponents.path) {
-        urnComponents.error = "URN can not be parsed";
-        return urnComponents;
+    function wsSerialize(wsComponent) {
+      if (wsComponent.port === (wsIsSecure(wsComponent) ? 443 : 80) || wsComponent.port === "") {
+        wsComponent.port = void 0;
       }
-      const matches = urnComponents.path.match(URN_REG);
+      if (typeof wsComponent.secure === "boolean") {
+        wsComponent.scheme = wsComponent.secure ? "wss" : "ws";
+        wsComponent.secure = void 0;
+      }
+      if (wsComponent.resourceName) {
+        const [path2, query] = wsComponent.resourceName.split("?");
+        wsComponent.path = path2 && path2 !== "/" ? path2 : void 0;
+        wsComponent.query = query;
+        wsComponent.resourceName = void 0;
+      }
+      wsComponent.fragment = void 0;
+      return wsComponent;
+    }
+    function urnParse(urnComponent, options) {
+      if (!urnComponent.path) {
+        urnComponent.error = "URN can not be parsed";
+        return urnComponent;
+      }
+      const matches = urnComponent.path.match(URN_REG);
       if (matches) {
-        const scheme = options.scheme || urnComponents.scheme || "urn";
-        urnComponents.nid = matches[1].toLowerCase();
-        urnComponents.nss = matches[2];
-        const urnScheme = `${scheme}:${options.nid || urnComponents.nid}`;
-        const schemeHandler = SCHEMES[urnScheme];
-        urnComponents.path = void 0;
+        const scheme = options.scheme || urnComponent.scheme || "urn";
+        urnComponent.nid = matches[1].toLowerCase();
+        urnComponent.nss = matches[2];
+        const urnScheme = `${scheme}:${options.nid || urnComponent.nid}`;
+        const schemeHandler = getSchemeHandler(urnScheme);
+        urnComponent.path = void 0;
         if (schemeHandler) {
-          urnComponents = schemeHandler.parse(urnComponents, options);
+          urnComponent = schemeHandler.parse(urnComponent, options);
         }
       } else {
-        urnComponents.error = urnComponents.error || "URN can not be parsed.";
+        urnComponent.error = urnComponent.error || "URN can not be parsed.";
       }
-      return urnComponents;
+      return urnComponent;
     }
-    function urnSerialize(urnComponents, options) {
-      const scheme = options.scheme || urnComponents.scheme || "urn";
-      const nid = urnComponents.nid.toLowerCase();
+    function urnSerialize(urnComponent, options) {
+      if (urnComponent.nid === void 0) {
+        throw new Error("URN without nid cannot be serialized");
+      }
+      const scheme = options.scheme || urnComponent.scheme || "urn";
+      const nid = urnComponent.nid.toLowerCase();
       const urnScheme = `${scheme}:${options.nid || nid}`;
-      const schemeHandler = SCHEMES[urnScheme];
+      const schemeHandler = getSchemeHandler(urnScheme);
       if (schemeHandler) {
-        urnComponents = schemeHandler.serialize(urnComponents, options);
+        urnComponent = schemeHandler.serialize(urnComponent, options);
       }
-      const uriComponents = urnComponents;
-      const nss = urnComponents.nss;
-      uriComponents.path = `${nid || options.nid}:${nss}`;
+      const uriComponent = urnComponent;
+      const nss = urnComponent.nss;
+      uriComponent.path = `${nid || options.nid}:${nss}`;
       options.skipEscape = true;
-      return uriComponents;
+      return uriComponent;
     }
-    function urnuuidParse(urnComponents, options) {
-      const uuidComponents = urnComponents;
-      uuidComponents.uuid = uuidComponents.nss;
-      uuidComponents.nss = void 0;
-      if (!options.tolerant && (!uuidComponents.uuid || !UUID_REG.test(uuidComponents.uuid))) {
-        uuidComponents.error = uuidComponents.error || "UUID is not valid.";
+    function urnuuidParse(urnComponent, options) {
+      const uuidComponent = urnComponent;
+      uuidComponent.uuid = uuidComponent.nss;
+      uuidComponent.nss = void 0;
+      if (!options.tolerant && (!uuidComponent.uuid || !isUUID(uuidComponent.uuid))) {
+        uuidComponent.error = uuidComponent.error || "UUID is not valid.";
       }
-      return uuidComponents;
+      return uuidComponent;
     }
-    function urnuuidSerialize(uuidComponents) {
-      const urnComponents = uuidComponents;
-      urnComponents.nss = (uuidComponents.uuid || "").toLowerCase();
-      return urnComponents;
+    function urnuuidSerialize(uuidComponent) {
+      const urnComponent = uuidComponent;
+      urnComponent.nss = (uuidComponent.uuid || "").toLowerCase();
+      return urnComponent;
     }
-    var http = {
-      scheme: "http",
-      domainHost: true,
-      parse: httpParse,
-      serialize: httpSerialize
+    var http = (
+      /** @type {SchemeHandler} */
+      {
+        scheme: "http",
+        domainHost: true,
+        parse: httpParse,
+        serialize: httpSerialize
+      }
+    );
+    var https = (
+      /** @type {SchemeHandler} */
+      {
+        scheme: "https",
+        domainHost: http.domainHost,
+        parse: httpParse,
+        serialize: httpSerialize
+      }
+    );
+    var ws = (
+      /** @type {SchemeHandler} */
+      {
+        scheme: "ws",
+        domainHost: true,
+        parse: wsParse,
+        serialize: wsSerialize
+      }
+    );
+    var wss = (
+      /** @type {SchemeHandler} */
+      {
+        scheme: "wss",
+        domainHost: ws.domainHost,
+        parse: ws.parse,
+        serialize: ws.serialize
+      }
+    );
+    var urn = (
+      /** @type {SchemeHandler} */
+      {
+        scheme: "urn",
+        parse: urnParse,
+        serialize: urnSerialize,
+        skipNormalize: true
+      }
+    );
+    var urnuuid = (
+      /** @type {SchemeHandler} */
+      {
+        scheme: "urn:uuid",
+        parse: urnuuidParse,
+        serialize: urnuuidSerialize,
+        skipNormalize: true
+      }
+    );
+    var SCHEMES = (
+      /** @type {Record<SchemeName, SchemeHandler>} */
+      {
+        http,
+        https,
+        ws,
+        wss,
+        urn,
+        "urn:uuid": urnuuid
+      }
+    );
+    Object.setPrototypeOf(SCHEMES, null);
+    function getSchemeHandler(scheme) {
+      return scheme && (SCHEMES[
+        /** @type {SchemeName} */
+        scheme
+      ] || SCHEMES[
+        /** @type {SchemeName} */
+        scheme.toLowerCase()
+      ]) || void 0;
+    }
+    module2.exports = {
+      wsIsSecure,
+      SCHEMES,
+      isValidSchemeName,
+      getSchemeHandler
     };
-    var https = {
-      scheme: "https",
-      domainHost: http.domainHost,
-      parse: httpParse,
-      serialize: httpSerialize
-    };
-    var ws = {
-      scheme: "ws",
-      domainHost: true,
-      parse: wsParse,
-      serialize: wsSerialize
-    };
-    var wss = {
-      scheme: "wss",
-      domainHost: ws.domainHost,
-      parse: ws.parse,
-      serialize: ws.serialize
-    };
-    var urn = {
-      scheme: "urn",
-      parse: urnParse,
-      serialize: urnSerialize,
-      skipNormalize: true
-    };
-    var urnuuid = {
-      scheme: "urn:uuid",
-      parse: urnuuidParse,
-      serialize: urnuuidSerialize,
-      skipNormalize: true
-    };
-    var SCHEMES = {
-      http,
-      https,
-      ws,
-      wss,
-      urn,
-      "urn:uuid": urnuuid
-    };
-    module2.exports = SCHEMES;
   }
 });
 
@@ -59154,26 +59266,29 @@ var require_schemes = __commonJS({
 var require_fast_uri = __commonJS({
   "node_modules/fast-uri/index.js"(exports2, module2) {
     "use strict";
-    var { normalizeIPv6, normalizeIPv4, removeDotSegments, recomposeAuthority, normalizeComponentEncoding } = require_utils5();
-    var SCHEMES = require_schemes();
+    var { normalizeIPv6, removeDotSegments, recomposeAuthority, normalizePercentEncoding, normalizePathEncoding, escapePreservingEscapes, reescapeHostDelimiters, isIPv4, nonSimpleDomain } = require_utils5();
+    var { SCHEMES, getSchemeHandler } = require_schemes();
     function normalize2(uri, options) {
       if (typeof uri === "string") {
-        uri = serialize(parse2(uri, options), options);
+        uri = /** @type {T} */
+        normalizeString(uri, options);
       } else if (typeof uri === "object") {
-        uri = parse2(serialize(uri, options), options);
+        uri = /** @type {T} */
+        parse3(serialize(uri, options), options);
       }
       return uri;
     }
     function resolve2(baseURI, relativeURI, options) {
-      const schemelessOptions = Object.assign({ scheme: "null" }, options);
-      const resolved = resolveComponents(parse2(baseURI, schemelessOptions), parse2(relativeURI, schemelessOptions), schemelessOptions, true);
-      return serialize(resolved, { ...schemelessOptions, skipEscape: true });
+      const schemelessOptions = options ? Object.assign({ scheme: "null" }, options) : { scheme: "null" };
+      const resolved = resolveComponent(parse3(baseURI, schemelessOptions), parse3(relativeURI, schemelessOptions), schemelessOptions, true);
+      schemelessOptions.skipEscape = true;
+      return serialize(resolved, schemelessOptions);
     }
-    function resolveComponents(base, relative2, options, skipNormalization) {
+    function resolveComponent(base, relative2, options, skipNormalization) {
       const target = {};
       if (!skipNormalization) {
-        base = parse2(serialize(base, options), options);
-        relative2 = parse2(serialize(relative2, options), options);
+        base = parse3(serialize(base, options), options);
+        relative2 = parse3(serialize(relative2, options), options);
       }
       options = options || {};
       if (!options.tolerant && relative2.scheme) {
@@ -59199,7 +59314,7 @@ var require_fast_uri = __commonJS({
               target.query = base.query;
             }
           } else {
-            if (relative2.path.charAt(0) === "/") {
+            if (relative2.path[0] === "/") {
               target.path = removeDotSegments(relative2.path);
             } else {
               if ((base.userinfo !== void 0 || base.host !== void 0 || base.port !== void 0) && !base.path) {
@@ -59223,22 +59338,12 @@ var require_fast_uri = __commonJS({
       return target;
     }
     function equal2(uriA, uriB, options) {
-      if (typeof uriA === "string") {
-        uriA = unescape(uriA);
-        uriA = serialize(normalizeComponentEncoding(parse2(uriA, options), true), { ...options, skipEscape: true });
-      } else if (typeof uriA === "object") {
-        uriA = serialize(normalizeComponentEncoding(uriA, true), { ...options, skipEscape: true });
-      }
-      if (typeof uriB === "string") {
-        uriB = unescape(uriB);
-        uriB = serialize(normalizeComponentEncoding(parse2(uriB, options), true), { ...options, skipEscape: true });
-      } else if (typeof uriB === "object") {
-        uriB = serialize(normalizeComponentEncoding(uriB, true), { ...options, skipEscape: true });
-      }
-      return uriA.toLowerCase() === uriB.toLowerCase();
+      const normalizedA = normalizeComparableURI(uriA, options);
+      const normalizedB = normalizeComparableURI(uriB, options);
+      return normalizedA !== void 0 && normalizedB !== void 0 && normalizedA.toLowerCase() === normalizedB.toLowerCase();
     }
     function serialize(cmpts, opts) {
-      const components = {
+      const component = {
         host: cmpts.host,
         scheme: cmpts.scheme,
         userinfo: cmpts.userinfo,
@@ -59256,62 +59361,60 @@ var require_fast_uri = __commonJS({
       };
       const options = Object.assign({}, opts);
       const uriTokens = [];
-      const schemeHandler = SCHEMES[(options.scheme || components.scheme || "").toLowerCase()];
-      if (schemeHandler && schemeHandler.serialize) schemeHandler.serialize(components, options);
-      if (components.path !== void 0) {
+      const schemeHandler = getSchemeHandler(options.scheme || component.scheme);
+      if (schemeHandler && schemeHandler.serialize) schemeHandler.serialize(component, options);
+      if (component.path !== void 0) {
         if (!options.skipEscape) {
-          components.path = escape(components.path);
-          if (components.scheme !== void 0) {
-            components.path = components.path.split("%3A").join(":");
+          component.path = escapePreservingEscapes(component.path);
+          if (component.scheme !== void 0) {
+            component.path = component.path.split("%3A").join(":");
           }
         } else {
-          components.path = unescape(components.path);
+          component.path = normalizePercentEncoding(component.path);
         }
       }
-      if (options.reference !== "suffix" && components.scheme) {
-        uriTokens.push(components.scheme, ":");
+      if (options.reference !== "suffix" && component.scheme) {
+        uriTokens.push(component.scheme, ":");
       }
-      const authority = recomposeAuthority(components);
+      const authority = recomposeAuthority(component);
       if (authority !== void 0) {
         if (options.reference !== "suffix") {
           uriTokens.push("//");
         }
         uriTokens.push(authority);
-        if (components.path && components.path.charAt(0) !== "/") {
+        if (component.path && component.path[0] !== "/") {
           uriTokens.push("/");
         }
       }
-      if (components.path !== void 0) {
-        let s = components.path;
+      if (component.path !== void 0) {
+        let s = component.path;
         if (!options.absolutePath && (!schemeHandler || !schemeHandler.absolutePath)) {
           s = removeDotSegments(s);
         }
-        if (authority === void 0) {
-          s = s.replace(/^\/\//u, "/%2F");
+        if (authority === void 0 && s[0] === "/" && s[1] === "/") {
+          s = "/%2F" + s.slice(2);
         }
         uriTokens.push(s);
       }
-      if (components.query !== void 0) {
-        uriTokens.push("?", components.query);
+      if (component.query !== void 0) {
+        uriTokens.push("?", component.query);
       }
-      if (components.fragment !== void 0) {
-        uriTokens.push("#", components.fragment);
+      if (component.fragment !== void 0) {
+        uriTokens.push("#", component.fragment);
       }
       return uriTokens.join("");
     }
-    var hexLookUp = Array.from({ length: 127 }, (_v, k) => /[^!"$&'()*+,\-.;=_`a-z{}~]/u.test(String.fromCharCode(k)));
-    function nonSimpleDomain(value) {
-      let code = 0;
-      for (let i = 0, len = value.length; i < len; ++i) {
-        code = value.charCodeAt(i);
-        if (code > 126 || hexLookUp[code]) {
-          return true;
-        }
-      }
-      return false;
-    }
     var URI_PARSE = /^(?:([^#/:?]+):)?(?:\/\/((?:([^#/?@]*)@)?(\[[^#/?\]]+\]|[^#/:?]*)(?::(\d*))?))?([^#?]*)(?:\?([^#]*))?(?:#((?:.|[\n\r])*))?/u;
-    function parse2(uri, opts) {
+    function getParseError(parsed, matches) {
+      if (matches[2] !== void 0 && parsed.path && parsed.path[0] !== "/") {
+        return 'URI path must start with "/" when authority is present.';
+      }
+      if (typeof parsed.port === "number" && (parsed.port < 0 || parsed.port > 65535)) {
+        return "URI port is malformed.";
+      }
+      return void 0;
+    }
+    function parseWithStatus(uri, opts) {
       const options = Object.assign({}, opts);
       const parsed = {
         scheme: void 0,
@@ -59322,9 +59425,15 @@ var require_fast_uri = __commonJS({
         query: void 0,
         fragment: void 0
       };
-      const gotEncoding = uri.indexOf("%") !== -1;
+      let malformedAuthorityOrPort = false;
       let isIP = false;
-      if (options.reference === "suffix") uri = (options.scheme ? options.scheme + ":" : "") + "//" + uri;
+      if (options.reference === "suffix") {
+        if (options.scheme) {
+          uri = options.scheme + ":" + uri;
+        } else {
+          uri = "//" + uri;
+        }
+      }
       const matches = uri.match(URI_PARSE);
       if (matches) {
         parsed.scheme = matches[1];
@@ -59337,14 +59446,18 @@ var require_fast_uri = __commonJS({
         if (isNaN(parsed.port)) {
           parsed.port = matches[5];
         }
+        const parseError = getParseError(parsed, matches);
+        if (parseError !== void 0) {
+          parsed.error = parsed.error || parseError;
+          malformedAuthorityOrPort = true;
+        }
         if (parsed.host) {
-          const ipv4result = normalizeIPv4(parsed.host);
-          if (ipv4result.isIPV4 === false) {
-            const ipv6result = normalizeIPv6(ipv4result.host);
+          const ipv4result = isIPv4(parsed.host);
+          if (ipv4result === false) {
+            const ipv6result = normalizeIPv6(parsed.host);
             parsed.host = ipv6result.host.toLowerCase();
             isIP = ipv6result.isIPV6;
           } else {
-            parsed.host = ipv4result.host;
             isIP = true;
           }
         }
@@ -59360,7 +59473,7 @@ var require_fast_uri = __commonJS({
         if (options.reference && options.reference !== "suffix" && options.reference !== parsed.reference) {
           parsed.error = parsed.error || "URI is not a " + options.reference + " reference.";
         }
-        const schemeHandler = SCHEMES[(options.scheme || parsed.scheme || "").toLowerCase()];
+        const schemeHandler = getSchemeHandler(options.scheme || parsed.scheme);
         if (!options.unicodeSupport && (!schemeHandler || !schemeHandler.unicodeSupport)) {
           if (parsed.host && (options.domainHost || schemeHandler && schemeHandler.domainHost) && isIP === false && nonSimpleDomain(parsed.host)) {
             try {
@@ -59371,17 +59484,23 @@ var require_fast_uri = __commonJS({
           }
         }
         if (!schemeHandler || schemeHandler && !schemeHandler.skipNormalize) {
-          if (gotEncoding && parsed.scheme !== void 0) {
-            parsed.scheme = unescape(parsed.scheme);
-          }
-          if (gotEncoding && parsed.host !== void 0) {
-            parsed.host = unescape(parsed.host);
+          if (uri.indexOf("%") !== -1) {
+            if (parsed.scheme !== void 0) {
+              parsed.scheme = unescape(parsed.scheme);
+            }
+            if (parsed.host !== void 0) {
+              parsed.host = reescapeHostDelimiters(unescape(parsed.host), isIP);
+            }
           }
           if (parsed.path) {
-            parsed.path = escape(unescape(parsed.path));
+            parsed.path = normalizePathEncoding(parsed.path);
           }
           if (parsed.fragment) {
-            parsed.fragment = encodeURI(decodeURIComponent(parsed.fragment));
+            try {
+              parsed.fragment = encodeURI(decodeURIComponent(parsed.fragment));
+            } catch {
+              parsed.error = parsed.error || "URI malformed";
+            }
           }
         }
         if (schemeHandler && schemeHandler.parse) {
@@ -59390,16 +59509,38 @@ var require_fast_uri = __commonJS({
       } else {
         parsed.error = parsed.error || "URI can not be parsed.";
       }
-      return parsed;
+      return { parsed, malformedAuthorityOrPort };
+    }
+    function parse3(uri, opts) {
+      return parseWithStatus(uri, opts).parsed;
+    }
+    function normalizeString(uri, opts) {
+      return normalizeStringWithStatus(uri, opts).normalized;
+    }
+    function normalizeStringWithStatus(uri, opts) {
+      const { parsed, malformedAuthorityOrPort } = parseWithStatus(uri, opts);
+      return {
+        normalized: malformedAuthorityOrPort ? uri : serialize(parsed, opts),
+        malformedAuthorityOrPort
+      };
+    }
+    function normalizeComparableURI(uri, opts) {
+      if (typeof uri === "string") {
+        const { normalized, malformedAuthorityOrPort } = normalizeStringWithStatus(uri, opts);
+        return malformedAuthorityOrPort ? void 0 : normalized;
+      }
+      if (typeof uri === "object") {
+        return serialize(uri, opts);
+      }
     }
     var fastUri = {
       SCHEMES,
       normalize: normalize2,
       resolve: resolve2,
-      resolveComponents,
+      resolveComponent,
       equal: equal2,
       serialize,
-      parse: parse2
+      parse: parse3
     };
     module2.exports = fastUri;
     module2.exports.default = fastUri;
@@ -62842,7 +62983,7 @@ var require_parse3 = __commonJS({
   "node_modules/semver/functions/parse.js"(exports2, module2) {
     "use strict";
     var SemVer = require_semver();
-    var parse2 = (version, options, throwErrors = false) => {
+    var parse3 = (version, options, throwErrors = false) => {
       if (version instanceof SemVer) {
         return version;
       }
@@ -62855,7 +62996,7 @@ var require_parse3 = __commonJS({
         throw er;
       }
     };
-    module2.exports = parse2;
+    module2.exports = parse3;
   }
 });
 
@@ -62863,9 +63004,9 @@ var require_parse3 = __commonJS({
 var require_valid = __commonJS({
   "node_modules/semver/functions/valid.js"(exports2, module2) {
     "use strict";
-    var parse2 = require_parse3();
+    var parse3 = require_parse3();
     var valid2 = (version, options) => {
-      const v = parse2(version, options);
+      const v = parse3(version, options);
       return v ? v.version : null;
     };
     module2.exports = valid2;
@@ -62876,9 +63017,9 @@ var require_valid = __commonJS({
 var require_clean = __commonJS({
   "node_modules/semver/functions/clean.js"(exports2, module2) {
     "use strict";
-    var parse2 = require_parse3();
+    var parse3 = require_parse3();
     var clean = (version, options) => {
-      const s = parse2(version.trim().replace(/^[=v]+/, ""), options);
+      const s = parse3(version.trim().replace(/^[=v]+/, ""), options);
       return s ? s.version : null;
     };
     module2.exports = clean;
@@ -62913,10 +63054,10 @@ var require_inc = __commonJS({
 var require_diff = __commonJS({
   "node_modules/semver/functions/diff.js"(exports2, module2) {
     "use strict";
-    var parse2 = require_parse3();
+    var parse3 = require_parse3();
     var diff = (version1, version2) => {
-      const v1 = parse2(version1, null, true);
-      const v2 = parse2(version2, null, true);
+      const v1 = parse3(version1, null, true);
+      const v2 = parse3(version2, null, true);
       const comparison = v1.compare(v2);
       if (comparison === 0) {
         return null;
@@ -62987,9 +63128,9 @@ var require_patch = __commonJS({
 var require_prerelease = __commonJS({
   "node_modules/semver/functions/prerelease.js"(exports2, module2) {
     "use strict";
-    var parse2 = require_parse3();
+    var parse3 = require_parse3();
     var prerelease = (version, options) => {
-      const parsed = parse2(version, options);
+      const parsed = parse3(version, options);
       return parsed && parsed.prerelease.length ? parsed.prerelease : null;
     };
     module2.exports = prerelease;
@@ -63175,7 +63316,7 @@ var require_coerce = __commonJS({
   "node_modules/semver/functions/coerce.js"(exports2, module2) {
     "use strict";
     var SemVer = require_semver();
-    var parse2 = require_parse3();
+    var parse3 = require_parse3();
     var { safeRe: re2, t } = require_re();
     var coerce2 = (version, options) => {
       if (version instanceof SemVer) {
@@ -63210,7 +63351,7 @@ var require_coerce = __commonJS({
       const patch = match[4] || "0";
       const prerelease = options.includePrerelease && match[5] ? `-${match[5]}` : "";
       const build = options.includePrerelease && match[6] ? `+${match[6]}` : "";
-      return parse2(`${major2}.${minor}.${patch}${prerelease}${build}`, options);
+      return parse3(`${major2}.${minor}.${patch}${prerelease}${build}`, options);
     };
     module2.exports = coerce2;
   }
@@ -64227,7 +64368,7 @@ var require_semver2 = __commonJS({
     var constants3 = require_constants13();
     var SemVer = require_semver();
     var identifiers = require_identifiers();
-    var parse2 = require_parse3();
+    var parse3 = require_parse3();
     var valid2 = require_valid();
     var clean = require_clean();
     var inc = require_inc();
@@ -64265,7 +64406,7 @@ var require_semver2 = __commonJS({
     var simplifyRange = require_simplify();
     var subset = require_subset();
     module2.exports = {
-      parse: parse2,
+      parse: parse3,
       valid: valid2,
       clean,
       inc,
@@ -69924,14 +70065,14 @@ var toNumber = (x) => {
   }
   throw new TypeConversionFailure("number", x);
 };
-var toRecord = (toValue) => {
+var toRecord = (toValue, toKey) => {
   return (x) => {
     if (!isRecord2(x)) {
       throw new TypeConversionFailure("record", x);
     }
     const entries = Object.entries(x).map(([k, v]) => {
       try {
-        return [toString(k), { value: toValue(v) }];
+        return [(toKey ?? toString)(k), { value: toValue(v) }];
       } catch (e) {
         if (e instanceof TypeConversionFailure) {
           return [k, { error: e }];
@@ -71572,6 +71713,11 @@ var toStartWorkspaceServiceParams = toObject({
   workspaceId: toNonNegativeInteger,
   updateIfOutdated: toUndefOr(toBoolean)
 });
+var toStartWorkspaceForUserServiceParams = toObject({
+  workspaceId: toNonNegativeInteger,
+  userId: toNonNegativeInteger,
+  updateIfOutdated: toUndefOr(toBoolean)
+});
 var toGetWorkspaceServiceArgs = toObject({
   id: toNonNegativeInteger
 });
@@ -71780,14 +71926,14 @@ var AVAILABLE_INTERNAL_FLAGS = [
   "workspace-ssh"
 ];
 var availableInternalFlags = [...AVAILABLE_INTERNAL_FLAGS];
-var AVAILABLE_ALPHA_FLAGS = [
+var AVAILABLE_PREVIEW_FLAGS = [
   "privileged-ports",
   "secret-management",
   "sub-path-mount",
   "tcp-udp",
   "ws-vscode-server"
 ];
-var availableAlphaFlags = [...AVAILABLE_ALPHA_FLAGS];
+var availablePreviewFlags = [...AVAILABLE_PREVIEW_FLAGS];
 var AVAILABLE_FEATURES = [
   "billing",
   "avatar-upload",
@@ -71800,11 +71946,11 @@ var AVAILABLE_FEATURES = [
 var availableFeatures = [...AVAILABLE_FEATURES];
 var allAvailableFlags = [
   ...AVAILABLE_INTERNAL_FLAGS,
-  ...AVAILABLE_ALPHA_FLAGS,
+  ...AVAILABLE_PREVIEW_FLAGS,
   ...AVAILABLE_FEATURES
 ];
 var toInternalFlagName = toLiteralUnion("InternalFlagName", availableInternalFlags);
-var toAlphaFlagName = toLiteralUnion("AlphaFlagName", availableAlphaFlags);
+var toPreviewFlagName = toLiteralUnion("PreviewFlagName", availablePreviewFlags);
 var toFlagName = toLiteralUnion("FlagName", allAvailableFlags);
 var toFeatureName = toLiteralUnion("FeatureName", availableFeatures);
 var toFlags = toObject({
@@ -71812,9 +71958,9 @@ var toFlags = toObject({
     available: toReadOnly(toArray(toInternalFlagName)),
     enabled: toReadOnly(toArray(toInternalFlagName))
   }),
-  alpha: toObject({
-    available: toReadOnly(toArray(toAlphaFlagName)),
-    enabled: toReadOnly(toArray(toAlphaFlagName))
+  preview: toObject({
+    available: toReadOnly(toArray(toPreviewFlagName)),
+    enabled: toReadOnly(toArray(toPreviewFlagName))
   }),
   features: toObject({
     available: toReadOnly(toArray(toFeatureName)),
@@ -71834,16 +71980,16 @@ var allEnabled = () => {
   }
   const enabledFlagList = [...enabledFlags];
   const enabledInternal = enabledFlagList.filter((x) => availableInternalFlags.includes(x));
-  const enabledAlpha = enabledFlagList.filter((x) => availableAlphaFlags.includes(x));
+  const enabledPreview = enabledFlagList.filter((x) => availablePreviewFlags.includes(x));
   const featureFlags = enabledFlagList.filter((x) => availableFeatures.includes(x));
   return {
     internal: {
       available: Object.freeze([...availableInternalFlags]),
       enabled: Object.freeze(enabledInternal)
     },
-    alpha: {
-      available: Object.freeze([...availableAlphaFlags]),
-      enabled: Object.freeze(enabledAlpha)
+    preview: {
+      available: Object.freeze([...availablePreviewFlags]),
+      enabled: Object.freeze(enabledPreview)
     },
     features: {
       available: Object.freeze([...availableFeatures]),
@@ -71853,43 +71999,43 @@ var allEnabled = () => {
 };
 var splitInternalConfig = (internal) => {
   const knownInternal = internal.filter((x) => availableInternalFlags.includes(x));
-  const knownAlpha = internal.filter((x) => availableAlphaFlags.includes(x));
+  const knownPreview = internal.filter((x) => availablePreviewFlags.includes(x));
   const knownFeatures = internal.filter((x) => availableFeatures.includes(x));
-  const unknown = internal.filter((x) => !availableInternalFlags.includes(x) && !availableAlphaFlags.includes(x) && !availableFeatures.includes(x));
+  const unknown = internal.filter((x) => !availableInternalFlags.includes(x) && !availablePreviewFlags.includes(x) && !availableFeatures.includes(x));
   return {
     unknown,
     knownInternal,
-    knownAlpha,
+    knownPreview,
     knownFeatures
   };
 };
-var splitAlphaConfig = (alpha) => {
-  const knownAlpha = alpha.filter((x) => availableAlphaFlags.includes(x));
-  const knownFeatures = alpha.filter((x) => availableFeatures.includes(x));
-  const unknown = alpha.filter((x) => !availableAlphaFlags.includes(x) && !availableFeatures.includes(x));
+var splitPreviewConfig = (preview) => {
+  const knownPreview = preview.filter((x) => availablePreviewFlags.includes(x));
+  const knownFeatures = preview.filter((x) => availableFeatures.includes(x));
+  const unknown = preview.filter((x) => !availablePreviewFlags.includes(x) && !availableFeatures.includes(x));
   return {
     unknown,
-    knownAlpha,
+    knownPreview,
     knownFeatures
   };
 };
-var setEnabledFlags = ({ internal, alpha, features }) => {
-  const { unknown, knownInternal, knownAlpha: knownAlphaFromInternal, knownFeatures: knownFeaturesFromInternal } = splitInternalConfig(internal ?? []);
+var setEnabledFlags = ({ internal, preview, features }) => {
+  const { unknown, knownInternal, knownPreview: knownPreviewFromInternal, knownFeatures: knownFeaturesFromInternal } = splitInternalConfig(internal ?? []);
   if (0 !== unknown.length) {
     logW(jj`unknown internal flags provided: ${unknown}`);
   }
-  if (0 !== knownAlphaFromInternal.length) {
-    logW(jj`alpha flags provided in internal config, please move to alpha: ${knownAlphaFromInternal}`);
+  if (0 !== knownPreviewFromInternal.length) {
+    logW(jj`preview flags provided in internal config, please move to preview: ${knownPreviewFromInternal}`);
   }
   if (0 !== knownFeaturesFromInternal.length) {
     logW(jj`feature flags provided in internal config, please move to features: ${knownFeaturesFromInternal}`);
   }
-  const { unknown: unknownAlpha, knownAlpha, knownFeatures: knownFeaturesFromAlpha } = splitAlphaConfig(alpha ?? []);
-  if (0 !== unknownAlpha.length) {
-    logW(jj`unknown alpha flags provided: ${unknownAlpha}`);
+  const { unknown: unknownPreview, knownPreview, knownFeatures: knownFeaturesFromPreview } = splitPreviewConfig(preview ?? []);
+  if (0 !== unknownPreview.length) {
+    logW(jj`unknown preview flags provided: ${unknownPreview}`);
   }
-  if (0 !== knownFeaturesFromAlpha.length) {
-    logW(jj`feature flags provided in alpha config, please move to features: ${knownFeaturesFromAlpha}`);
+  if (0 !== knownFeaturesFromPreview.length) {
+    logW(jj`feature flags provided in preview config, please move to features: ${knownFeaturesFromPreview}`);
   }
   const [unknownFeatures, knownFeatures] = filterSplit(features ?? [], (x) => availableFeatures.includes(x));
   if (0 !== unknownFeatures.length) {
@@ -71897,17 +72043,17 @@ var setEnabledFlags = ({ internal, alpha, features }) => {
   }
   const currentFlags = [...enabledFlags?.values() ?? []];
   const keptInternal = internal === void 0 ? currentFlags.filter((x) => availableInternalFlags.includes(x)) : [];
-  const keptAlpha = alpha === void 0 ? currentFlags.filter((x) => availableAlphaFlags.includes(x)) : [];
+  const keptPreview = preview === void 0 ? currentFlags.filter((x) => availablePreviewFlags.includes(x)) : [];
   const keptFeatures = features === void 0 ? currentFlags.filter((x) => availableFeatures.includes(x)) : [];
   enabledFlags = /* @__PURE__ */ new Set([
     ...keptInternal,
-    ...keptAlpha,
+    ...keptPreview,
     ...keptFeatures,
     ...knownInternal,
-    ...knownAlphaFromInternal,
-    ...knownAlpha,
+    ...knownPreviewFromInternal,
+    ...knownPreview,
     ...knownFeaturesFromInternal,
-    ...knownFeaturesFromAlpha,
+    ...knownFeaturesFromPreview,
     ...knownFeatures
   ]);
   return allEnabled();
@@ -72320,9 +72466,22 @@ var toRangeVectorResultData = toObject({
   resultType: toLiteral("matrix"),
   result: toArray(toRangeVectorResultEntry)
 });
+var toInstantVectorResultEntry = toObject({
+  metric: toRecord(toString),
+  value: toUnixTimeAndValueTuple
+});
+var toInstantVectorResultData = toObject({
+  resultType: toLiteral("vector"),
+  result: toArray(toInstantVectorResultEntry)
+});
 var toPrometheusResponseSuccess = toObject({
   status: toLiteral("success"),
   data: toRangeVectorResultData,
+  warnings: toUndefOr(toArray(toString))
+});
+var toPrometheusInstantResponseSuccess = toObject({
+  status: toLiteral("success"),
+  data: toInstantVectorResultData,
   warnings: toUndefOr(toArray(toString))
 });
 var toPrometheusResponseError = toObject({
@@ -72509,6 +72668,11 @@ var workspaceDeploymentService = {
     startWorkspace: rpc({
       response: toStartWorkspaceStatus,
       request: toStartWorkspaceServiceParams,
+      defaultOptions: { timeout: duration({ seconds: 20 }) }
+    }),
+    startWorkspaceForUser: rpc({
+      response: toStartWorkspaceStatus,
+      request: toStartWorkspaceForUserServiceParams,
       defaultOptions: { timeout: duration({ seconds: 20 }) }
     }),
     landscapeServerReadinessStream: stream({
@@ -74754,8 +74918,8 @@ var __decorate11 = function(decorators, target, key, desc) {
 };
 var workspaceAlreadyExists = (name) => `The workspace with the name "${name}" already exists`;
 var InvalidWorkspaceName = class extends Exception {
-  constructor(reason) {
-    super(reason);
+  constructor(reason, opts) {
+    super(reason, opts);
   }
 };
 var FreeWorkspaceLimitReached = class FreeWorkspaceLimitReached2 extends SimpleSerializableException {
@@ -74764,7 +74928,7 @@ var FreeWorkspaceLimitReached = class FreeWorkspaceLimitReached2 extends SimpleS
       `Request would exceed the team=${teamId} limit`,
       ` of ${limit} free replicas for plan ${planId}`,
       ` (in use: ${inUse}, requested: ${requested}).`
-    ].join(""));
+    ].join(""), { scope: "public" });
   }
 };
 FreeWorkspaceLimitReached = __decorate11([
@@ -77570,7 +77734,7 @@ TeamStub = __decorate16([
 var initExperiments = (cfg = []) => {
   setEnabledFlags(isOfType(cfg, toReadOnly(toArray(toString))) ? {
     internal: cfg,
-    alpha: []
+    preview: []
   } : cfg);
 };
 
@@ -77936,6 +78100,25 @@ var toSchemaObject = (x) => {
   return s;
 };
 
+// packages/utils/common/lib/typing/semver.js
+var import_semver3 = __toESM(require_semver2(), 1);
+var toSemVer = (x) => {
+  let s;
+  try {
+    s = (0, import_semver3.parse)(toString(x), false, true).toString();
+  } catch (e) {
+    throw new TypeConversionFailure("semver", x, void 0, {
+      cause: e
+    });
+  }
+  if (s !== x) {
+    throw new TypeConversionFailure("semver", x, void 0, {
+      cause: new AmbiguousArgument(`Parser would have produced: ${s}`)
+    });
+  }
+  return s;
+};
+
 // packages/marketplace/common/lib/api/managedService.js
 var __decorate20 = function(decorators, target, key, desc) {
   var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -77971,11 +78154,11 @@ var mutablePropertiesConv = {
 };
 var providerNamePattern = "^[a-z0-9-_]+$";
 var toProviderName = toStringMatchingRegex("ProviderName", new RegExp(providerNamePattern));
-var providerVersionPattern = "^v[0-9][0-9a-z]*$";
-var toProviderVersion = toStringMatchingRegex("ProviderVersion", new RegExp(providerVersionPattern));
+var providerSchemaVersionPattern = "^v[0-9][0-9a-z]*$";
+var toProviderSchemaVersion = toStringMatchingRegex("ProviderSchemaVersion", new RegExp(providerSchemaVersionPattern));
 var immutablePropertiesConv = {
   provider: toProviderName,
-  providerVersion: toProviderVersion
+  providerVersion: toProviderSchemaVersion
 };
 var toRecoveryRef = toOr(toObject({
   id: toUuid,
@@ -78129,7 +78312,7 @@ var managedServiceProviderCommonProperties = {
   displayName: toString,
   iconUrl: toString,
   plans: toArray(toManagedServicePlan),
-  version: toProviderVersion,
+  schemaVersion: toProviderSchemaVersion,
   scope: toProviderScope,
   teamSingleton: toUndefOr(toBoolean)
 };
@@ -78142,9 +78325,16 @@ var toManagedServiceRestProvider = toObject({
     })
   })
 });
+var toVersions = toRecord(toObject({
+  gitRef: toString,
+  ciProfile: toString,
+  appVersion: toUndefOr(toString),
+  description: toUndefOr(toString)
+}), toSemVer);
 var toManagedServiceLandscapeProvider = toObject({
   ...managedServiceProviderCommonProperties,
-  backend: toLandscapeSettings
+  backend: toLandscapeSettings,
+  versions: toUndefOr(toVersions)
 });
 var toPartialManagedServiceLandscapeProvider = toObject({
   author: toUndefOr(toString),
@@ -78162,7 +78352,8 @@ var toPartialManagedServiceLandscapeProvider = toObject({
   iconUrl: toUndefOr(toString),
   plans: toUndefOr(toArray(toManagedServicePlan)),
   scope: toUndefOr(toProviderScope),
-  backend: toUndefOr(toLandscapeSettings)
+  backend: toUndefOr(toLandscapeSettings),
+  versions: toUndefOr(toVersions)
 });
 var toManagedServiceProvider = (x) => {
   const prov = toOr(toManagedServiceRestProvider, toManagedServiceLandscapeProvider)(x);
@@ -78183,7 +78374,8 @@ var managedServiceProviderConfigProperties = {
     configSchema: toSchemaObject,
     secretsSchema: toSchemaObject
   })),
-  version: toProviderVersion,
+  version: toUndefOr(toProviderSchemaVersion),
+  schemaVersion: toUndefOr(toProviderSchemaVersion),
   displayName: toUndefOr(toString),
   description: toUndefOr(toString),
   author: toUndefOr(toString),
@@ -78203,12 +78395,13 @@ var toManagedServiceRestProviderConfig = toObject({
 });
 var toManagedServiceLandscapeProviderConfig = toObject({
   ...managedServiceProviderConfigProperties,
-  backend: toUndefOr(toLandscapeSettings)
+  backend: toUndefOr(toLandscapeSettings),
+  versions: toUndefOr(toVersions)
 });
 var toManagedServiceProviderConfig = toOr(toManagedServiceRestProviderConfig, toManagedServiceLandscapeProviderConfig);
 var MissingProviderCapabilities = class MissingProviderCapabilities2 extends InvalidArgument {
-  static create(provider, missingCaps) {
-    return new this(`The operation couldn't be performed because the provider ${provider.name} / ${provider.version} doesn't have capabilities: ${missingCaps.join(", ")}.`, { scope: "public" });
+  static create({ name, schemaVersion }, missingCaps) {
+    return new this(`The operation couldn't be performed because the provider ${name} / ${schemaVersion} doesn't have capabilities: ${missingCaps.join(", ")}.`, { scope: "public" });
   }
 };
 MissingProviderCapabilities = __decorate20([
@@ -78233,11 +78426,11 @@ var toCreateLandscapeProviderByGitArgs = toObject({
 });
 var toProvider = toObject({
   name: toProviderName,
-  version: toProviderVersion
+  schemaVersion: toProviderSchemaVersion
 });
 var toUpdateLandscapeProviderArgs = toObject({
   name: toProviderName,
-  version: toProviderVersion,
+  schemaVersion: toProviderSchemaVersion,
   provider: toPartialManagedServiceLandscapeProvider,
   scope: toUndefOr(toProviderScopeArgs)
 });
