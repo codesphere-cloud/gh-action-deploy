@@ -71742,7 +71742,8 @@ var toCreateWorkspaceServiceArgs = toObject({
   restricted: toUndefOr(toBoolean),
   env: toUndefOr(toEnvVars),
   managedServiceId: toUndefOr(toUuid),
-  storageMib: toUndefOr(toPositiveInteger)
+  storageMib: toUndefOr(toPositiveInteger),
+  sharedVaultName: toUndefOr(toString)
 });
 var toUpdateWorkspaceServiceArgs = toObject({
   workspaceId: toNonNegativeInteger,
@@ -71753,7 +71754,8 @@ var toUpdateWorkspaceServiceArgs = toObject({
   replicas: toUndefOr(toPositiveInteger),
   vpnConfig: toUndefOr(toNullOr(toString)),
   restricted: toUndefOr(toBoolean),
-  storageMib: toUndefOr(toNullOr(toPositiveInteger))
+  storageMib: toUndefOr(toNullOr(toPositiveInteger)),
+  sharedVaultName: toUndefOr(toNullOr(toString))
 });
 var toHasAccessArgs = toObject({
   ...workspaceServiceArgs,
@@ -72364,7 +72366,8 @@ var workspace = {
   persistentLogs: toBoolean,
   createdAt: toDate,
   managedServiceId: toUndefOr(toUuid),
-  storageMib: toUndefOr(toPositiveInteger)
+  storageMib: toUndefOr(toPositiveInteger),
+  sharedVaultName: toUndefOr(toString)
 };
 var toWorkspace = toObject(workspace);
 var validServerNameRegex = new RegExp("^(?:[a-z]|[a-z][-a-z0-9]{0,30}[a-z0-9])$");
@@ -76643,7 +76646,8 @@ var toWorkspaceDbEntry = toObject({
   persistentLogs: toBoolean,
   createdAt: toDate,
   managedServiceId: toUndefOr(toUuid),
-  storageMib: toUndefOr(toPositiveInteger)
+  storageMib: toUndefOr(toPositiveInteger),
+  sharedVaultName: toUndefOr(toString)
 });
 var unsafeDbRecordToWorkspaceDbEntry = (r) => {
   return {
@@ -76669,7 +76673,8 @@ var unsafeDbRecordToWorkspaceDbEntry = (r) => {
     persistentLogs: r.persistentLogs,
     managedServiceId: r.managedServiceId,
     createdAt: r.createdAt,
-    storageMib: r.storageMib
+    storageMib: r.storageMib,
+    sharedVaultName: r.sharedVaultName
   };
 };
 var NO_CONDITION = {};
@@ -76696,7 +76701,8 @@ var LIST_COLS = [
   "persistentLogs",
   "createdAt",
   "managedServiceId",
-  "storageMib"
+  "storageMib",
+  "sharedVaultName"
 ];
 var WorkspacesDAODatabase = class WorkspacesDAODatabase2 {
   constructor(pubSub, db, getWorkspacePlan) {
@@ -76729,7 +76735,7 @@ var WorkspacesDAODatabase = class WorkspacesDAODatabase2 {
   async publish(teamId, workspace2) {
     await this.pubSub.publish(`${teamId}`, workspace2);
   }
-  async create({ ownerUserId, ownerUserEmail, teamId, name, isPrivateRepo, replicas, dataCenterId, planId, gitUrl, welcomeMessage, initialBranch, cloneDepth, skipLfs, recurseSubmodules, sourceWorkspaceId, vpnConfig, initiatorUserId, initiatorUserEmail, restricted, baseImage: baseImage2, env, managedServiceId, storageMib }) {
+  async create({ ownerUserId, ownerUserEmail, teamId, name, isPrivateRepo, replicas, dataCenterId, planId, gitUrl, welcomeMessage, initialBranch, cloneDepth, skipLfs, recurseSubmodules, sourceWorkspaceId, vpnConfig, initiatorUserId, initiatorUserEmail, restricted, baseImage: baseImage2, env, managedServiceId, storageMib, sharedVaultName }) {
     return await this.db.transaction(async (tx) => {
       const ws = unsafeDbRecordToWorkspaceDbEntry(await rethrowAsync(() => tx.insert("workspaceService.workspaces", {
         userId: ownerUserId,
@@ -76750,7 +76756,8 @@ var WorkspacesDAODatabase = class WorkspacesDAODatabase2 {
         restricted,
         baseImage: baseImage2,
         managedServiceId,
-        storageMib
+        storageMib,
+        sharedVaultName
       }), [
         DbUniquenessViolation,
         () => new InvalidWorkspaceName(ALREADY_EXISTS_ERROR)
@@ -76860,7 +76867,10 @@ var WorkspacesDAODatabase = class WorkspacesDAODatabase2 {
         ...void 0 !== update.vpnConfig ? { vpnConfig: update.vpnConfig ?? void 0 } : {},
         ...void 0 !== update.restricted ? { restricted: update.restricted ?? void 0 } : {},
         ...void 0 !== update.baseImage ? { baseImage: update.baseImage } : {},
-        ...void 0 !== update.storageMib ? { storageMib: update.storageMib ?? void 0 } : {}
+        ...void 0 !== update.storageMib ? { storageMib: update.storageMib ?? void 0 } : {},
+        ...void 0 !== update.sharedVaultName ? {
+          sharedVaultName: update.sharedVaultName ?? void 0
+        } : {}
       }, { id }), [
         DbForeignKeyViolation,
         (m) => {
@@ -78150,7 +78160,8 @@ var validMsNamePattern = "^(?!\\s)[a-zA-Z0-9\\-_\\s]{0,126}[a-zA-Z0-9\\-_]$";
 var mutablePropertiesConv = {
   name: toStringMatchingRegex("alphanumeric with spaces in between (max length 127)", new RegExp(validMsNamePattern)),
   plan: toPlanSelection,
-  config: toConfig
+  config: toConfig,
+  version: toUndefOr(toSemVer)
 };
 var providerNamePattern = "^[a-z0-9-_]+$";
 var toProviderName = toStringMatchingRegex("ProviderName", new RegExp(providerNamePattern));
@@ -78270,7 +78281,8 @@ var toUpdateManagedServiceArgs = toObject({
   name: toUndefOr(toString),
   pause: toUndefOr(toBoolean),
   plan: toUndefOr(toPlanSelection),
-  secrets: toUndefOr(toSecrets)
+  secrets: toUndefOr(toSecrets),
+  version: toUndefOr(toSemVer)
 });
 var toListManagedServiceArgs = toObject({
   ...teamServiceArgs,
