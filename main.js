@@ -71899,14 +71899,12 @@ var AVAILABLE_INTERNAL_FLAGS = [
   "cimg-private-registry",
   "custom-service-image",
   "gateway-domains",
-  "git-panel",
   "gpu-plan",
-  "hermetic",
   "headless-services",
-  "language-server",
+  "hermetic",
   "legacy-marketplace",
-  "managed-services",
   MAINTENANCE_MODE_INTERNAL_FLAG_NAME,
+  "managed-services",
   "ms-in-ls",
   "msd",
   "o11y",
@@ -71915,12 +71913,9 @@ var AVAILABLE_INTERNAL_FLAGS = [
   "overview-react",
   "persistent-logs",
   "persistent-nix",
-  "preview-comments",
-  "react-create-ws",
   "recaptcha-v3",
-  "recursive-watcher",
-  "single-workspace-mode",
   "selectable-resources",
+  "single-workspace-mode",
   "time-sameDc",
   "vcluster",
   "virtual-machines",
@@ -71929,19 +71924,19 @@ var AVAILABLE_INTERNAL_FLAGS = [
 ];
 var availableInternalFlags = [...AVAILABLE_INTERNAL_FLAGS];
 var AVAILABLE_PREVIEW_FLAGS = [
+  "preview-comments",
   "privileged-ports",
   "secret-management",
   "sub-path-mount",
-  "tcp-udp",
-  "ws-vscode-server"
+  "tcp-udp"
 ];
 var availablePreviewFlags = [...AVAILABLE_PREVIEW_FLAGS];
 var AVAILABLE_FEATURES = [
-  "billing",
   "avatar-upload",
+  "billing",
   "dev-domains-port",
-  "email-signup",
   "email-signin",
+  "email-signup",
   "run-as-root-insecure",
   "standalone-teams"
 ];
