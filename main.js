@@ -77131,6 +77131,8 @@ var require_defaults = __commonJS({
       idleTimeoutMillis: 3e4,
       client_encoding: "",
       ssl: false,
+      // SSL negotiation style: 'postgres' (traditional SSLRequest) or 'direct'
+      sslnegotiation: void 0,
       application_name: void 0,
       fallback_application_name: void 0,
       options: void 0,
@@ -77749,6 +77751,9 @@ var require_pg_connection_string = __commonJS({
       if (config.sslcert || config.sslkey || config.sslrootcert || config.sslmode) {
         config.ssl = {};
       }
+      if (config.sslnegotiation === "direct" && config.ssl === void 0) {
+        config.ssl = true;
+      }
       const fs2 = config.sslcert || config.sslkey || config.sslrootcert ? require("fs") : null;
       if (config.sslcert) {
         config.ssl.cert = fs2.readFileSync(config.sslcert).toString();
@@ -77954,6 +77959,15 @@ var require_connection_parameters = __commonJS({
             enumerable: false
           });
         }
+        this.sslnegotiation = val("sslnegotiation", config, "PGSSLNEGOTIATION");
+        if (this.sslnegotiation !== void 0 && this.sslnegotiation !== "postgres" && this.sslnegotiation !== "direct") {
+          throw new Error(
+            `Invalid sslnegotiation value: "${this.sslnegotiation}". Valid values are "postgres" and "direct".`
+          );
+        }
+        if (this.sslnegotiation === "direct" && !this.ssl) {
+          throw new Error("sslnegotiation=direct requires SSL to be enabled");
+        }
         this.client_encoding = val("client_encoding", config);
         this.replication = val("replication", config);
         this.isDomainSocket = !(this.host || "").indexOf("/");
@@ -77992,6 +78006,7 @@ var require_connection_parameters = __commonJS({
         add(params, ssl, "sslkey");
         add(params, ssl, "sslcert");
         add(params, ssl, "sslrootcert");
+        add(params, this, "sslnegotiation");
         if (this.database) {
           params.push("dbname=" + quoteParamValue(this.database));
         }
@@ -78287,6 +78302,8 @@ var require_query = __commonJS({
             valueMapper: utils.prepareValue
           });
         } catch (err) {
+          connection.close({ type: "S", name: this.name });
+          connection.sync();
           this.handleError(err, connection);
           return;
         }
@@ -78526,6 +78543,25 @@ var require_buffer_writer = __commonJS({
         this.offset += len;
         return this;
       }
+      // Write an Int32 byte-length prefix immediately followed by the string's UTF-8
+      // bytes. Postgres' Bind wire format prefixes every parameter with its length,
+      // and doing it in one method computes Buffer.byteLength ONCE — the previous
+      // `addInt32(Buffer.byteLength(s)).addString(s)` pairing scanned the string
+      // three times (byteLength for the prefix, byteLength again inside addString,
+      // then the encode), which is costly for large text parameters.
+      addInt32PrefixedString(string) {
+        const len = Buffer.byteLength(string);
+        this.ensure(4 + len);
+        const buffer = this.buffer;
+        let offset = this.offset;
+        buffer[offset++] = len >>> 24 & 255;
+        buffer[offset++] = len >>> 16 & 255;
+        buffer[offset++] = len >>> 8 & 255;
+        buffer[offset++] = len >>> 0 & 255;
+        buffer.write(string, offset, "utf-8");
+        this.offset = offset + len;
+        return this;
+      }
       add(otherBuffer) {
         this.ensure(otherBuffer.length);
         otherBuffer.copy(this.buffer, this.offset);
@@ -78546,6 +78582,10 @@ var require_buffer_writer = __commonJS({
         this.headerPosition = 0;
         this.buffer = Buffer.allocUnsafe(this.size);
         return result;
+      }
+      clear() {
+        this.offset = 5;
+        this.headerPosition = 0;
       }
     };
     exports2.Writer = Writer;
@@ -78583,7 +78623,7 @@ var require_serializer = __commonJS({
       );
     };
     var sendSASLInitialResponseMessage = function(mechanism, initialResponse) {
-      writer.addCString(mechanism).addInt32(Buffer.byteLength(initialResponse)).addString(initialResponse);
+      writer.addCString(mechanism).addInt32PrefixedString(initialResponse);
       return writer.flush(
         112
         /* code.startup */
@@ -78642,8 +78682,7 @@ var require_serializer = __commonJS({
             0
             /* ParamType.STRING */
           );
-          paramWriter.addInt32(Buffer.byteLength(mappedVal));
-          paramWriter.addString(mappedVal);
+          paramWriter.addInt32PrefixedString(mappedVal);
         }
       }
     };
@@ -78655,7 +78694,13 @@ var require_serializer = __commonJS({
       const len = values.length;
       writer.addCString(portal).addCString(statement);
       writer.addInt16(len);
-      writeValues(values, config.valueMapper);
+      try {
+        writeValues(values, config.valueMapper);
+      } catch (err) {
+        writer.clear();
+        paramWriter.clear();
+        throw err;
+      }
       writer.addInt16(len);
       writer.add(paramWriter.flush());
       writer.addInt16(1);
@@ -78813,7 +78858,7 @@ var require_buffer_reader = __commonJS({
       cstring() {
         const start = this.offset;
         let end = start;
-        while (this.buffer[end++] !== 0) {
+        while (this.buffer[end++]) {
         }
         this.offset = end;
         return this.buffer.toString(this.encoding, start, end - 1);
@@ -79140,7 +79185,8 @@ var require_dist3 = __commonJS({
   "node_modules/pg/node_modules/pg-protocol/dist/index.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.DatabaseError = exports2.serialize = exports2.parse = void 0;
+    exports2.DatabaseError = exports2.serialize = void 0;
+    exports2.parse = parse3;
     var messages_1 = require_messages();
     Object.defineProperty(exports2, "DatabaseError", { enumerable: true, get: function() {
       return messages_1.DatabaseError;
@@ -79155,7 +79201,6 @@ var require_dist3 = __commonJS({
       stream2.on("data", (buffer) => parser.parse(buffer, callback));
       return new Promise((resolve2) => stream2.on("end", () => resolve2()));
     }
-    exports2.parse = parse3;
   }
 });
 
@@ -79240,7 +79285,8 @@ var require_connection3 = __commonJS({
     "use strict";
     var EventEmitter = require("events").EventEmitter;
     var { parse: parse3, serialize } = require_dist3();
-    var { getStream, getSecureStream } = require_stream2();
+    var stream2 = require_stream2();
+    var { getStream } = stream2;
     var flushBuffer = serialize.flush();
     var syncBuffer = serialize.sync();
     var endBuffer = serialize.end();
@@ -79256,6 +79302,7 @@ var require_connection3 = __commonJS({
         this._keepAliveInitialDelayMillis = config.keepAliveInitialDelayMillis;
         this.parsedStatements = {};
         this.ssl = config.ssl || false;
+        this.sslNegotiation = config.sslNegotiation || "postgres";
         this._ending = false;
         this._emitMessage = false;
         const self2 = this;
@@ -79289,6 +79336,11 @@ var require_connection3 = __commonJS({
         if (!this.ssl) {
           return this.attachListeners(this.stream);
         }
+        if (this.sslNegotiation === "direct") {
+          return this.stream.once("connect", function() {
+            self2.upgradeToSSL(host, reportStreamError);
+          });
+        }
         this.stream.once("data", function(buffer) {
           const responseCode = buffer.toString("utf8");
           switch (responseCode) {
@@ -79301,31 +79353,38 @@ var require_connection3 = __commonJS({
               self2.stream.end();
               return self2.emit("error", new Error("There was an error establishing an SSL connection"));
           }
-          const options = {
-            socket: self2.stream
-          };
-          if (self2.ssl !== true) {
-            Object.assign(options, self2.ssl);
-            if ("key" in self2.ssl) {
-              options.key = self2.ssl.key;
-            }
-          }
-          const net = require("net");
-          if (net.isIP && net.isIP(host) === 0) {
-            options.servername = host;
-          }
-          try {
-            self2.stream = getSecureStream(options);
-          } catch (err) {
-            return self2.emit("error", err);
-          }
-          self2.attachListeners(self2.stream);
-          self2.stream.on("error", reportStreamError);
-          self2.emit("sslconnect");
+          self2.upgradeToSSL(host, reportStreamError);
         });
       }
-      attachListeners(stream2) {
-        parse3(stream2, (msg) => {
+      upgradeToSSL(host, reportStreamError) {
+        const self2 = this;
+        const options = {
+          socket: self2.stream
+        };
+        if (self2.ssl !== true) {
+          Object.assign(options, self2.ssl);
+          if ("key" in self2.ssl) {
+            options.key = self2.ssl.key;
+          }
+        }
+        if (self2.sslNegotiation === "direct") {
+          options.ALPNProtocols = ["postgresql"];
+        }
+        const net = require("net");
+        if (net.isIP && net.isIP(host) === 0) {
+          options.servername = host;
+        }
+        try {
+          self2.stream = stream2.getSecureStream(options);
+        } catch (err) {
+          return self2.emit("error", err);
+        }
+        self2.attachListeners(self2.stream);
+        self2.stream.on("error", reportStreamError);
+        self2.emit("sslconnect");
+      }
+      attachListeners(stream3) {
+        parse3(stream3, (msg) => {
           const eventName = msg.name === "error" ? "errorMessage" : msg.name;
           if (this._emitMessage) {
             this.emit("message", msg);
@@ -79792,6 +79851,7 @@ var require_client4 = __commonJS({
         this.connection = c.connection || new Connection2({
           stream: c.stream,
           ssl: this.connectionParameters.ssl,
+          sslNegotiation: this.connectionParameters.sslnegotiation,
           keepAlive: c.keepAlive || false,
           keepAliveInitialDelayMillis: c.keepAliveInitialDelayMillis || 0,
           encoding: this.connectionParameters.client_encoding || "utf8"
@@ -79801,6 +79861,7 @@ var require_client4 = __commonJS({
         this.processID = null;
         this.secretKey = null;
         this.ssl = this.connectionParameters.ssl || false;
+        this.sslNegotiation = this.connectionParameters.sslnegotiation || "postgres";
         if (this.ssl && this.ssl.key) {
           Object.defineProperty(this.ssl, "key", {
             enumerable: false
@@ -79861,7 +79922,9 @@ var require_client4 = __commonJS({
         }
         con.on("connect", function() {
           if (self2.ssl) {
-            con.requestSsl();
+            if (self2.sslNegotiation !== "direct") {
+              con.requestSsl();
+            }
           } else {
             con.startup(self2.getStartupConf());
           }
@@ -89484,15 +89547,16 @@ var require_range2 = __commonJS({
     };
     var replaceTilde = (comp, options) => {
       const r = options.loose ? re3[t.TILDELOOSE] : re3[t.TILDE];
+      const z = options.includePrerelease ? "-0" : "";
       return comp.replace(r, (_, M, m, p, pr) => {
         debug2("tilde", comp, _, M, m, p, pr);
         let ret;
         if (isX(M)) {
           ret = "";
         } else if (isX(m)) {
-          ret = `>=${M}.0.0 <${+M + 1}.0.0-0`;
+          ret = `>=${M}.0.0${z} <${+M + 1}.0.0-0`;
         } else if (isX(p)) {
-          ret = `>=${M}.${m}.0 <${M}.${+m + 1}.0-0`;
+          ret = `>=${M}.${m}.0${z} <${M}.${+m + 1}.0-0`;
         } else if (pr) {
           debug2("replaceTilde pr", pr);
           ret = `>=${M}.${m}.${p}-${pr} <${M}.${+m + 1}.0-0`;
@@ -97776,13 +97840,13 @@ var MAINTENANCE_MODE_INTERNAL_FLAG_NAME = "maintenance-mode";
 var AVAILABLE_INTERNAL_FLAGS = [
   "allow-legacy-ci",
   "cimg-private-registry",
+  "cluster-admin",
   "custom-service-image",
   "gateway-domains",
   "gpu-plan",
   "headless-services",
   "hermetic",
   MAINTENANCE_MODE_INTERNAL_FLAG_NAME,
-  "managed-services",
   "ms-in-ls",
   "msd",
   "o11y",
@@ -100922,6 +100986,8 @@ var import_node_cache = __toESM(require_node_cache2(), 1);
 
 // packages/stubs/node/lib/auth/auth.js
 var import_sdk = __toESM(require_dist2(), 1);
+var fgaCluster = (clusterId) => `cluster:${clusterId}`;
+var CLUSTER = fgaCluster("default");
 
 // node_modules/pg/esm/index.mjs
 var import_lib = __toESM(require_lib4(), 1);
@@ -101368,7 +101434,8 @@ var toUpdateTeamArgs = toObject({
 var toSendInviteArgs = toObject({
   ...teamServiceArgs,
   userEmail: toString,
-  role: toRole
+  role: toRole,
+  addToOrg: toUndefOr(toBoolean)
 });
 var toUpdateAvatarIdArgs = toObject({
   ...teamServiceArgs,
@@ -101763,6 +101830,7 @@ var LeaveTeamFailed_1;
 var ChangeMemberRoleFailed_1;
 var NotEnoughSeats_1;
 var SendInviteFailed_1;
+var AddToOrgFailed_1;
 var InvalidInvitation_1;
 var TeamUpdateFailed_1;
 var FileTooLarge_1;
@@ -101821,6 +101889,14 @@ var SendInviteFailed = SendInviteFailed_1 = class SendInviteFailed2 extends Simp
 SendInviteFailed = SendInviteFailed_1 = __decorate14([
   registerError()
 ], SendInviteFailed);
+var AddToOrgFailed = AddToOrgFailed_1 = class AddToOrgFailed2 extends SimpleSerializableException {
+  static create(opts) {
+    return new AddToOrgFailed_1("Failed to add the user to the organization. Please try again later", opts);
+  }
+};
+AddToOrgFailed = AddToOrgFailed_1 = __decorate14([
+  registerError()
+], AddToOrgFailed);
 var InvalidInvitation = InvalidInvitation_1 = class InvalidInvitation2 extends SimpleSerializableException {
   static create(opts) {
     return new InvalidInvitation_1("Failed to accept invitation.", opts);
@@ -102739,6 +102815,7 @@ var toCreateLandscapeProviderByGitArgs = toObject({
   gitRef: toUndefOr(toString),
   scope: toUndefOr(toProviderScopeArgs)
 });
+var toUpsertLandscapeProviderArgs = toOr(toCreateLandscapeProviderArgs, toCreateLandscapeProviderByGitArgs);
 var toProvider = toObject({
   name: toProviderName,
   schemaVersion: toProviderSchemaVersion
@@ -102805,6 +102882,10 @@ var managedServicesService = {
     }),
     createLandscapeProviderByGit: rpc({
       request: toCreateLandscapeProviderByGitArgs,
+      response: toManagedServiceLandscapeProvider
+    }),
+    upsertLandscapeProvider: rpc({
+      request: toUpsertLandscapeProviderArgs,
       response: toManagedServiceLandscapeProvider
     }),
     deleteLandscapeProvider: rpc({
