@@ -63135,7 +63135,13 @@ var require_axios = __commonJS({
     var AxiosError = class _AxiosError extends Error {
       static from(error, code, config, request2, response, customProps) {
         const axiosError = new _AxiosError(error.message, code || error.code, config, request2, response);
-        axiosError.cause = error;
+        Object.defineProperty(axiosError, "cause", {
+          __proto__: null,
+          value: error,
+          writable: true,
+          enumerable: false,
+          configurable: true
+        });
         axiosError.name = error.name;
         if (error.status != null && axiosError.status == null) {
           axiosError.status = error.status;
@@ -63267,7 +63273,13 @@ var require_axios = __commonJS({
           throw new AxiosError("Blob is not supported. Use a Buffer instead.");
         }
         if (utils$1.isArrayBuffer(value) || utils$1.isTypedArray(value)) {
-          return useBlob && typeof Blob === "function" ? new Blob([value]) : Buffer.from(value);
+          if (useBlob && typeof _Blob === "function") {
+            return new _Blob([value]);
+          }
+          if (typeof Buffer !== "undefined") {
+            return Buffer.from(value);
+          }
+          throw new AxiosError("Blob is not supported. Use a Buffer instead.", AxiosError.ERR_NOT_SUPPORT);
         }
         return value;
       }
@@ -63369,9 +63381,7 @@ var require_axios = __commonJS({
       this._pairs.push([name, value]);
     };
     prototype.toString = function toString3(encoder) {
-      const _encode = encoder ? function(value) {
-        return encoder.call(this, value, encode$1);
-      } : encode$1;
+      const _encode = encoder ? (value) => encoder.call(this, value, encode$1) : encode$1;
       return this._pairs.map(function each(pair) {
         return _encode(pair[0]) + "=" + _encode(pair[1]);
       }, "").join("&");
@@ -63383,6 +63393,7 @@ var require_axios = __commonJS({
       if (!params) {
         return url2;
       }
+      url2 = url2 || "";
       const _options = utils$1.isFunction(options) ? {
         serialize: options
       } : options;
@@ -63844,7 +63855,7 @@ var require_axios = __commonJS({
     function getEnv2(key) {
       return process.env[key.toLowerCase()] || process.env[key.toUpperCase()] || "";
     }
-    var VERSION11 = "1.18.0";
+    var VERSION11 = "1.18.1";
     function parseProtocol(url2) {
       const match = /^([-+\w]{1,25}):(?:\/\/)?/.exec(url2);
       return match && match[1] || "";
@@ -63866,13 +63877,13 @@ var require_axios = __commonJS({
         const params = match[2];
         const encoding = match[3] ? "base64" : "utf8";
         const body = match[4];
-        let mime;
+        let mime = "";
         if (type) {
           mime = params ? type + params : type;
         } else if (params) {
           mime = "text/plain" + params;
         }
-        const buffer = Buffer.from(decodeURIComponent(body), encoding);
+        const buffer = encoding === "base64" ? Buffer.from(body, "base64") : Buffer.from(decodeURIComponent(body), encoding);
         if (asBlob) {
           if (!_Blob) {
             throw new AxiosError("Blob is not supported", AxiosError.ERR_NOT_SUPPORT);
@@ -64545,6 +64556,33 @@ var require_axios = __commonJS({
     var kAxiosInstalledTunnel = /* @__PURE__ */ Symbol("axios.http.installedTunnel");
     var tunnelingAgentCache = /* @__PURE__ */ new Map();
     var tunnelingAgentCacheUser = /* @__PURE__ */ new WeakMap();
+    var NODE_NATIVE_ENV_PROXY_SUPPORT = {
+      22: 21,
+      24: 5
+    };
+    function isNodeNativeEnvProxySupported(nodeVersion = process.versions && process.versions.node) {
+      if (!nodeVersion) {
+        return false;
+      }
+      const [major3, minor] = nodeVersion.split(".").map((part) => Number(part));
+      if (!Number.isInteger(major3) || !Number.isInteger(minor)) {
+        return false;
+      }
+      if (major3 > 24) {
+        return true;
+      }
+      return NODE_NATIVE_ENV_PROXY_SUPPORT[major3] != null && minor >= NODE_NATIVE_ENV_PROXY_SUPPORT[major3];
+    }
+    function isNodeEnvProxyEnabled(agent, nodeVersion = process.versions && process.versions.node) {
+      if (!isNodeNativeEnvProxySupported(nodeVersion)) {
+        return false;
+      }
+      const agentOptions = agent && agent.options;
+      return Boolean(agentOptions && utils$1.hasOwnProp(agentOptions, "proxyEnv") && agentOptions.proxyEnv != null);
+    }
+    function getProxyEnvAgent(options, configHttpAgent, configHttpsAgent) {
+      return isHttps.test(options.protocol) ? configHttpsAgent || https.globalAgent : configHttpAgent || http.globalAgent;
+    }
     function getTunnelingAgent(agentOptions, userHttpsAgent) {
       const key = agentOptions.protocol + "//" + agentOptions.hostname + ":" + (agentOptions.port || "") + "#" + (agentOptions.auth || "");
       const cache = userHttpsAgent ? tunnelingAgentCacheUser.get(userHttpsAgent) || tunnelingAgentCacheUser.set(userHttpsAgent, /* @__PURE__ */ new Map()).get(userHttpsAgent) : tunnelingAgentCache;
@@ -64623,9 +64661,10 @@ var require_axios = __commonJS({
         return false;
       }
     }
-    function setProxy(options, configProxy, location, isRedirect, configHttpsAgent) {
+    function setProxy(options, configProxy, location, isRedirect, configHttpsAgent, configHttpAgent) {
       let proxy = configProxy;
-      if (!proxy && proxy !== false) {
+      const proxyEnvAgent = getProxyEnvAgent(options, configHttpAgent, configHttpsAgent);
+      if (!proxy && proxy !== false && !isNodeEnvProxyEnabled(proxyEnvAgent)) {
         const proxyUrl = getProxyForUrl(location);
         if (proxyUrl) {
           if (!shouldBypassProxy(location)) {
@@ -64716,7 +64755,7 @@ var require_axios = __commonJS({
         }
       }
       options.beforeRedirects.proxy = function beforeRedirect(redirectOptions) {
-        setProxy(redirectOptions, configProxy, redirectOptions.href, true, configHttpsAgent);
+        setProxy(redirectOptions, configProxy, redirectOptions.href, true, configHttpsAgent, configHttpAgent);
       };
     }
     var isHttpAdapterSupported = typeof process !== "undefined" && utils$1.kindOf(process) === "process";
@@ -64801,10 +64840,12 @@ var require_axios = __commonJS({
         let httpVersion = own2("httpVersion");
         if (httpVersion === void 0) httpVersion = 1;
         let http2Options = own2("http2Options");
-        const responseType = own2("responseType");
-        const responseEncoding = own2("responseEncoding");
         const httpAgent = own2("httpAgent");
         const httpsAgent = own2("httpsAgent");
+        const configProxy = own2("proxy");
+        const responseType = own2("responseType");
+        const responseEncoding = own2("responseEncoding");
+        const socketPath = own2("socketPath");
         const method = own2("method").toUpperCase();
         const maxRedirects = own2("maxRedirects");
         const maxBodyLength = own2("maxBodyLength");
@@ -64894,7 +64935,8 @@ var require_axios = __commonJS({
           }
         });
         const fullPath = buildFullPath(own2("baseURL"), own2("url"), own2("allowAbsoluteUrls"), config);
-        const parsed = new URL(fullPath, platform2.hasBrowserEnv ? platform2.origin : void 0);
+        const urlBase = socketPath ? "http://localhost" : platform2.hasBrowserEnv ? platform2.origin : void 0;
+        const parsed = new URL(fullPath, urlBase);
         const protocol = parsed.protocol || supportedProtocols[0];
         if (protocol === "data:") {
           if (maxContentLength > -1) {
@@ -65018,11 +65060,10 @@ var require_axios = __commonJS({
         try {
           path$1 = buildURL(parsed.pathname + parsed.search, own2("params"), own2("paramsSerializer")).replace(/^\?/, "");
         } catch (err) {
-          const customErr = new Error(err.message);
-          customErr.config = config;
-          customErr.url = own2("url");
-          customErr.exists = true;
-          return reject(customErr);
+          return reject(AxiosError.from(err, AxiosError.ERR_BAD_REQUEST, config, null, null, {
+            url: own2("url"),
+            exists: true
+          }));
         }
         headers.set("Accept-Encoding", utils$1.hasOwnProp(transitional, "advertiseZstdAcceptEncoding") && transitional.advertiseZstdAcceptEncoding === true ? ACCEPT_ENCODING_WITH_ZSTD : ACCEPT_ENCODING, false);
         const options = Object.assign(/* @__PURE__ */ Object.create(null), {
@@ -65041,7 +65082,6 @@ var require_axios = __commonJS({
           http2Options
         });
         !utils$1.isUndefined(lookup) && (options.lookup = lookup);
-        const socketPath = own2("socketPath");
         if (socketPath) {
           if (typeof socketPath !== "string") {
             return reject(new AxiosError("socketPath must be a string", AxiosError.ERR_BAD_OPTION_VALUE, config));
@@ -65059,7 +65099,7 @@ var require_axios = __commonJS({
         } else {
           options.hostname = parsed.hostname.startsWith("[") ? parsed.hostname.slice(1, -1) : parsed.hostname;
           options.port = parsed.port;
-          setProxy(options, own2("proxy"), protocol + "//" + parsed.hostname + (parsed.port ? ":" + parsed.port : "") + options.path, false, httpsAgent);
+          setProxy(options, configProxy, protocol + "//" + parsed.hostname + (parsed.port ? ":" + parsed.port : "") + options.path, false, httpsAgent, httpAgent);
         }
         let transport;
         let isNativeTransport = false;
@@ -65262,7 +65302,9 @@ var require_axios = __commonJS({
         });
         const boundSockets = /* @__PURE__ */ new Set();
         req.on("socket", function handleRequestSocket(socket) {
-          socket.setKeepAlive(true, 1e3 * 60);
+          if (typeof socket.setKeepAlive === "function") {
+            socket.setKeepAlive(true, 1e3 * 60);
+          }
           if (!socket[kAxiosSocketListener]) {
             socket.on("error", function handleSocketError(err) {
               const current = socket[kAxiosCurrentReq];
@@ -65374,7 +65416,11 @@ var require_axios = __commonJS({
             const cookie = cookies2[i].replace(/^\s+/, "");
             const eq = cookie.indexOf("=");
             if (eq !== -1 && cookie.slice(0, eq) === name) {
-              return decodeURIComponent(cookie.slice(eq + 1));
+              try {
+                return decodeURIComponent(cookie.slice(eq + 1));
+              } catch (e) {
+                return cookie.slice(eq + 1);
+              }
             }
           }
           return null;
@@ -65399,6 +65445,7 @@ var require_axios = __commonJS({
       ...thing
     } : thing;
     function mergeConfig(config1, config2) {
+      config1 = config1 || {};
       config2 = config2 || {};
       const config = /* @__PURE__ */ Object.create(null);
       Object.defineProperty(config, "hasOwnProperty", {
@@ -65523,7 +65570,7 @@ var require_axios = __commonJS({
         headers.set(formHeaders);
         return;
       }
-      Object.entries(formHeaders).forEach(([key, val]) => {
+      Object.entries(formHeaders || {}).forEach(([key, val]) => {
         if (FORM_DATA_CONTENT_HEADERS.includes(key.toLowerCase())) {
           headers.set(key, val);
         }
@@ -65547,7 +65594,11 @@ var require_axios = __commonJS({
       if (auth2) {
         const username = utils$1.getSafeProp(auth2, "username") || "";
         const password = utils$1.getSafeProp(auth2, "password") || "";
-        headers.set("Authorization", "Basic " + btoa(username + ":" + (password ? encodeUTF8$1(password) : "")));
+        try {
+          headers.set("Authorization", "Basic " + btoa(username + ":" + (password ? encodeUTF8$1(password) : "")));
+        } catch (e) {
+          throw AxiosError.from(e, AxiosError.ERR_BAD_OPTION_VALUE, config);
+        }
       }
       if (utils$1.isFormData(data)) {
         if (platform2.hasStandardBrowserEnv || platform2.hasStandardBrowserWebWorkerEnv || utils$1.isReactNative(data)) {
@@ -65694,6 +65745,7 @@ var require_axios = __commonJS({
         const protocol = parseProtocol(_config.url);
         if (protocol && !platform2.protocols.includes(protocol)) {
           reject(new AxiosError("Unsupported protocol " + protocol + ":", AxiosError.ERR_BAD_REQUEST, config));
+          done();
           return;
         }
         request2.send(requestData || null);
@@ -65729,7 +65781,9 @@ var require_axios = __commonJS({
         });
         signals = null;
       };
-      signals.forEach((signal2) => signal2.addEventListener("abort", onabort));
+      signals.forEach((signal2) => signal2.addEventListener("abort", onabort, {
+        once: true
+      }));
       const {
         signal
       } = controller;
@@ -66122,7 +66176,15 @@ var require_axios = __commonJS({
             const canceledError = composedSignal.reason;
             canceledError.config = config;
             request2 && (canceledError.request = request2);
-            err !== canceledError && (canceledError.cause = err);
+            if (err !== canceledError) {
+              Object.defineProperty(canceledError, "cause", {
+                __proto__: null,
+                value: err,
+                writable: true,
+                enumerable: false,
+                configurable: true
+              });
+            }
             throw canceledError;
           }
           if (pendingBodyError) {
@@ -66134,9 +66196,15 @@ var require_axios = __commonJS({
             throw err;
           }
           if (err && err.name === "TypeError" && /Load failed|fetch/i.test(err.message)) {
-            throw Object.assign(new AxiosError("Network Error", AxiosError.ERR_NETWORK, config, request2, err && err.response), {
-              cause: err.cause || err
+            const networkError = new AxiosError("Network Error", AxiosError.ERR_NETWORK, config, request2, err && err.response);
+            Object.defineProperty(networkError, "cause", {
+              __proto__: null,
+              value: err.cause || err,
+              writable: true,
+              enumerable: false,
+              configurable: true
             });
+            throw networkError;
           }
           throw AxiosError.from(err, err && err.code, config, request2, err && err.response);
         }
@@ -66211,7 +66279,7 @@ var require_axios = __commonJS({
       if (!adapter) {
         const reasons = Object.entries(rejectedReasons).map(([id, state]) => `adapter ${id} ` + (state === false ? "is not supported by the environment" : "is not available in the build"));
         let s = length ? reasons.length > 1 ? "since :\n" + reasons.map(renderReason).join("\n") : " " + renderReason(reasons[0]) : "as no adapter specified";
-        throw new AxiosError(`There is no suitable adapter to dispatch the request ` + s, "ERR_NOT_SUPPORT");
+        throw new AxiosError(`There is no suitable adapter to dispatch the request ` + s, AxiosError.ERR_NOT_SUPPORT);
       }
       return adapter;
     }
@@ -66298,7 +66366,7 @@ var require_axios = __commonJS({
       };
     };
     function assertOptions(options, schema, allowUnknown) {
-      if (typeof options !== "object") {
+      if (typeof options !== "object" || options === null) {
         throw new AxiosError("options must be an object", AxiosError.ERR_BAD_OPTION_VALUE);
       }
       const keys2 = Object.keys(options);
@@ -97850,7 +97918,6 @@ var AVAILABLE_INTERNAL_FLAGS = [
   "ms-in-ls",
   "msd",
   "o11y",
-  "openfga-authz",
   "organizations",
   "overview-react",
   "persistent-logs",
@@ -97861,16 +97928,17 @@ var AVAILABLE_INTERNAL_FLAGS = [
   "time-sameDc",
   "vcluster",
   "virtual-machines",
-  "vpn",
-  "workspace-ssh"
+  "vpn"
 ];
 var availableInternalFlags = [...AVAILABLE_INTERNAL_FLAGS];
 var AVAILABLE_PREVIEW_FLAGS = [
+  "openfga-authz",
   "preview-comments",
   "privileged-ports",
   "secret-management",
   "sub-path-mount",
-  "tcp-udp"
+  "tcp-udp",
+  "workspace-ssh"
 ];
 var availablePreviewFlags = [...AVAILABLE_PREVIEW_FLAGS];
 var AVAILABLE_FEATURES = [
@@ -98215,7 +98283,7 @@ var toDeployStageServerContainerRuntime = toObject({
 });
 var toDeployStageServer = toOr(toDeployStageServerReactive, toDeployStageServerContainerRuntime);
 var isDeployStageServer = (x) => isOfType(x, toDeployStageServer);
-var toManagedServiceConfigFields = {
+var toManagedServiceConfigV01 = toObject({
   provider: toObject({
     name: toString,
     version: toString
@@ -98226,8 +98294,23 @@ var toManagedServiceConfigFields = {
   }),
   config: toRecord(toUnknown),
   secrets: toRecord(toUnknown)
+});
+var toManagedServiceConfigFieldsV02 = {
+  provider: toObject({
+    name: toString,
+    schemaVersion: toString
+  }),
+  plan: toObject({
+    id: toNonNegativeInteger,
+    parameters: toRecord(toInteger)
+  }),
+  config: toRecord(toUnknown),
+  secrets: toRecord(toUnknown)
 };
-var toManagedServiceConfig = toObject(toManagedServiceConfigFields);
+var toManagedServiceConfigV02 = toObject(toManagedServiceConfigFieldsV02);
+var toManagedServiceConfigFieldsLatest = toManagedServiceConfigFieldsV02;
+var toManagedServiceConfigLatest = toObject(toManagedServiceConfigFieldsLatest);
+var toManagedServiceConfig = toOr(toManagedServiceConfigV01, toManagedServiceConfigV02);
 var toHeadlessPath = toObject({
   path: toUrlPath,
   stripPath: toBoolean,
@@ -98245,7 +98328,9 @@ var toVirtualMachineConfig = toObject({
   storageGib: toPositiveNumber,
   cloudInitUserDataBase64: toUndefOr(toString)
 });
-var toDeployStage = toRecord(toOr(toDeployStageServer, toManagedServiceConfig, toHeadlessServiceConfig, toVirtualMachineConfig));
+var toDeployStageV01 = toRecord(toOr(toDeployStageServer, toManagedServiceConfigV01, toHeadlessServiceConfig, toVirtualMachineConfig));
+var toDeployStageV02 = toRecord(toOr(toDeployStageServer, toManagedServiceConfigV02, toHeadlessServiceConfig, toVirtualMachineConfig));
+var toDeployStage = toOr(toDeployStageV01, toDeployStageV02);
 var isDeployStage = (x) => isOfType(x, toDeployStage);
 var toPipelineConfigV01 = toObject({
   prepare: toStage,
@@ -98256,15 +98341,21 @@ var toPipelineConfigV02 = toObject({
   schemaVersion: toLiteral("v0.2"),
   prepare: toStage,
   test: toStage,
-  run: toDeployStage
+  run: toDeployStageV01
 });
 var toPipelineConfigV03 = toObject({
   schemaVersion: toLiteral("v0.3"),
   prepare: toStage,
   test: toStage,
-  run: toDeployStage
+  run: toDeployStageV01
 });
-var toPipelineConfig = toOr(toPipelineConfigV03, toPipelineConfigV02, toPipelineConfigV01);
+var toPipelineConfigV04 = toObject({
+  schemaVersion: toLiteral("v0.4"),
+  prepare: toStage,
+  test: toStage,
+  run: toDeployStageV02
+});
+var toPipelineConfig = toOr(toPipelineConfigV04, toPipelineConfigV03, toPipelineConfigV02, toPipelineConfigV01);
 var pipelineProcessingStates = [
   "waiting",
   "running",
@@ -98544,6 +98635,10 @@ var toReplicaResourceUtilization = toObject({
   planId: toPlanId,
   usage: toArray(toUnixTimeAndValueTuple)
 });
+var toUninstallDeploymentArgs = toObject({
+  workspaceId: toNonNegativeInteger,
+  server: toUndefOr(toMsdServerName)
+});
 var LandscapeServerReadinessStatus;
 (function(LandscapeServerReadinessStatus2) {
   LandscapeServerReadinessStatus2["Ready"] = "Ready";
@@ -98614,7 +98709,7 @@ var workspaceDeploymentService = {
     }),
     uninstallDeployment: rpc({
       response: toVoid,
-      request: toWorkspaceServiceArgs2,
+      request: toUninstallDeploymentArgs,
       defaultOptions: { timeout: duration({ seconds: 25 }) }
     }),
     startWorkspace: rpc({
@@ -102384,6 +102479,7 @@ var UpdateConstraint;
 (function(UpdateConstraint2) {
   UpdateConstraint2["IncreaseOnly"] = "increase-only";
   UpdateConstraint2["MinorUpgradeOnly"] = "minor-upgrade-only";
+  UpdateConstraint2["SameMajorOnly"] = "same-major-only";
   UpdateConstraint2["Immutable"] = "immutable";
 })(UpdateConstraint || (UpdateConstraint = {}));
 var SUPPORTED_FORMATS = [
@@ -102406,7 +102502,7 @@ var normalizeSemver = (value) => {
 var satisfiesIncreaseOnlyConstraint = (newValue, currentValue) => {
   return isNumber(newValue) && isNumber(currentValue) && newValue >= currentValue;
 };
-var satisfiesMinorUpgradeOnlyConstraint = (newValue, currentValue) => {
+var satisfiesSameMajorConstraint = (newValue, currentValue) => {
   if (!isString(newValue) || !isString(currentValue)) {
     return false;
   }
@@ -102420,7 +102516,13 @@ var satisfiesMinorUpgradeOnlyConstraint = (newValue, currentValue) => {
   if (newMajor === void 0 || currentMajor === void 0) {
     return false;
   }
-  return newMajor === currentMajor && (0, import_semver3.compare)(normalizedNewValue, normalizedCurrentValue) >= 0;
+  return newMajor === currentMajor;
+};
+var satisfiesMinorUpgradeOnlyConstraint = (newValue, currentValue) => {
+  if (!satisfiesSameMajorConstraint(newValue, currentValue)) {
+    return false;
+  }
+  return (0, import_semver3.compare)(normalizeSemver(newValue), normalizeSemver(currentValue)) >= 0;
 };
 var compile = (schema, options) => {
   const ajv = new import_ajv.Ajv({
@@ -102458,6 +102560,16 @@ var compile = (schema, options) => {
           return true;
         }
         return satisfiesMinorUpgradeOnlyConstraint(newValue, currentValue);
+      }
+      if (constraint === UpdateConstraint.SameMajorOnly) {
+        if (!this?.previousValues) {
+          return true;
+        }
+        const currentValue = this?.previousValues?.[key];
+        if (currentValue === void 0 || currentValue === null) {
+          return true;
+        }
+        return satisfiesSameMajorConstraint(newValue, currentValue);
       }
       if (constraint === UpdateConstraint.Immutable) {
         const prevValue = this?.previousValues?.[key];
@@ -102539,7 +102651,7 @@ var providerSchemaVersionPattern = "^v[0-9][0-9a-z]*$";
 var toProviderSchemaVersion = toStringMatchingRegex("ProviderSchemaVersion", new RegExp(providerSchemaVersionPattern));
 var immutablePropertiesConv = {
   provider: toProviderName,
-  providerVersion: toProviderSchemaVersion
+  providerSchemaVersion: toProviderSchemaVersion
 };
 var toRecoveryRef = toOr(toObject({
   id: toUuid,
@@ -103476,7 +103588,7 @@ mime-types/index.js:
    *)
 
 axios/dist/node/axios.cjs:
-  (*! Axios v1.18.0 Copyright (c) 2026 Matt Zabriskie and contributors *)
+  (*! Axios v1.18.1 Copyright (c) 2026 Matt Zabriskie and contributors *)
 
 @octokit/request-error/dist-src/index.js:
   (* v8 ignore else -- @preserve -- Bug with vitest coverage where it sees an else branch that doesn't exist *)
