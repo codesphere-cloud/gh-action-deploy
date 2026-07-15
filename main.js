@@ -4869,14 +4869,14 @@ var require_templates = __commonJS({
       const results = [];
       const chunks = arguments_.trim().split(/\s*,\s*/g);
       let matches;
-      for (const chunk of chunks) {
-        const number = Number(chunk);
+      for (const chunk2 of chunks) {
+        const number = Number(chunk2);
         if (!Number.isNaN(number)) {
           results.push(number);
-        } else if (matches = chunk.match(STRING_REGEX)) {
+        } else if (matches = chunk2.match(STRING_REGEX)) {
           results.push(matches[2].replace(ESCAPE_REGEX, (m, escape2, character) => escape2 ? unescape2(escape2) : character));
         } else {
-          throw new Error(`Invalid Chalk template style argument: ${chunk} (in style '${name}')`);
+          throw new Error(`Invalid Chalk template style argument: ${chunk2} (in style '${name}')`);
         }
       }
       return results;
@@ -4918,27 +4918,27 @@ var require_templates = __commonJS({
     module2.exports = (chalk2, temporary) => {
       const styles = [];
       const chunks = [];
-      let chunk = [];
+      let chunk2 = [];
       temporary.replace(TEMPLATE_REGEX, (m, escapeCharacter, inverse, style, close, character) => {
         if (escapeCharacter) {
-          chunk.push(unescape2(escapeCharacter));
+          chunk2.push(unescape2(escapeCharacter));
         } else if (style) {
-          const string = chunk.join("");
-          chunk = [];
+          const string = chunk2.join("");
+          chunk2 = [];
           chunks.push(styles.length === 0 ? string : buildStyle(chalk2, styles)(string));
           styles.push({ inverse, styles: parseStyle(style) });
         } else if (close) {
           if (styles.length === 0) {
             throw new Error("Found extraneous } in Chalk template literal");
           }
-          chunks.push(buildStyle(chalk2, styles)(chunk.join("")));
-          chunk = [];
+          chunks.push(buildStyle(chalk2, styles)(chunk2.join("")));
+          chunk2 = [];
           styles.pop();
         } else {
-          chunk.push(character);
+          chunk2.push(character);
         }
       });
-      chunks.push(chunk.join(""));
+      chunks.push(chunk2.join(""));
       if (styles.length > 0) {
         const errMessage = `Chalk template literal is missing ${styles.length} closing bracket${styles.length === 1 ? "" : "s"} (\`}\`)`;
         throw new Error(errMessage);
@@ -7659,13 +7659,13 @@ var require_request = __commonJS({
           channels.create.publish({ request: this });
         }
       }
-      onBodySent(chunk) {
+      onBodySent(chunk2) {
         if (channels.bodyChunkSent.hasSubscribers) {
-          channels.bodyChunkSent.publish({ request: this, chunk });
+          channels.bodyChunkSent.publish({ request: this, chunk: chunk2 });
         }
         if (this[kHandler].onBodySent) {
           try {
-            return this[kHandler].onBodySent(chunk);
+            return this[kHandler].onBodySent(chunk2);
           } catch (err) {
             this.abort(err);
           }
@@ -7717,15 +7717,15 @@ var require_request = __commonJS({
           return false;
         }
       }
-      onResponseData(chunk) {
+      onResponseData(chunk2) {
         assert(!this.aborted);
         assert(!this.completed);
         if (channels.bodyChunkReceived.hasSubscribers) {
-          channels.bodyChunkReceived.publish({ request: this, chunk });
+          channels.bodyChunkReceived.publish({ request: this, chunk: chunk2 });
         }
         const controller = this[kController];
         try {
-          this[kHandler].onResponseData?.(controller, chunk);
+          this[kHandler].onResponseData?.(controller, chunk2);
           return !controller?.paused;
         } catch (err) {
           this.abort(err);
@@ -10634,17 +10634,17 @@ var require_util3 = __commonJS({
         const bytes2 = [];
         let byteLength = 0;
         do {
-          const { done, value: chunk } = await reader.read();
+          const { done, value: chunk2 } = await reader.read();
           if (done) {
             successSteps(Buffer.concat(bytes2, byteLength));
             return;
           }
-          if (!isUint8Array(chunk)) {
+          if (!isUint8Array(chunk2)) {
             failureSteps(new TypeError("Received non-Uint8Array chunk"));
             return;
           }
-          bytes2.push(chunk);
-          byteLength += chunk.length;
+          bytes2.push(chunk2);
+          byteLength += chunk2.length;
         } while (true);
       } catch (e) {
         failureSteps(e);
@@ -10750,18 +10750,18 @@ var require_util3 = __commonJS({
         super();
         this.#zlibOptions = zlibOptions;
       }
-      _transform(chunk, encoding, callback) {
+      _transform(chunk2, encoding, callback) {
         if (!this._inflateStream) {
-          if (chunk.length === 0) {
+          if (chunk2.length === 0) {
             callback();
             return;
           }
-          this._inflateStream = (chunk[0] & 15) === 8 ? zlib.createInflate(this.#zlibOptions) : zlib.createInflateRaw(this.#zlibOptions);
+          this._inflateStream = (chunk2[0] & 15) === 8 ? zlib.createInflate(this.#zlibOptions) : zlib.createInflateRaw(this.#zlibOptions);
           this._inflateStream.on("data", this.push.bind(this));
           this._inflateStream.on("end", () => this.push(null));
           this._inflateStream.on("error", (err) => this.destroy(err));
         }
-        this._inflateStream.write(chunk, encoding, callback);
+        this._inflateStream.write(chunk2, encoding, callback);
       }
       _final(callback) {
         if (this._inflateStream) {
@@ -11568,29 +11568,29 @@ Content-Disposition: form-data`;
         let hasUnknownSizeValue = false;
         for (const [name, value] of object) {
           if (typeof value === "string") {
-            const chunk2 = textEncoder.encode(prefix + `; name="${formdataEscape(normalizeLinefeeds(name))}"\r
+            const chunk3 = textEncoder.encode(prefix + `; name="${formdataEscape(normalizeLinefeeds(name))}"\r
 \r
 ${normalizeLinefeeds(value)}\r
 `);
-            blobParts.push(chunk2);
-            length += chunk2.byteLength;
+            blobParts.push(chunk3);
+            length += chunk3.byteLength;
           } else {
-            const chunk2 = textEncoder.encode(`${prefix}; name="${formdataEscape(normalizeLinefeeds(name))}"` + (value.name ? `; filename="${formdataEscape(value.name)}"` : "") + `\r
+            const chunk3 = textEncoder.encode(`${prefix}; name="${formdataEscape(normalizeLinefeeds(name))}"` + (value.name ? `; filename="${formdataEscape(value.name)}"` : "") + `\r
 Content-Type: ${value.type || "application/octet-stream"}\r
 \r
 `);
-            blobParts.push(chunk2, value, rn);
+            blobParts.push(chunk3, value, rn);
             if (typeof value.size === "number") {
-              length += chunk2.byteLength + value.size + rn.byteLength;
+              length += chunk3.byteLength + value.size + rn.byteLength;
             } else {
               hasUnknownSizeValue = true;
             }
           }
         }
-        const chunk = textEncoder.encode(`--${boundary}--\r
+        const chunk2 = textEncoder.encode(`--${boundary}--\r
 `);
-        blobParts.push(chunk);
-        length += chunk.byteLength;
+        blobParts.push(chunk2);
+        length += chunk2.byteLength;
         if (hasUnknownSizeValue) {
           length = null;
         }
@@ -12045,44 +12045,44 @@ var require_client_h1 = __commonJS({
       }
       readMore() {
         while (!this.paused && this.ptr) {
-          const chunk = this.socket.read();
-          if (chunk === null) {
+          const chunk2 = this.socket.read();
+          if (chunk2 === null) {
             break;
           }
-          this.execute(chunk);
+          this.execute(chunk2);
         }
       }
       /**
        * @param {Buffer} chunk
        */
-      execute(chunk) {
+      execute(chunk2) {
         assert(currentParser === null);
         assert(this.ptr != null);
         assert(!this.paused);
         const { socket, llhttp } = this;
-        if (chunk.length > currentBufferSize) {
+        if (chunk2.length > currentBufferSize) {
           if (currentBufferPtr) {
             llhttp.free(currentBufferPtr);
           }
-          currentBufferSize = Math.ceil(chunk.length / 4096) * 4096;
+          currentBufferSize = Math.ceil(chunk2.length / 4096) * 4096;
           currentBufferPtr = llhttp.malloc(currentBufferSize);
         }
         if (currentBuffer === null || currentBuffer.buffer !== llhttp.memory.buffer || currentBuffer.byteOffset !== currentBufferPtr || currentBuffer.byteLength !== currentBufferSize) {
           currentBuffer = new Uint8Array(llhttp.memory.buffer, currentBufferPtr, currentBufferSize);
         }
-        currentBuffer.set(chunk);
+        currentBuffer.set(chunk2);
         try {
           let ret;
           try {
-            currentBufferRef = chunk;
+            currentBufferRef = chunk2;
             currentParser = this;
-            ret = llhttp.llhttp_execute(this.ptr, currentBufferPtr, chunk.length);
+            ret = llhttp.llhttp_execute(this.ptr, currentBufferPtr, chunk2.length);
           } finally {
             currentParser = null;
             currentBufferRef = null;
           }
           if (ret !== constants3.ERROR.OK) {
-            const data = chunk.subarray(llhttp.llhttp_get_error_pos(this.ptr) - currentBufferPtr);
+            const data = chunk2.subarray(llhttp.llhttp_get_error_pos(this.ptr) - currentBufferPtr);
             if (ret === constants3.ERROR.PAUSED_UPGRADE) {
               this.onUpgrade(data);
             } else if (ret === constants3.ERROR.PAUSED) {
@@ -12778,12 +12778,12 @@ upgrade: ${upgrade}\r
       assert(contentLength !== 0 || client[kRunning] === 0, "stream body cannot be pipelined");
       let finished = false;
       const writer = new AsyncWriter({ abort, socket, request: request2, contentLength, client, expectsPayload, header });
-      const onData = function(chunk) {
+      const onData = function(chunk2) {
         if (finished) {
           return;
         }
         try {
-          if (!writer.write(chunk) && this.pause) {
+          if (!writer.write(chunk2) && this.pause) {
             this.pause();
           }
         } catch (err) {
@@ -12917,11 +12917,11 @@ upgrade: ${upgrade}\r
       socket.on("close", onDrain).on("drain", onDrain);
       const writer = new AsyncWriter({ abort, socket, request: request2, contentLength, client, expectsPayload, header });
       try {
-        for await (const chunk of body) {
+        for await (const chunk2 of body) {
           if (socket[kError]) {
             throw socket[kError];
           }
-          if (!writer.write(chunk)) {
+          if (!writer.write(chunk2)) {
             await waitForDrain();
           }
         }
@@ -12959,7 +12959,7 @@ upgrade: ${upgrade}\r
        * @param {string|Uint8Array} chunk
        * @returns
        */
-      write(chunk) {
+      write(chunk2) {
         const { socket, request: request2, contentLength, client, bytesWritten, expectsPayload, header } = this;
         if (socket[kError]) {
           throw socket[kError];
@@ -12967,7 +12967,7 @@ upgrade: ${upgrade}\r
         if (socket.destroyed) {
           return false;
         }
-        const len = chunk instanceof Uint8Array ? chunk.byteLength : Buffer.byteLength(chunk);
+        const len = chunk2 instanceof Uint8Array ? chunk2.byteLength : Buffer.byteLength(chunk2);
         if (!len) {
           return true;
         }
@@ -12997,9 +12997,9 @@ ${len.toString(16)}\r
 `, "latin1");
         }
         this.bytesWritten += len;
-        const ret = socket.write(chunk);
+        const ret = socket.write(chunk2);
         socket.uncork();
-        request2.onBodySent(chunk);
+        request2.onBodySent(chunk2);
         if (!ret) {
           if (socket[kParser].timeout && socket[kParser].timeoutType === TIMEOUT_HEADERS) {
             if (socket[kParser].timeout.refresh) {
@@ -13887,13 +13887,13 @@ var require_client_h2 = __commonJS({
         stream2.once("error", noop3);
       }
     }
-    function onData(chunk) {
+    function onData(chunk2) {
       const stream2 = this;
       const { request: request2 } = stream2[kRequestStreamState];
       if (request2.aborted || request2.completed) {
         return;
       }
-      if (request2.onResponseData(chunk) === false) {
+      if (request2.onResponseData(chunk2) === false) {
         stream2.pause();
       }
     }
@@ -14077,8 +14077,8 @@ var require_client_h2 = __commonJS({
         }
       );
       util.addListener(pipe, "data", onPipeData);
-      function onPipeData(chunk) {
-        request2.onBodySent(chunk);
+      function onPipeData(chunk2) {
+        request2.onBodySent(chunk2);
       }
     }
     async function writeBlob(abort, h2stream, body, client, request2, socket, contentLength, expectsPayload) {
@@ -14121,12 +14121,12 @@ var require_client_h2 = __commonJS({
       });
       h2stream.on("close", onDrain).on("drain", onDrain);
       try {
-        for await (const chunk of body) {
+        for await (const chunk2 of body) {
           if (socket[kError]) {
             throw socket[kError];
           }
-          const res = h2stream.write(chunk);
-          request2.onBodySent(chunk);
+          const res = h2stream.write(chunk2);
+          request2.onBodySent(chunk2);
           if (!res) {
             await waitForDrain();
           }
@@ -15518,8 +15518,8 @@ var require_dispatcher1_wrapper = __commonJS({
           controller.pause();
         }
       }
-      onResponseData(controller, chunk) {
-        if (this.#handler.onData?.(chunk) === false) {
+      onResponseData(controller, chunk2) {
+        if (this.#handler.onData?.(chunk2) === false) {
           controller.pause();
         }
       }
@@ -15533,8 +15533,8 @@ var require_dispatcher1_wrapper = __commonJS({
         }
         this.#handler.onError(err);
       }
-      onBodySent(chunk) {
-        this.#handler.onBodySent?.(chunk);
+      onBodySent(chunk2) {
+        this.#handler.onBodySent?.(chunk2);
       }
       onRequestSent() {
         this.#handler.onRequestSent?.();
@@ -16914,12 +16914,12 @@ var require_retry_handler = __commonJS({
           });
         }
       }
-      onResponseData(controller, chunk) {
+      onResponseData(controller, chunk2) {
         if (this.error) {
           return;
         }
-        this.start += chunk.length;
-        this.handler.onResponseData?.(controller, chunk);
+        this.start += chunk2.length;
+        this.handler.onResponseData?.(controller, chunk2);
       }
       onResponseEnd(controller, trailers) {
         if (this.error && this.retryOpts.throwOnError) {
@@ -17183,15 +17183,15 @@ var require_readable = __commonJS({
        * @param {Buffer|null} chunk
        * @returns {boolean}
        */
-      push(chunk) {
-        if (chunk) {
-          this[kBytesRead] += chunk.length;
+      push(chunk2) {
+        if (chunk2) {
+          this[kBytesRead] += chunk2.length;
           if (this[kConsume]) {
-            consumePush(this[kConsume], chunk);
-            return this[kReading] ? super.push(chunk) : true;
+            consumePush(this[kConsume], chunk2);
+            return this[kReading] ? super.push(chunk2) : true;
           }
         }
-        return super.push(chunk);
+        return super.push(chunk2);
       }
       /**
        * Consumes and returns the body as a string.
@@ -17382,8 +17382,8 @@ var require_readable = __commonJS({
           consumePush(consume2, state.buffer[n]);
         }
       } else {
-        for (const chunk of state.buffer) {
-          consumePush(consume2, chunk);
+        for (const chunk2 of state.buffer) {
+          consumePush(consume2, chunk2);
         }
       }
       if (state.endEmitted) {
@@ -17420,9 +17420,9 @@ var require_readable = __commonJS({
       const buffer = new Uint8Array(Buffer.allocUnsafeSlow(length).buffer);
       let offset = 0;
       for (let i = 0; i < chunks.length; ++i) {
-        const chunk = chunks[i];
-        buffer.set(chunk, offset);
-        offset += chunk.length;
+        const chunk2 = chunks[i];
+        buffer.set(chunk2, offset);
+        offset += chunk2.length;
       }
       return buffer;
     }
@@ -17445,9 +17445,9 @@ var require_readable = __commonJS({
         stream2.destroy(err);
       }
     }
-    function consumePush(consume2, chunk) {
-      consume2.length += chunk.length;
-      consume2.body.push(chunk);
+    function consumePush(consume2, chunk2) {
+      consume2.length += chunk2.length;
+      consume2.body.push(chunk2);
     }
     function consumeFinish(consume2, err) {
       if (consume2.body === null) {
@@ -17595,11 +17595,11 @@ var require_api_request = __commonJS({
           }
         }
       }
-      onResponseData(controller, chunk) {
+      onResponseData(controller, chunk2) {
         if (!this.res) {
           return;
         }
-        if (this.res.push(chunk) === false) {
+        if (this.res.push(chunk2) === false) {
           controller.pause();
         }
       }
@@ -17871,12 +17871,12 @@ var require_api_stream = __commonJS({
           controller.pause();
         }
       }
-      onResponseData(controller, chunk) {
+      onResponseData(controller, chunk2) {
         const { res } = this;
         if (!res) {
           return;
         }
-        if (res.write(chunk) === false) {
+        if (res.write(chunk2) === false) {
           controller.pause();
         }
       }
@@ -18023,9 +18023,9 @@ var require_api_pipeline = __commonJS({
               body.resume();
             }
           },
-          write: (chunk, encoding, callback) => {
+          write: (chunk2, encoding, callback) => {
             const { req } = this;
-            if (req.push(chunk, encoding) || req._readableState.destroyed) {
+            if (req.push(chunk2, encoding) || req._readableState.destroyed) {
               callback();
             } else {
               req[kResume] = callback;
@@ -18092,9 +18092,9 @@ var require_api_pipeline = __commonJS({
         if (!body || typeof body.on !== "function") {
           throw new InvalidReturnValueError("expected Readable");
         }
-        body.on("data", (chunk) => {
+        body.on("data", (chunk2) => {
           const { ret, body: body2 } = this;
-          if (!ret.push(chunk) && body2.pause) {
+          if (!ret.push(chunk2) && body2.pause) {
             body2.pause();
           }
         }).on("error", (err) => {
@@ -18111,9 +18111,9 @@ var require_api_pipeline = __commonJS({
         });
         this.body = body;
       }
-      onResponseData(controller, chunk) {
+      onResponseData(controller, chunk2) {
         const { res } = this;
-        if (res.push(chunk) === false) {
+        if (res.push(chunk2) === false) {
           controller.pause();
         }
       }
@@ -19292,8 +19292,8 @@ var require_pending_interceptors_formatter = __commonJS({
     module2.exports = class PendingInterceptorsFormatter {
       constructor({ disableColors } = {}) {
         this.transform = new Transform({
-          transform(chunk, _enc, cb) {
-            cb(null, chunk);
+          transform(chunk2, _enc, cb) {
+            cb(null, chunk2);
           }
         });
         this.logger = new Console({
@@ -20103,9 +20103,9 @@ var require_snapshot_agent = __commonJS({
             responseData.headers = headers;
             return handler2.onResponseStart(controller, statusCode, headers, statusMessage);
           },
-          onResponseData(controller, chunk) {
-            responseData.body.push(chunk);
-            return handler2.onResponseData(controller, chunk);
+          onResponseData(controller, chunk2) {
+            responseData.body.push(chunk2);
+            return handler2.onResponseData(controller, chunk2);
           },
           onResponseEnd(controller, trailers) {
             responseData.trailers = trailers;
@@ -20474,10 +20474,10 @@ var require_redirect_handler = __commonJS({
         this.opts.origin = origin;
         this.opts.query = null;
       }
-      onResponseData(controller, chunk) {
+      onResponseData(controller, chunk2) {
         if (this.location) {
         } else {
-          this.handler.onResponseData?.(controller, chunk);
+          this.handler.onResponseData?.(controller, chunk2);
         }
       }
       onResponseEnd(controller, trailers) {
@@ -20606,11 +20606,11 @@ var require_response_error = __commonJS({
           this.#decoder = new TextDecoder("utf-8");
         }
       }
-      onResponseData(controller, chunk) {
+      onResponseData(controller, chunk2) {
         if (this.#statusCode < 400) {
-          return super.onResponseData(controller, chunk);
+          return super.onResponseData(controller, chunk2);
         }
-        this.#body += this.#decoder?.decode(chunk, { stream: true }) ?? "";
+        this.#body += this.#decoder?.decode(chunk2, { stream: true }) ?? "";
       }
       onResponseEnd(controller, trailers) {
         if (this.#statusCode >= 400) {
@@ -20723,8 +20723,8 @@ var require_dump = __commonJS({
         err = this.#controller?.reason ?? err;
         super.onResponseError(controller, err);
       }
-      onResponseData(controller, chunk) {
-        this.#size = this.#size + chunk.length;
+      onResponseData(controller, chunk2) {
+        this.#size = this.#size + chunk2.length;
         if (this.#size >= this.#maxSize) {
           this.#dumped = true;
           if (this.aborted === true) {
@@ -22130,9 +22130,9 @@ var require_cache_handler = __commonJS({
             if (typeof cachedValue.body.values === "function") {
               const bodyIterator = cachedValue.body.values();
               const streamCachedBody = () => {
-                for (const chunk of bodyIterator) {
-                  const full = this.#writeStream.write(chunk) === false;
-                  this.#handler.onResponseData?.(controller, chunk);
+                for (const chunk2 of bodyIterator) {
+                  const full = this.#writeStream.write(chunk2) === false;
+                  this.#handler.onResponseData?.(controller, chunk2);
                   if (full) {
                     break;
                   }
@@ -22150,9 +22150,9 @@ var require_cache_handler = __commonJS({
               });
               streamCachedBody();
             } else if (typeof cachedValue.body.on === "function") {
-              cachedValue.body.on("data", (chunk) => {
-                this.#writeStream.write(chunk);
-                this.#handler.onResponseData?.(controller, chunk);
+              cachedValue.body.on("data", (chunk2) => {
+                this.#writeStream.write(chunk2);
+                this.#handler.onResponseData?.(controller, chunk2);
               }).on("end", () => {
                 this.#writeStream.end();
               }).on("error", () => {
@@ -22195,11 +22195,11 @@ var require_cache_handler = __commonJS({
           downstreamOnHeaders();
         }
       }
-      onResponseData(controller, chunk) {
-        if (this.#writeStream?.write(chunk) === false) {
+      onResponseData(controller, chunk2) {
+        if (this.#writeStream?.write(chunk2) === false) {
           controller.pause();
         }
-        this.#handler.onResponseData?.(controller, chunk);
+        this.#handler.onResponseData?.(controller, chunk2);
       }
       onResponseEnd(controller, trailers) {
         this.#writeStream?.end();
@@ -22448,15 +22448,15 @@ var require_memory_cache_store = __commonJS({
         const store = this;
         const entry = { ...key, ...val, body: [], size: 0 };
         return new Writable({
-          write(chunk, encoding, callback) {
-            if (typeof chunk === "string") {
-              chunk = Buffer.from(chunk, encoding);
+          write(chunk2, encoding, callback) {
+            if (typeof chunk2 === "string") {
+              chunk2 = Buffer.from(chunk2, encoding);
             }
-            entry.size += chunk.byteLength;
+            entry.size += chunk2.byteLength;
             if (entry.size > store.#maxEntrySize) {
               this.destroy();
             } else {
-              entry.body.push(chunk);
+              entry.body.push(chunk2);
             }
             callback(null);
           },
@@ -22586,11 +22586,11 @@ var require_cache_revalidation_handler = __commonJS({
           statusMessage
         );
       }
-      onResponseData(controller, chunk) {
+      onResponseData(controller, chunk2) {
         if (this.#successful) {
           return;
         }
-        return this.#handler.onResponseData?.(controller, chunk);
+        return this.#handler.onResponseData?.(controller, chunk2);
       }
       onResponseEnd(controller, trailers) {
         if (this.#successful) {
@@ -22769,8 +22769,8 @@ var require_cache2 = __commonJS({
       if (opts.method === "HEAD") {
         stream2.destroy();
       } else {
-        stream2.on("data", function(chunk) {
-          handler2.onResponseData?.(controller, chunk);
+        stream2.on("data", function(chunk2) {
+          handler2.onResponseData?.(controller, chunk2);
         });
       }
     }
@@ -23044,9 +23044,9 @@ var require_decompress = __commonJS({
        */
       #setupDecompressorEvents(decompressor, controller) {
         decompressor.on("readable", () => {
-          let chunk;
-          while ((chunk = decompressor.read()) !== null) {
-            const result = super.onResponseData(controller, chunk);
+          let chunk2;
+          while ((chunk2 = decompressor.read()) !== null) {
+            const result = super.onResponseData(controller, chunk2);
             if (result === false) {
               break;
             }
@@ -23145,12 +23145,12 @@ var require_decompress = __commonJS({
        * @param {Buffer} chunk
        * @returns {void}
        */
-      onResponseData(controller, chunk) {
+      onResponseData(controller, chunk2) {
         if (this.#decompressors.length > 0) {
-          this.#decompressors[0].write(chunk);
+          this.#decompressors[0].write(chunk2);
           return;
         }
-        super.onResponseData(controller, chunk);
+        super.onResponseData(controller, chunk2);
       }
       /**
        * @param {Controller} controller
@@ -23354,12 +23354,12 @@ var require_deduplication_handler = __commonJS({
        * @param {import('../../types/dispatcher.d.ts').default.DispatchController} controller
        * @param {Buffer} chunk
        */
-      onResponseData(controller, chunk) {
+      onResponseData(controller, chunk2) {
         if (this.#aborted || this.#completed) {
           return;
         }
         this.#responseDataStarted = true;
-        this.#primaryHandler.onResponseData?.(controller, chunk);
+        this.#primaryHandler.onResponseData?.(controller, chunk2);
         for (const waitingHandler of this.#waitingHandlers) {
           const { handler: handler2, controller: waitingController } = waitingHandler;
           if (waitingHandler.done || waitingController.aborted) {
@@ -23367,11 +23367,11 @@ var require_deduplication_handler = __commonJS({
             continue;
           }
           if (waitingController.paused) {
-            this.#bufferWaitingChunk(waitingHandler, chunk);
+            this.#bufferWaitingChunk(waitingHandler, chunk2);
             continue;
           }
           try {
-            handler2.onResponseData?.(waitingController, chunk);
+            handler2.onResponseData?.(waitingController, chunk2);
           } catch {
           }
           if (waitingController.aborted) {
@@ -23496,14 +23496,14 @@ var require_deduplication_handler = __commonJS({
        * @param {WaitingHandler} waitingHandler
        * @param {Buffer} chunk
        */
-      #bufferWaitingChunk(waitingHandler, chunk) {
+      #bufferWaitingChunk(waitingHandler, chunk2) {
         if (waitingHandler.done || waitingHandler.controller.aborted) {
           waitingHandler.done = true;
           waitingHandler.bufferedChunks = [];
           waitingHandler.bufferedBytes = 0;
           return;
         }
-        const bufferedChunk = Buffer.from(chunk);
+        const bufferedChunk = Buffer.from(chunk2);
         waitingHandler.bufferedChunks.push(bufferedChunk);
         waitingHandler.bufferedBytes += bufferedChunk.length;
         if (waitingHandler.bufferedBytes > this.#maxBufferSize) {
@@ -23895,10 +23895,10 @@ var require_sqlite_cache_store = __commonJS({
         const store = this;
         return new Writable({
           decodeStrings: true,
-          write(chunk, encoding, callback) {
-            size2 += chunk.byteLength;
+          write(chunk2, encoding, callback) {
+            size2 += chunk2.byteLength;
             if (size2 <= store.#maxEntrySize) {
-              body.push(chunk);
+              body.push(chunk2);
             } else {
               this.destroy();
             }
@@ -26889,11 +26889,11 @@ var require_fetch = __commonJS({
                   }).on("error", onError) : this.body.on("error", onError)
                 });
               },
-              onResponseData(controller, chunk) {
+              onResponseData(controller, chunk2) {
                 if (fetchParams.controller.dump) {
                   return;
                 }
-                const bytes2 = chunk;
+                const bytes2 = chunk2;
                 timingInfo.encodedBodySize += bytes2.byteLength;
                 if (this.body.push(bytes2) === false) {
                   controller.pause();
@@ -28875,7 +28875,7 @@ var require_permessage_deflate = __commonJS({
        * @param {boolean} fin Final fragment flag
        * @param {Function} callback Callback function
        */
-      decompress(chunk, fin, callback) {
+      decompress(chunk2, fin, callback) {
         if (!this.#inflate) {
           let windowBits = Z_DEFAULT_WINDOWBITS;
           if (this.#options.serverMaxWindowBits) {
@@ -28908,7 +28908,7 @@ var require_permessage_deflate = __commonJS({
             callback(err);
           });
         }
-        this.#inflate.write(chunk);
+        this.#inflate.write(chunk2);
         if (fin) {
           this.#inflate.write(tail);
         }
@@ -28982,9 +28982,9 @@ var require_receiver = __commonJS({
        * @param {Buffer} chunk
        * @param {() => void} callback
        */
-      _write(chunk, _, callback) {
-        this.#buffers.push(chunk);
-        this.#byteOffset += chunk.length;
+      _write(chunk2, _, callback) {
+        this.#buffers.push(chunk2);
+        this.#byteOffset += chunk2.length;
         this.#loop = true;
         this.run(callback);
       }
@@ -29428,8 +29428,8 @@ var require_websocket = __commonJS({
         onMessage: (opcode, data) => this.#onMessage(opcode, data),
         onParserError: (err) => failWebsocketConnection(this.#handler, null, err.message),
         onParserDrain: () => this.#onParserDrain(),
-        onSocketData: (chunk) => {
-          if (!this.#parser.write(chunk)) {
+        onSocketData: (chunk2) => {
+          if (!this.#parser.write(chunk2)) {
             this.#handler.socket.pause();
           }
         },
@@ -29986,8 +29986,8 @@ var require_websocketstream = __commonJS({
         onMessage: (opcode, data) => this.#onMessage(opcode, data),
         onParserError: (err) => failWebsocketConnection(this.#handler, null, err.message),
         onParserDrain: () => this.#handler.socket.resume(),
-        onSocketData: (chunk) => {
-          if (!this.#parser.write(chunk)) {
+        onSocketData: (chunk2) => {
+          if (!this.#parser.write(chunk2)) {
             this.#handler.socket.pause();
           }
         },
@@ -30082,18 +30082,18 @@ var require_websocketstream = __commonJS({
         const reason = closeInfo.reason;
         closeWebSocketConnection(this.#handler, code, reason, true);
       }
-      #write(chunk) {
-        chunk = webidl.converters.WebSocketStreamWrite(chunk);
+      #write(chunk2) {
+        chunk2 = webidl.converters.WebSocketStreamWrite(chunk2);
         const promise = Promise.withResolvers();
         let data = null;
         let opcode = null;
-        if (webidl.is.BufferSource(chunk)) {
-          data = new Uint8Array(ArrayBuffer.isView(chunk) ? new Uint8Array(chunk.buffer, chunk.byteOffset, chunk.byteLength) : chunk.slice());
+        if (webidl.is.BufferSource(chunk2)) {
+          data = new Uint8Array(ArrayBuffer.isView(chunk2) ? new Uint8Array(chunk2.buffer, chunk2.byteOffset, chunk2.byteLength) : chunk2.slice());
           opcode = opcodes.BINARY;
         } else {
           let string;
           try {
-            string = webidl.converters.DOMString(chunk);
+            string = webidl.converters.DOMString(chunk2);
           } catch (e) {
             promise.reject(e);
             return promise.promise;
@@ -30131,7 +30131,7 @@ var require_websocketstream = __commonJS({
           cancel: (reason) => this.#cancel(reason)
         });
         const writable = new WritableStream({
-          write: (chunk) => this.#write(chunk),
+          write: (chunk2) => this.#write(chunk2),
           close: () => closeWebSocketConnection(this.#handler, null, null),
           abort: (reason) => this.#closeUsingReason(reason)
         });
@@ -30149,18 +30149,18 @@ var require_websocketstream = __commonJS({
         if (this.#handler.readyState !== states.OPEN) {
           return;
         }
-        let chunk;
+        let chunk2;
         if (type === opcodes.TEXT) {
           try {
-            chunk = utf8Decode(data);
+            chunk2 = utf8Decode(data);
           } catch {
             failWebsocketConnection(this.#handler, 1007, "Received invalid UTF-8 in text frame.");
             return;
           }
         } else if (type === opcodes.BINARY) {
-          chunk = new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+          chunk2 = new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
         }
-        this.#readableStreamController.enqueue(chunk);
+        this.#readableStreamController.enqueue(chunk2);
       }
       /** @type {import('../websocket').Handler['onSocketClose']} */
       #onSocketClose() {
@@ -30390,12 +30390,12 @@ var require_eventsource_stream = __commonJS({
        * @param {Function} callback
        * @returns {void}
        */
-      _transform(chunk, _encoding, callback) {
-        if (chunk.length === 0) {
+      _transform(chunk2, _encoding, callback) {
+        if (chunk2.length === 0) {
           callback();
           return;
         }
-        this.chunks.push(chunk);
+        this.chunks.push(chunk2);
         if (this.checkBOM) {
           if (this.handleBOM()) {
             callback();
@@ -30563,10 +30563,10 @@ ${value}`;
         const chunks = [];
         let length = 0;
         for (let i = this.lineChunkIndex; i <= this.chunkIndex; i++) {
-          const chunk = this.chunks[i];
+          const chunk2 = this.chunks[i];
           const start = i === this.lineChunkIndex ? this.linePos : 0;
-          const end = i === this.chunkIndex ? this.pos : chunk.length;
-          const slice = chunk.subarray(start, end);
+          const end = i === this.chunkIndex ? this.pos : chunk2.length;
+          const slice = chunk2.subarray(start, end);
           length += slice.length;
           chunks.push(slice);
         }
@@ -30576,10 +30576,10 @@ ${value}`;
         let chunkIndex = this.lineChunkIndex;
         let pos = this.linePos;
         while (chunkIndex < this.chunks.length) {
-          const chunk = this.chunks[chunkIndex];
-          const remaining = chunk.length - pos;
+          const chunk2 = this.chunks[chunkIndex];
+          const remaining = chunk2.length - pos;
           if (offset < remaining) {
-            return chunk[pos + offset];
+            return chunk2[pos + offset];
           }
           offset -= remaining;
           chunkIndex++;
@@ -30588,8 +30588,8 @@ ${value}`;
       }
       discardLeadingBytes(count) {
         while (count > 0 && this.lineChunkIndex < this.chunks.length) {
-          const chunk = this.chunks[this.lineChunkIndex];
-          const remaining = chunk.length - this.linePos;
+          const chunk2 = this.chunks[this.lineChunkIndex];
+          const remaining = chunk2.length - this.linePos;
           if (count < remaining) {
             this.linePos += count;
             count = 0;
@@ -33517,13 +33517,13 @@ var require_request3 = __commonJS({
           channels.create.publish({ request: this });
         }
       }
-      onBodySent(chunk) {
+      onBodySent(chunk2) {
         if (channels.bodyChunkSent.hasSubscribers) {
-          channels.bodyChunkSent.publish({ request: this, chunk });
+          channels.bodyChunkSent.publish({ request: this, chunk: chunk2 });
         }
         if (this[kHandler].onBodySent) {
           try {
-            return this[kHandler].onBodySent(chunk);
+            return this[kHandler].onBodySent(chunk2);
           } catch (err) {
             this.abort(err);
           }
@@ -33575,15 +33575,15 @@ var require_request3 = __commonJS({
           return false;
         }
       }
-      onResponseData(chunk) {
+      onResponseData(chunk2) {
         assert(!this.aborted);
         assert(!this.completed);
         if (channels.bodyChunkReceived.hasSubscribers) {
-          channels.bodyChunkReceived.publish({ request: this, chunk });
+          channels.bodyChunkReceived.publish({ request: this, chunk: chunk2 });
         }
         const controller = this[kController];
         try {
-          this[kHandler].onResponseData?.(controller, chunk);
+          this[kHandler].onResponseData?.(controller, chunk2);
           return !controller?.paused;
         } catch (err) {
           this.abort(err);
@@ -36492,17 +36492,17 @@ var require_util9 = __commonJS({
         const bytes2 = [];
         let byteLength = 0;
         do {
-          const { done, value: chunk } = await reader.read();
+          const { done, value: chunk2 } = await reader.read();
           if (done) {
             successSteps(Buffer.concat(bytes2, byteLength));
             return;
           }
-          if (!isUint8Array(chunk)) {
+          if (!isUint8Array(chunk2)) {
             failureSteps(new TypeError("Received non-Uint8Array chunk"));
             return;
           }
-          bytes2.push(chunk);
-          byteLength += chunk.length;
+          bytes2.push(chunk2);
+          byteLength += chunk2.length;
         } while (true);
       } catch (e) {
         failureSteps(e);
@@ -36608,18 +36608,18 @@ var require_util9 = __commonJS({
         super();
         this.#zlibOptions = zlibOptions;
       }
-      _transform(chunk, encoding, callback) {
+      _transform(chunk2, encoding, callback) {
         if (!this._inflateStream) {
-          if (chunk.length === 0) {
+          if (chunk2.length === 0) {
             callback();
             return;
           }
-          this._inflateStream = (chunk[0] & 15) === 8 ? zlib.createInflate(this.#zlibOptions) : zlib.createInflateRaw(this.#zlibOptions);
+          this._inflateStream = (chunk2[0] & 15) === 8 ? zlib.createInflate(this.#zlibOptions) : zlib.createInflateRaw(this.#zlibOptions);
           this._inflateStream.on("data", this.push.bind(this));
           this._inflateStream.on("end", () => this.push(null));
           this._inflateStream.on("error", (err) => this.destroy(err));
         }
-        this._inflateStream.write(chunk, encoding, callback);
+        this._inflateStream.write(chunk2, encoding, callback);
       }
       _final(callback) {
         if (this._inflateStream) {
@@ -37426,29 +37426,29 @@ Content-Disposition: form-data`;
         let hasUnknownSizeValue = false;
         for (const [name, value] of object) {
           if (typeof value === "string") {
-            const chunk2 = textEncoder.encode(prefix + `; name="${formdataEscape(normalizeLinefeeds(name))}"\r
+            const chunk3 = textEncoder.encode(prefix + `; name="${formdataEscape(normalizeLinefeeds(name))}"\r
 \r
 ${normalizeLinefeeds(value)}\r
 `);
-            blobParts.push(chunk2);
-            length += chunk2.byteLength;
+            blobParts.push(chunk3);
+            length += chunk3.byteLength;
           } else {
-            const chunk2 = textEncoder.encode(`${prefix}; name="${formdataEscape(normalizeLinefeeds(name))}"` + (value.name ? `; filename="${formdataEscape(value.name)}"` : "") + `\r
+            const chunk3 = textEncoder.encode(`${prefix}; name="${formdataEscape(normalizeLinefeeds(name))}"` + (value.name ? `; filename="${formdataEscape(value.name)}"` : "") + `\r
 Content-Type: ${value.type || "application/octet-stream"}\r
 \r
 `);
-            blobParts.push(chunk2, value, rn);
+            blobParts.push(chunk3, value, rn);
             if (typeof value.size === "number") {
-              length += chunk2.byteLength + value.size + rn.byteLength;
+              length += chunk3.byteLength + value.size + rn.byteLength;
             } else {
               hasUnknownSizeValue = true;
             }
           }
         }
-        const chunk = textEncoder.encode(`--${boundary}--\r
+        const chunk2 = textEncoder.encode(`--${boundary}--\r
 `);
-        blobParts.push(chunk);
-        length += chunk.byteLength;
+        blobParts.push(chunk2);
+        length += chunk2.byteLength;
         if (hasUnknownSizeValue) {
           length = null;
         }
@@ -37903,44 +37903,44 @@ var require_client_h12 = __commonJS({
       }
       readMore() {
         while (!this.paused && this.ptr) {
-          const chunk = this.socket.read();
-          if (chunk === null) {
+          const chunk2 = this.socket.read();
+          if (chunk2 === null) {
             break;
           }
-          this.execute(chunk);
+          this.execute(chunk2);
         }
       }
       /**
        * @param {Buffer} chunk
        */
-      execute(chunk) {
+      execute(chunk2) {
         assert(currentParser === null);
         assert(this.ptr != null);
         assert(!this.paused);
         const { socket, llhttp } = this;
-        if (chunk.length > currentBufferSize) {
+        if (chunk2.length > currentBufferSize) {
           if (currentBufferPtr) {
             llhttp.free(currentBufferPtr);
           }
-          currentBufferSize = Math.ceil(chunk.length / 4096) * 4096;
+          currentBufferSize = Math.ceil(chunk2.length / 4096) * 4096;
           currentBufferPtr = llhttp.malloc(currentBufferSize);
         }
         if (currentBuffer === null || currentBuffer.buffer !== llhttp.memory.buffer || currentBuffer.byteOffset !== currentBufferPtr || currentBuffer.byteLength !== currentBufferSize) {
           currentBuffer = new Uint8Array(llhttp.memory.buffer, currentBufferPtr, currentBufferSize);
         }
-        currentBuffer.set(chunk);
+        currentBuffer.set(chunk2);
         try {
           let ret;
           try {
-            currentBufferRef = chunk;
+            currentBufferRef = chunk2;
             currentParser = this;
-            ret = llhttp.llhttp_execute(this.ptr, currentBufferPtr, chunk.length);
+            ret = llhttp.llhttp_execute(this.ptr, currentBufferPtr, chunk2.length);
           } finally {
             currentParser = null;
             currentBufferRef = null;
           }
           if (ret !== constants3.ERROR.OK) {
-            const data = chunk.subarray(llhttp.llhttp_get_error_pos(this.ptr) - currentBufferPtr);
+            const data = chunk2.subarray(llhttp.llhttp_get_error_pos(this.ptr) - currentBufferPtr);
             if (ret === constants3.ERROR.PAUSED_UPGRADE) {
               this.onUpgrade(data);
             } else if (ret === constants3.ERROR.PAUSED) {
@@ -38636,12 +38636,12 @@ upgrade: ${upgrade}\r
       assert(contentLength !== 0 || client[kRunning] === 0, "stream body cannot be pipelined");
       let finished = false;
       const writer = new AsyncWriter({ abort, socket, request: request2, contentLength, client, expectsPayload, header });
-      const onData = function(chunk) {
+      const onData = function(chunk2) {
         if (finished) {
           return;
         }
         try {
-          if (!writer.write(chunk) && this.pause) {
+          if (!writer.write(chunk2) && this.pause) {
             this.pause();
           }
         } catch (err) {
@@ -38775,11 +38775,11 @@ upgrade: ${upgrade}\r
       socket.on("close", onDrain).on("drain", onDrain);
       const writer = new AsyncWriter({ abort, socket, request: request2, contentLength, client, expectsPayload, header });
       try {
-        for await (const chunk of body) {
+        for await (const chunk2 of body) {
           if (socket[kError]) {
             throw socket[kError];
           }
-          if (!writer.write(chunk)) {
+          if (!writer.write(chunk2)) {
             await waitForDrain();
           }
         }
@@ -38817,7 +38817,7 @@ upgrade: ${upgrade}\r
        * @param {string|Uint8Array} chunk
        * @returns
        */
-      write(chunk) {
+      write(chunk2) {
         const { socket, request: request2, contentLength, client, bytesWritten, expectsPayload, header } = this;
         if (socket[kError]) {
           throw socket[kError];
@@ -38825,7 +38825,7 @@ upgrade: ${upgrade}\r
         if (socket.destroyed) {
           return false;
         }
-        const len = chunk instanceof Uint8Array ? chunk.byteLength : Buffer.byteLength(chunk);
+        const len = chunk2 instanceof Uint8Array ? chunk2.byteLength : Buffer.byteLength(chunk2);
         if (!len) {
           return true;
         }
@@ -38855,9 +38855,9 @@ ${len.toString(16)}\r
 `, "latin1");
         }
         this.bytesWritten += len;
-        const ret = socket.write(chunk);
+        const ret = socket.write(chunk2);
         socket.uncork();
-        request2.onBodySent(chunk);
+        request2.onBodySent(chunk2);
         if (!ret) {
           if (socket[kParser].timeout && socket[kParser].timeoutType === TIMEOUT_HEADERS) {
             if (socket[kParser].timeout.refresh) {
@@ -39745,13 +39745,13 @@ var require_client_h22 = __commonJS({
         stream2.once("error", noop3);
       }
     }
-    function onData(chunk) {
+    function onData(chunk2) {
       const stream2 = this;
       const { request: request2 } = stream2[kRequestStreamState];
       if (request2.aborted || request2.completed) {
         return;
       }
-      if (request2.onResponseData(chunk) === false) {
+      if (request2.onResponseData(chunk2) === false) {
         stream2.pause();
       }
     }
@@ -39935,8 +39935,8 @@ var require_client_h22 = __commonJS({
         }
       );
       util.addListener(pipe, "data", onPipeData);
-      function onPipeData(chunk) {
-        request2.onBodySent(chunk);
+      function onPipeData(chunk2) {
+        request2.onBodySent(chunk2);
       }
     }
     async function writeBlob(abort, h2stream, body, client, request2, socket, contentLength, expectsPayload) {
@@ -39979,12 +39979,12 @@ var require_client_h22 = __commonJS({
       });
       h2stream.on("close", onDrain).on("drain", onDrain);
       try {
-        for await (const chunk of body) {
+        for await (const chunk2 of body) {
           if (socket[kError]) {
             throw socket[kError];
           }
-          const res = h2stream.write(chunk);
-          request2.onBodySent(chunk);
+          const res = h2stream.write(chunk2);
+          request2.onBodySent(chunk2);
           if (!res) {
             await waitForDrain();
           }
@@ -41376,8 +41376,8 @@ var require_dispatcher1_wrapper2 = __commonJS({
           controller.pause();
         }
       }
-      onResponseData(controller, chunk) {
-        if (this.#handler.onData?.(chunk) === false) {
+      onResponseData(controller, chunk2) {
+        if (this.#handler.onData?.(chunk2) === false) {
           controller.pause();
         }
       }
@@ -41391,8 +41391,8 @@ var require_dispatcher1_wrapper2 = __commonJS({
         }
         this.#handler.onError(err);
       }
-      onBodySent(chunk) {
-        this.#handler.onBodySent?.(chunk);
+      onBodySent(chunk2) {
+        this.#handler.onBodySent?.(chunk2);
       }
       onRequestSent() {
         this.#handler.onRequestSent?.();
@@ -42772,12 +42772,12 @@ var require_retry_handler2 = __commonJS({
           });
         }
       }
-      onResponseData(controller, chunk) {
+      onResponseData(controller, chunk2) {
         if (this.error) {
           return;
         }
-        this.start += chunk.length;
-        this.handler.onResponseData?.(controller, chunk);
+        this.start += chunk2.length;
+        this.handler.onResponseData?.(controller, chunk2);
       }
       onResponseEnd(controller, trailers) {
         if (this.error && this.retryOpts.throwOnError) {
@@ -43041,15 +43041,15 @@ var require_readable2 = __commonJS({
        * @param {Buffer|null} chunk
        * @returns {boolean}
        */
-      push(chunk) {
-        if (chunk) {
-          this[kBytesRead] += chunk.length;
+      push(chunk2) {
+        if (chunk2) {
+          this[kBytesRead] += chunk2.length;
           if (this[kConsume]) {
-            consumePush(this[kConsume], chunk);
-            return this[kReading] ? super.push(chunk) : true;
+            consumePush(this[kConsume], chunk2);
+            return this[kReading] ? super.push(chunk2) : true;
           }
         }
-        return super.push(chunk);
+        return super.push(chunk2);
       }
       /**
        * Consumes and returns the body as a string.
@@ -43240,8 +43240,8 @@ var require_readable2 = __commonJS({
           consumePush(consume2, state.buffer[n]);
         }
       } else {
-        for (const chunk of state.buffer) {
-          consumePush(consume2, chunk);
+        for (const chunk2 of state.buffer) {
+          consumePush(consume2, chunk2);
         }
       }
       if (state.endEmitted) {
@@ -43278,9 +43278,9 @@ var require_readable2 = __commonJS({
       const buffer = new Uint8Array(Buffer.allocUnsafeSlow(length).buffer);
       let offset = 0;
       for (let i = 0; i < chunks.length; ++i) {
-        const chunk = chunks[i];
-        buffer.set(chunk, offset);
-        offset += chunk.length;
+        const chunk2 = chunks[i];
+        buffer.set(chunk2, offset);
+        offset += chunk2.length;
       }
       return buffer;
     }
@@ -43303,9 +43303,9 @@ var require_readable2 = __commonJS({
         stream2.destroy(err);
       }
     }
-    function consumePush(consume2, chunk) {
-      consume2.length += chunk.length;
-      consume2.body.push(chunk);
+    function consumePush(consume2, chunk2) {
+      consume2.length += chunk2.length;
+      consume2.body.push(chunk2);
     }
     function consumeFinish(consume2, err) {
       if (consume2.body === null) {
@@ -43453,11 +43453,11 @@ var require_api_request2 = __commonJS({
           }
         }
       }
-      onResponseData(controller, chunk) {
+      onResponseData(controller, chunk2) {
         if (!this.res) {
           return;
         }
-        if (this.res.push(chunk) === false) {
+        if (this.res.push(chunk2) === false) {
           controller.pause();
         }
       }
@@ -43729,12 +43729,12 @@ var require_api_stream2 = __commonJS({
           controller.pause();
         }
       }
-      onResponseData(controller, chunk) {
+      onResponseData(controller, chunk2) {
         const { res } = this;
         if (!res) {
           return;
         }
-        if (res.write(chunk) === false) {
+        if (res.write(chunk2) === false) {
           controller.pause();
         }
       }
@@ -43881,9 +43881,9 @@ var require_api_pipeline2 = __commonJS({
               body.resume();
             }
           },
-          write: (chunk, encoding, callback) => {
+          write: (chunk2, encoding, callback) => {
             const { req } = this;
-            if (req.push(chunk, encoding) || req._readableState.destroyed) {
+            if (req.push(chunk2, encoding) || req._readableState.destroyed) {
               callback();
             } else {
               req[kResume] = callback;
@@ -43950,9 +43950,9 @@ var require_api_pipeline2 = __commonJS({
         if (!body || typeof body.on !== "function") {
           throw new InvalidReturnValueError("expected Readable");
         }
-        body.on("data", (chunk) => {
+        body.on("data", (chunk2) => {
           const { ret, body: body2 } = this;
-          if (!ret.push(chunk) && body2.pause) {
+          if (!ret.push(chunk2) && body2.pause) {
             body2.pause();
           }
         }).on("error", (err) => {
@@ -43969,9 +43969,9 @@ var require_api_pipeline2 = __commonJS({
         });
         this.body = body;
       }
-      onResponseData(controller, chunk) {
+      onResponseData(controller, chunk2) {
         const { res } = this;
-        if (res.push(chunk) === false) {
+        if (res.push(chunk2) === false) {
           controller.pause();
         }
       }
@@ -45150,8 +45150,8 @@ var require_pending_interceptors_formatter2 = __commonJS({
     module2.exports = class PendingInterceptorsFormatter {
       constructor({ disableColors } = {}) {
         this.transform = new Transform({
-          transform(chunk, _enc, cb) {
-            cb(null, chunk);
+          transform(chunk2, _enc, cb) {
+            cb(null, chunk2);
           }
         });
         this.logger = new Console({
@@ -45961,9 +45961,9 @@ var require_snapshot_agent2 = __commonJS({
             responseData.headers = headers;
             return handler2.onResponseStart(controller, statusCode, headers, statusMessage);
           },
-          onResponseData(controller, chunk) {
-            responseData.body.push(chunk);
-            return handler2.onResponseData(controller, chunk);
+          onResponseData(controller, chunk2) {
+            responseData.body.push(chunk2);
+            return handler2.onResponseData(controller, chunk2);
           },
           onResponseEnd(controller, trailers) {
             responseData.trailers = trailers;
@@ -46332,10 +46332,10 @@ var require_redirect_handler2 = __commonJS({
         this.opts.origin = origin;
         this.opts.query = null;
       }
-      onResponseData(controller, chunk) {
+      onResponseData(controller, chunk2) {
         if (this.location) {
         } else {
-          this.handler.onResponseData?.(controller, chunk);
+          this.handler.onResponseData?.(controller, chunk2);
         }
       }
       onResponseEnd(controller, trailers) {
@@ -46464,11 +46464,11 @@ var require_response_error2 = __commonJS({
           this.#decoder = new TextDecoder("utf-8");
         }
       }
-      onResponseData(controller, chunk) {
+      onResponseData(controller, chunk2) {
         if (this.#statusCode < 400) {
-          return super.onResponseData(controller, chunk);
+          return super.onResponseData(controller, chunk2);
         }
-        this.#body += this.#decoder?.decode(chunk, { stream: true }) ?? "";
+        this.#body += this.#decoder?.decode(chunk2, { stream: true }) ?? "";
       }
       onResponseEnd(controller, trailers) {
         if (this.#statusCode >= 400) {
@@ -46581,8 +46581,8 @@ var require_dump2 = __commonJS({
         err = this.#controller?.reason ?? err;
         super.onResponseError(controller, err);
       }
-      onResponseData(controller, chunk) {
-        this.#size = this.#size + chunk.length;
+      onResponseData(controller, chunk2) {
+        this.#size = this.#size + chunk2.length;
         if (this.#size >= this.#maxSize) {
           this.#dumped = true;
           if (this.aborted === true) {
@@ -47988,9 +47988,9 @@ var require_cache_handler2 = __commonJS({
             if (typeof cachedValue.body.values === "function") {
               const bodyIterator = cachedValue.body.values();
               const streamCachedBody = () => {
-                for (const chunk of bodyIterator) {
-                  const full = this.#writeStream.write(chunk) === false;
-                  this.#handler.onResponseData?.(controller, chunk);
+                for (const chunk2 of bodyIterator) {
+                  const full = this.#writeStream.write(chunk2) === false;
+                  this.#handler.onResponseData?.(controller, chunk2);
                   if (full) {
                     break;
                   }
@@ -48008,9 +48008,9 @@ var require_cache_handler2 = __commonJS({
               });
               streamCachedBody();
             } else if (typeof cachedValue.body.on === "function") {
-              cachedValue.body.on("data", (chunk) => {
-                this.#writeStream.write(chunk);
-                this.#handler.onResponseData?.(controller, chunk);
+              cachedValue.body.on("data", (chunk2) => {
+                this.#writeStream.write(chunk2);
+                this.#handler.onResponseData?.(controller, chunk2);
               }).on("end", () => {
                 this.#writeStream.end();
               }).on("error", () => {
@@ -48053,11 +48053,11 @@ var require_cache_handler2 = __commonJS({
           downstreamOnHeaders();
         }
       }
-      onResponseData(controller, chunk) {
-        if (this.#writeStream?.write(chunk) === false) {
+      onResponseData(controller, chunk2) {
+        if (this.#writeStream?.write(chunk2) === false) {
           controller.pause();
         }
-        this.#handler.onResponseData?.(controller, chunk);
+        this.#handler.onResponseData?.(controller, chunk2);
       }
       onResponseEnd(controller, trailers) {
         this.#writeStream?.end();
@@ -48306,15 +48306,15 @@ var require_memory_cache_store2 = __commonJS({
         const store = this;
         const entry = { ...key, ...val, body: [], size: 0 };
         return new Writable({
-          write(chunk, encoding, callback) {
-            if (typeof chunk === "string") {
-              chunk = Buffer.from(chunk, encoding);
+          write(chunk2, encoding, callback) {
+            if (typeof chunk2 === "string") {
+              chunk2 = Buffer.from(chunk2, encoding);
             }
-            entry.size += chunk.byteLength;
+            entry.size += chunk2.byteLength;
             if (entry.size > store.#maxEntrySize) {
               this.destroy();
             } else {
-              entry.body.push(chunk);
+              entry.body.push(chunk2);
             }
             callback(null);
           },
@@ -48444,11 +48444,11 @@ var require_cache_revalidation_handler2 = __commonJS({
           statusMessage
         );
       }
-      onResponseData(controller, chunk) {
+      onResponseData(controller, chunk2) {
         if (this.#successful) {
           return;
         }
-        return this.#handler.onResponseData?.(controller, chunk);
+        return this.#handler.onResponseData?.(controller, chunk2);
       }
       onResponseEnd(controller, trailers) {
         if (this.#successful) {
@@ -48627,8 +48627,8 @@ var require_cache5 = __commonJS({
       if (opts.method === "HEAD") {
         stream2.destroy();
       } else {
-        stream2.on("data", function(chunk) {
-          handler2.onResponseData?.(controller, chunk);
+        stream2.on("data", function(chunk2) {
+          handler2.onResponseData?.(controller, chunk2);
         });
       }
     }
@@ -48902,9 +48902,9 @@ var require_decompress2 = __commonJS({
        */
       #setupDecompressorEvents(decompressor, controller) {
         decompressor.on("readable", () => {
-          let chunk;
-          while ((chunk = decompressor.read()) !== null) {
-            const result = super.onResponseData(controller, chunk);
+          let chunk2;
+          while ((chunk2 = decompressor.read()) !== null) {
+            const result = super.onResponseData(controller, chunk2);
             if (result === false) {
               break;
             }
@@ -49003,12 +49003,12 @@ var require_decompress2 = __commonJS({
        * @param {Buffer} chunk
        * @returns {void}
        */
-      onResponseData(controller, chunk) {
+      onResponseData(controller, chunk2) {
         if (this.#decompressors.length > 0) {
-          this.#decompressors[0].write(chunk);
+          this.#decompressors[0].write(chunk2);
           return;
         }
-        super.onResponseData(controller, chunk);
+        super.onResponseData(controller, chunk2);
       }
       /**
        * @param {Controller} controller
@@ -49212,12 +49212,12 @@ var require_deduplication_handler2 = __commonJS({
        * @param {import('../../types/dispatcher.d.ts').default.DispatchController} controller
        * @param {Buffer} chunk
        */
-      onResponseData(controller, chunk) {
+      onResponseData(controller, chunk2) {
         if (this.#aborted || this.#completed) {
           return;
         }
         this.#responseDataStarted = true;
-        this.#primaryHandler.onResponseData?.(controller, chunk);
+        this.#primaryHandler.onResponseData?.(controller, chunk2);
         for (const waitingHandler of this.#waitingHandlers) {
           const { handler: handler2, controller: waitingController } = waitingHandler;
           if (waitingHandler.done || waitingController.aborted) {
@@ -49225,11 +49225,11 @@ var require_deduplication_handler2 = __commonJS({
             continue;
           }
           if (waitingController.paused) {
-            this.#bufferWaitingChunk(waitingHandler, chunk);
+            this.#bufferWaitingChunk(waitingHandler, chunk2);
             continue;
           }
           try {
-            handler2.onResponseData?.(waitingController, chunk);
+            handler2.onResponseData?.(waitingController, chunk2);
           } catch {
           }
           if (waitingController.aborted) {
@@ -49354,14 +49354,14 @@ var require_deduplication_handler2 = __commonJS({
        * @param {WaitingHandler} waitingHandler
        * @param {Buffer} chunk
        */
-      #bufferWaitingChunk(waitingHandler, chunk) {
+      #bufferWaitingChunk(waitingHandler, chunk2) {
         if (waitingHandler.done || waitingHandler.controller.aborted) {
           waitingHandler.done = true;
           waitingHandler.bufferedChunks = [];
           waitingHandler.bufferedBytes = 0;
           return;
         }
-        const bufferedChunk = Buffer.from(chunk);
+        const bufferedChunk = Buffer.from(chunk2);
         waitingHandler.bufferedChunks.push(bufferedChunk);
         waitingHandler.bufferedBytes += bufferedChunk.length;
         if (waitingHandler.bufferedBytes > this.#maxBufferSize) {
@@ -49753,10 +49753,10 @@ var require_sqlite_cache_store2 = __commonJS({
         const store = this;
         return new Writable({
           decodeStrings: true,
-          write(chunk, encoding, callback) {
-            size2 += chunk.byteLength;
+          write(chunk2, encoding, callback) {
+            size2 += chunk2.byteLength;
             if (size2 <= store.#maxEntrySize) {
-              body.push(chunk);
+              body.push(chunk2);
             } else {
               this.destroy();
             }
@@ -52747,11 +52747,11 @@ var require_fetch2 = __commonJS({
                   }).on("error", onError) : this.body.on("error", onError)
                 });
               },
-              onResponseData(controller, chunk) {
+              onResponseData(controller, chunk2) {
                 if (fetchParams.controller.dump) {
                   return;
                 }
-                const bytes2 = chunk;
+                const bytes2 = chunk2;
                 timingInfo.encodedBodySize += bytes2.byteLength;
                 if (this.body.push(bytes2) === false) {
                   controller.pause();
@@ -54733,7 +54733,7 @@ var require_permessage_deflate2 = __commonJS({
        * @param {boolean} fin Final fragment flag
        * @param {Function} callback Callback function
        */
-      decompress(chunk, fin, callback) {
+      decompress(chunk2, fin, callback) {
         if (!this.#inflate) {
           let windowBits = Z_DEFAULT_WINDOWBITS;
           if (this.#options.serverMaxWindowBits) {
@@ -54766,7 +54766,7 @@ var require_permessage_deflate2 = __commonJS({
             callback(err);
           });
         }
-        this.#inflate.write(chunk);
+        this.#inflate.write(chunk2);
         if (fin) {
           this.#inflate.write(tail);
         }
@@ -54840,9 +54840,9 @@ var require_receiver2 = __commonJS({
        * @param {Buffer} chunk
        * @param {() => void} callback
        */
-      _write(chunk, _, callback) {
-        this.#buffers.push(chunk);
-        this.#byteOffset += chunk.length;
+      _write(chunk2, _, callback) {
+        this.#buffers.push(chunk2);
+        this.#byteOffset += chunk2.length;
         this.#loop = true;
         this.run(callback);
       }
@@ -55286,8 +55286,8 @@ var require_websocket2 = __commonJS({
         onMessage: (opcode, data) => this.#onMessage(opcode, data),
         onParserError: (err) => failWebsocketConnection(this.#handler, null, err.message),
         onParserDrain: () => this.#onParserDrain(),
-        onSocketData: (chunk) => {
-          if (!this.#parser.write(chunk)) {
+        onSocketData: (chunk2) => {
+          if (!this.#parser.write(chunk2)) {
             this.#handler.socket.pause();
           }
         },
@@ -55844,8 +55844,8 @@ var require_websocketstream2 = __commonJS({
         onMessage: (opcode, data) => this.#onMessage(opcode, data),
         onParserError: (err) => failWebsocketConnection(this.#handler, null, err.message),
         onParserDrain: () => this.#handler.socket.resume(),
-        onSocketData: (chunk) => {
-          if (!this.#parser.write(chunk)) {
+        onSocketData: (chunk2) => {
+          if (!this.#parser.write(chunk2)) {
             this.#handler.socket.pause();
           }
         },
@@ -55940,18 +55940,18 @@ var require_websocketstream2 = __commonJS({
         const reason = closeInfo.reason;
         closeWebSocketConnection(this.#handler, code, reason, true);
       }
-      #write(chunk) {
-        chunk = webidl.converters.WebSocketStreamWrite(chunk);
+      #write(chunk2) {
+        chunk2 = webidl.converters.WebSocketStreamWrite(chunk2);
         const promise = Promise.withResolvers();
         let data = null;
         let opcode = null;
-        if (webidl.is.BufferSource(chunk)) {
-          data = new Uint8Array(ArrayBuffer.isView(chunk) ? new Uint8Array(chunk.buffer, chunk.byteOffset, chunk.byteLength) : chunk.slice());
+        if (webidl.is.BufferSource(chunk2)) {
+          data = new Uint8Array(ArrayBuffer.isView(chunk2) ? new Uint8Array(chunk2.buffer, chunk2.byteOffset, chunk2.byteLength) : chunk2.slice());
           opcode = opcodes.BINARY;
         } else {
           let string;
           try {
-            string = webidl.converters.DOMString(chunk);
+            string = webidl.converters.DOMString(chunk2);
           } catch (e) {
             promise.reject(e);
             return promise.promise;
@@ -55989,7 +55989,7 @@ var require_websocketstream2 = __commonJS({
           cancel: (reason) => this.#cancel(reason)
         });
         const writable = new WritableStream({
-          write: (chunk) => this.#write(chunk),
+          write: (chunk2) => this.#write(chunk2),
           close: () => closeWebSocketConnection(this.#handler, null, null),
           abort: (reason) => this.#closeUsingReason(reason)
         });
@@ -56007,18 +56007,18 @@ var require_websocketstream2 = __commonJS({
         if (this.#handler.readyState !== states.OPEN) {
           return;
         }
-        let chunk;
+        let chunk2;
         if (type === opcodes.TEXT) {
           try {
-            chunk = utf8Decode(data);
+            chunk2 = utf8Decode(data);
           } catch {
             failWebsocketConnection(this.#handler, 1007, "Received invalid UTF-8 in text frame.");
             return;
           }
         } else if (type === opcodes.BINARY) {
-          chunk = new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+          chunk2 = new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
         }
-        this.#readableStreamController.enqueue(chunk);
+        this.#readableStreamController.enqueue(chunk2);
       }
       /** @type {import('../websocket').Handler['onSocketClose']} */
       #onSocketClose() {
@@ -56248,12 +56248,12 @@ var require_eventsource_stream2 = __commonJS({
        * @param {Function} callback
        * @returns {void}
        */
-      _transform(chunk, _encoding, callback) {
-        if (chunk.length === 0) {
+      _transform(chunk2, _encoding, callback) {
+        if (chunk2.length === 0) {
           callback();
           return;
         }
-        this.chunks.push(chunk);
+        this.chunks.push(chunk2);
         if (this.checkBOM) {
           if (this.handleBOM()) {
             callback();
@@ -56421,10 +56421,10 @@ ${value}`;
         const chunks = [];
         let length = 0;
         for (let i = this.lineChunkIndex; i <= this.chunkIndex; i++) {
-          const chunk = this.chunks[i];
+          const chunk2 = this.chunks[i];
           const start = i === this.lineChunkIndex ? this.linePos : 0;
-          const end = i === this.chunkIndex ? this.pos : chunk.length;
-          const slice = chunk.subarray(start, end);
+          const end = i === this.chunkIndex ? this.pos : chunk2.length;
+          const slice = chunk2.subarray(start, end);
           length += slice.length;
           chunks.push(slice);
         }
@@ -56434,10 +56434,10 @@ ${value}`;
         let chunkIndex = this.lineChunkIndex;
         let pos = this.linePos;
         while (chunkIndex < this.chunks.length) {
-          const chunk = this.chunks[chunkIndex];
-          const remaining = chunk.length - pos;
+          const chunk2 = this.chunks[chunkIndex];
+          const remaining = chunk2.length - pos;
           if (offset < remaining) {
-            return chunk[pos + offset];
+            return chunk2[pos + offset];
           }
           offset -= remaining;
           chunkIndex++;
@@ -56446,8 +56446,8 @@ ${value}`;
       }
       discardLeadingBytes(count) {
         while (count > 0 && this.lineChunkIndex < this.chunks.length) {
-          const chunk = this.chunks[this.lineChunkIndex];
-          const remaining = chunk.length - this.linePos;
+          const chunk2 = this.chunks[this.lineChunkIndex];
+          const remaining = chunk2.length - this.linePos;
           if (count < remaining) {
             this.linePos += count;
             count = 0;
@@ -57150,8 +57150,8 @@ var require_lib = __commonJS({
         return __awaiter3(this, void 0, void 0, function* () {
           return new Promise((resolve2) => __awaiter3(this, void 0, void 0, function* () {
             let output = Buffer.alloc(0);
-            this.message.on("data", (chunk) => {
-              output = Buffer.concat([output, chunk]);
+            this.message.on("data", (chunk2) => {
+              output = Buffer.concat([output, chunk2]);
             });
             this.message.on("end", () => {
               resolve2(output.toString());
@@ -57163,8 +57163,8 @@ var require_lib = __commonJS({
         return __awaiter3(this, void 0, void 0, function* () {
           return new Promise((resolve2) => __awaiter3(this, void 0, void 0, function* () {
             const chunks = [];
-            this.message.on("data", (chunk) => {
-              chunks.push(chunk);
+            this.message.on("data", (chunk2) => {
+              chunks.push(chunk2);
             });
             this.message.on("end", () => {
               resolve2(Buffer.concat(chunks));
@@ -64986,14 +64986,14 @@ var require_permessage_deflate3 = __commonJS({
       }
     };
     module2.exports = PerMessageDeflate2;
-    function deflateOnData(chunk) {
-      this[kBuffers].push(chunk);
-      this[kTotalLength] += chunk.length;
+    function deflateOnData(chunk2) {
+      this[kBuffers].push(chunk2);
+      this[kTotalLength] += chunk2.length;
     }
-    function inflateOnData(chunk) {
-      this[kTotalLength] += chunk.length;
+    function inflateOnData(chunk2) {
+      this[kTotalLength] += chunk2.length;
       if (this[kPerMessageDeflate]._maxPayload < 1 || this[kTotalLength] <= this[kPerMessageDeflate]._maxPayload) {
-        this[kBuffers].push(chunk);
+        this[kBuffers].push(chunk2);
         return;
       }
       this[kError] = new RangeError("Max payload size exceeded");
@@ -65293,7 +65293,7 @@ var require_receiver3 = __commonJS({
        * @param {Function} cb Callback
        * @private
        */
-      _write(chunk, encoding, cb) {
+      _write(chunk2, encoding, cb) {
         if (this._opcode === 8 && this._state == GET_INFO) return cb();
         if (this._maxBufferedChunks > 0 && this._buffers.length >= this._maxBufferedChunks) {
           cb(
@@ -65307,8 +65307,8 @@ var require_receiver3 = __commonJS({
           );
           return;
         }
-        this._bufferedBytes += chunk.length;
-        this._buffers.push(chunk);
+        this._bufferedBytes += chunk2.length;
+        this._buffers.push(chunk2);
         this.startLoop(cb);
       }
       /**
@@ -67582,8 +67582,8 @@ var require_websocket3 = __commonJS({
       this.removeListener("end", socketOnEnd);
       websocket._readyState = WebSocket2.CLOSING;
       if (!this._readableState.endEmitted && !websocket._closeFrameReceived && !websocket._receiver._writableState.errorEmitted && this._readableState.length !== 0) {
-        const chunk = this.read(this._readableState.length);
-        websocket._receiver.write(chunk);
+        const chunk2 = this.read(this._readableState.length);
+        websocket._receiver.write(chunk2);
       }
       websocket._receiver.end();
       this[kWebSocket] = void 0;
@@ -67595,8 +67595,8 @@ var require_websocket3 = __commonJS({
         websocket._receiver.on("finish", receiverOnFinish);
       }
     }
-    function socketOnData(chunk) {
-      if (!this[kWebSocket]._receiver.write(chunk)) {
+    function socketOnData(chunk2) {
+      if (!this[kWebSocket]._receiver.write(chunk2)) {
         this.pause();
       }
     }
@@ -67699,14 +67699,14 @@ var require_stream = __commonJS({
       duplex._read = function() {
         if (ws.isPaused) ws.resume();
       };
-      duplex._write = function(chunk, encoding, callback) {
+      duplex._write = function(chunk2, encoding, callback) {
         if (ws.readyState === ws.CONNECTING) {
           ws.once("open", function open2() {
-            duplex._write(chunk, encoding, callback);
+            duplex._write(chunk2, encoding, callback);
           });
           return;
         }
-        ws.send(chunk, callback);
+        ws.send(chunk2, callback);
       };
       duplex.on("end", duplexOnEnd);
       duplex.on("error", duplexOnError);
@@ -82383,7 +82383,7 @@ var require_axios = __commonJS({
         }
         return super._read(size2);
       }
-      _transform(chunk, encoding, callback) {
+      _transform(chunk2, encoding, callback) {
         const internals = this[kInternals];
         const maxRate = internals.maxRate;
         const readableHighWaterMark = this.readableHighWaterMark;
@@ -82439,7 +82439,7 @@ var require_axios = __commonJS({
             process.nextTick(_callback, null, chunkRemainder);
           } : _callback);
         };
-        transformChunk(chunk, function transformNextChunk(err, _chunk) {
+        transformChunk(chunk2, function transformNextChunk(err, _chunk) {
           if (err) {
             return callback(err);
           }
@@ -82547,21 +82547,21 @@ var require_axios = __commonJS({
       })());
     };
     var ZlibHeaderTransformStream = class extends stream2.Transform {
-      __transform(chunk, encoding, callback) {
-        this.push(chunk);
+      __transform(chunk2, encoding, callback) {
+        this.push(chunk2);
         callback();
       }
-      _transform(chunk, encoding, callback) {
-        if (chunk.length !== 0) {
+      _transform(chunk2, encoding, callback) {
+        if (chunk2.length !== 0) {
           this._transform = this.__transform;
-          if (chunk[0] !== 120) {
+          if (chunk2[0] !== 120) {
             const header = Buffer.alloc(2);
             header[0] = 120;
             header[1] = 156;
             this.push(header, encoding);
           }
         }
-        this.__transform(chunk, encoding, callback);
+        this.__transform(chunk2, encoding, callback);
       }
     };
     var Http2Sessions = class {
@@ -83673,12 +83673,12 @@ var require_axios = __commonJS({
               const source = responseStream;
               async function* enforceMaxContentLength() {
                 let totalResponseBytes = 0;
-                for await (const chunk of source) {
-                  totalResponseBytes += chunk.length;
+                for await (const chunk2 of source) {
+                  totalResponseBytes += chunk2.length;
                   if (totalResponseBytes > limit) {
                     throw new AxiosError("maxContentLength size of " + limit + " exceeded", AxiosError.ERR_BAD_RESPONSE, config, lastRequest);
                   }
-                  yield chunk;
+                  yield chunk2;
                 }
               }
               responseStream = stream2.Readable.from(enforceMaxContentLength(), {
@@ -83690,9 +83690,9 @@ var require_axios = __commonJS({
           } else {
             const responseBuffer = [];
             let totalResponseBytes = 0;
-            responseStream.on("data", function handleStreamData(chunk) {
-              responseBuffer.push(chunk);
-              totalResponseBytes += chunk.length;
+            responseStream.on("data", function handleStreamData(chunk2) {
+              responseBuffer.push(chunk2);
+              totalResponseBytes += chunk2.length;
               if (maxContentLength > -1 && totalResponseBytes > maxContentLength) {
                 rejected = true;
                 responseStream.destroy();
@@ -83807,12 +83807,12 @@ var require_axios = __commonJS({
             const limit = maxBodyLength;
             let bytesSent = 0;
             uploadStream = stream2.pipeline([data, new stream2.Transform({
-              transform(chunk, _enc, cb) {
-                bytesSent += chunk.length;
+              transform(chunk2, _enc, cb) {
+                bytesSent += chunk2.length;
                 if (bytesSent > limit) {
                   return cb(new AxiosError("Request body larger than maxBodyLength limit", AxiosError.ERR_BAD_REQUEST, config, req));
                 }
-                cb(null, chunk);
+                cb(null, chunk2);
               }
             })], utils$1.noop);
             uploadStream.on("error", (err) => {
@@ -84234,23 +84234,23 @@ var require_axios = __commonJS({
       signal.unsubscribe = () => utils$1.asap(unsubscribe);
       return signal;
     };
-    var streamChunk = function* (chunk, chunkSize) {
-      let len = chunk.byteLength;
+    var streamChunk = function* (chunk2, chunkSize) {
+      let len = chunk2.byteLength;
       if (len < chunkSize) {
-        yield chunk;
+        yield chunk2;
         return;
       }
       let pos = 0;
       let end;
       while (pos < len) {
         end = pos + chunkSize;
-        yield chunk.slice(pos, end);
+        yield chunk2.slice(pos, end);
         pos = end;
       }
     };
     var readBytes = async function* (iterable, chunkSize) {
-      for await (const chunk of readStream(iterable)) {
-        yield* streamChunk(chunk, chunkSize);
+      for await (const chunk2 of readStream(iterable)) {
+        yield* streamChunk(chunk2, chunkSize);
       }
     };
     var readStream = async function* (stream3) {
@@ -92193,12 +92193,12 @@ var require_streaming = __commonJS({
           const pendings = [];
           let ended = false;
           let error = null;
-          const onData = (chunk) => {
+          const onData = (chunk2) => {
             if (pendings.length > 0) {
               const { resolve: resolve2 } = pendings.shift();
-              resolve2({ value: chunk, done: false });
+              resolve2({ value: chunk2, done: false });
             } else {
-              chunkQueue.push(chunk);
+              chunkQueue.push(chunk2);
             }
           };
           const onEnd = () => {
@@ -92291,8 +92291,8 @@ var require_streaming = __commonJS({
       }
       const isAsyncIterable = stream2 && typeof stream2[Symbol.asyncIterator] === "function";
       const source = isAsyncIterable ? stream2 : createAsyncIterableFromReadable(stream2);
-      for await (const chunk of source) {
-        const uint8Chunk = typeof chunk === "string" ? new TextEncoder().encode(chunk) : chunk instanceof Buffer ? new Uint8Array(chunk) : chunk;
+      for await (const chunk2 of source) {
+        const uint8Chunk = typeof chunk2 === "string" ? new TextEncoder().encode(chunk2) : chunk2 instanceof Buffer ? new Uint8Array(chunk2) : chunk2;
         buffer += decoder.decode(uint8Chunk, { stream: true });
         const lines = buffer.split("\n");
         buffer = lines.pop() || "";
@@ -92628,12 +92628,12 @@ var require_client3 = __commonJS({
         (0, utils_1.setHeaderIfNotSet)(headers, CLIENT_BULK_REQUEST_ID_HEADER, (0, utils_1.generateRandomIdWithNonUniqueFallback)());
         const writeResponses = [];
         if (writes?.length) {
-          for await (const singleChunkResponse of asyncPool(maxParallelRequests, (0, utils_1.chunkArray)(writes, maxPerChunk), (chunk) => this.writeTuples(chunk, { ...options, headers, conflict, transaction: void 0 }).catch((err) => {
+          for await (const singleChunkResponse of asyncPool(maxParallelRequests, (0, utils_1.chunkArray)(writes, maxPerChunk), (chunk2) => this.writeTuples(chunk2, { ...options, headers, conflict, transaction: void 0 }).catch((err) => {
             if (err instanceof errors_1.FgaApiAuthenticationError) {
               throw err;
             }
             return {
-              writes: chunk.map((tuple) => ({
+              writes: chunk2.map((tuple) => ({
                 tuple_key: tuple,
                 status: ClientWriteStatus.FAILURE,
                 err
@@ -92646,13 +92646,13 @@ var require_client3 = __commonJS({
         }
         const deleteResponses = [];
         if (deletes?.length) {
-          for await (const singleChunkResponse of asyncPool(maxParallelRequests, (0, utils_1.chunkArray)(deletes, maxPerChunk), (chunk) => this.deleteTuples(chunk, { ...options, headers, conflict, transaction: void 0 }).catch((err) => {
+          for await (const singleChunkResponse of asyncPool(maxParallelRequests, (0, utils_1.chunkArray)(deletes, maxPerChunk), (chunk2) => this.deleteTuples(chunk2, { ...options, headers, conflict, transaction: void 0 }).catch((err) => {
             if (err instanceof errors_1.FgaApiAuthenticationError) {
               throw err;
             }
             return {
               writes: [],
-              deletes: chunk.map((tuple) => ({
+              deletes: chunk2.map((tuple) => ({
                 tuple_key: tuple,
                 status: ClientWriteStatus.FAILURE,
                 err
@@ -95344,9 +95344,9 @@ var require_messages = __commonJS({
     };
     exports2.DatabaseError = DatabaseError2;
     var CopyDataMessage = class {
-      constructor(length, chunk) {
+      constructor(length, chunk2) {
         this.length = length;
-        this.chunk = chunk;
+        this.chunk = chunk2;
         this.name = "copyData";
       }
     };
@@ -95738,8 +95738,8 @@ var require_serializer = __commonJS({
       const text = `${msg.type}${msg.name || ""}`;
       return cstringMessage(67, text);
     };
-    var copyData = (chunk) => {
-      return writer.add(chunk).flush(
+    var copyData = (chunk2) => {
+      return writer.add(chunk2).flush(
         100
         /* code.copyFromChunk */
       );
@@ -96012,8 +96012,8 @@ var require_parser = __commonJS({
       return new messages_1.CommandCompleteMessage(LATEINIT_LENGTH, text);
     };
     var parseCopyData = (reader, length) => {
-      const chunk = reader.bytes(length - 4);
-      return new messages_1.CopyDataMessage(LATEINIT_LENGTH, chunk);
+      const chunk2 = reader.bytes(length - 4);
+      return new messages_1.CopyDataMessage(LATEINIT_LENGTH, chunk2);
     };
     var parseCopyInMessage = (reader) => parseCopyMessage(reader, "copyInResponse");
     var parseCopyOutMessage = (reader) => parseCopyMessage(reader, "copyOutResponse");
@@ -96436,8 +96436,8 @@ var require_connection3 = __commonJS({
       describe(msg) {
         this._send(serialize.describe(msg));
       }
-      sendCopyFromChunk(chunk) {
-        this._send(serialize.copyData(chunk));
+      sendCopyFromChunk(chunk2) {
+        this._send(serialize.copyData(chunk2));
       }
       endCopyFrom() {
         this._send(serialize.copyDone());
@@ -96458,16 +96458,16 @@ var require_split2 = __commonJS({
     var { StringDecoder } = require("string_decoder");
     var kLast = /* @__PURE__ */ Symbol("last");
     var kDecoder = /* @__PURE__ */ Symbol("decoder");
-    function transform(chunk, enc, cb) {
+    function transform(chunk2, enc, cb) {
       let list;
       if (this.overflow) {
-        const buf = this[kDecoder].write(chunk);
+        const buf = this[kDecoder].write(chunk2);
         list = buf.split(this.matcher);
         if (list.length === 1) return cb();
         list.shift();
         this.overflow = false;
       } else {
-        this[kLast] += this[kDecoder].write(chunk);
+        this[kLast] += this[kDecoder].write(chunk2);
         list = this[kLast].split(this.matcher);
       }
       this[kLast] = list.pop();
@@ -116684,8 +116684,9 @@ var toPlanSelection = toObject({
   parameters: toRecord(toInteger)
 });
 var toCapabilities = toUndefOr(toObject({
-  pause: toUndefOr(toBoolean),
   backups: toUndefOr(toBoolean),
+  highAvailability: toUndefOr(toBoolean),
+  pause: toUndefOr(toBoolean),
   pointInTimeRecovery: toUndefOr(toBoolean)
 }));
 var toProviderScope = withDefault(toUndefOr(toLiteralUnion("ProviderScope", ["global", "team"])), () => "global");
@@ -116869,7 +116870,8 @@ var managedServiceProviderCommonProperties = {
   plans: toArray(toManagedServicePlan),
   schemaVersion: toProviderSchemaVersion,
   scope: toProviderScope,
-  teamSingleton: toUndefOr(toBoolean)
+  teamSingleton: toUndefOr(toBoolean),
+  documentationUrl: toUndefOr(toString)
 };
 var toRestBackendSecret = toStringMatchingRegex("Only ASCII characters 32 through 126", /^[\x20-\x7E]*$/);
 var toRestEndpointSecrets = toArray(toObject({
@@ -116898,7 +116900,8 @@ var toVersions = toRecord(toObject({
 var toLandscapeProviderObject = toObject({
   ...managedServiceProviderCommonProperties,
   backend: toLandscapeSettings,
-  versions: toUndefOr(toVersions)
+  versions: toUndefOr(toVersions),
+  createdAt: toUndefOr(toDate)
 });
 var toManagedServiceLandscapeProvider = (x) => {
   const prov = toLandscapeProviderObject(x);
@@ -116956,6 +116959,7 @@ var managedServiceProviderConfigProperties = {
   category: toUndefOr(toString),
   configSchema: toUndefOr(toSchemaObject),
   detailsSchema: toUndefOr(toSchemaObject),
+  documentationUrl: toUndefOr(toString),
   plans: toUndefOr(toArray(toManagedServicePlan)),
   scope: toProviderScope,
   teamSingleton: toUndefOr(toBoolean),
@@ -116988,7 +116992,11 @@ var toTeamScope = toObject({
 });
 var toProviderScopeArgs = toOr(toGlobalScope, toTeamScope);
 var toCreateLandscapeProviderArgs = toObject({
-  provider: toManagedServiceLandscapeProvider,
+  provider: toObject({
+    ...managedServiceProviderCommonProperties,
+    backend: toLandscapeSettings,
+    versions: toUndefOr(toVersions)
+  }),
   scope: toUndefOr(toProviderScopeArgs)
 });
 var toCreateLandscapeProviderByGitArgs = toObject({
