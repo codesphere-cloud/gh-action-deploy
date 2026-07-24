@@ -89,6 +89,15 @@ The vpn configuration has to be configured in the team before.
 
 Base domain of the target Codesphere instance (with https://), e.g. `https://codesphere.com`, or `https://my-custom-codesphere.com`
 
+### `sharedVaultName` (optional)
+
+Name of the shared vault to attach to the created workspace.
+The shared vault has to be configured in the team before.
+
+When set, the preview deployment reuses the secrets of this shared vault instead
+of maintaining its own isolated set, so secrets can be maintained once and
+shared across all preview workspaces.
+
 
 ## Example usage
 
