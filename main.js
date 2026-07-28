@@ -122421,7 +122421,7 @@ var runMain = (main2) => {
 };
 
 // packages/integrations/lib/deploy.js
-var import_path4 = __toESM(require("path"), 1);
+var import_path5 = __toESM(require("path"), 1);
 
 // packages/deployment-service/common/lib/api/replica.js
 var import_inversify2 = __toESM(require_inversify(), 1);
@@ -122963,7 +122963,8 @@ var toTeamMember = toObject({
   name: toUndefOr(toNullOr(toString)),
   email: toUndefOr(toNullOr(toString)),
   avatarUrl: toUndefOr(toNullOr(toString)),
-  deletedAt: toUndefOr(toDate)
+  deletedAt: toUndefOr(toDate),
+  isOrgAdmin: toUndefOr(toBoolean)
 });
 var toTeamWithMembers = toObject({
   ...team,
@@ -123243,17 +123244,20 @@ var AVAILABLE_INTERNAL_FLAGS = [
   "headless-services",
   "hermetic",
   MAINTENANCE_MODE_INTERNAL_FLAG_NAME,
+  "merged-sync-run",
   "ms-in-ls",
   "msd",
   "native-deploy",
   "o11y",
   "openfga-authz-primary",
+  "overview-cockpit",
   "overview-react",
   "persistent-logs",
   "persistent-nix",
   "recaptcha-v3",
   "selectable-resources",
   "single-workspace-mode",
+  "team-container-registries",
   "time-sameDc",
   "vcluster",
   "virtual-machines",
@@ -123573,6 +123577,12 @@ var toSemVer = (x2) => {
   return s;
 };
 
+// packages/workspace-agent/common/lib/pipeline/execution.js
+var import_path2 = require("path");
+var CODESPHERE_INTERNAL_DIR = ".codesphere-internal";
+var INTERNAL_CI_CONFIGS_DIR = (0, import_path2.join)(CODESPHERE_INTERNAL_DIR, "ci-configs");
+var STATIC_BUILD_CONFIG_DIR = (0, import_path2.join)(INTERNAL_CI_CONFIGS_DIR, "static-build");
+
 // packages/workspace-agent/common/lib/pipeline/types.js
 var singleRunningStageKinds = ["prepare", "test"];
 var multiRunningStageKinds = ["run"];
@@ -123655,17 +123665,19 @@ var toDeployStageServerCommonFields = {
   runAsGroup: toUndefOr(toUserGroupId({ forceAllowRoot: true })),
   volumeMounts: toUndefOr(toVolumeMounts)
 };
-var toDeployStageServerReactive = toObject({
+var deployStageServerReactiveFields = {
   ...toDeployStageServerCommonFields,
   steps: toArray(toStep),
   image: toUndefOr(toNonEmptyString)
-});
-var toDeployStageServerContainerRuntime = toObject({
+};
+var toDeployStageServerReactive = toObject(deployStageServerReactiveFields);
+var deployStageServerContainerRuntimeFields = {
   ...toDeployStageServerCommonFields,
   steps: toUndef,
   image: toNonEmptyString,
   command: toUndefOr(toArray(toString))
-});
+};
+var toDeployStageServerContainerRuntime = toObject(deployStageServerContainerRuntimeFields);
 var toDeployStageServer = toOr(toDeployStageServerReactive, toDeployStageServerContainerRuntime);
 var isDeployStageServer = (x2) => isOfType(x2, toDeployStageServer);
 var toManagedServiceConfigV01 = toObject({
@@ -123714,8 +123726,37 @@ var toVirtualMachineConfig = toObject({
   storageGib: toPositiveNumber,
   cloudInitUserDataBase64: toUndefOr(toString)
 });
+var toRouterPath = toObject({
+  path: toUrlPath,
+  stripPath: toBoolean,
+  service: toString,
+  port: toNumber
+});
+var toRouterService = toObject({
+  type: toLiteral("router"),
+  plan: toUndefOr(toPlanId),
+  replicaCount: toPositiveInteger,
+  network: toObject({
+    isLandscapeGateway: toUndefOr(toBoolean),
+    paths: toUndefOr(toArray(toRouterPath)),
+    externalTargets: toUndefOr(toArray(toHeadlessPath))
+  })
+});
+var toDeployStageServerNetworkV02 = toObject({
+  ports: toNonEmptyArray(toPositiveInteger),
+  landscapeGateway: toUndefOr(toLandscapeGatewayConfig)
+});
+var toDeployStageServerReactiveV02 = toObject({
+  ...deployStageServerReactiveFields,
+  network: toDeployStageServerNetworkV02
+});
+var toDeployStageServerContainerRuntimeV02 = toObject({
+  ...deployStageServerContainerRuntimeFields,
+  network: toDeployStageServerNetworkV02
+});
 var toDeployStageV01 = toRecord(toOr(toDeployStageServer, toManagedServiceConfigV01, toHeadlessServiceConfig, toVirtualMachineConfig));
 var toDeployStageV02 = toRecord(toOr(toDeployStageServer, toManagedServiceConfigV02, toHeadlessServiceConfig, toVirtualMachineConfig));
+var toDeployStageV03 = toRecord(toOr(toDeployStageServerReactiveV02, toDeployStageServerContainerRuntimeV02, toRouterService, toManagedServiceConfigV02, toVirtualMachineConfig));
 var toDeployStage = toOr(toDeployStageV01, toDeployStageV02);
 var isDeployStage = (x2) => isOfType(x2, toDeployStage);
 var toPipelineConfigV02 = toObject({
@@ -123735,6 +123776,13 @@ var toPipelineConfigV04 = toObject({
   prepare: toStage,
   test: toStage,
   run: toDeployStageV02,
+  build: toUndefOr(toBuildStage)
+});
+var toPipelineConfigV05 = toObject({
+  schemaVersion: toLiteral("v0.5"),
+  prepare: toStage,
+  test: toStage,
+  run: toDeployStageV03,
   build: toUndefOr(toBuildStage)
 });
 var toPipelineConfig = toOr(toPipelineConfigV04, toPipelineConfigV03, toPipelineConfigV02);
@@ -123820,7 +123868,8 @@ var server = {
   env: toUndefOr(toEnv),
   runAsUser: toUndefOr(toNonNegativeInteger),
   runAsGroup: toUndefOr(toNonNegativeInteger),
-  volumeMounts: toUndefOr(toVolumeMounts)
+  volumeMounts: toUndefOr(toVolumeMounts),
+  steps: toUndefOr(toArray(toStep))
 };
 var toServer = toObject(server);
 var toHeadlessService = toObject({
@@ -123885,6 +123934,7 @@ var deployStageServerToLandscape = (name, config) => {
     runAsUser: config.runAsUser ?? void 0,
     runAsGroup: config.runAsGroup ?? void 0,
     volumeMounts: config.volumeMounts,
+    steps: config.steps,
     isLandscapeGateway,
     landscapeGatewayHttpPort: isLandscapeGateway ? network.landscapeGateway.httpPort : void 0,
     network: has(network) && isAdvancedNetworkConfig(network) ? advancedNetworkToServerNetwork(network) : simpleNetworkToServerNetwork(network, config.isPublic)
@@ -126441,7 +126491,7 @@ var toCustomImage = toObject({
   workingDir: toUndefOr(toString)
 });
 var toPipelineMetaConfig = toObject({
-  configDir: toString,
+  configRootDir: toString,
   workingDirectory: toString,
   internalDataDir: toString,
   maxLogsPerStep: toNumber,
@@ -130457,6 +130507,8 @@ var __decorate14 = function(decorators, target, key, desc) {
 };
 var FetchMembersFailed_1;
 var IsLastAdmin_1;
+var CannotChangeOrgAdminRole_1;
+var CannotRemoveOrgAdmin_1;
 var LeaveTeamFailed_1;
 var ChangeMemberRoleFailed_1;
 var NotEnoughSeats_1;
@@ -130489,6 +130541,22 @@ var IsLastAdmin = IsLastAdmin_1 = class IsLastAdmin2 extends SimpleSerializableE
 IsLastAdmin = IsLastAdmin_1 = __decorate14([
   registerError()
 ], IsLastAdmin);
+var CannotChangeOrgAdminRole = CannotChangeOrgAdminRole_1 = class CannotChangeOrgAdminRole2 extends SimpleSerializableException {
+  static create(opts) {
+    return new CannotChangeOrgAdminRole_1("This user has Admin rights inherited from their organization owner role that cannot be changed at the resource group level.", opts);
+  }
+};
+CannotChangeOrgAdminRole = CannotChangeOrgAdminRole_1 = __decorate14([
+  registerError()
+], CannotChangeOrgAdminRole);
+var CannotRemoveOrgAdmin = CannotRemoveOrgAdmin_1 = class CannotRemoveOrgAdmin2 extends SimpleSerializableException {
+  static create(opts) {
+    return new CannotRemoveOrgAdmin_1("This user has Admin rights inherited from their organization owner role and cannot be removed at the resource group level.", opts);
+  }
+};
+CannotRemoveOrgAdmin = CannotRemoveOrgAdmin_1 = __decorate14([
+  registerError()
+], CannotRemoveOrgAdmin);
 var LeaveTeamFailed = LeaveTeamFailed_1 = class LeaveTeamFailed2 extends SimpleSerializableException {
   static create(opts) {
     return new LeaveTeamFailed_1("Failed to leave team try again later", opts);
@@ -131175,7 +131243,7 @@ var toSecretRevisions = toUndefOr(toRecord(toString));
 var toDetails = toRecord(toUnknown);
 var toLandscapeSettings = toObject({
   landscape: toObject({
-    gitUrl: toString,
+    gitUrl: toFullUrl,
     ciProfile: toUndefOr(toString)
   })
 });
@@ -131331,7 +131399,7 @@ var toManagedServicePlan = toObject({
   description: toString,
   name: toString
 });
-var managedServiceProviderCommonProperties = {
+var managedServiceProviderDefinitionProperties = {
   name: toProviderName,
   author: toString,
   backups: toUndefOr(toObject({
@@ -131348,9 +131416,12 @@ var managedServiceProviderCommonProperties = {
   iconUrl: toString,
   plans: toArray(toManagedServicePlan),
   schemaVersion: toProviderSchemaVersion,
-  scope: toProviderScope,
   teamSingleton: toUndefOr(toBoolean),
   documentationUrl: toUndefOr(toString)
+};
+var managedServiceProviderCommonProperties = {
+  ...managedServiceProviderDefinitionProperties,
+  scope: toProviderScope
 };
 var toRestBackendSecret = toStringMatchingRegex("Only ASCII characters 32 through 126", /^[\x20-\x7E]*$/);
 var toRestEndpointSecrets = toArray(toObject({
@@ -131382,12 +131453,15 @@ var toLandscapeProviderObject = toObject({
   versions: toUndefOr(toVersions),
   createdAt: toUndefOr(toDate)
 });
-var toManagedServiceLandscapeProvider = (x2) => {
-  const prov = toLandscapeProviderObject(x2);
+var assertLandscapeHasVersion = (prov) => {
   const hasVersions = prov.versions !== void 0 && Object.keys(prov.versions).length > 0;
   if (!hasVersions && prov.backend.landscape.ciProfile === void 0) {
     throw new InvalidArgument(`Landscape provider ${prov.name} must define at least one version.`, { scope: "public" });
   }
+};
+var toManagedServiceLandscapeProvider = (x2) => {
+  const prov = toLandscapeProviderObject(x2);
+  assertLandscapeHasVersion(prov);
   return prov;
 };
 var toPartialManagedServiceLandscapeProvider = toObject({
@@ -131405,7 +131479,6 @@ var toPartialManagedServiceLandscapeProvider = toObject({
   displayName: toUndefOr(toString),
   iconUrl: toUndefOr(toString),
   plans: toUndefOr(toArray(toManagedServicePlan)),
-  scope: toUndefOr(toProviderScope),
   backend: toUndefOr(toLandscapeSettings),
   versions: toUndefOr(toVersions)
 });
@@ -131422,7 +131495,7 @@ var toRestBackendConfig = toObject({
     secret: toUndefOr(toString)
   })
 });
-var managedServiceProviderConfigProperties = {
+var partialManagedServiceProviderConfigProperties = {
   name: toProviderName,
   backups: toUndefOr(toObject({
     configSchema: toSchemaObject,
@@ -131445,11 +131518,11 @@ var managedServiceProviderConfigProperties = {
   secretsSchema: toUndefOr(toSchemaObject)
 };
 var toManagedServiceRestProviderConfig = toObject({
-  ...managedServiceProviderConfigProperties,
+  ...partialManagedServiceProviderConfigProperties,
   backend: toUndefOr(toRestBackendConfig)
 });
 var toManagedServiceLandscapeProviderConfig = toObject({
-  ...managedServiceProviderConfigProperties,
+  ...partialManagedServiceProviderConfigProperties,
   backend: toUndefOr(toLandscapeSettings),
   versions: toUndefOr(toVersions)
 });
@@ -131470,16 +131543,25 @@ var toTeamScope = toObject({
   teamIds: toArray(toInteger)
 });
 var toProviderScopeArgs = toOr(toGlobalScope, toTeamScope);
+var toCreateLandscapeProviderObject = toObject({
+  ...managedServiceProviderDefinitionProperties,
+  backend: toLandscapeSettings,
+  versions: toUndefOr(toVersions)
+});
 var toCreateLandscapeProviderArgs = toObject({
-  provider: toObject({
-    ...managedServiceProviderCommonProperties,
-    backend: toLandscapeSettings,
-    versions: toUndefOr(toVersions)
-  }),
+  provider: toCreateLandscapeProviderObject,
+  scope: toUndefOr(toProviderScopeArgs)
+});
+var toCreateRestProviderArgs = toObject({
+  provider: toManagedServiceRestProvider,
+  scope: toUndefOr(toProviderScopeArgs)
+});
+var toCreateProviderArgs = toObject({
+  provider: toOr(toCreateLandscapeProviderObject, toManagedServiceRestProvider),
   scope: toUndefOr(toProviderScopeArgs)
 });
 var toCreateLandscapeProviderByGitArgs = toObject({
-  gitUrl: toString,
+  gitUrl: toFullUrl,
   gitRef: toUndefOr(toString),
   scope: toUndefOr(toProviderScopeArgs)
 });
@@ -131593,7 +131675,7 @@ var toManagedService2 = toObject({
   config: toManagedServiceConfig,
   status: toOr(toManagedServiceStatus, toSyncError)
 });
-var toStateStreamResponse = toRecord(toOr(toManagedService2, toHeadlessServiceConfig));
+var toStateStreamResponse = toRecord(toOr(toManagedService2, toHeadlessServiceConfig, toVirtualMachineConfig));
 var toSyncLandscapeArgs = toObject({
   workspaceId: toNonNegativeInteger,
   landscape: toDeployStage
@@ -131699,7 +131781,7 @@ var DEFAULT_PLAN_TITLE = "Boost";
 var deploymentLinkTypes = ["dev-domain", "preview"];
 var toDeploymentLinkType = toUndefOr(toNullOr(toLiteralUnion("DeploymentLinkType", deploymentLinkTypes)));
 var codesphereWorkspaceUrl = (apiUrl, w) => {
-  return new URL(import_path4.default.posix.join(apiUrl.pathname, `/ide/teams/${w.teamId}/workspaces/${w.id}`), apiUrl);
+  return new URL(import_path5.default.posix.join(apiUrl.pathname, `/ide/teams/${w.teamId}/workspaces/${w.id}`), apiUrl);
 };
 var codespherePreviewUrl = (apiUrl, w) => {
   const wsUrl = codesphereWorkspaceUrl(apiUrl, w);
@@ -131860,7 +131942,9 @@ var updateRepositoryInWorkspace = async (process2, workspace2, gitUrl, gitAuth, 
     await run2(["git", "fetch"], duration({ minutes: 30 }));
     logI(`Setting repository to origin/${pr.branch}.`);
     await run2(["git", "reset", { hard: true }, `origin/${pr.branch}`], duration({ minutes: 2 }));
-    await run2(["git", "submodule", "update", { recursive: true, init: true }], duration({ minutes: 30 }));
+    if (workspace2.recurseSubmodules ?? true) {
+      await run2(["git", "submodule", "update", { recursive: true, init: true }], duration({ minutes: 30 }));
+    }
     return true;
   } finally {
     await run2(["rm", netrcPath]);
