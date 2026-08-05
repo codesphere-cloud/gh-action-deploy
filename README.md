@@ -4,18 +4,15 @@ This action creates a preview environment of your repository in Codesphere.
 
 ## :warning: Prerequisites
 
-- Configure a user in Codesphere https://codesphere.com with username and password.
+- If you don't have an account on Codesphere yet, create one at https://cloud.codesphere.com or your private cloud url
 - Connect your user account with GitHub and allow access to your repository.
+- Create an api token at https://cloud.codesphere.com/ide/user/public-api-keys for authentication (replace cloud.codesphere.com with your private cloud url if you want to use it with your private cloud instance)
 
 ## Inputs
 
-### `email`
+### `apiToken`
 
-**Required** email of the codesphere user.
-
-### `password`
-
-**Required** Password of the codesphere user account.
+**Required** api token of the codesphere user.
 
 ### `team`
 
@@ -23,14 +20,14 @@ This action creates a preview environment of your repository in Codesphere.
 
 ### `plan`
 
-Plan of the created workspace.
+Plan of the workspaces ide service. All landscape services are deployed with the plan configured in your selected ci profile
 
 Available options:
 - Micro
 - Boost
 - Pro
 
-Default `"Boost"`.
+Default: Smallest plan
 
 ### `onDemand`
 
@@ -109,8 +106,7 @@ This integration can either be used as an action or as a workflow.
 # .github/workflows/codesphere.yaml
 uses: codesphere-cloud/gh-action-deploy@main
 with:
-  email: 'bot@example.com'
-  password: '123'
+  apiToken: 'xxx'
   team: 'MyTeam'
   plan: 'Boost'
   env: |
@@ -153,8 +149,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
-            email: ${{ secrets.CS_EMAIL }}
-            password: ${{ secrets.CS_PASSWORD }}
+            apiToken: ${{ secrets.CS_API_TOKEN }}
             team: 'My Team'
             plan: 'Boost'
             env: |
