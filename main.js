@@ -1127,99 +1127,134 @@ var require_Reflect = __commonJS({
   }
 });
 
-// node_modules/fast-content-type-parse/index.js
-var require_fast_content_type_parse = __commonJS({
-  "node_modules/fast-content-type-parse/index.js"(exports2, module2) {
+// node_modules/@octokit/request/node_modules/content-type/dist/index.js
+var require_dist = __commonJS({
+  "node_modules/@octokit/request/node_modules/content-type/dist/index.js"(exports2) {
     "use strict";
-    var NullObject = function NullObject2() {
-    };
-    NullObject.prototype = /* @__PURE__ */ Object.create(null);
-    var paramRE = /; *([!#$%&'*+.^\w`|~-]+)=("(?:[\v\u0020\u0021\u0023-\u005b\u005d-\u007e\u0080-\u00ff]|\\[\v\u0020-\u00ff])*"|[!#$%&'*+.^\w`|~-]+) */gu;
-    var quotedPairRE = /\\([\v\u0020-\u00ff])/gu;
-    var mediaTypeRE = /^[!#$%&'*+.^\w|~-]+\/[!#$%&'*+.^\w|~-]+$/u;
-    var defaultContentType = { type: "", parameters: new NullObject() };
-    Object.freeze(defaultContentType.parameters);
-    Object.freeze(defaultContentType);
-    function parse3(header) {
-      if (typeof header !== "string") {
-        throw new TypeError("argument header is required and must be a string");
-      }
-      let index = header.indexOf(";");
-      const type = index !== -1 ? header.slice(0, index).trim() : header.trim();
-      if (mediaTypeRE.test(type) === false) {
-        throw new TypeError("invalid media type");
-      }
-      const result = {
-        type: type.toLowerCase(),
-        parameters: new NullObject()
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.format = format;
+    exports2.parse = parse4;
+    var TEXT_REGEXP = /^[\u0009\u0020-\u007e\u0080-\u00ff]*$/;
+    var TOKEN_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
+    var QUOTE_REGEXP = /[\\"]/g;
+    var TYPE_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
+    var NullObject = /* @__PURE__ */ (() => {
+      const C2 = function() {
       };
-      if (index === -1) {
-        return result;
+      C2.prototype = /* @__PURE__ */ Object.create(null);
+      return C2;
+    })();
+    function format(obj) {
+      const { type, parameters } = obj;
+      if (!type || !TYPE_REGEXP.test(type)) {
+        throw new TypeError(`Invalid type: ${type}`);
       }
-      let key;
-      let match;
-      let value;
-      paramRE.lastIndex = index;
-      while (match = paramRE.exec(header)) {
-        if (match.index !== index) {
-          throw new TypeError("invalid parameter format");
+      let result = type;
+      if (parameters) {
+        for (const param of Object.keys(parameters)) {
+          if (!TOKEN_REGEXP.test(param)) {
+            throw new TypeError(`Invalid parameter name: ${param}`);
+          }
+          result += `; ${param}=${qstring(parameters[param])}`;
         }
-        index += match[0].length;
-        key = match[1].toLowerCase();
-        value = match[2];
-        if (value[0] === '"') {
-          value = value.slice(1, value.length - 1);
-          quotedPairRE.test(value) && (value = value.replace(quotedPairRE, "$1"));
-        }
-        result.parameters[key] = value;
-      }
-      if (index !== header.length) {
-        throw new TypeError("invalid parameter format");
       }
       return result;
     }
-    function safeParse2(header) {
-      if (typeof header !== "string") {
-        return defaultContentType;
-      }
-      let index = header.indexOf(";");
-      const type = index !== -1 ? header.slice(0, index).trim() : header.trim();
-      if (mediaTypeRE.test(type) === false) {
-        return defaultContentType;
-      }
-      const result = {
-        type: type.toLowerCase(),
-        parameters: new NullObject()
-      };
-      if (index === -1) {
-        return result;
-      }
-      let key;
-      let match;
-      let value;
-      paramRE.lastIndex = index;
-      while (match = paramRE.exec(header)) {
-        if (match.index !== index) {
-          return defaultContentType;
-        }
-        index += match[0].length;
-        key = match[1].toLowerCase();
-        value = match[2];
-        if (value[0] === '"') {
-          value = value.slice(1, value.length - 1);
-          quotedPairRE.test(value) && (value = value.replace(quotedPairRE, "$1"));
-        }
-        result.parameters[key] = value;
-      }
-      if (index !== header.length) {
-        return defaultContentType;
-      }
-      return result;
+    function parse4(header, options) {
+      const len = header.length;
+      let index = skipOWS(header, 0, len);
+      const valueStart = index;
+      index = skipValue(header, index, len);
+      const valueEnd = trailingOWS(header, valueStart, index);
+      const type = header.slice(valueStart, valueEnd).toLowerCase();
+      const parameters = options?.parameters === false ? new NullObject() : parseParameters(header, index, len);
+      return { type, parameters };
     }
-    module2.exports.default = { parse: parse3, safeParse: safeParse2 };
-    module2.exports.parse = parse3;
-    module2.exports.safeParse = safeParse2;
-    module2.exports.defaultContentType = defaultContentType;
+    var SP = 32;
+    var HTAB = 9;
+    var SEMI = 59;
+    var EQ = 61;
+    var DQUOTE = 34;
+    var BSLASH = 92;
+    function parseParameters(header, index, len) {
+      const parameters = new NullObject();
+      parameter: while (index < len) {
+        index = skipOWS(header, index + 1, len);
+        const keyStart = index;
+        while (index < len) {
+          const code = header.charCodeAt(index);
+          if (code === SEMI)
+            continue parameter;
+          if (code === EQ) {
+            const keyEnd = trailingOWS(header, keyStart, index);
+            const key = header.slice(keyStart, keyEnd).toLowerCase();
+            index = skipOWS(header, index + 1, len);
+            if (index < len && header.charCodeAt(index) === DQUOTE) {
+              index++;
+              let value = "";
+              while (index < len) {
+                const code2 = header.charCodeAt(index++);
+                if (code2 === DQUOTE) {
+                  index = skipValue(header, index, len);
+                  if (parameters[key] === void 0)
+                    parameters[key] = value;
+                  break;
+                }
+                if (code2 === BSLASH && index < len) {
+                  value += header[index++];
+                  continue;
+                }
+                value += String.fromCharCode(code2);
+              }
+              continue parameter;
+            }
+            const valueStart = index;
+            index = skipValue(header, index, len);
+            if (parameters[key] === void 0) {
+              const valueEnd = trailingOWS(header, valueStart, index);
+              parameters[key] = header.slice(valueStart, valueEnd);
+            }
+            continue parameter;
+          }
+          index++;
+        }
+      }
+      return parameters;
+    }
+    function skipValue(str, index, len) {
+      while (index < len) {
+        const char = str.charCodeAt(index);
+        if (char === SEMI)
+          break;
+        index++;
+      }
+      return index;
+    }
+    function skipOWS(header, index, len) {
+      while (index < len) {
+        const char = header.charCodeAt(index);
+        if (char !== SP && char !== HTAB)
+          break;
+        index++;
+      }
+      return index;
+    }
+    function trailingOWS(header, start, end) {
+      while (end > start) {
+        const char = header.charCodeAt(end - 1);
+        if (char !== SP && char !== HTAB)
+          break;
+        end--;
+      }
+      return end;
+    }
+    function qstring(str) {
+      if (TOKEN_REGEXP.test(str))
+        return str;
+      if (TEXT_REGEXP.test(str))
+        return `"${str.replace(QUOTE_REGEXP, "\\$&")}"`;
+      throw new TypeError(`Invalid parameter value: ${str}`);
+    }
   }
 });
 
@@ -1301,7 +1336,7 @@ var require_main = __commonJS({
     var packageJson = require_package();
     var version = packageJson.version;
     var LINE = /(?:^|^)\s*(?:export\s+)?([\w.-]+)(?:\s*=\s*?|:\s+?)(\s*'(?:\\'|[^'])*'|\s*"(?:\\"|[^"])*"|\s*`(?:\\`|[^`])*`|[^#\r\n]+)?\s*(?:#.*)?(?:$|$)/mg;
-    function parse3(src) {
+    function parse4(src) {
       const obj = {};
       let lines = src.toString();
       lines = lines.replace(/\r\n?/mg, "\n");
@@ -1567,7 +1602,7 @@ var require_main = __commonJS({
       _parseVault,
       config,
       decrypt,
-      parse: parse3,
+      parse: parse4,
       populate
     };
     module2.exports.configDotenv = DotenvModule.configDotenv;
@@ -7048,12 +7083,12 @@ var require_util2 = __commonJS({
       }
       return obj;
     }
-    function errorRequest(client, request2, err) {
+    function errorRequest(client2, request2, err) {
       try {
         request2.onResponseError(err);
         assert(request2.aborted);
       } catch (err2) {
-        client.emit("error", err2);
+        client2.emit("error", err2);
       }
     }
     var setupConnectTimeout = process.platform === "win32" ? (socketWeakRef, opts) => {
@@ -7200,11 +7235,11 @@ var require_stats = __commonJS({
       kQueued
     } = require_symbols();
     var ClientStats = class {
-      constructor(client) {
-        this.connected = client[kConnected];
-        this.pending = client[kPending];
-        this.running = client[kRunning];
-        this.size = client[kSize];
+      constructor(client2) {
+        this.connected = client2[kConnected];
+        this.pending = client2[kPending];
+        this.running = client2[kRunning];
+        this.size = client2[kSize];
       }
     };
     var PoolStats = class {
@@ -11980,10 +12015,10 @@ var require_client_h1 = __commonJS({
          * @param {import('net').Socket} socket
          * @param {*} llhttp
          */
-      constructor(client, socket, { exports: exports3 }) {
+      constructor(client2, socket, { exports: exports3 }) {
         this.llhttp = exports3;
         this.ptr = this.llhttp.llhttp_alloc(constants3.TYPE.RESPONSE);
-        this.client = client;
+        this.client = client2;
         this.socket = socket;
         this.timeout = null;
         this.timeoutWeakRef = new WeakRef(this);
@@ -11994,7 +12029,7 @@ var require_client_h1 = __commonJS({
         this.upgrade = false;
         this.headers = [];
         this.headersSize = 0;
-        this.headersMaxSize = client[kMaxHeadersSize];
+        this.headersMaxSize = client2[kMaxHeadersSize];
         this.shouldKeepAlive = false;
         this.paused = false;
         this.resume = this.resume.bind(this);
@@ -12002,7 +12037,7 @@ var require_client_h1 = __commonJS({
         this.keepAlive = "";
         this.contentLength = -1;
         this.connectionKeepAlive = false;
-        this.maxResponseSize = client[kMaxResponseSize];
+        this.maxResponseSize = client2[kMaxResponseSize];
       }
       setTimeout(delay, type) {
         if (delay !== this.timeoutValue || type & USE_FAST_TIMER ^ this.timeoutType & USE_FAST_TIMER) {
@@ -12152,15 +12187,15 @@ var require_client_h1 = __commonJS({
        * @returns {0|-1}
        */
       onMessageBegin() {
-        const { socket, client } = this;
+        const { socket, client: client2 } = this;
         if (socket.destroyed) {
           return -1;
         }
-        if (client[kRunning] === 0) {
+        if (client2[kRunning] === 0) {
           util.destroy(socket, new SocketError("bad response", util.getSocketInfo(socket)));
           return -1;
         }
-        const request2 = client[kQueue][client[kRunningIdx]];
+        const request2 = client2[kQueue][client2[kRunningIdx]];
         if (!request2) {
           return -1;
         }
@@ -12225,13 +12260,13 @@ var require_client_h1 = __commonJS({
        * @param {Buffer} head
        */
       onUpgrade(head) {
-        const { upgrade, client, socket, headers, statusCode } = this;
+        const { upgrade, client: client2, socket, headers, statusCode } = this;
         assert(upgrade);
-        assert(client[kSocket] === socket);
+        assert(client2[kSocket] === socket);
         assert(!socket.destroyed);
         assert(!this.paused);
         assert((headers.length & 1) === 0);
-        const request2 = client[kQueue][client[kRunningIdx]];
+        const request2 = client2[kQueue][client2[kRunningIdx]];
         assert(request2);
         assert(request2.upgrade || request2.method === "CONNECT");
         this.statusCode = 0;
@@ -12245,16 +12280,16 @@ var require_client_h1 = __commonJS({
         socket[kClient] = null;
         socket[kError] = null;
         removeAllListeners(socket);
-        client[kSocket] = null;
-        client[kHTTPContext] = null;
-        client[kQueue][client[kRunningIdx]++] = null;
-        client.emit("disconnect", client[kUrl], [client], new InformationalError("upgrade"));
+        client2[kSocket] = null;
+        client2[kHTTPContext] = null;
+        client2[kQueue][client2[kRunningIdx]++] = null;
+        client2.emit("disconnect", client2[kUrl], [client2], new InformationalError("upgrade"));
         try {
           request2.onRequestUpgrade(statusCode, headers, socket);
         } catch (err) {
           util.destroy(socket, err);
         }
-        client[kResume]();
+        client2[kResume]();
       }
       /**
        * @param {number} statusCode
@@ -12263,15 +12298,15 @@ var require_client_h1 = __commonJS({
        * @returns {number}
        */
       onHeadersComplete(statusCode, upgrade, shouldKeepAlive) {
-        const { client, socket, headers, statusText } = this;
+        const { client: client2, socket, headers, statusText } = this;
         if (socket.destroyed) {
           return -1;
         }
-        if (client[kRunning] === 0) {
+        if (client2[kRunning] === 0) {
           util.destroy(socket, new SocketError("bad response", util.getSocketInfo(socket)));
           return -1;
         }
-        const request2 = client[kQueue][client[kRunningIdx]];
+        const request2 = client2[kQueue][client2[kRunningIdx]];
         if (!request2) {
           return -1;
         }
@@ -12290,7 +12325,7 @@ var require_client_h1 = __commonJS({
         this.shouldKeepAlive = shouldKeepAlive || // Override llhttp value which does not allow keepAlive for HEAD.
         request2.method === "HEAD" && !socket[kReset] && this.connectionKeepAlive;
         if (this.statusCode >= 200) {
-          const bodyTimeout = request2.bodyTimeout != null ? request2.bodyTimeout : client[kBodyTimeout];
+          const bodyTimeout = request2.bodyTimeout != null ? request2.bodyTimeout : client2[kBodyTimeout];
           this.setTimeout(bodyTimeout, TIMEOUT_BODY);
         } else if (this.timeout) {
           if (this.timeout.refresh) {
@@ -12298,32 +12333,32 @@ var require_client_h1 = __commonJS({
           }
         }
         if (request2.method === "CONNECT") {
-          assert(client[kRunning] === 1);
+          assert(client2[kRunning] === 1);
           this.upgrade = true;
           return 2;
         }
         if (upgrade) {
-          assert(client[kRunning] === 1);
+          assert(client2[kRunning] === 1);
           this.upgrade = true;
           return 2;
         }
         assert((this.headers.length & 1) === 0);
         this.headers = [];
         this.headersSize = 0;
-        if (this.shouldKeepAlive && client[kPipelining]) {
+        if (this.shouldKeepAlive && client2[kPipelining]) {
           const keepAliveTimeout = this.keepAlive ? util.parseKeepAliveTimeout(this.keepAlive) : null;
           if (keepAliveTimeout != null) {
             const timeout = Math.min(
-              keepAliveTimeout - client[kKeepAliveTimeoutThreshold],
-              client[kKeepAliveMaxTimeout]
+              keepAliveTimeout - client2[kKeepAliveTimeoutThreshold],
+              client2[kKeepAliveMaxTimeout]
             );
             if (timeout <= 0) {
               socket[kReset] = true;
             } else {
-              client[kKeepAliveTimeoutValue] = timeout;
+              client2[kKeepAliveTimeoutValue] = timeout;
             }
           } else {
-            client[kKeepAliveTimeoutValue] = client[kKeepAliveDefaultTimeout];
+            client2[kKeepAliveTimeoutValue] = client2[kKeepAliveDefaultTimeout];
           }
         } else {
           socket[kReset] = true;
@@ -12340,7 +12375,7 @@ var require_client_h1 = __commonJS({
         }
         if (socket[kBlocking]) {
           socket[kBlocking] = false;
-          client[kResume]();
+          client2[kResume]();
         }
         return pause ? constants3.ERROR.PAUSED : 0;
       }
@@ -12349,11 +12384,11 @@ var require_client_h1 = __commonJS({
        * @returns {number}
        */
       onBody(buf) {
-        const { client, socket, statusCode, maxResponseSize } = this;
+        const { client: client2, socket, statusCode, maxResponseSize } = this;
         if (socket.destroyed) {
           return -1;
         }
-        const request2 = client[kQueue][client[kRunningIdx]];
+        const request2 = client2[kQueue][client2[kRunningIdx]];
         assert(request2);
         assert(this.timeoutType === TIMEOUT_BODY);
         if (this.timeout) {
@@ -12376,7 +12411,7 @@ var require_client_h1 = __commonJS({
        * @returns {number}
        */
       onMessageComplete() {
-        const { client, socket, statusCode, upgrade, headers, contentLength, bytesRead, shouldKeepAlive } = this;
+        const { client: client2, socket, statusCode, upgrade, headers, contentLength, bytesRead, shouldKeepAlive } = this;
         if (socket.destroyed && (!statusCode || shouldKeepAlive)) {
           return -1;
         }
@@ -12385,7 +12420,7 @@ var require_client_h1 = __commonJS({
         }
         assert(statusCode >= 100);
         assert((this.headers.length & 1) === 0);
-        const request2 = client[kQueue][client[kRunningIdx]];
+        const request2 = client2[kQueue][client2[kRunningIdx]];
         assert(request2);
         this.statusCode = 0;
         this.statusText = "";
@@ -12403,22 +12438,22 @@ var require_client_h1 = __commonJS({
           return -1;
         }
         request2.onResponseEnd(headers);
-        client[kQueue][client[kRunningIdx]++] = null;
-        socket[kSocketUsed] = client[kPending] === 0;
+        client2[kQueue][client2[kRunningIdx]++] = null;
+        socket[kSocketUsed] = client2[kPending] === 0;
         if (socket[kWriting]) {
-          assert(client[kRunning] === 0);
+          assert(client2[kRunning] === 0);
           util.destroy(socket, new InformationalError("reset"));
           return constants3.ERROR.PAUSED;
         } else if (!shouldKeepAlive) {
           util.destroy(socket, new InformationalError("reset"));
           return constants3.ERROR.PAUSED;
-        } else if (socket[kReset] && client[kRunning] === 0) {
+        } else if (socket[kReset] && client2[kRunning] === 0) {
           util.destroy(socket, new InformationalError("reset"));
           return constants3.ERROR.PAUSED;
-        } else if (client[kPipelining] == null || client[kPipelining] === 1) {
-          setImmediate(client[kResume]);
+        } else if (client2[kPipelining] == null || client2[kPipelining] === 1) {
+          setImmediate(client2[kResume]);
         } else {
-          client[kResume]();
+          client2[kResume]();
         }
         return 0;
       }
@@ -12428,9 +12463,9 @@ var require_client_h1 = __commonJS({
       if (!parser) {
         return;
       }
-      const { socket, timeoutType, client, paused } = parser;
+      const { socket, timeoutType, client: client2, paused } = parser;
       if (timeoutType === TIMEOUT_HEADERS) {
-        if (!socket[kWriting] || socket.writableNeedDrain || client[kRunning] > 1) {
+        if (!socket[kWriting] || socket.writableNeedDrain || client2[kRunning] > 1) {
           assert(!paused, "cannot be paused while waiting for headers");
           util.destroy(socket, new HeadersTimeoutError());
         }
@@ -12439,12 +12474,12 @@ var require_client_h1 = __commonJS({
           util.destroy(socket, new BodyTimeoutError());
         }
       } else if (timeoutType === TIMEOUT_KEEP_ALIVE) {
-        assert(client[kRunning] === 0 && client[kKeepAliveTimeoutValue]);
+        assert(client2[kRunning] === 0 && client2[kKeepAliveTimeoutValue]);
         util.destroy(socket, new InformationalError("socket idle timeout"));
       }
     }
-    function connectH1(client, socket) {
-      client[kSocket] = socket;
+    function connectH1(client2, socket) {
+      client2[kSocket] = socket;
       if (!llhttpInstance) {
         llhttpInstance = lazyllhttp();
       }
@@ -12461,7 +12496,7 @@ var require_client_h1 = __commonJS({
       socket[kIdleSocketValidation] = 0;
       socket[kIdleSocketValidationTimeout] = null;
       socket[kSocketUsed] = false;
-      socket[kParser] = new Parser(client, socket, llhttpInstance);
+      socket[kParser] = new Parser(client2, socket, llhttpInstance);
       util.addListener(socket, "error", onHttpSocketError);
       util.addListener(socket, "readable", onHttpSocketReadable);
       util.addListener(socket, "end", onHttpSocketEnd);
@@ -12472,10 +12507,10 @@ var require_client_h1 = __commonJS({
         version: "h1",
         defaultPipelining: 1,
         write(request2) {
-          return writeH1(client, request2);
+          return writeH1(client2, request2);
         },
         resume() {
-          resumeH1(client);
+          resumeH1(client2);
         },
         /**
          * @param {Error|undefined} err
@@ -12504,13 +12539,13 @@ var require_client_h1 = __commonJS({
             return true;
           }
           if (request2) {
-            if (client[kRunning] > 0 && !request2.idempotent) {
+            if (client2[kRunning] > 0 && !request2.idempotent) {
               return true;
             }
-            if (client[kRunning] > 0 && (request2.upgrade || request2.method === "CONNECT")) {
+            if (client2[kRunning] > 0 && (request2.upgrade || request2.method === "CONNECT")) {
               return true;
             }
-            if (client[kRunning] > 0 && util.bodyLength(request2.body) !== 0 && (util.isStream(request2.body) || util.isAsyncIterable(request2.body) || util.isFormDataLike(request2.body))) {
+            if (client2[kRunning] > 0 && util.bodyLength(request2.body) !== 0 && (util.isStream(request2.body) || util.isAsyncIterable(request2.body) || util.isFormDataLike(request2.body))) {
               return true;
             }
           }
@@ -12557,25 +12592,25 @@ var require_client_h1 = __commonJS({
         this[kParser] = null;
       }
       const err = this[kError] || new SocketError("closed", util.getSocketInfo(this));
-      const client = this[kClient];
-      client[kSocket] = null;
-      client[kHTTPContext] = null;
-      if (client.destroyed) {
-        assert(client[kPending] === 0);
-        const requests = client[kQueue].splice(client[kRunningIdx]);
+      const client2 = this[kClient];
+      client2[kSocket] = null;
+      client2[kHTTPContext] = null;
+      if (client2.destroyed) {
+        assert(client2[kPending] === 0);
+        const requests = client2[kQueue].splice(client2[kRunningIdx]);
         for (let i = 0; i < requests.length; i++) {
           const request2 = requests[i];
-          util.errorRequest(client, request2, err);
+          util.errorRequest(client2, request2, err);
         }
-      } else if (client[kRunning] > 0 && err.code !== "UND_ERR_INFO") {
-        const request2 = client[kQueue][client[kRunningIdx]];
-        client[kQueue][client[kRunningIdx]++] = null;
-        util.errorRequest(client, request2, err);
+      } else if (client2[kRunning] > 0 && err.code !== "UND_ERR_INFO") {
+        const request2 = client2[kQueue][client2[kRunningIdx]];
+        client2[kQueue][client2[kRunningIdx]++] = null;
+        util.errorRequest(client2, request2, err);
       }
-      client[kPendingIdx] = client[kRunningIdx];
-      assert(client[kRunning] === 0);
-      client.emit("disconnect", client[kUrl], [client], err);
-      client[kResume]();
+      client2[kPendingIdx] = client2[kRunningIdx];
+      assert(client2[kRunning] === 0);
+      client2.emit("disconnect", client2[kUrl], [client2], err);
+      client2[kResume]();
     }
     function onSocketClose() {
       this[kClosed] = true;
@@ -12587,21 +12622,21 @@ var require_client_h1 = __commonJS({
       }
       socket[kIdleSocketValidation] = 0;
     }
-    function scheduleIdleSocketValidation(client, socket) {
+    function scheduleIdleSocketValidation(client2, socket) {
       socket[kIdleSocketValidation] = 1;
       socket[kIdleSocketValidationTimeout] = setTimeout(() => {
         socket[kIdleSocketValidationTimeout] = null;
         socket[kIdleSocketValidation] = 2;
-        if (client[kSocket] === socket && !socket.destroyed) {
-          client[kResume]();
+        if (client2[kSocket] === socket && !socket.destroyed) {
+          client2[kResume]();
         }
       }, 0);
       socket[kIdleSocketValidationTimeout].unref?.();
     }
-    function resumeH1(client) {
-      const socket = client[kSocket];
+    function resumeH1(client2) {
+      const socket = client2[kSocket];
       if (socket && !socket.destroyed) {
-        if (client[kSize] === 0) {
+        if (client2[kSize] === 0) {
           if (!socket[kNoRef] && socket.unref) {
             socket.unref();
             socket[kNoRef] = true;
@@ -12610,9 +12645,9 @@ var require_client_h1 = __commonJS({
           socket.ref();
           socket[kNoRef] = false;
         }
-        if (client[kRunning] === 0 && client[kPending] > 0 && socket[kSocketUsed]) {
+        if (client2[kRunning] === 0 && client2[kPending] > 0 && socket[kSocketUsed]) {
           if (socket[kIdleSocketValidation] === 0) {
-            scheduleIdleSocketValidation(client, socket);
+            scheduleIdleSocketValidation(client2, socket);
             socket[kParser].readMore();
             if (socket.destroyed) {
               return;
@@ -12627,20 +12662,20 @@ var require_client_h1 = __commonJS({
             return;
           }
         }
-        if (client[kRunning] === 0) {
+        if (client2[kRunning] === 0) {
           socket[kParser].readMore();
           if (socket.destroyed) {
             return;
           }
         }
-        if (client[kSize] === 0) {
+        if (client2[kSize] === 0) {
           if (socket[kParser].timeoutType !== TIMEOUT_KEEP_ALIVE) {
-            socket[kParser].setTimeout(client[kKeepAliveTimeoutValue], TIMEOUT_KEEP_ALIVE);
+            socket[kParser].setTimeout(client2[kKeepAliveTimeoutValue], TIMEOUT_KEEP_ALIVE);
           }
-        } else if (client[kRunning] > 0 && socket[kParser].statusCode < 200) {
+        } else if (client2[kRunning] > 0 && socket[kParser].statusCode < 200) {
           if (socket[kParser].timeoutType !== TIMEOUT_HEADERS) {
-            const request2 = client[kQueue][client[kRunningIdx]];
-            const headersTimeout = request2.headersTimeout != null ? request2.headersTimeout : client[kHeadersTimeout];
+            const request2 = client2[kQueue][client2[kRunningIdx]];
+            const headersTimeout = request2.headersTimeout != null ? request2.headersTimeout : client2[kHeadersTimeout];
             socket[kParser].setTimeout(headersTimeout, TIMEOUT_HEADERS);
           }
         }
@@ -12649,7 +12684,7 @@ var require_client_h1 = __commonJS({
     function shouldSendContentLength(method) {
       return method !== "GET" && method !== "HEAD" && method !== "OPTIONS" && method !== "TRACE" && method !== "CONNECT";
     }
-    function writeH1(client, request2) {
+    function writeH1(client2, request2) {
       const { method, path: path2, host, upgrade, blocking, reset } = request2;
       let { body, headers, contentLength } = request2;
       const expectsPayload = method === "PUT" || method === "POST" || method === "PATCH" || method === "QUERY" || method === "PROPFIND" || method === "PROPPATCH";
@@ -12678,26 +12713,26 @@ var require_client_h1 = __commonJS({
         contentLength = null;
       }
       if (shouldSendContentLength(method) && contentLength > 0 && request2.contentLength !== null && request2.contentLength !== contentLength) {
-        if (client[kStrictContentLength]) {
-          util.errorRequest(client, request2, new RequestContentLengthMismatchError());
+        if (client2[kStrictContentLength]) {
+          util.errorRequest(client2, request2, new RequestContentLengthMismatchError());
           return false;
         }
         process.emitWarning(new RequestContentLengthMismatchError());
       }
-      const socket = client[kSocket];
+      const socket = client2[kSocket];
       clearIdleSocketValidation(socket);
       const abort = (err) => {
         if (request2.aborted || request2.completed) {
           return;
         }
-        util.errorRequest(client, request2, err || new RequestAbortedError());
+        util.errorRequest(client2, request2, err || new RequestAbortedError());
         util.destroy(body);
         util.destroy(socket, new InformationalError("aborted"));
       };
       try {
         request2.onRequestStart(abort, null);
       } catch (err) {
-        util.errorRequest(client, request2, err);
+        util.errorRequest(client2, request2, err);
       }
       if (request2.aborted) {
         return false;
@@ -12711,7 +12746,7 @@ var require_client_h1 = __commonJS({
       if (reset != null) {
         socket[kReset] = reset;
       }
-      if (client[kMaxRequests] && ++socket[kCounter] >= client[kMaxRequests]) {
+      if (client2[kMaxRequests] && ++socket[kCounter] >= client2[kMaxRequests]) {
         socket[kReset] = true;
       }
       if (blocking) {
@@ -12726,13 +12761,13 @@ var require_client_h1 = __commonJS({
         header += `host: ${host}\r
 `;
       } else {
-        header += client[kHostHeader];
+        header += client2[kHostHeader];
       }
       if (upgrade) {
         header += `connection: upgrade\r
 upgrade: ${upgrade}\r
 `;
-      } else if (client[kPipelining] && !socket[kReset]) {
+      } else if (client2[kPipelining] && !socket[kReset]) {
         header += "connection: keep-alive\r\n";
       } else {
         header += "connection: close\r\n";
@@ -12756,28 +12791,28 @@ upgrade: ${upgrade}\r
         channels.sendHeaders.publish({ request: request2, headers: header, socket });
       }
       if (!body || bodyLength === 0) {
-        writeBuffer(abort, null, client, request2, socket, contentLength, header, expectsPayload);
+        writeBuffer(abort, null, client2, request2, socket, contentLength, header, expectsPayload);
       } else if (util.isBuffer(body)) {
-        writeBuffer(abort, body, client, request2, socket, contentLength, header, expectsPayload);
+        writeBuffer(abort, body, client2, request2, socket, contentLength, header, expectsPayload);
       } else if (util.isBlobLike(body)) {
         if (typeof body.stream === "function") {
-          writeIterable(abort, body.stream(), client, request2, socket, contentLength, header, expectsPayload);
+          writeIterable(abort, body.stream(), client2, request2, socket, contentLength, header, expectsPayload);
         } else {
-          writeBlob(abort, body, client, request2, socket, contentLength, header, expectsPayload);
+          writeBlob(abort, body, client2, request2, socket, contentLength, header, expectsPayload);
         }
       } else if (util.isStream(body)) {
-        writeStream(abort, body, client, request2, socket, contentLength, header, expectsPayload);
+        writeStream(abort, body, client2, request2, socket, contentLength, header, expectsPayload);
       } else if (util.isIterable(body)) {
-        writeIterable(abort, body, client, request2, socket, contentLength, header, expectsPayload);
+        writeIterable(abort, body, client2, request2, socket, contentLength, header, expectsPayload);
       } else {
         assert(false);
       }
       return true;
     }
-    function writeStream(abort, body, client, request2, socket, contentLength, header, expectsPayload) {
-      assert(contentLength !== 0 || client[kRunning] === 0, "stream body cannot be pipelined");
+    function writeStream(abort, body, client2, request2, socket, contentLength, header, expectsPayload) {
+      assert(contentLength !== 0 || client2[kRunning] === 0, "stream body cannot be pipelined");
       let finished = false;
-      const writer = new AsyncWriter({ abort, socket, request: request2, contentLength, client, expectsPayload, header });
+      const writer = new AsyncWriter({ abort, socket, request: request2, contentLength, client: client2, expectsPayload, header });
       const onData = function(chunk2) {
         if (finished) {
           return;
@@ -12812,7 +12847,7 @@ upgrade: ${upgrade}\r
           return;
         }
         finished = true;
-        assert(socket.destroyed || socket[kWriting] && client[kRunning] <= 1);
+        assert(socket.destroyed || socket[kWriting] && client2[kRunning] <= 1);
         socket.off("drain", onDrain).off("error", onFinished);
         body.removeListener("data", onData).removeListener("end", onFinished).removeListener("close", onClose);
         if (!err) {
@@ -12843,7 +12878,7 @@ upgrade: ${upgrade}\r
         setImmediate(onClose);
       }
     }
-    function writeBuffer(abort, body, client, request2, socket, contentLength, header, expectsPayload) {
+    function writeBuffer(abort, body, client2, request2, socket, contentLength, header, expectsPayload) {
       try {
         if (!body) {
           if (contentLength === 0) {
@@ -12869,12 +12904,12 @@ upgrade: ${upgrade}\r
           }
         }
         request2.onRequestSent();
-        client[kResume]();
+        client2[kResume]();
       } catch (err) {
         abort(err);
       }
     }
-    async function writeBlob(abort, body, client, request2, socket, contentLength, header, expectsPayload) {
+    async function writeBlob(abort, body, client2, request2, socket, contentLength, header, expectsPayload) {
       try {
         if (contentLength != null && contentLength !== body.size) {
           throw new RequestContentLengthMismatchError();
@@ -12891,13 +12926,13 @@ upgrade: ${upgrade}\r
         if (!expectsPayload && request2.reset !== false) {
           socket[kReset] = true;
         }
-        client[kResume]();
+        client2[kResume]();
       } catch (err) {
         abort(err);
       }
     }
-    async function writeIterable(abort, body, client, request2, socket, contentLength, header, expectsPayload) {
-      assert(contentLength !== 0 || client[kRunning] === 0, "iterator body cannot be pipelined");
+    async function writeIterable(abort, body, client2, request2, socket, contentLength, header, expectsPayload) {
+      assert(contentLength !== 0 || client2[kRunning] === 0, "iterator body cannot be pipelined");
       let callback = null;
       function onDrain() {
         if (callback) {
@@ -12915,7 +12950,7 @@ upgrade: ${upgrade}\r
         }
       });
       socket.on("close", onDrain).on("drain", onDrain);
-      const writer = new AsyncWriter({ abort, socket, request: request2, contentLength, client, expectsPayload, header });
+      const writer = new AsyncWriter({ abort, socket, request: request2, contentLength, client: client2, expectsPayload, header });
       try {
         for await (const chunk2 of body) {
           if (socket[kError]) {
@@ -12944,11 +12979,11 @@ upgrade: ${upgrade}\r
        * @param {boolean} arg.expectsPayload
        * @param {string} arg.header
        */
-      constructor({ abort, socket, request: request2, contentLength, client, expectsPayload, header }) {
+      constructor({ abort, socket, request: request2, contentLength, client: client2, expectsPayload, header }) {
         this.socket = socket;
         this.request = request2;
         this.contentLength = contentLength;
-        this.client = client;
+        this.client = client2;
         this.bytesWritten = 0;
         this.expectsPayload = expectsPayload;
         this.header = header;
@@ -12960,7 +12995,7 @@ upgrade: ${upgrade}\r
        * @returns
        */
       write(chunk2) {
-        const { socket, request: request2, contentLength, client, bytesWritten, expectsPayload, header } = this;
+        const { socket, request: request2, contentLength, client: client2, bytesWritten, expectsPayload, header } = this;
         if (socket[kError]) {
           throw socket[kError];
         }
@@ -12972,7 +13007,7 @@ upgrade: ${upgrade}\r
           return true;
         }
         if (contentLength !== null && bytesWritten + len > contentLength) {
-          if (client[kStrictContentLength]) {
+          if (client2[kStrictContentLength]) {
             throw new RequestContentLengthMismatchError();
           }
           process.emitWarning(new RequestContentLengthMismatchError());
@@ -13013,7 +13048,7 @@ ${len.toString(16)}\r
        * @returns {void}
        */
       end() {
-        const { socket, contentLength, client, bytesWritten, expectsPayload, header, request: request2 } = this;
+        const { socket, contentLength, client: client2, bytesWritten, expectsPayload, header, request: request2 } = this;
         request2.onRequestSent();
         socket[kWriting] = false;
         if (socket[kError]) {
@@ -13035,7 +13070,7 @@ ${len.toString(16)}\r
           socket.write("\r\n0\r\n\r\n", "latin1");
         }
         if (contentLength !== null && bytesWritten !== contentLength) {
-          if (client[kStrictContentLength]) {
+          if (client2[kStrictContentLength]) {
             throw new RequestContentLengthMismatchError();
           } else {
             process.emitWarning(new RequestContentLengthMismatchError());
@@ -13046,17 +13081,17 @@ ${len.toString(16)}\r
             socket[kParser].timeout.refresh();
           }
         }
-        client[kResume]();
+        client2[kResume]();
       }
       /**
        * @param {Error} [err]
        * @returns {void}
        */
       destroy(err) {
-        const { socket, client, abort } = this;
+        const { socket, client: client2, abort } = this;
         socket[kWriting] = false;
         if (err) {
-          assert(client[kRunning] <= 1, "pipeline should only contain this request");
+          assert(client2[kRunning] <= 1, "pipeline should only contain this request");
           abort(err);
         }
       }
@@ -13144,12 +13179,12 @@ var require_client_h2 = __commonJS({
       return session[kError] || (errorCode === NGHTTP2_NO_ERROR ? new InformationalError(`HTTP/2: "GOAWAY" frame received with code ${errorCode}`) : new SocketError(`HTTP/2: "GOAWAY" frame received with code ${errorCode}`, util.getSocketInfo(session[kSocket])));
     }
     function resetHttp2Session(session, err) {
-      const client = session[kClient];
+      const client2 = session[kClient];
       const socket = session[kSocket];
-      if (client[kHTTP2Session] === session) {
-        client[kSocket] = null;
-        client[kHTTPContext] = null;
-        client[kHTTP2Session] = null;
+      if (client2[kHTTP2Session] === session) {
+        client2[kSocket] = null;
+        client2[kHTTPContext] = null;
+        client2[kHTTP2Session] = null;
       }
       if (socket != null && socket[kError] == null) {
         socket[kError] = err;
@@ -13162,10 +13197,10 @@ var require_client_h2 = __commonJS({
       }
       util.destroy(socket, err);
     }
-    function getGoAwayPendingIdx(client, lastStreamID) {
+    function getGoAwayPendingIdx(client2, lastStreamID) {
       const maxAcceptedStreamID = Number.isInteger(lastStreamID) ? lastStreamID : Number.MAX_SAFE_INTEGER;
-      for (let i = client[kRunningIdx]; i < client[kPendingIdx]; i++) {
-        const request2 = client[kQueue][i];
+      for (let i = client2[kRunningIdx]; i < client2[kPendingIdx]; i++) {
+        const request2 = client2[kQueue][i];
         if (request2 == null) {
           continue;
         }
@@ -13173,7 +13208,7 @@ var require_client_h2 = __commonJS({
           return i;
         }
       }
-      return client[kPendingIdx];
+      return client2[kPendingIdx];
     }
     function detachRequestFromStream(request2) {
       request2[kRequestStreamId] = null;
@@ -13195,18 +13230,18 @@ var require_client_h2 = __commonJS({
       detachRequestFromStream(request2);
       cleanup?.(stream2);
     }
-    function requeueUnsentRequest(client, request2) {
-      client[kQueue].splice(client[kPendingIdx] + 1, 0, request2);
+    function requeueUnsentRequest(client2, request2) {
+      client2[kQueue].splice(client2[kPendingIdx] + 1, 0, request2);
     }
-    function completeRequest(client, request2, resetPendingIdx = false) {
-      const index = client[kQueue].indexOf(request2, client[kRunningIdx]);
-      if (index === -1 || index >= client[kPendingIdx]) {
+    function completeRequest(client2, request2, resetPendingIdx = false) {
+      const index = client2[kQueue].indexOf(request2, client2[kRunningIdx]);
+      if (index === -1 || index >= client2[kPendingIdx]) {
         return;
       }
-      client[kQueue].splice(index, 1);
-      client[kPendingIdx]--;
-      if (resetPendingIdx && client[kPendingIdx] < client[kRunningIdx]) {
-        client[kPendingIdx] = client[kRunningIdx];
+      client2[kQueue].splice(index, 1);
+      client2[kPendingIdx]--;
+      if (resetPendingIdx && client2[kPendingIdx] < client2[kRunningIdx]) {
+        client2[kPendingIdx] = client2[kRunningIdx];
       }
     }
     function canRetryRequestAfterGoAway(request2) {
@@ -13223,27 +13258,27 @@ var require_client_h2 = __commonJS({
         }
       }
     }
-    function connectH2(client, socket) {
-      client[kSocket] = socket;
-      const http2InitialWindowSize = client[kHTTP2InitialWindowSize];
-      const http2ConnectionWindowSize = client[kHTTP2ConnectionWindowSize];
-      const session = http2.connect(client[kUrl], {
+    function connectH2(client2, socket) {
+      client2[kSocket] = socket;
+      const http2InitialWindowSize = client2[kHTTP2InitialWindowSize];
+      const http2ConnectionWindowSize = client2[kHTTP2ConnectionWindowSize];
+      const session = http2.connect(client2[kUrl], {
         createConnection: () => socket,
-        peerMaxConcurrentStreams: client[kMaxConcurrentStreams],
+        peerMaxConcurrentStreams: client2[kMaxConcurrentStreams],
         settings: {
           // TODO(metcoder95): add support for PUSH
           enablePush: false,
           ...http2InitialWindowSize != null ? { initialWindowSize: http2InitialWindowSize } : null
         }
       });
-      client[kSocket] = socket;
+      client2[kSocket] = socket;
       session[kOpenStreams] = 0;
-      session[kClient] = client;
+      session[kClient] = client2;
       session[kSocket] = socket;
       session[kHTTP2SessionState] = {
         idleTimeout: null,
         ping: {
-          interval: client[kPingInterval] === 0 ? null : setInterval(onHttp2SendPing, client[kPingInterval], session).unref()
+          interval: client2[kPingInterval] === 0 ? null : setInterval(onHttp2SendPing, client2[kPingInterval], session).unref()
         }
       };
       session[kReceivedGoAway] = false;
@@ -13259,7 +13294,7 @@ var require_client_h2 = __commonJS({
       util.addListener(session, "close", onHttp2SessionClose);
       util.addListener(session, "remoteSettings", onHttp2RemoteSettings);
       session.unref();
-      client[kHTTP2Session] = session;
+      client2[kHTTP2Session] = session;
       socket[kHTTP2Session] = session;
       util.addListener(socket, "error", onHttp2SocketError);
       util.addListener(socket, "end", onHttp2SocketEnd);
@@ -13274,13 +13309,13 @@ var require_client_h2 = __commonJS({
          * @returns {boolean}
         */
         write(request2) {
-          return writeH2(client, request2);
+          return writeH2(client2, request2);
         },
         /**
          * @returns {void}
          */
         resume() {
-          resumeH2(client);
+          resumeH2(client2);
         },
         /**
          * @param {Error | null} err
@@ -13304,14 +13339,14 @@ var require_client_h2 = __commonJS({
          * @returns {boolean}
         */
         busy(request2) {
-          if (session[kRemoteSettings] === false && client[kRunning] > 0) {
+          if (session[kRemoteSettings] === false && client2[kRunning] > 0) {
             return true;
           }
-          if (client[kRunning] >= client[kMaxConcurrentStreams]) {
+          if (client2[kRunning] >= client2[kMaxConcurrentStreams]) {
             return true;
           }
           if (request2 != null) {
-            if (client[kRunning] > 0) {
+            if (client2[kRunning] > 0) {
               if ((request2.upgrade === "websocket" || request2.method === "CONNECT") && session[kRemoteSettings] === false) return true;
               if (util.bodyLength(request2.body) !== 0 && (util.isStream(request2.body) || util.isAsyncIterable(request2.body) || util.isFormDataLike(request2.body))) return true;
             } else {
@@ -13322,18 +13357,18 @@ var require_client_h2 = __commonJS({
         }
       };
     }
-    function resumeH2(client) {
-      const socket = client[kSocket];
-      const session = client[kHTTP2Session];
+    function resumeH2(client2) {
+      const socket = client2[kSocket];
+      const session = client2[kHTTP2Session];
       if (socket?.destroyed === false) {
-        if (client[kSize] === 0 || client[kMaxConcurrentStreams] === 0) {
+        if (client2[kSize] === 0 || client2[kMaxConcurrentStreams] === 0) {
           socket.unref();
           session.unref();
         } else {
           socket.ref();
           session.ref();
         }
-        if (client[kSize] === 0 && session[kOpenStreams] === 0) {
+        if (client2[kSize] === 0 && session[kOpenStreams] === 0) {
           setHttp2IdleTimeout(session);
         } else {
           clearHttp2IdleTimeout(session);
@@ -13348,25 +13383,25 @@ var require_client_h2 = __commonJS({
       }
     }
     function setHttp2IdleTimeout(session) {
-      const client = session[kClient];
-      if (client[kHTTP2Session] !== session || session.closed || session.destroyed) {
+      const client2 = session[kClient];
+      if (client2[kHTTP2Session] !== session || session.closed || session.destroyed) {
         return;
       }
-      if (session[kOpenStreams] !== 0 || client[kSize] !== 0) {
+      if (session[kOpenStreams] !== 0 || client2[kSize] !== 0) {
         clearHttp2IdleTimeout(session);
         return;
       }
       const state = session[kHTTP2SessionState];
       if (state.idleTimeout == null) {
-        state.idleTimeout = setTimeout(onHttp2SessionIdleTimeout, client[kKeepAliveDefaultTimeout], session).unref();
+        state.idleTimeout = setTimeout(onHttp2SessionIdleTimeout, client2[kKeepAliveDefaultTimeout], session).unref();
       }
     }
     function onHttp2SessionIdleTimeout(session) {
-      const client = session[kClient];
+      const client2 = session[kClient];
       const socket = session[kSocket];
       const state = session[kHTTP2SessionState];
       state.idleTimeout = null;
-      if (client[kHTTP2Session] !== session || session[kOpenStreams] !== 0 || client[kSize] !== 0 || session.closed || session.destroyed) {
+      if (client2[kHTTP2Session] !== session || session[kOpenStreams] !== 0 || client2[kSize] !== 0 || session.closed || session.destroyed) {
         return;
       }
       const err = new InformationalError("socket idle timeout");
@@ -13402,14 +13437,14 @@ var require_client_h2 = __commonJS({
       }
       session.ping(onPing.bind(session));
       function onPing(err, duration2) {
-        const client = this[kClient];
+        const client2 = this[kClient];
         const socket = this[kSocket];
         if (err != null) {
           const error = new InformationalError(`HTTP/2: "PING" errored - type ${err.message}`);
           socket[kError] = error;
-          client[kOnError](error);
+          client2[kOnError](error);
         } else {
-          client.emit("ping", duration2);
+          client2.emit("ping", duration2);
         }
       }
     }
@@ -13436,59 +13471,59 @@ var require_client_h2 = __commonJS({
       }
       this[kReceivedGoAway] = true;
       const err = getGoAwayError(this, errorCode);
-      const client = this[kClient];
-      const previousPendingIdx = client[kPendingIdx];
-      const pendingIdx = getGoAwayPendingIdx(client, lastStreamID);
+      const client2 = this[kClient];
+      const previousPendingIdx = client2[kPendingIdx];
+      const pendingIdx = getGoAwayPendingIdx(client2, lastStreamID);
       const retriableRequests = [];
       for (let i = pendingIdx; i < previousPendingIdx; i++) {
-        const request2 = client[kQueue][i];
+        const request2 = client2[kQueue][i];
         if (request2 != null) {
           closeRequestStream(request2);
           if (canRetryRequestAfterGoAway(request2)) {
             retriableRequests.push(request2);
           } else {
-            util.errorRequest(client, request2, err);
+            util.errorRequest(client2, request2, err);
           }
         }
       }
       if (pendingIdx !== previousPendingIdx) {
-        const remainingPendingRequests = client[kQueue].slice(previousPendingIdx);
-        client[kQueue].length = pendingIdx;
-        client[kQueue].push(...retriableRequests, ...remainingPendingRequests);
+        const remainingPendingRequests = client2[kQueue].slice(previousPendingIdx);
+        client2[kQueue].length = pendingIdx;
+        client2[kQueue].push(...retriableRequests, ...remainingPendingRequests);
       }
-      if (client[kHTTP2Session] === this) {
-        client[kSocket] = null;
-        client[kHTTPContext] = null;
-        client[kHTTP2Session] = null;
+      if (client2[kHTTP2Session] === this) {
+        client2[kSocket] = null;
+        client2[kHTTPContext] = null;
+        client2[kHTTP2Session] = null;
       }
       clearHttp2IdleTimeout(this);
       if (!this.closed && !this.destroyed) {
         this.close();
       }
-      client[kPendingIdx] = pendingIdx;
-      client.emit("disconnect", client[kUrl], [client], err);
-      client[kResume]();
+      client2[kPendingIdx] = pendingIdx;
+      client2.emit("disconnect", client2[kUrl], [client2], err);
+      client2[kResume]();
     }
     function onHttp2SessionClose() {
-      const { [kClient]: client, [kHTTP2SessionState]: state, [kSocket]: socket } = this;
+      const { [kClient]: client2, [kHTTP2SessionState]: state, [kSocket]: socket } = this;
       const err = socket[kError] || this[kError] || new SocketError("closed", util.getSocketInfo(socket));
-      if (client[kHTTP2Session] === this) {
-        client[kSocket] = null;
-        client[kHTTPContext] = null;
-        client[kHTTP2Session] = null;
+      if (client2[kHTTP2Session] === this) {
+        client2[kSocket] = null;
+        client2[kHTTPContext] = null;
+        client2[kHTTP2Session] = null;
       }
       clearHttp2IdleTimeout(this);
       if (state.ping.interval != null) {
         clearInterval(state.ping.interval);
         state.ping.interval = null;
       }
-      if (client.destroyed) {
-        assert(client[kPending] === 0);
-        const requests = client[kQueue].splice(client[kRunningIdx]);
+      if (client2.destroyed) {
+        assert(client2[kPending] === 0);
+        const requests = client2[kQueue].splice(client2[kRunningIdx]);
         for (let i = 0; i < requests.length; i++) {
           const request2 = requests[i];
           if (request2 != null) {
-            util.errorRequest(client, request2, err);
+            util.errorRequest(client2, request2, err);
           }
         }
       }
@@ -13496,22 +13531,22 @@ var require_client_h2 = __commonJS({
     function onHttp2SocketClose() {
       const err = this[kError] || new SocketError("closed", util.getSocketInfo(this));
       const session = this[kHTTP2Session];
-      const client = session[kClient];
-      if (client[kSocket] !== this) {
-        if (session[kReceivedGoAway] || client[kHTTP2Session] != null && client[kHTTP2Session] !== session) {
+      const client2 = session[kClient];
+      if (client2[kSocket] !== this) {
+        if (session[kReceivedGoAway] || client2[kHTTP2Session] != null && client2[kHTTP2Session] !== session) {
           return;
         }
       }
-      client[kSocket] = null;
-      client[kHTTPContext] = null;
-      if (client[kHTTP2Session] === session) {
-        client[kHTTP2Session] = null;
+      client2[kSocket] = null;
+      client2[kHTTPContext] = null;
+      if (client2[kHTTP2Session] === session) {
+        client2[kHTTP2Session] = null;
       }
       session.destroy(err);
-      client[kPendingIdx] = client[kRunningIdx];
-      assert(client[kRunning] === 0);
-      client.emit("disconnect", client[kUrl], [client], err);
-      client[kResume]();
+      client2[kPendingIdx] = client2[kRunningIdx];
+      assert(client2[kRunning] === 0);
+      client2.emit("disconnect", client2[kUrl], [client2], err);
+      client2[kResume]();
     }
     function onHttp2SocketError(err) {
       assert(err.code !== "ERR_TLS_CERT_ALTNAME_INVALID");
@@ -13664,19 +13699,19 @@ var require_client_h2 = __commonJS({
       ++session[kOpenStreams];
       stream2.setTimeout(headersTimeout);
     }
-    function writeH2(client, request2) {
-      const headersTimeout = request2.headersTimeout ?? client[kHeadersTimeout];
-      const bodyTimeout = request2.bodyTimeout ?? client[kBodyTimeout];
-      const session = client[kHTTP2Session];
+    function writeH2(client2, request2) {
+      const headersTimeout = request2.headersTimeout ?? client2[kHeadersTimeout];
+      const bodyTimeout = request2.bodyTimeout ?? client2[kBodyTimeout];
+      const session = client2[kHTTP2Session];
       const { method, path: path2, host, upgrade, expectContinue, signal, protocol, headers: reqHeaders } = request2;
       let { body } = request2;
       if (upgrade != null && upgrade !== "websocket") {
-        util.errorRequest(client, request2, new InvalidArgumentError(`Custom upgrade "${upgrade}" not supported over HTTP/2`));
+        util.errorRequest(client2, request2, new InvalidArgumentError(`Custom upgrade "${upgrade}" not supported over HTTP/2`));
         return false;
       }
       const headers = buildRequestHeaders(reqHeaders);
       let stream2 = null;
-      headers[HTTP2_HEADER_AUTHORITY] = host || client[kHostAuthority];
+      headers[HTTP2_HEADER_AUTHORITY] = host || client2[kHostAuthority];
       headers[HTTP2_HEADER_METHOD] = method;
       let requestFinalized = false;
       const finalizeRequest = (resetPendingIdx = false) => {
@@ -13684,19 +13719,19 @@ var require_client_h2 = __commonJS({
           return;
         }
         requestFinalized = true;
-        completeRequest(client, request2, resetPendingIdx);
-        client[kResume]();
+        completeRequest(client2, request2, resetPendingIdx);
+        client2[kResume]();
       };
       const abort = (err, resetPendingIdx = false) => {
         if (request2.aborted || request2.completed) {
           return;
         }
         err = err || new RequestAbortedError();
-        util.errorRequest(client, request2, err);
+        util.errorRequest(client2, request2, err);
         if (stream2 != null) {
           clearRequestStream(request2);
           stream2.close();
-          client[kOnError](err);
+          client2[kOnError](err);
           finalizeRequest(resetPendingIdx);
         }
         util.destroy(body, err);
@@ -13710,7 +13745,7 @@ var require_client_h2 = __commonJS({
             wrappedErr2.cause = err;
             session[kError] = wrappedErr2;
             resetHttp2Session(session, wrappedErr2);
-            requeueUnsentRequest(client, request2);
+            requeueUnsentRequest(client2, request2);
             return null;
           }
           const wrappedErr = new InformationalError(err.message, { cause: err });
@@ -13725,7 +13760,7 @@ var require_client_h2 = __commonJS({
       try {
         request2.onRequestStart(abort, null);
       } catch (err) {
-        util.errorRequest(client, request2, err);
+        util.errorRequest(client2, request2, err);
       }
       if (request2.aborted) {
         return false;
@@ -13744,7 +13779,7 @@ var require_client_h2 = __commonJS({
         };
         if (upgrade === "websocket") {
           if (session[kEnableConnectProtocol] === false) {
-            util.errorRequest(client, request2, new InformationalError("HTTP/2: Extended CONNECT protocol not supported by server"));
+            util.errorRequest(client2, request2, new InformationalError("HTTP/2: Extended CONNECT protocol not supported by server"));
             session.unref();
             return false;
           }
@@ -13793,8 +13828,8 @@ var require_client_h2 = __commonJS({
         contentLength = null;
       }
       if (shouldSendContentLength(method) && contentLength > 0 && request2.contentLength != null && request2.contentLength !== contentLength) {
-        if (client[kStrictContentLength]) {
-          util.errorRequest(client, request2, new RequestContentLengthMismatchError());
+        if (client2[kStrictContentLength]) {
+          util.errorRequest(client2, request2, new RequestContentLengthMismatchError());
           return false;
         }
         process.emitWarning(new RequestContentLengthMismatchError());
@@ -13816,7 +13851,7 @@ var require_client_h2 = __commonJS({
       const state = {
         abort,
         body,
-        client,
+        client: client2,
         contentLength,
         expectsPayload,
         finalizeRequest,
@@ -13965,15 +14000,15 @@ var require_client_h2 = __commonJS({
     function writeBodyH2() {
       const stream2 = this;
       const state = stream2[kRequestStreamState];
-      const { abort, body, client, contentLength, expectsPayload, request: request2 } = state;
+      const { abort, body, client: client2, contentLength, expectsPayload, request: request2 } = state;
       if (!body || contentLength === 0) {
         writeBuffer(
           abort,
           stream2,
           null,
-          client,
+          client2,
           request2,
-          client[kSocket],
+          client2[kSocket],
           contentLength,
           expectsPayload
         );
@@ -13982,9 +14017,9 @@ var require_client_h2 = __commonJS({
           abort,
           stream2,
           body,
-          client,
+          client2,
           request2,
-          client[kSocket],
+          client2[kSocket],
           contentLength,
           expectsPayload
         );
@@ -13994,9 +14029,9 @@ var require_client_h2 = __commonJS({
             abort,
             stream2,
             body.stream(),
-            client,
+            client2,
             request2,
-            client[kSocket],
+            client2[kSocket],
             contentLength,
             expectsPayload
           );
@@ -14005,9 +14040,9 @@ var require_client_h2 = __commonJS({
             abort,
             stream2,
             body,
-            client,
+            client2,
             request2,
-            client[kSocket],
+            client2[kSocket],
             contentLength,
             expectsPayload
           );
@@ -14015,11 +14050,11 @@ var require_client_h2 = __commonJS({
       } else if (util.isStream(body)) {
         writeStream(
           abort,
-          client[kSocket],
+          client2[kSocket],
           expectsPayload,
           stream2,
           body,
-          client,
+          client2,
           request2,
           contentLength
         );
@@ -14028,9 +14063,9 @@ var require_client_h2 = __commonJS({
           abort,
           stream2,
           body,
-          client,
+          client2,
           request2,
-          client[kSocket],
+          client2[kSocket],
           contentLength,
           expectsPayload
         );
@@ -14038,7 +14073,7 @@ var require_client_h2 = __commonJS({
         assert(false);
       }
     }
-    function writeBuffer(abort, h2stream, body, client, request2, socket, contentLength, expectsPayload) {
+    function writeBuffer(abort, h2stream, body, client2, request2, socket, contentLength, expectsPayload) {
       try {
         if (body != null && util.isBuffer(body)) {
           assert(contentLength === body.byteLength, "buffer body must have content length");
@@ -14052,13 +14087,13 @@ var require_client_h2 = __commonJS({
           socket[kReset] = true;
         }
         request2.onRequestSent();
-        client[kResume]();
+        client2[kResume]();
       } catch (error) {
         abort(error);
       }
     }
-    function writeStream(abort, socket, expectsPayload, h2stream, body, client, request2, contentLength) {
-      assert(contentLength !== 0 || client[kRunning] === 0, "stream body cannot be pipelined");
+    function writeStream(abort, socket, expectsPayload, h2stream, body, client2, request2, contentLength) {
+      assert(contentLength !== 0 || client2[kRunning] === 0, "stream body cannot be pipelined");
       const pipe = pipeline(
         body,
         h2stream,
@@ -14072,7 +14107,7 @@ var require_client_h2 = __commonJS({
             if (!expectsPayload) {
               socket[kReset] = true;
             }
-            client[kResume]();
+            client2[kResume]();
           }
         }
       );
@@ -14081,7 +14116,7 @@ var require_client_h2 = __commonJS({
         request2.onBodySent(chunk2);
       }
     }
-    async function writeBlob(abort, h2stream, body, client, request2, socket, contentLength, expectsPayload) {
+    async function writeBlob(abort, h2stream, body, client2, request2, socket, contentLength, expectsPayload) {
       try {
         if (contentLength != null && contentLength !== body.size) {
           throw new RequestContentLengthMismatchError();
@@ -14096,13 +14131,13 @@ var require_client_h2 = __commonJS({
         if (!expectsPayload) {
           socket[kReset] = true;
         }
-        client[kResume]();
+        client2[kResume]();
       } catch (err) {
         abort(err);
       }
     }
-    async function writeIterable(abort, h2stream, body, client, request2, socket, contentLength, expectsPayload) {
-      assert(contentLength !== 0 || client[kRunning] === 0, "iterator body cannot be pipelined");
+    async function writeIterable(abort, h2stream, body, client2, request2, socket, contentLength, expectsPayload) {
+      assert(contentLength !== 0 || client2[kRunning] === 0, "iterator body cannot be pipelined");
       let callback = null;
       function onDrain() {
         if (callback) {
@@ -14136,7 +14171,7 @@ var require_client_h2 = __commonJS({
         if (!expectsPayload) {
           socket[kReset] = true;
         }
-        client[kResume]();
+        client2[kResume]();
       } catch (err) {
         abort(err);
       } finally {
@@ -14217,14 +14252,14 @@ var require_client = __commonJS({
     };
     var noop3 = () => {
     };
-    function getPipelining(client) {
-      return client[kPipelining] ?? client[kHTTPContext]?.defaultPipelining ?? 1;
+    function getPipelining(client2) {
+      return client2[kPipelining] ?? client2[kHTTPContext]?.defaultPipelining ?? 1;
     }
-    function getMaxConcurrent(client) {
-      if (client[kHTTPContext]?.version === "h2") {
-        return client[kMaxConcurrentStreams];
+    function getMaxConcurrent(client2) {
+      if (client2[kHTTPContext]?.version === "h2") {
+        return client2[kMaxConcurrentStreams];
       }
-      return getPipelining(client);
+      return getPipelining(client2);
     }
     var Client2 = class extends DispatcherBase {
       /**
@@ -14236,7 +14271,7 @@ var require_client = __commonJS({
         maxHeaderSize,
         headersTimeout,
         socketTimeout,
-        requestTimeout,
+        requestTimeout: requestTimeout2,
         connectTimeout,
         bodyTimeout,
         idleTimeout,
@@ -14271,7 +14306,7 @@ var require_client = __commonJS({
         if (socketTimeout !== void 0) {
           throw new InvalidArgumentError("unsupported socketTimeout, use headersTimeout & bodyTimeout instead");
         }
-        if (requestTimeout !== void 0) {
+        if (requestTimeout2 !== void 0) {
           throw new InvalidArgumentError("unsupported requestTimeout, use headersTimeout & bodyTimeout instead");
         }
         if (idleTimeout !== void 0) {
@@ -14475,23 +14510,23 @@ var require_client = __commonJS({
         });
       }
     };
-    function onError(client, err) {
-      if (client[kRunning] === 0 && err.code !== "UND_ERR_INFO" && err.code !== "UND_ERR_SOCKET") {
-        assert(client[kPendingIdx] === client[kRunningIdx]);
-        const requests = client[kQueue].splice(client[kRunningIdx]);
+    function onError(client2, err) {
+      if (client2[kRunning] === 0 && err.code !== "UND_ERR_INFO" && err.code !== "UND_ERR_SOCKET") {
+        assert(client2[kPendingIdx] === client2[kRunningIdx]);
+        const requests = client2[kQueue].splice(client2[kRunningIdx]);
         for (let i = 0; i < requests.length; i++) {
           const request2 = requests[i];
           if (request2 != null) {
-            util.errorRequest(client, request2, err);
+            util.errorRequest(client2, request2, err);
           }
         }
-        assert(client[kSize] === 0);
+        assert(client2[kSize] === 0);
       }
     }
-    function connect(client) {
-      assert(!client[kConnecting]);
-      assert(!client[kHTTPContext]);
-      let { host, hostname, protocol, port } = client[kUrl];
+    function connect(client2) {
+      assert(!client2[kConnecting]);
+      assert(!client2[kHTTPContext]);
+      let { host, hostname, protocol, port } = client2[kUrl];
       if (hostname[0] === "[") {
         const idx = hostname.indexOf("]");
         assert(idx !== -1);
@@ -14499,7 +14534,7 @@ var require_client = __commonJS({
         assert(net.isIPv6(ip));
         hostname = ip;
       }
-      client[kConnecting] = true;
+      client2[kConnecting] = true;
       if (channels.beforeConnect.hasSubscribers) {
         channels.beforeConnect.publish({
           connectParams: {
@@ -14507,45 +14542,45 @@ var require_client = __commonJS({
             hostname,
             protocol,
             port,
-            version: client[kHTTPContext]?.version,
-            servername: client[kServerName],
-            localAddress: client[kLocalAddress]
+            version: client2[kHTTPContext]?.version,
+            servername: client2[kServerName],
+            localAddress: client2[kLocalAddress]
           },
-          connector: client[kConnector]
+          connector: client2[kConnector]
         });
       }
       try {
-        client[kConnector]({
+        client2[kConnector]({
           host,
           hostname,
           protocol,
           port,
-          servername: client[kServerName],
-          localAddress: client[kLocalAddress]
+          servername: client2[kServerName],
+          localAddress: client2[kLocalAddress]
         }, (err, socket) => {
           if (err) {
-            handleConnectError(client, err, { host, hostname, protocol, port });
-            client[kResume]();
+            handleConnectError(client2, err, { host, hostname, protocol, port });
+            client2[kResume]();
             return;
           }
-          if (client.destroyed) {
+          if (client2.destroyed) {
             util.destroy(socket.on("error", noop3), new ClientDestroyedError());
-            client[kResume]();
+            client2[kResume]();
             return;
           }
           assert(socket);
           try {
-            client[kHTTPContext] = socket.alpnProtocol === "h2" ? connectH2(client, socket) : connectH1(client, socket);
+            client2[kHTTPContext] = socket.alpnProtocol === "h2" ? connectH2(client2, socket) : connectH1(client2, socket);
           } catch (err2) {
             socket.destroy().on("error", noop3);
-            handleConnectError(client, err2, { host, hostname, protocol, port });
-            client[kResume]();
+            handleConnectError(client2, err2, { host, hostname, protocol, port });
+            client2[kResume]();
             return;
           }
-          client[kConnecting] = false;
+          client2[kConnecting] = false;
           socket[kCounter] = 0;
-          socket[kMaxRequests] = client[kMaxRequests];
-          socket[kClient] = client;
+          socket[kMaxRequests] = client2[kMaxRequests];
+          socket[kClient] = client2;
           socket[kError] = null;
           if (channels.connected.hasSubscribers) {
             channels.connected.publish({
@@ -14554,27 +14589,27 @@ var require_client = __commonJS({
                 hostname,
                 protocol,
                 port,
-                version: client[kHTTPContext]?.version,
-                servername: client[kServerName],
-                localAddress: client[kLocalAddress]
+                version: client2[kHTTPContext]?.version,
+                servername: client2[kServerName],
+                localAddress: client2[kLocalAddress]
               },
-              connector: client[kConnector],
+              connector: client2[kConnector],
               socket
             });
           }
-          client.emit("connect", client[kUrl], [client]);
-          client[kResume]();
+          client2.emit("connect", client2[kUrl], [client2]);
+          client2[kResume]();
         });
       } catch (err) {
-        handleConnectError(client, err, { host, hostname, protocol, port });
-        client[kResume]();
+        handleConnectError(client2, err, { host, hostname, protocol, port });
+        client2[kResume]();
       }
     }
-    function handleConnectError(client, err, { host, hostname, protocol, port }) {
-      if (client.destroyed) {
+    function handleConnectError(client2, err, { host, hostname, protocol, port }) {
+      if (client2.destroyed) {
         return;
       }
-      client[kConnecting] = false;
+      client2[kConnecting] = false;
       if (channels.connectError.hasSubscribers) {
         channels.connectError.publish({
           connectParams: {
@@ -14582,108 +14617,108 @@ var require_client = __commonJS({
             hostname,
             protocol,
             port,
-            version: client[kHTTPContext]?.version,
-            servername: client[kServerName],
-            localAddress: client[kLocalAddress]
+            version: client2[kHTTPContext]?.version,
+            servername: client2[kServerName],
+            localAddress: client2[kLocalAddress]
           },
-          connector: client[kConnector],
+          connector: client2[kConnector],
           error: err
         });
       }
       if (err.code === "ERR_TLS_CERT_ALTNAME_INVALID") {
-        const running = client[kQueue].splice(client[kRunningIdx], client[kRunning]);
-        client[kPendingIdx] = client[kRunningIdx];
+        const running = client2[kQueue].splice(client2[kRunningIdx], client2[kRunning]);
+        client2[kPendingIdx] = client2[kRunningIdx];
         for (let i = 0; i < running.length; i++) {
-          util.errorRequest(client, running[i], err);
+          util.errorRequest(client2, running[i], err);
         }
-        while (client[kPending] > 0 && client[kQueue][client[kPendingIdx]].servername === client[kServerName]) {
-          const request2 = client[kQueue].splice(client[kPendingIdx], 1)[0];
-          util.errorRequest(client, request2, err);
+        while (client2[kPending] > 0 && client2[kQueue][client2[kPendingIdx]].servername === client2[kServerName]) {
+          const request2 = client2[kQueue].splice(client2[kPendingIdx], 1)[0];
+          util.errorRequest(client2, request2, err);
         }
       } else {
-        onError(client, err);
+        onError(client2, err);
       }
-      client.emit("connectionError", client[kUrl], [client], err);
+      client2.emit("connectionError", client2[kUrl], [client2], err);
     }
-    function emitDrain(client) {
-      client[kNeedDrain] = 0;
-      client.emit("drain", client[kUrl], [client]);
+    function emitDrain(client2) {
+      client2[kNeedDrain] = 0;
+      client2.emit("drain", client2[kUrl], [client2]);
     }
-    function resume(client, sync) {
-      if (client[kResuming] === 2) {
+    function resume(client2, sync) {
+      if (client2[kResuming] === 2) {
         return;
       }
-      client[kResuming] = 2;
-      _resume(client, sync);
-      client[kResuming] = 0;
-      if (client[kRunningIdx] > 256) {
-        client[kQueue].splice(0, client[kRunningIdx]);
-        client[kPendingIdx] -= client[kRunningIdx];
-        client[kRunningIdx] = 0;
+      client2[kResuming] = 2;
+      _resume(client2, sync);
+      client2[kResuming] = 0;
+      if (client2[kRunningIdx] > 256) {
+        client2[kQueue].splice(0, client2[kRunningIdx]);
+        client2[kPendingIdx] -= client2[kRunningIdx];
+        client2[kRunningIdx] = 0;
       }
     }
-    function _resume(client, sync) {
+    function _resume(client2, sync) {
       while (true) {
-        if (client.destroyed) {
-          assert(client[kPending] === 0);
+        if (client2.destroyed) {
+          assert(client2[kPending] === 0);
           return;
         }
-        if (client[kClosedResolve] && !client[kSize]) {
-          client[kClosedResolve]();
-          client[kClosedResolve] = null;
+        if (client2[kClosedResolve] && !client2[kSize]) {
+          client2[kClosedResolve]();
+          client2[kClosedResolve] = null;
           return;
         }
-        if (client[kHTTPContext]) {
-          client[kHTTPContext].resume();
+        if (client2[kHTTPContext]) {
+          client2[kHTTPContext].resume();
         }
-        if (client[kBusy]) {
-          client[kNeedDrain] = 2;
-        } else if (client[kNeedDrain] === 2) {
+        if (client2[kBusy]) {
+          client2[kNeedDrain] = 2;
+        } else if (client2[kNeedDrain] === 2) {
           if (sync) {
-            client[kNeedDrain] = 1;
-            queueMicrotask(() => emitDrain(client));
+            client2[kNeedDrain] = 1;
+            queueMicrotask(() => emitDrain(client2));
           } else {
-            emitDrain(client);
+            emitDrain(client2);
           }
           continue;
         }
-        if (client[kPending] === 0) {
+        if (client2[kPending] === 0) {
           return;
         }
-        if (client[kRunning] >= (getMaxConcurrent(client) || 1)) {
+        if (client2[kRunning] >= (getMaxConcurrent(client2) || 1)) {
           return;
         }
-        const request2 = client[kQueue][client[kPendingIdx]];
+        const request2 = client2[kQueue][client2[kPendingIdx]];
         if (request2 === null) {
           return;
         }
-        if (client[kUrl].protocol === "https:" && client[kServerName] !== request2.servername) {
-          if (client[kRunning] > 0) {
+        if (client2[kUrl].protocol === "https:" && client2[kServerName] !== request2.servername) {
+          if (client2[kRunning] > 0) {
             return;
           }
-          client[kServerName] = request2.servername;
-          client[kHTTPContext]?.destroy(new InformationalError("servername changed"), () => {
-            client[kHTTPContext] = null;
-            resume(client);
+          client2[kServerName] = request2.servername;
+          client2[kHTTPContext]?.destroy(new InformationalError("servername changed"), () => {
+            client2[kHTTPContext] = null;
+            resume(client2);
           });
         }
-        if (client[kConnecting]) {
+        if (client2[kConnecting]) {
           return;
         }
-        if (!client[kHTTPContext]) {
-          connect(client);
+        if (!client2[kHTTPContext]) {
+          connect(client2);
           return;
         }
-        if (client[kHTTPContext].destroyed) {
+        if (client2[kHTTPContext].destroyed) {
           return;
         }
-        if (client[kHTTPContext].busy(request2)) {
+        if (client2[kHTTPContext].busy(request2)) {
           return;
         }
-        if (!request2.aborted && client[kHTTPContext].write(request2)) {
-          client[kPendingIdx]++;
+        if (!request2.aborted && client2[kHTTPContext].write(request2)) {
+          client2[kPendingIdx]++;
         } else {
-          client[kQueue].splice(client[kPendingIdx], 1);
+          client2[kQueue].splice(client2[kPendingIdx], 1);
         }
       }
     }
@@ -14787,7 +14822,7 @@ var require_pool_base = __commonJS({
       [kQueued] = 0;
       [kClients] = [];
       [kNeedDrain] = false;
-      [kOnDrain](client, origin, targets) {
+      [kOnDrain](client2, origin, targets) {
         const queue = this[kQueue];
         let needDrain = false;
         while (!needDrain) {
@@ -14796,9 +14831,9 @@ var require_pool_base = __commonJS({
             break;
           }
           this[kQueued]--;
-          needDrain = !client.dispatch(item.opts, item.handler);
+          needDrain = !client2.dispatch(item.opts, item.handler);
         }
-        client[kNeedDrain] = needDrain;
+        client2[kNeedDrain] = needDrain;
         if (!needDrain && this[kNeedDrain]) {
           this[kNeedDrain] = false;
           this.emit("drain", origin, [this, ...targets]);
@@ -14806,9 +14841,9 @@ var require_pool_base = __commonJS({
         if (this[kClosedResolve] && queue.isEmpty()) {
           const closeAll = [];
           for (let i = 0; i < this[kClients].length; i++) {
-            const client2 = this[kClients][i];
-            if (!client2.destroyed) {
-              closeAll.push(client2.close());
+            const client3 = this[kClients][i];
+            if (!client3.destroyed) {
+              closeAll.push(client3.close());
             }
           }
           return Promise.all(closeAll).then(this[kClosedResolve]);
@@ -14868,9 +14903,9 @@ var require_pool_base = __commonJS({
         if (this[kQueue].isEmpty()) {
           const closeAll = [];
           for (let i = 0; i < this[kClients].length; i++) {
-            const client = this[kClients][i];
-            if (!client.destroyed) {
-              closeAll.push(client.close());
+            const client2 = this[kClients][i];
+            if (!client2.destroyed) {
+              closeAll.push(client2.close());
             }
           }
           return Promise.all(closeAll);
@@ -14915,24 +14950,24 @@ var require_pool_base = __commonJS({
         }
         return false;
       }
-      [kAddClient](client) {
-        client.on("drain", this[kOnDrain].bind(this, client)).on("connect", this[kOnConnect]).on("disconnect", this[kOnDisconnect]).on("connectionError", this[kOnConnectionError]);
-        this[kClients].push(client);
+      [kAddClient](client2) {
+        client2.on("drain", this[kOnDrain].bind(this, client2)).on("connect", this[kOnConnect]).on("disconnect", this[kOnDisconnect]).on("connectionError", this[kOnConnectionError]);
+        this[kClients].push(client2);
         if (this[kNeedDrain]) {
           queueMicrotask(() => {
             if (this[kNeedDrain]) {
-              this[kOnDrain](client, client[kUrl], [client, this]);
+              this[kOnDrain](client2, client2[kUrl], [client2, this]);
             }
           });
         }
         return this;
       }
-      [kRemoveClient](client) {
-        const idx = this[kClients].indexOf(client);
+      [kRemoveClient](client2) {
+        const idx = this[kClients].indexOf(client2);
         if (idx !== -1) {
           this[kClients].splice(idx, 1);
         }
-        client.close(() => {
+        client2.close(() => {
         });
         this[kNeedDrain] = !this[kClients].some((dispatcher) => !dispatcher[kNeedDrain] && dispatcher.closed !== true && dispatcher.destroyed !== true);
       }
@@ -15036,12 +15071,12 @@ var require_pool = __commonJS({
       [kGetDispatcher]() {
         const clientTtlOption = this[kOptions].clientTtl;
         for (let i = 0; i < this[kClients].length; i++) {
-          const client = this[kClients][i];
-          if (clientTtlOption != null && clientTtlOption > 0 && client.ttl && Date.now() - client.ttl > clientTtlOption) {
-            this[kRemoveClient](client);
+          const client2 = this[kClients][i];
+          if (clientTtlOption != null && clientTtlOption > 0 && client2.ttl && Date.now() - client2.ttl > clientTtlOption) {
+            this[kRemoveClient](client2);
             i--;
-          } else if (!client[kNeedDrain]) {
-            return client;
+          } else if (!client2[kNeedDrain]) {
+            return client2;
           }
         }
         if (!this[kConnections] || this[kClients].length < this[kConnections]) {
@@ -15053,11 +15088,11 @@ var require_pool = __commonJS({
       [kHasDispatcher]() {
         const clientTtlOption = this[kOptions].clientTtl;
         for (let i = 0; i < this[kClients].length; i++) {
-          const client = this[kClients][i];
-          if (clientTtlOption != null && clientTtlOption > 0 && client.ttl && Date.now() - client.ttl > clientTtlOption) {
-            this[kRemoveClient](client);
+          const client2 = this[kClients][i];
+          if (clientTtlOption != null && clientTtlOption > 0 && client2.ttl && Date.now() - client2.ttl > clientTtlOption) {
+            this[kRemoveClient](client2);
             i--;
-          } else if (!client[kNeedDrain]) {
+          } else if (!client2[kNeedDrain]) {
             return true;
           }
         }
@@ -15153,8 +15188,8 @@ var require_balanced_pool = __commonJS({
             this._updateBalancedPoolStats();
           }
         });
-        for (const client of this[kClients]) {
-          client[kWeight] = this[kMaxWeightPerServer];
+        for (const client2 of this[kClients]) {
+          client2[kWeight] = this[kMaxWeightPerServer];
         }
         this._updateBalancedPoolStats();
         return this;
@@ -15312,14 +15347,14 @@ var require_round_robin_pool = __commonJS({
         let checked = 0;
         while (checked < this[kClients].length) {
           this[kIndex] = (this[kIndex] + 1) % this[kClients].length;
-          const client = this[kClients][this[kIndex]];
-          if (clientTtlOption != null && clientTtlOption > 0 && client.ttl && Date.now() - client.ttl > clientTtlOption) {
-            this[kRemoveClient](client);
+          const client2 = this[kClients][this[kIndex]];
+          if (clientTtlOption != null && clientTtlOption > 0 && client2.ttl && Date.now() - client2.ttl > clientTtlOption) {
+            this[kRemoveClient](client2);
             this[kIndex]--;
             continue;
           }
-          if (!client[kNeedDrain]) {
-            return client;
+          if (!client2[kNeedDrain]) {
+            return client2;
           }
           checked++;
         }
@@ -15332,14 +15367,14 @@ var require_round_robin_pool = __commonJS({
       [kHasDispatcher]() {
         const clientTtlOption = this[kOptions].clientTtl;
         for (let i = 0; i < this[kClients].length; i++) {
-          const client = this[kClients][i];
-          if (clientTtlOption != null && clientTtlOption > 0 && client.ttl && Date.now() - client.ttl > clientTtlOption) {
-            this[kRemoveClient](client);
+          const client2 = this[kClients][i];
+          if (clientTtlOption != null && clientTtlOption > 0 && client2.ttl && Date.now() - client2.ttl > clientTtlOption) {
+            this[kRemoveClient](client2);
             if (i <= this[kIndex]) {
               this[kIndex]--;
             }
             i--;
-          } else if (!client[kNeedDrain]) {
+          } else if (!client2[kNeedDrain]) {
             return true;
           }
         }
@@ -15441,8 +15476,8 @@ var require_agent = __commonJS({
               dispatcher.close();
             }
             let hasOrigin = false;
-            for (const client of this[kClients].values()) {
-              if (client[kUrl].origin === dispatcher[kUrl].origin) {
+            for (const client2 of this[kClients].values()) {
+              if (client2[kUrl].origin === dispatcher[kUrl].origin) {
                 hasOrigin = true;
                 break;
               }
@@ -28705,12 +28740,12 @@ var require_connection = __commonJS({
     var { runtimeFeatures } = require_runtime_features();
     var crypto2 = runtimeFeatures.has("crypto") ? require("node:crypto") : null;
     var warningEmitted = false;
-    function establishWebSocketConnection(url, protocols, client, handler2, options) {
+    function establishWebSocketConnection(url, protocols, client2, handler2, options) {
       const requestURL = url;
       requestURL.protocol = url.protocol === "ws:" ? "http:" : "https:";
       const request2 = makeRequest({
         urlList: [requestURL],
-        client,
+        client: client2,
         serviceWorkers: "none",
         referrer: "no-referrer",
         mode: "websocket",
@@ -29491,11 +29526,11 @@ var require_websocket = __commonJS({
           throw new DOMException("Invalid Sec-WebSocket-Protocol value", "SyntaxError");
         }
         this.#url = new URL(urlRecord.href);
-        const client = environmentSettingsObject.settingsObject;
+        const client2 = environmentSettingsObject.settingsObject;
         this.#handler.controller = establishWebSocketConnection(
           urlRecord,
           protocols,
-          client,
+          client2,
           this.#handler,
           options
         );
@@ -30052,11 +30087,11 @@ var require_websocketstream = __commonJS({
             }
           });
         }
-        const client = environmentSettingsObject.settingsObject;
+        const client2 = environmentSettingsObject.settingsObject;
         this.#handler.controller = establishWebSocketConnection(
           urlRecord,
           protocols,
-          client,
+          client2,
           this.#handler,
           options
         );
@@ -32906,12 +32941,12 @@ var require_util8 = __commonJS({
       }
       return obj;
     }
-    function errorRequest(client, request2, err) {
+    function errorRequest(client2, request2, err) {
       try {
         request2.onResponseError(err);
         assert(request2.aborted);
       } catch (err2) {
-        client.emit("error", err2);
+        client2.emit("error", err2);
       }
     }
     var setupConnectTimeout = process.platform === "win32" ? (socketWeakRef, opts) => {
@@ -33058,11 +33093,11 @@ var require_stats2 = __commonJS({
       kQueued
     } = require_symbols2();
     var ClientStats = class {
-      constructor(client) {
-        this.connected = client[kConnected];
-        this.pending = client[kPending];
-        this.running = client[kRunning];
-        this.size = client[kSize];
+      constructor(client2) {
+        this.connected = client2[kConnected];
+        this.pending = client2[kPending];
+        this.running = client2[kRunning];
+        this.size = client2[kSize];
       }
     };
     var PoolStats = class {
@@ -37838,10 +37873,10 @@ var require_client_h12 = __commonJS({
          * @param {import('net').Socket} socket
          * @param {*} llhttp
          */
-      constructor(client, socket, { exports: exports3 }) {
+      constructor(client2, socket, { exports: exports3 }) {
         this.llhttp = exports3;
         this.ptr = this.llhttp.llhttp_alloc(constants3.TYPE.RESPONSE);
-        this.client = client;
+        this.client = client2;
         this.socket = socket;
         this.timeout = null;
         this.timeoutWeakRef = new WeakRef(this);
@@ -37852,7 +37887,7 @@ var require_client_h12 = __commonJS({
         this.upgrade = false;
         this.headers = [];
         this.headersSize = 0;
-        this.headersMaxSize = client[kMaxHeadersSize];
+        this.headersMaxSize = client2[kMaxHeadersSize];
         this.shouldKeepAlive = false;
         this.paused = false;
         this.resume = this.resume.bind(this);
@@ -37860,7 +37895,7 @@ var require_client_h12 = __commonJS({
         this.keepAlive = "";
         this.contentLength = -1;
         this.connectionKeepAlive = false;
-        this.maxResponseSize = client[kMaxResponseSize];
+        this.maxResponseSize = client2[kMaxResponseSize];
       }
       setTimeout(delay, type) {
         if (delay !== this.timeoutValue || type & USE_FAST_TIMER ^ this.timeoutType & USE_FAST_TIMER) {
@@ -38010,15 +38045,15 @@ var require_client_h12 = __commonJS({
        * @returns {0|-1}
        */
       onMessageBegin() {
-        const { socket, client } = this;
+        const { socket, client: client2 } = this;
         if (socket.destroyed) {
           return -1;
         }
-        if (client[kRunning] === 0) {
+        if (client2[kRunning] === 0) {
           util.destroy(socket, new SocketError("bad response", util.getSocketInfo(socket)));
           return -1;
         }
-        const request2 = client[kQueue][client[kRunningIdx]];
+        const request2 = client2[kQueue][client2[kRunningIdx]];
         if (!request2) {
           return -1;
         }
@@ -38083,13 +38118,13 @@ var require_client_h12 = __commonJS({
        * @param {Buffer} head
        */
       onUpgrade(head) {
-        const { upgrade, client, socket, headers, statusCode } = this;
+        const { upgrade, client: client2, socket, headers, statusCode } = this;
         assert(upgrade);
-        assert(client[kSocket] === socket);
+        assert(client2[kSocket] === socket);
         assert(!socket.destroyed);
         assert(!this.paused);
         assert((headers.length & 1) === 0);
-        const request2 = client[kQueue][client[kRunningIdx]];
+        const request2 = client2[kQueue][client2[kRunningIdx]];
         assert(request2);
         assert(request2.upgrade || request2.method === "CONNECT");
         this.statusCode = 0;
@@ -38103,16 +38138,16 @@ var require_client_h12 = __commonJS({
         socket[kClient] = null;
         socket[kError] = null;
         removeAllListeners(socket);
-        client[kSocket] = null;
-        client[kHTTPContext] = null;
-        client[kQueue][client[kRunningIdx]++] = null;
-        client.emit("disconnect", client[kUrl], [client], new InformationalError("upgrade"));
+        client2[kSocket] = null;
+        client2[kHTTPContext] = null;
+        client2[kQueue][client2[kRunningIdx]++] = null;
+        client2.emit("disconnect", client2[kUrl], [client2], new InformationalError("upgrade"));
         try {
           request2.onRequestUpgrade(statusCode, headers, socket);
         } catch (err) {
           util.destroy(socket, err);
         }
-        client[kResume]();
+        client2[kResume]();
       }
       /**
        * @param {number} statusCode
@@ -38121,15 +38156,15 @@ var require_client_h12 = __commonJS({
        * @returns {number}
        */
       onHeadersComplete(statusCode, upgrade, shouldKeepAlive) {
-        const { client, socket, headers, statusText } = this;
+        const { client: client2, socket, headers, statusText } = this;
         if (socket.destroyed) {
           return -1;
         }
-        if (client[kRunning] === 0) {
+        if (client2[kRunning] === 0) {
           util.destroy(socket, new SocketError("bad response", util.getSocketInfo(socket)));
           return -1;
         }
-        const request2 = client[kQueue][client[kRunningIdx]];
+        const request2 = client2[kQueue][client2[kRunningIdx]];
         if (!request2) {
           return -1;
         }
@@ -38148,7 +38183,7 @@ var require_client_h12 = __commonJS({
         this.shouldKeepAlive = shouldKeepAlive || // Override llhttp value which does not allow keepAlive for HEAD.
         request2.method === "HEAD" && !socket[kReset] && this.connectionKeepAlive;
         if (this.statusCode >= 200) {
-          const bodyTimeout = request2.bodyTimeout != null ? request2.bodyTimeout : client[kBodyTimeout];
+          const bodyTimeout = request2.bodyTimeout != null ? request2.bodyTimeout : client2[kBodyTimeout];
           this.setTimeout(bodyTimeout, TIMEOUT_BODY);
         } else if (this.timeout) {
           if (this.timeout.refresh) {
@@ -38156,32 +38191,32 @@ var require_client_h12 = __commonJS({
           }
         }
         if (request2.method === "CONNECT") {
-          assert(client[kRunning] === 1);
+          assert(client2[kRunning] === 1);
           this.upgrade = true;
           return 2;
         }
         if (upgrade) {
-          assert(client[kRunning] === 1);
+          assert(client2[kRunning] === 1);
           this.upgrade = true;
           return 2;
         }
         assert((this.headers.length & 1) === 0);
         this.headers = [];
         this.headersSize = 0;
-        if (this.shouldKeepAlive && client[kPipelining]) {
+        if (this.shouldKeepAlive && client2[kPipelining]) {
           const keepAliveTimeout = this.keepAlive ? util.parseKeepAliveTimeout(this.keepAlive) : null;
           if (keepAliveTimeout != null) {
             const timeout = Math.min(
-              keepAliveTimeout - client[kKeepAliveTimeoutThreshold],
-              client[kKeepAliveMaxTimeout]
+              keepAliveTimeout - client2[kKeepAliveTimeoutThreshold],
+              client2[kKeepAliveMaxTimeout]
             );
             if (timeout <= 0) {
               socket[kReset] = true;
             } else {
-              client[kKeepAliveTimeoutValue] = timeout;
+              client2[kKeepAliveTimeoutValue] = timeout;
             }
           } else {
-            client[kKeepAliveTimeoutValue] = client[kKeepAliveDefaultTimeout];
+            client2[kKeepAliveTimeoutValue] = client2[kKeepAliveDefaultTimeout];
           }
         } else {
           socket[kReset] = true;
@@ -38198,7 +38233,7 @@ var require_client_h12 = __commonJS({
         }
         if (socket[kBlocking]) {
           socket[kBlocking] = false;
-          client[kResume]();
+          client2[kResume]();
         }
         return pause ? constants3.ERROR.PAUSED : 0;
       }
@@ -38207,11 +38242,11 @@ var require_client_h12 = __commonJS({
        * @returns {number}
        */
       onBody(buf) {
-        const { client, socket, statusCode, maxResponseSize } = this;
+        const { client: client2, socket, statusCode, maxResponseSize } = this;
         if (socket.destroyed) {
           return -1;
         }
-        const request2 = client[kQueue][client[kRunningIdx]];
+        const request2 = client2[kQueue][client2[kRunningIdx]];
         assert(request2);
         assert(this.timeoutType === TIMEOUT_BODY);
         if (this.timeout) {
@@ -38234,7 +38269,7 @@ var require_client_h12 = __commonJS({
        * @returns {number}
        */
       onMessageComplete() {
-        const { client, socket, statusCode, upgrade, headers, contentLength, bytesRead, shouldKeepAlive } = this;
+        const { client: client2, socket, statusCode, upgrade, headers, contentLength, bytesRead, shouldKeepAlive } = this;
         if (socket.destroyed && (!statusCode || shouldKeepAlive)) {
           return -1;
         }
@@ -38243,7 +38278,7 @@ var require_client_h12 = __commonJS({
         }
         assert(statusCode >= 100);
         assert((this.headers.length & 1) === 0);
-        const request2 = client[kQueue][client[kRunningIdx]];
+        const request2 = client2[kQueue][client2[kRunningIdx]];
         assert(request2);
         this.statusCode = 0;
         this.statusText = "";
@@ -38261,22 +38296,22 @@ var require_client_h12 = __commonJS({
           return -1;
         }
         request2.onResponseEnd(headers);
-        client[kQueue][client[kRunningIdx]++] = null;
-        socket[kSocketUsed] = client[kPending] === 0;
+        client2[kQueue][client2[kRunningIdx]++] = null;
+        socket[kSocketUsed] = client2[kPending] === 0;
         if (socket[kWriting]) {
-          assert(client[kRunning] === 0);
+          assert(client2[kRunning] === 0);
           util.destroy(socket, new InformationalError("reset"));
           return constants3.ERROR.PAUSED;
         } else if (!shouldKeepAlive) {
           util.destroy(socket, new InformationalError("reset"));
           return constants3.ERROR.PAUSED;
-        } else if (socket[kReset] && client[kRunning] === 0) {
+        } else if (socket[kReset] && client2[kRunning] === 0) {
           util.destroy(socket, new InformationalError("reset"));
           return constants3.ERROR.PAUSED;
-        } else if (client[kPipelining] == null || client[kPipelining] === 1) {
-          setImmediate(client[kResume]);
+        } else if (client2[kPipelining] == null || client2[kPipelining] === 1) {
+          setImmediate(client2[kResume]);
         } else {
-          client[kResume]();
+          client2[kResume]();
         }
         return 0;
       }
@@ -38286,9 +38321,9 @@ var require_client_h12 = __commonJS({
       if (!parser) {
         return;
       }
-      const { socket, timeoutType, client, paused } = parser;
+      const { socket, timeoutType, client: client2, paused } = parser;
       if (timeoutType === TIMEOUT_HEADERS) {
-        if (!socket[kWriting] || socket.writableNeedDrain || client[kRunning] > 1) {
+        if (!socket[kWriting] || socket.writableNeedDrain || client2[kRunning] > 1) {
           assert(!paused, "cannot be paused while waiting for headers");
           util.destroy(socket, new HeadersTimeoutError());
         }
@@ -38297,12 +38332,12 @@ var require_client_h12 = __commonJS({
           util.destroy(socket, new BodyTimeoutError());
         }
       } else if (timeoutType === TIMEOUT_KEEP_ALIVE) {
-        assert(client[kRunning] === 0 && client[kKeepAliveTimeoutValue]);
+        assert(client2[kRunning] === 0 && client2[kKeepAliveTimeoutValue]);
         util.destroy(socket, new InformationalError("socket idle timeout"));
       }
     }
-    function connectH1(client, socket) {
-      client[kSocket] = socket;
+    function connectH1(client2, socket) {
+      client2[kSocket] = socket;
       if (!llhttpInstance) {
         llhttpInstance = lazyllhttp();
       }
@@ -38319,7 +38354,7 @@ var require_client_h12 = __commonJS({
       socket[kIdleSocketValidation] = 0;
       socket[kIdleSocketValidationTimeout] = null;
       socket[kSocketUsed] = false;
-      socket[kParser] = new Parser(client, socket, llhttpInstance);
+      socket[kParser] = new Parser(client2, socket, llhttpInstance);
       util.addListener(socket, "error", onHttpSocketError);
       util.addListener(socket, "readable", onHttpSocketReadable);
       util.addListener(socket, "end", onHttpSocketEnd);
@@ -38330,10 +38365,10 @@ var require_client_h12 = __commonJS({
         version: "h1",
         defaultPipelining: 1,
         write(request2) {
-          return writeH1(client, request2);
+          return writeH1(client2, request2);
         },
         resume() {
-          resumeH1(client);
+          resumeH1(client2);
         },
         /**
          * @param {Error|undefined} err
@@ -38362,13 +38397,13 @@ var require_client_h12 = __commonJS({
             return true;
           }
           if (request2) {
-            if (client[kRunning] > 0 && !request2.idempotent) {
+            if (client2[kRunning] > 0 && !request2.idempotent) {
               return true;
             }
-            if (client[kRunning] > 0 && (request2.upgrade || request2.method === "CONNECT")) {
+            if (client2[kRunning] > 0 && (request2.upgrade || request2.method === "CONNECT")) {
               return true;
             }
-            if (client[kRunning] > 0 && util.bodyLength(request2.body) !== 0 && (util.isStream(request2.body) || util.isAsyncIterable(request2.body) || util.isFormDataLike(request2.body))) {
+            if (client2[kRunning] > 0 && util.bodyLength(request2.body) !== 0 && (util.isStream(request2.body) || util.isAsyncIterable(request2.body) || util.isFormDataLike(request2.body))) {
               return true;
             }
           }
@@ -38415,25 +38450,25 @@ var require_client_h12 = __commonJS({
         this[kParser] = null;
       }
       const err = this[kError] || new SocketError("closed", util.getSocketInfo(this));
-      const client = this[kClient];
-      client[kSocket] = null;
-      client[kHTTPContext] = null;
-      if (client.destroyed) {
-        assert(client[kPending] === 0);
-        const requests = client[kQueue].splice(client[kRunningIdx]);
+      const client2 = this[kClient];
+      client2[kSocket] = null;
+      client2[kHTTPContext] = null;
+      if (client2.destroyed) {
+        assert(client2[kPending] === 0);
+        const requests = client2[kQueue].splice(client2[kRunningIdx]);
         for (let i = 0; i < requests.length; i++) {
           const request2 = requests[i];
-          util.errorRequest(client, request2, err);
+          util.errorRequest(client2, request2, err);
         }
-      } else if (client[kRunning] > 0 && err.code !== "UND_ERR_INFO") {
-        const request2 = client[kQueue][client[kRunningIdx]];
-        client[kQueue][client[kRunningIdx]++] = null;
-        util.errorRequest(client, request2, err);
+      } else if (client2[kRunning] > 0 && err.code !== "UND_ERR_INFO") {
+        const request2 = client2[kQueue][client2[kRunningIdx]];
+        client2[kQueue][client2[kRunningIdx]++] = null;
+        util.errorRequest(client2, request2, err);
       }
-      client[kPendingIdx] = client[kRunningIdx];
-      assert(client[kRunning] === 0);
-      client.emit("disconnect", client[kUrl], [client], err);
-      client[kResume]();
+      client2[kPendingIdx] = client2[kRunningIdx];
+      assert(client2[kRunning] === 0);
+      client2.emit("disconnect", client2[kUrl], [client2], err);
+      client2[kResume]();
     }
     function onSocketClose() {
       this[kClosed] = true;
@@ -38445,21 +38480,21 @@ var require_client_h12 = __commonJS({
       }
       socket[kIdleSocketValidation] = 0;
     }
-    function scheduleIdleSocketValidation(client, socket) {
+    function scheduleIdleSocketValidation(client2, socket) {
       socket[kIdleSocketValidation] = 1;
       socket[kIdleSocketValidationTimeout] = setTimeout(() => {
         socket[kIdleSocketValidationTimeout] = null;
         socket[kIdleSocketValidation] = 2;
-        if (client[kSocket] === socket && !socket.destroyed) {
-          client[kResume]();
+        if (client2[kSocket] === socket && !socket.destroyed) {
+          client2[kResume]();
         }
       }, 0);
       socket[kIdleSocketValidationTimeout].unref?.();
     }
-    function resumeH1(client) {
-      const socket = client[kSocket];
+    function resumeH1(client2) {
+      const socket = client2[kSocket];
       if (socket && !socket.destroyed) {
-        if (client[kSize] === 0) {
+        if (client2[kSize] === 0) {
           if (!socket[kNoRef] && socket.unref) {
             socket.unref();
             socket[kNoRef] = true;
@@ -38468,9 +38503,9 @@ var require_client_h12 = __commonJS({
           socket.ref();
           socket[kNoRef] = false;
         }
-        if (client[kRunning] === 0 && client[kPending] > 0 && socket[kSocketUsed]) {
+        if (client2[kRunning] === 0 && client2[kPending] > 0 && socket[kSocketUsed]) {
           if (socket[kIdleSocketValidation] === 0) {
-            scheduleIdleSocketValidation(client, socket);
+            scheduleIdleSocketValidation(client2, socket);
             socket[kParser].readMore();
             if (socket.destroyed) {
               return;
@@ -38485,20 +38520,20 @@ var require_client_h12 = __commonJS({
             return;
           }
         }
-        if (client[kRunning] === 0) {
+        if (client2[kRunning] === 0) {
           socket[kParser].readMore();
           if (socket.destroyed) {
             return;
           }
         }
-        if (client[kSize] === 0) {
+        if (client2[kSize] === 0) {
           if (socket[kParser].timeoutType !== TIMEOUT_KEEP_ALIVE) {
-            socket[kParser].setTimeout(client[kKeepAliveTimeoutValue], TIMEOUT_KEEP_ALIVE);
+            socket[kParser].setTimeout(client2[kKeepAliveTimeoutValue], TIMEOUT_KEEP_ALIVE);
           }
-        } else if (client[kRunning] > 0 && socket[kParser].statusCode < 200) {
+        } else if (client2[kRunning] > 0 && socket[kParser].statusCode < 200) {
           if (socket[kParser].timeoutType !== TIMEOUT_HEADERS) {
-            const request2 = client[kQueue][client[kRunningIdx]];
-            const headersTimeout = request2.headersTimeout != null ? request2.headersTimeout : client[kHeadersTimeout];
+            const request2 = client2[kQueue][client2[kRunningIdx]];
+            const headersTimeout = request2.headersTimeout != null ? request2.headersTimeout : client2[kHeadersTimeout];
             socket[kParser].setTimeout(headersTimeout, TIMEOUT_HEADERS);
           }
         }
@@ -38507,7 +38542,7 @@ var require_client_h12 = __commonJS({
     function shouldSendContentLength(method) {
       return method !== "GET" && method !== "HEAD" && method !== "OPTIONS" && method !== "TRACE" && method !== "CONNECT";
     }
-    function writeH1(client, request2) {
+    function writeH1(client2, request2) {
       const { method, path: path2, host, upgrade, blocking, reset } = request2;
       let { body, headers, contentLength } = request2;
       const expectsPayload = method === "PUT" || method === "POST" || method === "PATCH" || method === "QUERY" || method === "PROPFIND" || method === "PROPPATCH";
@@ -38536,26 +38571,26 @@ var require_client_h12 = __commonJS({
         contentLength = null;
       }
       if (shouldSendContentLength(method) && contentLength > 0 && request2.contentLength !== null && request2.contentLength !== contentLength) {
-        if (client[kStrictContentLength]) {
-          util.errorRequest(client, request2, new RequestContentLengthMismatchError());
+        if (client2[kStrictContentLength]) {
+          util.errorRequest(client2, request2, new RequestContentLengthMismatchError());
           return false;
         }
         process.emitWarning(new RequestContentLengthMismatchError());
       }
-      const socket = client[kSocket];
+      const socket = client2[kSocket];
       clearIdleSocketValidation(socket);
       const abort = (err) => {
         if (request2.aborted || request2.completed) {
           return;
         }
-        util.errorRequest(client, request2, err || new RequestAbortedError());
+        util.errorRequest(client2, request2, err || new RequestAbortedError());
         util.destroy(body);
         util.destroy(socket, new InformationalError("aborted"));
       };
       try {
         request2.onRequestStart(abort, null);
       } catch (err) {
-        util.errorRequest(client, request2, err);
+        util.errorRequest(client2, request2, err);
       }
       if (request2.aborted) {
         return false;
@@ -38569,7 +38604,7 @@ var require_client_h12 = __commonJS({
       if (reset != null) {
         socket[kReset] = reset;
       }
-      if (client[kMaxRequests] && ++socket[kCounter] >= client[kMaxRequests]) {
+      if (client2[kMaxRequests] && ++socket[kCounter] >= client2[kMaxRequests]) {
         socket[kReset] = true;
       }
       if (blocking) {
@@ -38584,13 +38619,13 @@ var require_client_h12 = __commonJS({
         header += `host: ${host}\r
 `;
       } else {
-        header += client[kHostHeader];
+        header += client2[kHostHeader];
       }
       if (upgrade) {
         header += `connection: upgrade\r
 upgrade: ${upgrade}\r
 `;
-      } else if (client[kPipelining] && !socket[kReset]) {
+      } else if (client2[kPipelining] && !socket[kReset]) {
         header += "connection: keep-alive\r\n";
       } else {
         header += "connection: close\r\n";
@@ -38614,28 +38649,28 @@ upgrade: ${upgrade}\r
         channels.sendHeaders.publish({ request: request2, headers: header, socket });
       }
       if (!body || bodyLength === 0) {
-        writeBuffer(abort, null, client, request2, socket, contentLength, header, expectsPayload);
+        writeBuffer(abort, null, client2, request2, socket, contentLength, header, expectsPayload);
       } else if (util.isBuffer(body)) {
-        writeBuffer(abort, body, client, request2, socket, contentLength, header, expectsPayload);
+        writeBuffer(abort, body, client2, request2, socket, contentLength, header, expectsPayload);
       } else if (util.isBlobLike(body)) {
         if (typeof body.stream === "function") {
-          writeIterable(abort, body.stream(), client, request2, socket, contentLength, header, expectsPayload);
+          writeIterable(abort, body.stream(), client2, request2, socket, contentLength, header, expectsPayload);
         } else {
-          writeBlob(abort, body, client, request2, socket, contentLength, header, expectsPayload);
+          writeBlob(abort, body, client2, request2, socket, contentLength, header, expectsPayload);
         }
       } else if (util.isStream(body)) {
-        writeStream(abort, body, client, request2, socket, contentLength, header, expectsPayload);
+        writeStream(abort, body, client2, request2, socket, contentLength, header, expectsPayload);
       } else if (util.isIterable(body)) {
-        writeIterable(abort, body, client, request2, socket, contentLength, header, expectsPayload);
+        writeIterable(abort, body, client2, request2, socket, contentLength, header, expectsPayload);
       } else {
         assert(false);
       }
       return true;
     }
-    function writeStream(abort, body, client, request2, socket, contentLength, header, expectsPayload) {
-      assert(contentLength !== 0 || client[kRunning] === 0, "stream body cannot be pipelined");
+    function writeStream(abort, body, client2, request2, socket, contentLength, header, expectsPayload) {
+      assert(contentLength !== 0 || client2[kRunning] === 0, "stream body cannot be pipelined");
       let finished = false;
-      const writer = new AsyncWriter({ abort, socket, request: request2, contentLength, client, expectsPayload, header });
+      const writer = new AsyncWriter({ abort, socket, request: request2, contentLength, client: client2, expectsPayload, header });
       const onData = function(chunk2) {
         if (finished) {
           return;
@@ -38670,7 +38705,7 @@ upgrade: ${upgrade}\r
           return;
         }
         finished = true;
-        assert(socket.destroyed || socket[kWriting] && client[kRunning] <= 1);
+        assert(socket.destroyed || socket[kWriting] && client2[kRunning] <= 1);
         socket.off("drain", onDrain).off("error", onFinished);
         body.removeListener("data", onData).removeListener("end", onFinished).removeListener("close", onClose);
         if (!err) {
@@ -38701,7 +38736,7 @@ upgrade: ${upgrade}\r
         setImmediate(onClose);
       }
     }
-    function writeBuffer(abort, body, client, request2, socket, contentLength, header, expectsPayload) {
+    function writeBuffer(abort, body, client2, request2, socket, contentLength, header, expectsPayload) {
       try {
         if (!body) {
           if (contentLength === 0) {
@@ -38727,12 +38762,12 @@ upgrade: ${upgrade}\r
           }
         }
         request2.onRequestSent();
-        client[kResume]();
+        client2[kResume]();
       } catch (err) {
         abort(err);
       }
     }
-    async function writeBlob(abort, body, client, request2, socket, contentLength, header, expectsPayload) {
+    async function writeBlob(abort, body, client2, request2, socket, contentLength, header, expectsPayload) {
       try {
         if (contentLength != null && contentLength !== body.size) {
           throw new RequestContentLengthMismatchError();
@@ -38749,13 +38784,13 @@ upgrade: ${upgrade}\r
         if (!expectsPayload && request2.reset !== false) {
           socket[kReset] = true;
         }
-        client[kResume]();
+        client2[kResume]();
       } catch (err) {
         abort(err);
       }
     }
-    async function writeIterable(abort, body, client, request2, socket, contentLength, header, expectsPayload) {
-      assert(contentLength !== 0 || client[kRunning] === 0, "iterator body cannot be pipelined");
+    async function writeIterable(abort, body, client2, request2, socket, contentLength, header, expectsPayload) {
+      assert(contentLength !== 0 || client2[kRunning] === 0, "iterator body cannot be pipelined");
       let callback = null;
       function onDrain() {
         if (callback) {
@@ -38773,7 +38808,7 @@ upgrade: ${upgrade}\r
         }
       });
       socket.on("close", onDrain).on("drain", onDrain);
-      const writer = new AsyncWriter({ abort, socket, request: request2, contentLength, client, expectsPayload, header });
+      const writer = new AsyncWriter({ abort, socket, request: request2, contentLength, client: client2, expectsPayload, header });
       try {
         for await (const chunk2 of body) {
           if (socket[kError]) {
@@ -38802,11 +38837,11 @@ upgrade: ${upgrade}\r
        * @param {boolean} arg.expectsPayload
        * @param {string} arg.header
        */
-      constructor({ abort, socket, request: request2, contentLength, client, expectsPayload, header }) {
+      constructor({ abort, socket, request: request2, contentLength, client: client2, expectsPayload, header }) {
         this.socket = socket;
         this.request = request2;
         this.contentLength = contentLength;
-        this.client = client;
+        this.client = client2;
         this.bytesWritten = 0;
         this.expectsPayload = expectsPayload;
         this.header = header;
@@ -38818,7 +38853,7 @@ upgrade: ${upgrade}\r
        * @returns
        */
       write(chunk2) {
-        const { socket, request: request2, contentLength, client, bytesWritten, expectsPayload, header } = this;
+        const { socket, request: request2, contentLength, client: client2, bytesWritten, expectsPayload, header } = this;
         if (socket[kError]) {
           throw socket[kError];
         }
@@ -38830,7 +38865,7 @@ upgrade: ${upgrade}\r
           return true;
         }
         if (contentLength !== null && bytesWritten + len > contentLength) {
-          if (client[kStrictContentLength]) {
+          if (client2[kStrictContentLength]) {
             throw new RequestContentLengthMismatchError();
           }
           process.emitWarning(new RequestContentLengthMismatchError());
@@ -38871,7 +38906,7 @@ ${len.toString(16)}\r
        * @returns {void}
        */
       end() {
-        const { socket, contentLength, client, bytesWritten, expectsPayload, header, request: request2 } = this;
+        const { socket, contentLength, client: client2, bytesWritten, expectsPayload, header, request: request2 } = this;
         request2.onRequestSent();
         socket[kWriting] = false;
         if (socket[kError]) {
@@ -38893,7 +38928,7 @@ ${len.toString(16)}\r
           socket.write("\r\n0\r\n\r\n", "latin1");
         }
         if (contentLength !== null && bytesWritten !== contentLength) {
-          if (client[kStrictContentLength]) {
+          if (client2[kStrictContentLength]) {
             throw new RequestContentLengthMismatchError();
           } else {
             process.emitWarning(new RequestContentLengthMismatchError());
@@ -38904,17 +38939,17 @@ ${len.toString(16)}\r
             socket[kParser].timeout.refresh();
           }
         }
-        client[kResume]();
+        client2[kResume]();
       }
       /**
        * @param {Error} [err]
        * @returns {void}
        */
       destroy(err) {
-        const { socket, client, abort } = this;
+        const { socket, client: client2, abort } = this;
         socket[kWriting] = false;
         if (err) {
-          assert(client[kRunning] <= 1, "pipeline should only contain this request");
+          assert(client2[kRunning] <= 1, "pipeline should only contain this request");
           abort(err);
         }
       }
@@ -39002,12 +39037,12 @@ var require_client_h22 = __commonJS({
       return session[kError] || (errorCode === NGHTTP2_NO_ERROR ? new InformationalError(`HTTP/2: "GOAWAY" frame received with code ${errorCode}`) : new SocketError(`HTTP/2: "GOAWAY" frame received with code ${errorCode}`, util.getSocketInfo(session[kSocket])));
     }
     function resetHttp2Session(session, err) {
-      const client = session[kClient];
+      const client2 = session[kClient];
       const socket = session[kSocket];
-      if (client[kHTTP2Session] === session) {
-        client[kSocket] = null;
-        client[kHTTPContext] = null;
-        client[kHTTP2Session] = null;
+      if (client2[kHTTP2Session] === session) {
+        client2[kSocket] = null;
+        client2[kHTTPContext] = null;
+        client2[kHTTP2Session] = null;
       }
       if (socket != null && socket[kError] == null) {
         socket[kError] = err;
@@ -39020,10 +39055,10 @@ var require_client_h22 = __commonJS({
       }
       util.destroy(socket, err);
     }
-    function getGoAwayPendingIdx(client, lastStreamID) {
+    function getGoAwayPendingIdx(client2, lastStreamID) {
       const maxAcceptedStreamID = Number.isInteger(lastStreamID) ? lastStreamID : Number.MAX_SAFE_INTEGER;
-      for (let i = client[kRunningIdx]; i < client[kPendingIdx]; i++) {
-        const request2 = client[kQueue][i];
+      for (let i = client2[kRunningIdx]; i < client2[kPendingIdx]; i++) {
+        const request2 = client2[kQueue][i];
         if (request2 == null) {
           continue;
         }
@@ -39031,7 +39066,7 @@ var require_client_h22 = __commonJS({
           return i;
         }
       }
-      return client[kPendingIdx];
+      return client2[kPendingIdx];
     }
     function detachRequestFromStream(request2) {
       request2[kRequestStreamId] = null;
@@ -39053,18 +39088,18 @@ var require_client_h22 = __commonJS({
       detachRequestFromStream(request2);
       cleanup?.(stream2);
     }
-    function requeueUnsentRequest(client, request2) {
-      client[kQueue].splice(client[kPendingIdx] + 1, 0, request2);
+    function requeueUnsentRequest(client2, request2) {
+      client2[kQueue].splice(client2[kPendingIdx] + 1, 0, request2);
     }
-    function completeRequest(client, request2, resetPendingIdx = false) {
-      const index = client[kQueue].indexOf(request2, client[kRunningIdx]);
-      if (index === -1 || index >= client[kPendingIdx]) {
+    function completeRequest(client2, request2, resetPendingIdx = false) {
+      const index = client2[kQueue].indexOf(request2, client2[kRunningIdx]);
+      if (index === -1 || index >= client2[kPendingIdx]) {
         return;
       }
-      client[kQueue].splice(index, 1);
-      client[kPendingIdx]--;
-      if (resetPendingIdx && client[kPendingIdx] < client[kRunningIdx]) {
-        client[kPendingIdx] = client[kRunningIdx];
+      client2[kQueue].splice(index, 1);
+      client2[kPendingIdx]--;
+      if (resetPendingIdx && client2[kPendingIdx] < client2[kRunningIdx]) {
+        client2[kPendingIdx] = client2[kRunningIdx];
       }
     }
     function canRetryRequestAfterGoAway(request2) {
@@ -39081,27 +39116,27 @@ var require_client_h22 = __commonJS({
         }
       }
     }
-    function connectH2(client, socket) {
-      client[kSocket] = socket;
-      const http2InitialWindowSize = client[kHTTP2InitialWindowSize];
-      const http2ConnectionWindowSize = client[kHTTP2ConnectionWindowSize];
-      const session = http2.connect(client[kUrl], {
+    function connectH2(client2, socket) {
+      client2[kSocket] = socket;
+      const http2InitialWindowSize = client2[kHTTP2InitialWindowSize];
+      const http2ConnectionWindowSize = client2[kHTTP2ConnectionWindowSize];
+      const session = http2.connect(client2[kUrl], {
         createConnection: () => socket,
-        peerMaxConcurrentStreams: client[kMaxConcurrentStreams],
+        peerMaxConcurrentStreams: client2[kMaxConcurrentStreams],
         settings: {
           // TODO(metcoder95): add support for PUSH
           enablePush: false,
           ...http2InitialWindowSize != null ? { initialWindowSize: http2InitialWindowSize } : null
         }
       });
-      client[kSocket] = socket;
+      client2[kSocket] = socket;
       session[kOpenStreams] = 0;
-      session[kClient] = client;
+      session[kClient] = client2;
       session[kSocket] = socket;
       session[kHTTP2SessionState] = {
         idleTimeout: null,
         ping: {
-          interval: client[kPingInterval] === 0 ? null : setInterval(onHttp2SendPing, client[kPingInterval], session).unref()
+          interval: client2[kPingInterval] === 0 ? null : setInterval(onHttp2SendPing, client2[kPingInterval], session).unref()
         }
       };
       session[kReceivedGoAway] = false;
@@ -39117,7 +39152,7 @@ var require_client_h22 = __commonJS({
       util.addListener(session, "close", onHttp2SessionClose);
       util.addListener(session, "remoteSettings", onHttp2RemoteSettings);
       session.unref();
-      client[kHTTP2Session] = session;
+      client2[kHTTP2Session] = session;
       socket[kHTTP2Session] = session;
       util.addListener(socket, "error", onHttp2SocketError);
       util.addListener(socket, "end", onHttp2SocketEnd);
@@ -39132,13 +39167,13 @@ var require_client_h22 = __commonJS({
          * @returns {boolean}
         */
         write(request2) {
-          return writeH2(client, request2);
+          return writeH2(client2, request2);
         },
         /**
          * @returns {void}
          */
         resume() {
-          resumeH2(client);
+          resumeH2(client2);
         },
         /**
          * @param {Error | null} err
@@ -39162,14 +39197,14 @@ var require_client_h22 = __commonJS({
          * @returns {boolean}
         */
         busy(request2) {
-          if (session[kRemoteSettings] === false && client[kRunning] > 0) {
+          if (session[kRemoteSettings] === false && client2[kRunning] > 0) {
             return true;
           }
-          if (client[kRunning] >= client[kMaxConcurrentStreams]) {
+          if (client2[kRunning] >= client2[kMaxConcurrentStreams]) {
             return true;
           }
           if (request2 != null) {
-            if (client[kRunning] > 0) {
+            if (client2[kRunning] > 0) {
               if ((request2.upgrade === "websocket" || request2.method === "CONNECT") && session[kRemoteSettings] === false) return true;
               if (util.bodyLength(request2.body) !== 0 && (util.isStream(request2.body) || util.isAsyncIterable(request2.body) || util.isFormDataLike(request2.body))) return true;
             } else {
@@ -39180,18 +39215,18 @@ var require_client_h22 = __commonJS({
         }
       };
     }
-    function resumeH2(client) {
-      const socket = client[kSocket];
-      const session = client[kHTTP2Session];
+    function resumeH2(client2) {
+      const socket = client2[kSocket];
+      const session = client2[kHTTP2Session];
       if (socket?.destroyed === false) {
-        if (client[kSize] === 0 || client[kMaxConcurrentStreams] === 0) {
+        if (client2[kSize] === 0 || client2[kMaxConcurrentStreams] === 0) {
           socket.unref();
           session.unref();
         } else {
           socket.ref();
           session.ref();
         }
-        if (client[kSize] === 0 && session[kOpenStreams] === 0) {
+        if (client2[kSize] === 0 && session[kOpenStreams] === 0) {
           setHttp2IdleTimeout(session);
         } else {
           clearHttp2IdleTimeout(session);
@@ -39206,25 +39241,25 @@ var require_client_h22 = __commonJS({
       }
     }
     function setHttp2IdleTimeout(session) {
-      const client = session[kClient];
-      if (client[kHTTP2Session] !== session || session.closed || session.destroyed) {
+      const client2 = session[kClient];
+      if (client2[kHTTP2Session] !== session || session.closed || session.destroyed) {
         return;
       }
-      if (session[kOpenStreams] !== 0 || client[kSize] !== 0) {
+      if (session[kOpenStreams] !== 0 || client2[kSize] !== 0) {
         clearHttp2IdleTimeout(session);
         return;
       }
       const state = session[kHTTP2SessionState];
       if (state.idleTimeout == null) {
-        state.idleTimeout = setTimeout(onHttp2SessionIdleTimeout, client[kKeepAliveDefaultTimeout], session).unref();
+        state.idleTimeout = setTimeout(onHttp2SessionIdleTimeout, client2[kKeepAliveDefaultTimeout], session).unref();
       }
     }
     function onHttp2SessionIdleTimeout(session) {
-      const client = session[kClient];
+      const client2 = session[kClient];
       const socket = session[kSocket];
       const state = session[kHTTP2SessionState];
       state.idleTimeout = null;
-      if (client[kHTTP2Session] !== session || session[kOpenStreams] !== 0 || client[kSize] !== 0 || session.closed || session.destroyed) {
+      if (client2[kHTTP2Session] !== session || session[kOpenStreams] !== 0 || client2[kSize] !== 0 || session.closed || session.destroyed) {
         return;
       }
       const err = new InformationalError("socket idle timeout");
@@ -39260,14 +39295,14 @@ var require_client_h22 = __commonJS({
       }
       session.ping(onPing.bind(session));
       function onPing(err, duration2) {
-        const client = this[kClient];
+        const client2 = this[kClient];
         const socket = this[kSocket];
         if (err != null) {
           const error = new InformationalError(`HTTP/2: "PING" errored - type ${err.message}`);
           socket[kError] = error;
-          client[kOnError](error);
+          client2[kOnError](error);
         } else {
-          client.emit("ping", duration2);
+          client2.emit("ping", duration2);
         }
       }
     }
@@ -39294,59 +39329,59 @@ var require_client_h22 = __commonJS({
       }
       this[kReceivedGoAway] = true;
       const err = getGoAwayError(this, errorCode);
-      const client = this[kClient];
-      const previousPendingIdx = client[kPendingIdx];
-      const pendingIdx = getGoAwayPendingIdx(client, lastStreamID);
+      const client2 = this[kClient];
+      const previousPendingIdx = client2[kPendingIdx];
+      const pendingIdx = getGoAwayPendingIdx(client2, lastStreamID);
       const retriableRequests = [];
       for (let i = pendingIdx; i < previousPendingIdx; i++) {
-        const request2 = client[kQueue][i];
+        const request2 = client2[kQueue][i];
         if (request2 != null) {
           closeRequestStream(request2);
           if (canRetryRequestAfterGoAway(request2)) {
             retriableRequests.push(request2);
           } else {
-            util.errorRequest(client, request2, err);
+            util.errorRequest(client2, request2, err);
           }
         }
       }
       if (pendingIdx !== previousPendingIdx) {
-        const remainingPendingRequests = client[kQueue].slice(previousPendingIdx);
-        client[kQueue].length = pendingIdx;
-        client[kQueue].push(...retriableRequests, ...remainingPendingRequests);
+        const remainingPendingRequests = client2[kQueue].slice(previousPendingIdx);
+        client2[kQueue].length = pendingIdx;
+        client2[kQueue].push(...retriableRequests, ...remainingPendingRequests);
       }
-      if (client[kHTTP2Session] === this) {
-        client[kSocket] = null;
-        client[kHTTPContext] = null;
-        client[kHTTP2Session] = null;
+      if (client2[kHTTP2Session] === this) {
+        client2[kSocket] = null;
+        client2[kHTTPContext] = null;
+        client2[kHTTP2Session] = null;
       }
       clearHttp2IdleTimeout(this);
       if (!this.closed && !this.destroyed) {
         this.close();
       }
-      client[kPendingIdx] = pendingIdx;
-      client.emit("disconnect", client[kUrl], [client], err);
-      client[kResume]();
+      client2[kPendingIdx] = pendingIdx;
+      client2.emit("disconnect", client2[kUrl], [client2], err);
+      client2[kResume]();
     }
     function onHttp2SessionClose() {
-      const { [kClient]: client, [kHTTP2SessionState]: state, [kSocket]: socket } = this;
+      const { [kClient]: client2, [kHTTP2SessionState]: state, [kSocket]: socket } = this;
       const err = socket[kError] || this[kError] || new SocketError("closed", util.getSocketInfo(socket));
-      if (client[kHTTP2Session] === this) {
-        client[kSocket] = null;
-        client[kHTTPContext] = null;
-        client[kHTTP2Session] = null;
+      if (client2[kHTTP2Session] === this) {
+        client2[kSocket] = null;
+        client2[kHTTPContext] = null;
+        client2[kHTTP2Session] = null;
       }
       clearHttp2IdleTimeout(this);
       if (state.ping.interval != null) {
         clearInterval(state.ping.interval);
         state.ping.interval = null;
       }
-      if (client.destroyed) {
-        assert(client[kPending] === 0);
-        const requests = client[kQueue].splice(client[kRunningIdx]);
+      if (client2.destroyed) {
+        assert(client2[kPending] === 0);
+        const requests = client2[kQueue].splice(client2[kRunningIdx]);
         for (let i = 0; i < requests.length; i++) {
           const request2 = requests[i];
           if (request2 != null) {
-            util.errorRequest(client, request2, err);
+            util.errorRequest(client2, request2, err);
           }
         }
       }
@@ -39354,22 +39389,22 @@ var require_client_h22 = __commonJS({
     function onHttp2SocketClose() {
       const err = this[kError] || new SocketError("closed", util.getSocketInfo(this));
       const session = this[kHTTP2Session];
-      const client = session[kClient];
-      if (client[kSocket] !== this) {
-        if (session[kReceivedGoAway] || client[kHTTP2Session] != null && client[kHTTP2Session] !== session) {
+      const client2 = session[kClient];
+      if (client2[kSocket] !== this) {
+        if (session[kReceivedGoAway] || client2[kHTTP2Session] != null && client2[kHTTP2Session] !== session) {
           return;
         }
       }
-      client[kSocket] = null;
-      client[kHTTPContext] = null;
-      if (client[kHTTP2Session] === session) {
-        client[kHTTP2Session] = null;
+      client2[kSocket] = null;
+      client2[kHTTPContext] = null;
+      if (client2[kHTTP2Session] === session) {
+        client2[kHTTP2Session] = null;
       }
       session.destroy(err);
-      client[kPendingIdx] = client[kRunningIdx];
-      assert(client[kRunning] === 0);
-      client.emit("disconnect", client[kUrl], [client], err);
-      client[kResume]();
+      client2[kPendingIdx] = client2[kRunningIdx];
+      assert(client2[kRunning] === 0);
+      client2.emit("disconnect", client2[kUrl], [client2], err);
+      client2[kResume]();
     }
     function onHttp2SocketError(err) {
       assert(err.code !== "ERR_TLS_CERT_ALTNAME_INVALID");
@@ -39522,19 +39557,19 @@ var require_client_h22 = __commonJS({
       ++session[kOpenStreams];
       stream2.setTimeout(headersTimeout);
     }
-    function writeH2(client, request2) {
-      const headersTimeout = request2.headersTimeout ?? client[kHeadersTimeout];
-      const bodyTimeout = request2.bodyTimeout ?? client[kBodyTimeout];
-      const session = client[kHTTP2Session];
+    function writeH2(client2, request2) {
+      const headersTimeout = request2.headersTimeout ?? client2[kHeadersTimeout];
+      const bodyTimeout = request2.bodyTimeout ?? client2[kBodyTimeout];
+      const session = client2[kHTTP2Session];
       const { method, path: path2, host, upgrade, expectContinue, signal, protocol, headers: reqHeaders } = request2;
       let { body } = request2;
       if (upgrade != null && upgrade !== "websocket") {
-        util.errorRequest(client, request2, new InvalidArgumentError(`Custom upgrade "${upgrade}" not supported over HTTP/2`));
+        util.errorRequest(client2, request2, new InvalidArgumentError(`Custom upgrade "${upgrade}" not supported over HTTP/2`));
         return false;
       }
       const headers = buildRequestHeaders(reqHeaders);
       let stream2 = null;
-      headers[HTTP2_HEADER_AUTHORITY] = host || client[kHostAuthority];
+      headers[HTTP2_HEADER_AUTHORITY] = host || client2[kHostAuthority];
       headers[HTTP2_HEADER_METHOD] = method;
       let requestFinalized = false;
       const finalizeRequest = (resetPendingIdx = false) => {
@@ -39542,19 +39577,19 @@ var require_client_h22 = __commonJS({
           return;
         }
         requestFinalized = true;
-        completeRequest(client, request2, resetPendingIdx);
-        client[kResume]();
+        completeRequest(client2, request2, resetPendingIdx);
+        client2[kResume]();
       };
       const abort = (err, resetPendingIdx = false) => {
         if (request2.aborted || request2.completed) {
           return;
         }
         err = err || new RequestAbortedError();
-        util.errorRequest(client, request2, err);
+        util.errorRequest(client2, request2, err);
         if (stream2 != null) {
           clearRequestStream(request2);
           stream2.close();
-          client[kOnError](err);
+          client2[kOnError](err);
           finalizeRequest(resetPendingIdx);
         }
         util.destroy(body, err);
@@ -39568,7 +39603,7 @@ var require_client_h22 = __commonJS({
             wrappedErr2.cause = err;
             session[kError] = wrappedErr2;
             resetHttp2Session(session, wrappedErr2);
-            requeueUnsentRequest(client, request2);
+            requeueUnsentRequest(client2, request2);
             return null;
           }
           const wrappedErr = new InformationalError(err.message, { cause: err });
@@ -39583,7 +39618,7 @@ var require_client_h22 = __commonJS({
       try {
         request2.onRequestStart(abort, null);
       } catch (err) {
-        util.errorRequest(client, request2, err);
+        util.errorRequest(client2, request2, err);
       }
       if (request2.aborted) {
         return false;
@@ -39602,7 +39637,7 @@ var require_client_h22 = __commonJS({
         };
         if (upgrade === "websocket") {
           if (session[kEnableConnectProtocol] === false) {
-            util.errorRequest(client, request2, new InformationalError("HTTP/2: Extended CONNECT protocol not supported by server"));
+            util.errorRequest(client2, request2, new InformationalError("HTTP/2: Extended CONNECT protocol not supported by server"));
             session.unref();
             return false;
           }
@@ -39651,8 +39686,8 @@ var require_client_h22 = __commonJS({
         contentLength = null;
       }
       if (shouldSendContentLength(method) && contentLength > 0 && request2.contentLength != null && request2.contentLength !== contentLength) {
-        if (client[kStrictContentLength]) {
-          util.errorRequest(client, request2, new RequestContentLengthMismatchError());
+        if (client2[kStrictContentLength]) {
+          util.errorRequest(client2, request2, new RequestContentLengthMismatchError());
           return false;
         }
         process.emitWarning(new RequestContentLengthMismatchError());
@@ -39674,7 +39709,7 @@ var require_client_h22 = __commonJS({
       const state = {
         abort,
         body,
-        client,
+        client: client2,
         contentLength,
         expectsPayload,
         finalizeRequest,
@@ -39823,15 +39858,15 @@ var require_client_h22 = __commonJS({
     function writeBodyH2() {
       const stream2 = this;
       const state = stream2[kRequestStreamState];
-      const { abort, body, client, contentLength, expectsPayload, request: request2 } = state;
+      const { abort, body, client: client2, contentLength, expectsPayload, request: request2 } = state;
       if (!body || contentLength === 0) {
         writeBuffer(
           abort,
           stream2,
           null,
-          client,
+          client2,
           request2,
-          client[kSocket],
+          client2[kSocket],
           contentLength,
           expectsPayload
         );
@@ -39840,9 +39875,9 @@ var require_client_h22 = __commonJS({
           abort,
           stream2,
           body,
-          client,
+          client2,
           request2,
-          client[kSocket],
+          client2[kSocket],
           contentLength,
           expectsPayload
         );
@@ -39852,9 +39887,9 @@ var require_client_h22 = __commonJS({
             abort,
             stream2,
             body.stream(),
-            client,
+            client2,
             request2,
-            client[kSocket],
+            client2[kSocket],
             contentLength,
             expectsPayload
           );
@@ -39863,9 +39898,9 @@ var require_client_h22 = __commonJS({
             abort,
             stream2,
             body,
-            client,
+            client2,
             request2,
-            client[kSocket],
+            client2[kSocket],
             contentLength,
             expectsPayload
           );
@@ -39873,11 +39908,11 @@ var require_client_h22 = __commonJS({
       } else if (util.isStream(body)) {
         writeStream(
           abort,
-          client[kSocket],
+          client2[kSocket],
           expectsPayload,
           stream2,
           body,
-          client,
+          client2,
           request2,
           contentLength
         );
@@ -39886,9 +39921,9 @@ var require_client_h22 = __commonJS({
           abort,
           stream2,
           body,
-          client,
+          client2,
           request2,
-          client[kSocket],
+          client2[kSocket],
           contentLength,
           expectsPayload
         );
@@ -39896,7 +39931,7 @@ var require_client_h22 = __commonJS({
         assert(false);
       }
     }
-    function writeBuffer(abort, h2stream, body, client, request2, socket, contentLength, expectsPayload) {
+    function writeBuffer(abort, h2stream, body, client2, request2, socket, contentLength, expectsPayload) {
       try {
         if (body != null && util.isBuffer(body)) {
           assert(contentLength === body.byteLength, "buffer body must have content length");
@@ -39910,13 +39945,13 @@ var require_client_h22 = __commonJS({
           socket[kReset] = true;
         }
         request2.onRequestSent();
-        client[kResume]();
+        client2[kResume]();
       } catch (error) {
         abort(error);
       }
     }
-    function writeStream(abort, socket, expectsPayload, h2stream, body, client, request2, contentLength) {
-      assert(contentLength !== 0 || client[kRunning] === 0, "stream body cannot be pipelined");
+    function writeStream(abort, socket, expectsPayload, h2stream, body, client2, request2, contentLength) {
+      assert(contentLength !== 0 || client2[kRunning] === 0, "stream body cannot be pipelined");
       const pipe = pipeline(
         body,
         h2stream,
@@ -39930,7 +39965,7 @@ var require_client_h22 = __commonJS({
             if (!expectsPayload) {
               socket[kReset] = true;
             }
-            client[kResume]();
+            client2[kResume]();
           }
         }
       );
@@ -39939,7 +39974,7 @@ var require_client_h22 = __commonJS({
         request2.onBodySent(chunk2);
       }
     }
-    async function writeBlob(abort, h2stream, body, client, request2, socket, contentLength, expectsPayload) {
+    async function writeBlob(abort, h2stream, body, client2, request2, socket, contentLength, expectsPayload) {
       try {
         if (contentLength != null && contentLength !== body.size) {
           throw new RequestContentLengthMismatchError();
@@ -39954,13 +39989,13 @@ var require_client_h22 = __commonJS({
         if (!expectsPayload) {
           socket[kReset] = true;
         }
-        client[kResume]();
+        client2[kResume]();
       } catch (err) {
         abort(err);
       }
     }
-    async function writeIterable(abort, h2stream, body, client, request2, socket, contentLength, expectsPayload) {
-      assert(contentLength !== 0 || client[kRunning] === 0, "iterator body cannot be pipelined");
+    async function writeIterable(abort, h2stream, body, client2, request2, socket, contentLength, expectsPayload) {
+      assert(contentLength !== 0 || client2[kRunning] === 0, "iterator body cannot be pipelined");
       let callback = null;
       function onDrain() {
         if (callback) {
@@ -39994,7 +40029,7 @@ var require_client_h22 = __commonJS({
         if (!expectsPayload) {
           socket[kReset] = true;
         }
-        client[kResume]();
+        client2[kResume]();
       } catch (err) {
         abort(err);
       } finally {
@@ -40075,14 +40110,14 @@ var require_client2 = __commonJS({
     };
     var noop3 = () => {
     };
-    function getPipelining(client) {
-      return client[kPipelining] ?? client[kHTTPContext]?.defaultPipelining ?? 1;
+    function getPipelining(client2) {
+      return client2[kPipelining] ?? client2[kHTTPContext]?.defaultPipelining ?? 1;
     }
-    function getMaxConcurrent(client) {
-      if (client[kHTTPContext]?.version === "h2") {
-        return client[kMaxConcurrentStreams];
+    function getMaxConcurrent(client2) {
+      if (client2[kHTTPContext]?.version === "h2") {
+        return client2[kMaxConcurrentStreams];
       }
-      return getPipelining(client);
+      return getPipelining(client2);
     }
     var Client2 = class extends DispatcherBase {
       /**
@@ -40094,7 +40129,7 @@ var require_client2 = __commonJS({
         maxHeaderSize,
         headersTimeout,
         socketTimeout,
-        requestTimeout,
+        requestTimeout: requestTimeout2,
         connectTimeout,
         bodyTimeout,
         idleTimeout,
@@ -40129,7 +40164,7 @@ var require_client2 = __commonJS({
         if (socketTimeout !== void 0) {
           throw new InvalidArgumentError("unsupported socketTimeout, use headersTimeout & bodyTimeout instead");
         }
-        if (requestTimeout !== void 0) {
+        if (requestTimeout2 !== void 0) {
           throw new InvalidArgumentError("unsupported requestTimeout, use headersTimeout & bodyTimeout instead");
         }
         if (idleTimeout !== void 0) {
@@ -40333,23 +40368,23 @@ var require_client2 = __commonJS({
         });
       }
     };
-    function onError(client, err) {
-      if (client[kRunning] === 0 && err.code !== "UND_ERR_INFO" && err.code !== "UND_ERR_SOCKET") {
-        assert(client[kPendingIdx] === client[kRunningIdx]);
-        const requests = client[kQueue].splice(client[kRunningIdx]);
+    function onError(client2, err) {
+      if (client2[kRunning] === 0 && err.code !== "UND_ERR_INFO" && err.code !== "UND_ERR_SOCKET") {
+        assert(client2[kPendingIdx] === client2[kRunningIdx]);
+        const requests = client2[kQueue].splice(client2[kRunningIdx]);
         for (let i = 0; i < requests.length; i++) {
           const request2 = requests[i];
           if (request2 != null) {
-            util.errorRequest(client, request2, err);
+            util.errorRequest(client2, request2, err);
           }
         }
-        assert(client[kSize] === 0);
+        assert(client2[kSize] === 0);
       }
     }
-    function connect(client) {
-      assert(!client[kConnecting]);
-      assert(!client[kHTTPContext]);
-      let { host, hostname, protocol, port } = client[kUrl];
+    function connect(client2) {
+      assert(!client2[kConnecting]);
+      assert(!client2[kHTTPContext]);
+      let { host, hostname, protocol, port } = client2[kUrl];
       if (hostname[0] === "[") {
         const idx = hostname.indexOf("]");
         assert(idx !== -1);
@@ -40357,7 +40392,7 @@ var require_client2 = __commonJS({
         assert(net.isIPv6(ip));
         hostname = ip;
       }
-      client[kConnecting] = true;
+      client2[kConnecting] = true;
       if (channels.beforeConnect.hasSubscribers) {
         channels.beforeConnect.publish({
           connectParams: {
@@ -40365,45 +40400,45 @@ var require_client2 = __commonJS({
             hostname,
             protocol,
             port,
-            version: client[kHTTPContext]?.version,
-            servername: client[kServerName],
-            localAddress: client[kLocalAddress]
+            version: client2[kHTTPContext]?.version,
+            servername: client2[kServerName],
+            localAddress: client2[kLocalAddress]
           },
-          connector: client[kConnector]
+          connector: client2[kConnector]
         });
       }
       try {
-        client[kConnector]({
+        client2[kConnector]({
           host,
           hostname,
           protocol,
           port,
-          servername: client[kServerName],
-          localAddress: client[kLocalAddress]
+          servername: client2[kServerName],
+          localAddress: client2[kLocalAddress]
         }, (err, socket) => {
           if (err) {
-            handleConnectError(client, err, { host, hostname, protocol, port });
-            client[kResume]();
+            handleConnectError(client2, err, { host, hostname, protocol, port });
+            client2[kResume]();
             return;
           }
-          if (client.destroyed) {
+          if (client2.destroyed) {
             util.destroy(socket.on("error", noop3), new ClientDestroyedError());
-            client[kResume]();
+            client2[kResume]();
             return;
           }
           assert(socket);
           try {
-            client[kHTTPContext] = socket.alpnProtocol === "h2" ? connectH2(client, socket) : connectH1(client, socket);
+            client2[kHTTPContext] = socket.alpnProtocol === "h2" ? connectH2(client2, socket) : connectH1(client2, socket);
           } catch (err2) {
             socket.destroy().on("error", noop3);
-            handleConnectError(client, err2, { host, hostname, protocol, port });
-            client[kResume]();
+            handleConnectError(client2, err2, { host, hostname, protocol, port });
+            client2[kResume]();
             return;
           }
-          client[kConnecting] = false;
+          client2[kConnecting] = false;
           socket[kCounter] = 0;
-          socket[kMaxRequests] = client[kMaxRequests];
-          socket[kClient] = client;
+          socket[kMaxRequests] = client2[kMaxRequests];
+          socket[kClient] = client2;
           socket[kError] = null;
           if (channels.connected.hasSubscribers) {
             channels.connected.publish({
@@ -40412,27 +40447,27 @@ var require_client2 = __commonJS({
                 hostname,
                 protocol,
                 port,
-                version: client[kHTTPContext]?.version,
-                servername: client[kServerName],
-                localAddress: client[kLocalAddress]
+                version: client2[kHTTPContext]?.version,
+                servername: client2[kServerName],
+                localAddress: client2[kLocalAddress]
               },
-              connector: client[kConnector],
+              connector: client2[kConnector],
               socket
             });
           }
-          client.emit("connect", client[kUrl], [client]);
-          client[kResume]();
+          client2.emit("connect", client2[kUrl], [client2]);
+          client2[kResume]();
         });
       } catch (err) {
-        handleConnectError(client, err, { host, hostname, protocol, port });
-        client[kResume]();
+        handleConnectError(client2, err, { host, hostname, protocol, port });
+        client2[kResume]();
       }
     }
-    function handleConnectError(client, err, { host, hostname, protocol, port }) {
-      if (client.destroyed) {
+    function handleConnectError(client2, err, { host, hostname, protocol, port }) {
+      if (client2.destroyed) {
         return;
       }
-      client[kConnecting] = false;
+      client2[kConnecting] = false;
       if (channels.connectError.hasSubscribers) {
         channels.connectError.publish({
           connectParams: {
@@ -40440,108 +40475,108 @@ var require_client2 = __commonJS({
             hostname,
             protocol,
             port,
-            version: client[kHTTPContext]?.version,
-            servername: client[kServerName],
-            localAddress: client[kLocalAddress]
+            version: client2[kHTTPContext]?.version,
+            servername: client2[kServerName],
+            localAddress: client2[kLocalAddress]
           },
-          connector: client[kConnector],
+          connector: client2[kConnector],
           error: err
         });
       }
       if (err.code === "ERR_TLS_CERT_ALTNAME_INVALID") {
-        const running = client[kQueue].splice(client[kRunningIdx], client[kRunning]);
-        client[kPendingIdx] = client[kRunningIdx];
+        const running = client2[kQueue].splice(client2[kRunningIdx], client2[kRunning]);
+        client2[kPendingIdx] = client2[kRunningIdx];
         for (let i = 0; i < running.length; i++) {
-          util.errorRequest(client, running[i], err);
+          util.errorRequest(client2, running[i], err);
         }
-        while (client[kPending] > 0 && client[kQueue][client[kPendingIdx]].servername === client[kServerName]) {
-          const request2 = client[kQueue].splice(client[kPendingIdx], 1)[0];
-          util.errorRequest(client, request2, err);
+        while (client2[kPending] > 0 && client2[kQueue][client2[kPendingIdx]].servername === client2[kServerName]) {
+          const request2 = client2[kQueue].splice(client2[kPendingIdx], 1)[0];
+          util.errorRequest(client2, request2, err);
         }
       } else {
-        onError(client, err);
+        onError(client2, err);
       }
-      client.emit("connectionError", client[kUrl], [client], err);
+      client2.emit("connectionError", client2[kUrl], [client2], err);
     }
-    function emitDrain(client) {
-      client[kNeedDrain] = 0;
-      client.emit("drain", client[kUrl], [client]);
+    function emitDrain(client2) {
+      client2[kNeedDrain] = 0;
+      client2.emit("drain", client2[kUrl], [client2]);
     }
-    function resume(client, sync) {
-      if (client[kResuming] === 2) {
+    function resume(client2, sync) {
+      if (client2[kResuming] === 2) {
         return;
       }
-      client[kResuming] = 2;
-      _resume(client, sync);
-      client[kResuming] = 0;
-      if (client[kRunningIdx] > 256) {
-        client[kQueue].splice(0, client[kRunningIdx]);
-        client[kPendingIdx] -= client[kRunningIdx];
-        client[kRunningIdx] = 0;
+      client2[kResuming] = 2;
+      _resume(client2, sync);
+      client2[kResuming] = 0;
+      if (client2[kRunningIdx] > 256) {
+        client2[kQueue].splice(0, client2[kRunningIdx]);
+        client2[kPendingIdx] -= client2[kRunningIdx];
+        client2[kRunningIdx] = 0;
       }
     }
-    function _resume(client, sync) {
+    function _resume(client2, sync) {
       while (true) {
-        if (client.destroyed) {
-          assert(client[kPending] === 0);
+        if (client2.destroyed) {
+          assert(client2[kPending] === 0);
           return;
         }
-        if (client[kClosedResolve] && !client[kSize]) {
-          client[kClosedResolve]();
-          client[kClosedResolve] = null;
+        if (client2[kClosedResolve] && !client2[kSize]) {
+          client2[kClosedResolve]();
+          client2[kClosedResolve] = null;
           return;
         }
-        if (client[kHTTPContext]) {
-          client[kHTTPContext].resume();
+        if (client2[kHTTPContext]) {
+          client2[kHTTPContext].resume();
         }
-        if (client[kBusy]) {
-          client[kNeedDrain] = 2;
-        } else if (client[kNeedDrain] === 2) {
+        if (client2[kBusy]) {
+          client2[kNeedDrain] = 2;
+        } else if (client2[kNeedDrain] === 2) {
           if (sync) {
-            client[kNeedDrain] = 1;
-            queueMicrotask(() => emitDrain(client));
+            client2[kNeedDrain] = 1;
+            queueMicrotask(() => emitDrain(client2));
           } else {
-            emitDrain(client);
+            emitDrain(client2);
           }
           continue;
         }
-        if (client[kPending] === 0) {
+        if (client2[kPending] === 0) {
           return;
         }
-        if (client[kRunning] >= (getMaxConcurrent(client) || 1)) {
+        if (client2[kRunning] >= (getMaxConcurrent(client2) || 1)) {
           return;
         }
-        const request2 = client[kQueue][client[kPendingIdx]];
+        const request2 = client2[kQueue][client2[kPendingIdx]];
         if (request2 === null) {
           return;
         }
-        if (client[kUrl].protocol === "https:" && client[kServerName] !== request2.servername) {
-          if (client[kRunning] > 0) {
+        if (client2[kUrl].protocol === "https:" && client2[kServerName] !== request2.servername) {
+          if (client2[kRunning] > 0) {
             return;
           }
-          client[kServerName] = request2.servername;
-          client[kHTTPContext]?.destroy(new InformationalError("servername changed"), () => {
-            client[kHTTPContext] = null;
-            resume(client);
+          client2[kServerName] = request2.servername;
+          client2[kHTTPContext]?.destroy(new InformationalError("servername changed"), () => {
+            client2[kHTTPContext] = null;
+            resume(client2);
           });
         }
-        if (client[kConnecting]) {
+        if (client2[kConnecting]) {
           return;
         }
-        if (!client[kHTTPContext]) {
-          connect(client);
+        if (!client2[kHTTPContext]) {
+          connect(client2);
           return;
         }
-        if (client[kHTTPContext].destroyed) {
+        if (client2[kHTTPContext].destroyed) {
           return;
         }
-        if (client[kHTTPContext].busy(request2)) {
+        if (client2[kHTTPContext].busy(request2)) {
           return;
         }
-        if (!request2.aborted && client[kHTTPContext].write(request2)) {
-          client[kPendingIdx]++;
+        if (!request2.aborted && client2[kHTTPContext].write(request2)) {
+          client2[kPendingIdx]++;
         } else {
-          client[kQueue].splice(client[kPendingIdx], 1);
+          client2[kQueue].splice(client2[kPendingIdx], 1);
         }
       }
     }
@@ -40645,7 +40680,7 @@ var require_pool_base2 = __commonJS({
       [kQueued] = 0;
       [kClients] = [];
       [kNeedDrain] = false;
-      [kOnDrain](client, origin, targets) {
+      [kOnDrain](client2, origin, targets) {
         const queue = this[kQueue];
         let needDrain = false;
         while (!needDrain) {
@@ -40654,9 +40689,9 @@ var require_pool_base2 = __commonJS({
             break;
           }
           this[kQueued]--;
-          needDrain = !client.dispatch(item.opts, item.handler);
+          needDrain = !client2.dispatch(item.opts, item.handler);
         }
-        client[kNeedDrain] = needDrain;
+        client2[kNeedDrain] = needDrain;
         if (!needDrain && this[kNeedDrain]) {
           this[kNeedDrain] = false;
           this.emit("drain", origin, [this, ...targets]);
@@ -40664,9 +40699,9 @@ var require_pool_base2 = __commonJS({
         if (this[kClosedResolve] && queue.isEmpty()) {
           const closeAll = [];
           for (let i = 0; i < this[kClients].length; i++) {
-            const client2 = this[kClients][i];
-            if (!client2.destroyed) {
-              closeAll.push(client2.close());
+            const client3 = this[kClients][i];
+            if (!client3.destroyed) {
+              closeAll.push(client3.close());
             }
           }
           return Promise.all(closeAll).then(this[kClosedResolve]);
@@ -40726,9 +40761,9 @@ var require_pool_base2 = __commonJS({
         if (this[kQueue].isEmpty()) {
           const closeAll = [];
           for (let i = 0; i < this[kClients].length; i++) {
-            const client = this[kClients][i];
-            if (!client.destroyed) {
-              closeAll.push(client.close());
+            const client2 = this[kClients][i];
+            if (!client2.destroyed) {
+              closeAll.push(client2.close());
             }
           }
           return Promise.all(closeAll);
@@ -40773,24 +40808,24 @@ var require_pool_base2 = __commonJS({
         }
         return false;
       }
-      [kAddClient](client) {
-        client.on("drain", this[kOnDrain].bind(this, client)).on("connect", this[kOnConnect]).on("disconnect", this[kOnDisconnect]).on("connectionError", this[kOnConnectionError]);
-        this[kClients].push(client);
+      [kAddClient](client2) {
+        client2.on("drain", this[kOnDrain].bind(this, client2)).on("connect", this[kOnConnect]).on("disconnect", this[kOnDisconnect]).on("connectionError", this[kOnConnectionError]);
+        this[kClients].push(client2);
         if (this[kNeedDrain]) {
           queueMicrotask(() => {
             if (this[kNeedDrain]) {
-              this[kOnDrain](client, client[kUrl], [client, this]);
+              this[kOnDrain](client2, client2[kUrl], [client2, this]);
             }
           });
         }
         return this;
       }
-      [kRemoveClient](client) {
-        const idx = this[kClients].indexOf(client);
+      [kRemoveClient](client2) {
+        const idx = this[kClients].indexOf(client2);
         if (idx !== -1) {
           this[kClients].splice(idx, 1);
         }
-        client.close(() => {
+        client2.close(() => {
         });
         this[kNeedDrain] = !this[kClients].some((dispatcher) => !dispatcher[kNeedDrain] && dispatcher.closed !== true && dispatcher.destroyed !== true);
       }
@@ -40894,12 +40929,12 @@ var require_pool2 = __commonJS({
       [kGetDispatcher]() {
         const clientTtlOption = this[kOptions].clientTtl;
         for (let i = 0; i < this[kClients].length; i++) {
-          const client = this[kClients][i];
-          if (clientTtlOption != null && clientTtlOption > 0 && client.ttl && Date.now() - client.ttl > clientTtlOption) {
-            this[kRemoveClient](client);
+          const client2 = this[kClients][i];
+          if (clientTtlOption != null && clientTtlOption > 0 && client2.ttl && Date.now() - client2.ttl > clientTtlOption) {
+            this[kRemoveClient](client2);
             i--;
-          } else if (!client[kNeedDrain]) {
-            return client;
+          } else if (!client2[kNeedDrain]) {
+            return client2;
           }
         }
         if (!this[kConnections] || this[kClients].length < this[kConnections]) {
@@ -40911,11 +40946,11 @@ var require_pool2 = __commonJS({
       [kHasDispatcher]() {
         const clientTtlOption = this[kOptions].clientTtl;
         for (let i = 0; i < this[kClients].length; i++) {
-          const client = this[kClients][i];
-          if (clientTtlOption != null && clientTtlOption > 0 && client.ttl && Date.now() - client.ttl > clientTtlOption) {
-            this[kRemoveClient](client);
+          const client2 = this[kClients][i];
+          if (clientTtlOption != null && clientTtlOption > 0 && client2.ttl && Date.now() - client2.ttl > clientTtlOption) {
+            this[kRemoveClient](client2);
             i--;
-          } else if (!client[kNeedDrain]) {
+          } else if (!client2[kNeedDrain]) {
             return true;
           }
         }
@@ -41011,8 +41046,8 @@ var require_balanced_pool2 = __commonJS({
             this._updateBalancedPoolStats();
           }
         });
-        for (const client of this[kClients]) {
-          client[kWeight] = this[kMaxWeightPerServer];
+        for (const client2 of this[kClients]) {
+          client2[kWeight] = this[kMaxWeightPerServer];
         }
         this._updateBalancedPoolStats();
         return this;
@@ -41170,14 +41205,14 @@ var require_round_robin_pool2 = __commonJS({
         let checked = 0;
         while (checked < this[kClients].length) {
           this[kIndex] = (this[kIndex] + 1) % this[kClients].length;
-          const client = this[kClients][this[kIndex]];
-          if (clientTtlOption != null && clientTtlOption > 0 && client.ttl && Date.now() - client.ttl > clientTtlOption) {
-            this[kRemoveClient](client);
+          const client2 = this[kClients][this[kIndex]];
+          if (clientTtlOption != null && clientTtlOption > 0 && client2.ttl && Date.now() - client2.ttl > clientTtlOption) {
+            this[kRemoveClient](client2);
             this[kIndex]--;
             continue;
           }
-          if (!client[kNeedDrain]) {
-            return client;
+          if (!client2[kNeedDrain]) {
+            return client2;
           }
           checked++;
         }
@@ -41190,14 +41225,14 @@ var require_round_robin_pool2 = __commonJS({
       [kHasDispatcher]() {
         const clientTtlOption = this[kOptions].clientTtl;
         for (let i = 0; i < this[kClients].length; i++) {
-          const client = this[kClients][i];
-          if (clientTtlOption != null && clientTtlOption > 0 && client.ttl && Date.now() - client.ttl > clientTtlOption) {
-            this[kRemoveClient](client);
+          const client2 = this[kClients][i];
+          if (clientTtlOption != null && clientTtlOption > 0 && client2.ttl && Date.now() - client2.ttl > clientTtlOption) {
+            this[kRemoveClient](client2);
             if (i <= this[kIndex]) {
               this[kIndex]--;
             }
             i--;
-          } else if (!client[kNeedDrain]) {
+          } else if (!client2[kNeedDrain]) {
             return true;
           }
         }
@@ -41299,8 +41334,8 @@ var require_agent2 = __commonJS({
               dispatcher.close();
             }
             let hasOrigin = false;
-            for (const client of this[kClients].values()) {
-              if (client[kUrl].origin === dispatcher[kUrl].origin) {
+            for (const client2 of this[kClients].values()) {
+              if (client2[kUrl].origin === dispatcher[kUrl].origin) {
                 hasOrigin = true;
                 break;
               }
@@ -54563,12 +54598,12 @@ var require_connection2 = __commonJS({
     var { runtimeFeatures } = require_runtime_features2();
     var crypto2 = runtimeFeatures.has("crypto") ? require("node:crypto") : null;
     var warningEmitted = false;
-    function establishWebSocketConnection(url, protocols, client, handler2, options) {
+    function establishWebSocketConnection(url, protocols, client2, handler2, options) {
       const requestURL = url;
       requestURL.protocol = url.protocol === "ws:" ? "http:" : "https:";
       const request2 = makeRequest({
         urlList: [requestURL],
-        client,
+        client: client2,
         serviceWorkers: "none",
         referrer: "no-referrer",
         mode: "websocket",
@@ -55349,11 +55384,11 @@ var require_websocket2 = __commonJS({
           throw new DOMException("Invalid Sec-WebSocket-Protocol value", "SyntaxError");
         }
         this.#url = new URL(urlRecord.href);
-        const client = environmentSettingsObject.settingsObject;
+        const client2 = environmentSettingsObject.settingsObject;
         this.#handler.controller = establishWebSocketConnection(
           urlRecord,
           protocols,
-          client,
+          client2,
           this.#handler,
           options
         );
@@ -55910,11 +55945,11 @@ var require_websocketstream2 = __commonJS({
             }
           });
         }
-        const client = environmentSettingsObject.settingsObject;
+        const client2 = environmentSettingsObject.settingsObject;
         this.#handler.controller = establishWebSocketConnection(
           urlRecord,
           protocols,
-          client,
+          client2,
           this.#handler,
           options
         );
@@ -57686,6 +57721,2000 @@ var require_lib = __commonJS({
     };
     exports2.HttpClient = HttpClient3;
     var lowercaseKeys2 = (obj) => Object.keys(obj).reduce((c, k2) => (c[k2.toLowerCase()] = obj[k2], c), {});
+  }
+});
+
+// node_modules/semver/internal/constants.js
+var require_constants11 = __commonJS({
+  "node_modules/semver/internal/constants.js"(exports2, module2) {
+    "use strict";
+    var SEMVER_SPEC_VERSION = "2.0.0";
+    var MAX_LENGTH = 256;
+    var MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER || /* istanbul ignore next */
+    9007199254740991;
+    var MAX_SAFE_COMPONENT_LENGTH = 16;
+    var MAX_SAFE_BUILD_LENGTH = MAX_LENGTH - 6;
+    var RELEASE_TYPES = [
+      "major",
+      "premajor",
+      "minor",
+      "preminor",
+      "patch",
+      "prepatch",
+      "prerelease"
+    ];
+    module2.exports = {
+      MAX_LENGTH,
+      MAX_SAFE_COMPONENT_LENGTH,
+      MAX_SAFE_BUILD_LENGTH,
+      MAX_SAFE_INTEGER,
+      RELEASE_TYPES,
+      SEMVER_SPEC_VERSION,
+      FLAG_INCLUDE_PRERELEASE: 1,
+      FLAG_LOOSE: 2
+    };
+  }
+});
+
+// node_modules/semver/internal/debug.js
+var require_debug = __commonJS({
+  "node_modules/semver/internal/debug.js"(exports2, module2) {
+    "use strict";
+    var debug2 = typeof process === "object" && process.env && process.env.NODE_DEBUG && /\bsemver\b/i.test(process.env.NODE_DEBUG) ? (...args) => console.error("SEMVER", ...args) : () => {
+    };
+    module2.exports = debug2;
+  }
+});
+
+// node_modules/semver/internal/re.js
+var require_re = __commonJS({
+  "node_modules/semver/internal/re.js"(exports2, module2) {
+    "use strict";
+    var {
+      MAX_SAFE_COMPONENT_LENGTH,
+      MAX_SAFE_BUILD_LENGTH,
+      MAX_LENGTH
+    } = require_constants11();
+    var debug2 = require_debug();
+    exports2 = module2.exports = {};
+    var re3 = exports2.re = [];
+    var safeRe = exports2.safeRe = [];
+    var src = exports2.src = [];
+    var safeSrc = exports2.safeSrc = [];
+    var t = exports2.t = {};
+    var R2 = 0;
+    var LETTERDASHNUMBER = "[a-zA-Z0-9-]";
+    var safeRegexReplacements = [
+      ["\\s", 1],
+      ["\\d", MAX_LENGTH],
+      [LETTERDASHNUMBER, MAX_SAFE_BUILD_LENGTH]
+    ];
+    var makeSafeRegex = (value) => {
+      for (const [token, max] of safeRegexReplacements) {
+        value = value.split(`${token}*`).join(`${token}{0,${max}}`).split(`${token}+`).join(`${token}{1,${max}}`);
+      }
+      return value;
+    };
+    var createToken = (name, value, isGlobal) => {
+      const safe = makeSafeRegex(value);
+      const index = R2++;
+      debug2(name, index, value);
+      t[name] = index;
+      src[index] = value;
+      safeSrc[index] = safe;
+      re3[index] = new RegExp(value, isGlobal ? "g" : void 0);
+      safeRe[index] = new RegExp(safe, isGlobal ? "g" : void 0);
+    };
+    createToken("NUMERICIDENTIFIER", "0|[1-9]\\d*");
+    createToken("NUMERICIDENTIFIERLOOSE", "\\d+");
+    createToken("NONNUMERICIDENTIFIER", `\\d*[a-zA-Z-]${LETTERDASHNUMBER}*`);
+    createToken("MAINVERSION", `(${src[t.NUMERICIDENTIFIER]})\\.(${src[t.NUMERICIDENTIFIER]})\\.(${src[t.NUMERICIDENTIFIER]})`);
+    createToken("MAINVERSIONLOOSE", `(${src[t.NUMERICIDENTIFIERLOOSE]})\\.(${src[t.NUMERICIDENTIFIERLOOSE]})\\.(${src[t.NUMERICIDENTIFIERLOOSE]})`);
+    createToken("PRERELEASEIDENTIFIER", `(?:${src[t.NONNUMERICIDENTIFIER]}|${src[t.NUMERICIDENTIFIER]})`);
+    createToken("PRERELEASEIDENTIFIERLOOSE", `(?:${src[t.NONNUMERICIDENTIFIER]}|${src[t.NUMERICIDENTIFIERLOOSE]})`);
+    createToken("PRERELEASE", `(?:-(${src[t.PRERELEASEIDENTIFIER]}(?:\\.${src[t.PRERELEASEIDENTIFIER]})*))`);
+    createToken("PRERELEASELOOSE", `(?:-?(${src[t.PRERELEASEIDENTIFIERLOOSE]}(?:\\.${src[t.PRERELEASEIDENTIFIERLOOSE]})*))`);
+    createToken("BUILDIDENTIFIER", `${LETTERDASHNUMBER}+`);
+    createToken("BUILD", `(?:\\+(${src[t.BUILDIDENTIFIER]}(?:\\.${src[t.BUILDIDENTIFIER]})*))`);
+    createToken("FULLPLAIN", `v?${src[t.MAINVERSION]}${src[t.PRERELEASE]}?${src[t.BUILD]}?`);
+    createToken("FULL", `^${src[t.FULLPLAIN]}$`);
+    createToken("LOOSEPLAIN", `[v=\\s]*${src[t.MAINVERSIONLOOSE]}${src[t.PRERELEASELOOSE]}?${src[t.BUILD]}?`);
+    createToken("LOOSE", `^${src[t.LOOSEPLAIN]}$`);
+    createToken("GTLT", "((?:<|>)?=?)");
+    createToken("XRANGEIDENTIFIERLOOSE", `${src[t.NUMERICIDENTIFIERLOOSE]}|x|X|\\*`);
+    createToken("XRANGEIDENTIFIER", `${src[t.NUMERICIDENTIFIER]}|x|X|\\*`);
+    createToken("XRANGEPLAIN", `[v=\\s]*(${src[t.XRANGEIDENTIFIER]})(?:\\.(${src[t.XRANGEIDENTIFIER]})(?:\\.(${src[t.XRANGEIDENTIFIER]})(?:${src[t.PRERELEASE]})?${src[t.BUILD]}?)?)?`);
+    createToken("XRANGEPLAINLOOSE", `[v=\\s]*(${src[t.XRANGEIDENTIFIERLOOSE]})(?:\\.(${src[t.XRANGEIDENTIFIERLOOSE]})(?:\\.(${src[t.XRANGEIDENTIFIERLOOSE]})(?:${src[t.PRERELEASELOOSE]})?${src[t.BUILD]}?)?)?`);
+    createToken("XRANGE", `^${src[t.GTLT]}\\s*${src[t.XRANGEPLAIN]}$`);
+    createToken("XRANGELOOSE", `^${src[t.GTLT]}\\s*${src[t.XRANGEPLAINLOOSE]}$`);
+    createToken("COERCEPLAIN", `${"(^|[^\\d])(\\d{1,"}${MAX_SAFE_COMPONENT_LENGTH}})(?:\\.(\\d{1,${MAX_SAFE_COMPONENT_LENGTH}}))?(?:\\.(\\d{1,${MAX_SAFE_COMPONENT_LENGTH}}))?`);
+    createToken("COERCE", `${src[t.COERCEPLAIN]}(?:$|[^\\d])`);
+    createToken("COERCEFULL", src[t.COERCEPLAIN] + `(?:${src[t.PRERELEASE]})?(?:${src[t.BUILD]})?(?:$|[^\\d])`);
+    createToken("COERCERTL", src[t.COERCE], true);
+    createToken("COERCERTLFULL", src[t.COERCEFULL], true);
+    createToken("LONETILDE", "(?:~>?)");
+    createToken("TILDETRIM", `(\\s*)${src[t.LONETILDE]}\\s+`, true);
+    exports2.tildeTrimReplace = "$1~";
+    createToken("TILDE", `^${src[t.LONETILDE]}${src[t.XRANGEPLAIN]}$`);
+    createToken("TILDELOOSE", `^${src[t.LONETILDE]}${src[t.XRANGEPLAINLOOSE]}$`);
+    createToken("LONECARET", "(?:\\^)");
+    createToken("CARETTRIM", `(\\s*)${src[t.LONECARET]}\\s+`, true);
+    exports2.caretTrimReplace = "$1^";
+    createToken("CARET", `^${src[t.LONECARET]}${src[t.XRANGEPLAIN]}$`);
+    createToken("CARETLOOSE", `^${src[t.LONECARET]}${src[t.XRANGEPLAINLOOSE]}$`);
+    createToken("COMPARATORLOOSE", `^${src[t.GTLT]}\\s*(${src[t.LOOSEPLAIN]})$|^$`);
+    createToken("COMPARATOR", `^${src[t.GTLT]}\\s*(${src[t.FULLPLAIN]})$|^$`);
+    createToken("COMPARATORTRIM", `(\\s*)${src[t.GTLT]}\\s*(${src[t.LOOSEPLAIN]}|${src[t.XRANGEPLAIN]})`, true);
+    exports2.comparatorTrimReplace = "$1$2$3";
+    createToken("HYPHENRANGE", `^\\s*(${src[t.XRANGEPLAIN]})\\s+-\\s+(${src[t.XRANGEPLAIN]})\\s*$`);
+    createToken("HYPHENRANGELOOSE", `^\\s*(${src[t.XRANGEPLAINLOOSE]})\\s+-\\s+(${src[t.XRANGEPLAINLOOSE]})\\s*$`);
+    createToken("STAR", "(<|>)?=?\\s*\\*");
+    createToken("GTE0", "^\\s*>=\\s*0\\.0\\.0\\s*$");
+    createToken("GTE0PRE", "^\\s*>=\\s*0\\.0\\.0-0\\s*$");
+  }
+});
+
+// node_modules/semver/internal/parse-options.js
+var require_parse_options = __commonJS({
+  "node_modules/semver/internal/parse-options.js"(exports2, module2) {
+    "use strict";
+    var looseOption = Object.freeze({ loose: true });
+    var emptyOpts = Object.freeze({});
+    var parseOptions = (options) => {
+      if (!options) {
+        return emptyOpts;
+      }
+      if (typeof options !== "object") {
+        return looseOption;
+      }
+      return options;
+    };
+    module2.exports = parseOptions;
+  }
+});
+
+// node_modules/semver/internal/identifiers.js
+var require_identifiers = __commonJS({
+  "node_modules/semver/internal/identifiers.js"(exports2, module2) {
+    "use strict";
+    var numeric = /^[0-9]+$/;
+    var compareIdentifiers = (a, b) => {
+      if (typeof a === "number" && typeof b === "number") {
+        return a === b ? 0 : a < b ? -1 : 1;
+      }
+      const anum = numeric.test(a);
+      const bnum = numeric.test(b);
+      if (anum && bnum) {
+        a = +a;
+        b = +b;
+      }
+      return a === b ? 0 : anum && !bnum ? -1 : bnum && !anum ? 1 : a < b ? -1 : 1;
+    };
+    var rcompareIdentifiers = (a, b) => compareIdentifiers(b, a);
+    module2.exports = {
+      compareIdentifiers,
+      rcompareIdentifiers
+    };
+  }
+});
+
+// node_modules/semver/classes/semver.js
+var require_semver = __commonJS({
+  "node_modules/semver/classes/semver.js"(exports2, module2) {
+    "use strict";
+    var debug2 = require_debug();
+    var { MAX_LENGTH, MAX_SAFE_INTEGER } = require_constants11();
+    var { safeRe: re3, t } = require_re();
+    var parseOptions = require_parse_options();
+    var { compareIdentifiers } = require_identifiers();
+    var isPrereleaseIdentifier = (prerelease, identifier) => {
+      const identifiers = identifier.split(".");
+      if (identifiers.length > prerelease.length) {
+        return false;
+      }
+      for (let i = 0; i < identifiers.length; i++) {
+        if (compareIdentifiers(prerelease[i], identifiers[i]) !== 0) {
+          return false;
+        }
+      }
+      return true;
+    };
+    var SemVer = class _SemVer {
+      constructor(version, options) {
+        options = parseOptions(options);
+        if (version instanceof _SemVer) {
+          if (version.loose === !!options.loose && version.includePrerelease === !!options.includePrerelease) {
+            return version;
+          } else {
+            version = version.version;
+          }
+        } else if (typeof version !== "string") {
+          throw new TypeError(`Invalid version. Must be a string. Got type "${typeof version}".`);
+        }
+        if (version.length > MAX_LENGTH) {
+          throw new TypeError(
+            `version is longer than ${MAX_LENGTH} characters`
+          );
+        }
+        debug2("SemVer", version, options);
+        this.options = options;
+        this.loose = !!options.loose;
+        this.includePrerelease = !!options.includePrerelease;
+        const m = version.trim().match(options.loose ? re3[t.LOOSE] : re3[t.FULL]);
+        if (!m) {
+          throw new TypeError(`Invalid Version: ${version}`);
+        }
+        this.raw = version;
+        this.major = +m[1];
+        this.minor = +m[2];
+        this.patch = +m[3];
+        if (this.major > MAX_SAFE_INTEGER || this.major < 0) {
+          throw new TypeError("Invalid major version");
+        }
+        if (this.minor > MAX_SAFE_INTEGER || this.minor < 0) {
+          throw new TypeError("Invalid minor version");
+        }
+        if (this.patch > MAX_SAFE_INTEGER || this.patch < 0) {
+          throw new TypeError("Invalid patch version");
+        }
+        if (!m[4]) {
+          this.prerelease = [];
+        } else {
+          this.prerelease = m[4].split(".").map((id) => {
+            if (/^[0-9]+$/.test(id)) {
+              const num = +id;
+              if (num >= 0 && num < MAX_SAFE_INTEGER) {
+                return num;
+              }
+            }
+            return id;
+          });
+        }
+        this.build = m[5] ? m[5].split(".") : [];
+        this.format();
+      }
+      format() {
+        this.version = `${this.major}.${this.minor}.${this.patch}`;
+        if (this.prerelease.length) {
+          this.version += `-${this.prerelease.join(".")}`;
+        }
+        return this.version;
+      }
+      toString() {
+        return this.version;
+      }
+      compare(other) {
+        debug2("SemVer.compare", this.version, this.options, other);
+        if (!(other instanceof _SemVer)) {
+          if (typeof other === "string" && other === this.version) {
+            return 0;
+          }
+          other = new _SemVer(other, this.options);
+        }
+        if (other.version === this.version) {
+          return 0;
+        }
+        return this.compareMain(other) || this.comparePre(other);
+      }
+      compareMain(other) {
+        if (!(other instanceof _SemVer)) {
+          other = new _SemVer(other, this.options);
+        }
+        if (this.major < other.major) {
+          return -1;
+        }
+        if (this.major > other.major) {
+          return 1;
+        }
+        if (this.minor < other.minor) {
+          return -1;
+        }
+        if (this.minor > other.minor) {
+          return 1;
+        }
+        if (this.patch < other.patch) {
+          return -1;
+        }
+        if (this.patch > other.patch) {
+          return 1;
+        }
+        return 0;
+      }
+      comparePre(other) {
+        if (!(other instanceof _SemVer)) {
+          other = new _SemVer(other, this.options);
+        }
+        if (this.prerelease.length && !other.prerelease.length) {
+          return -1;
+        } else if (!this.prerelease.length && other.prerelease.length) {
+          return 1;
+        } else if (!this.prerelease.length && !other.prerelease.length) {
+          return 0;
+        }
+        let i = 0;
+        do {
+          const a = this.prerelease[i];
+          const b = other.prerelease[i];
+          debug2("prerelease compare", i, a, b);
+          if (a === void 0 && b === void 0) {
+            return 0;
+          } else if (b === void 0) {
+            return 1;
+          } else if (a === void 0) {
+            return -1;
+          } else if (a === b) {
+            continue;
+          } else {
+            return compareIdentifiers(a, b);
+          }
+        } while (++i);
+      }
+      compareBuild(other) {
+        if (!(other instanceof _SemVer)) {
+          other = new _SemVer(other, this.options);
+        }
+        let i = 0;
+        do {
+          const a = this.build[i];
+          const b = other.build[i];
+          debug2("build compare", i, a, b);
+          if (a === void 0 && b === void 0) {
+            return 0;
+          } else if (b === void 0) {
+            return 1;
+          } else if (a === void 0) {
+            return -1;
+          } else if (a === b) {
+            continue;
+          } else {
+            return compareIdentifiers(a, b);
+          }
+        } while (++i);
+      }
+      // preminor will bump the version up to the next minor release, and immediately
+      // down to pre-release. premajor and prepatch work the same way.
+      inc(release, identifier, identifierBase) {
+        if (release.startsWith("pre")) {
+          if (!identifier && identifierBase === false) {
+            throw new Error("invalid increment argument: identifier is empty");
+          }
+          if (identifier) {
+            const match = `-${identifier}`.match(this.options.loose ? re3[t.PRERELEASELOOSE] : re3[t.PRERELEASE]);
+            if (!match || match[1] !== identifier) {
+              throw new Error(`invalid identifier: ${identifier}`);
+            }
+          }
+        }
+        switch (release) {
+          case "premajor":
+            this.prerelease.length = 0;
+            this.patch = 0;
+            this.minor = 0;
+            this.major++;
+            this.inc("pre", identifier, identifierBase);
+            break;
+          case "preminor":
+            this.prerelease.length = 0;
+            this.patch = 0;
+            this.minor++;
+            this.inc("pre", identifier, identifierBase);
+            break;
+          case "prepatch":
+            this.prerelease.length = 0;
+            this.inc("patch", identifier, identifierBase);
+            this.inc("pre", identifier, identifierBase);
+            break;
+          // If the input is a non-prerelease version, this acts the same as
+          // prepatch.
+          case "prerelease":
+            if (this.prerelease.length === 0) {
+              this.inc("patch", identifier, identifierBase);
+            }
+            this.inc("pre", identifier, identifierBase);
+            break;
+          case "release":
+            if (this.prerelease.length === 0) {
+              throw new Error(`version ${this.raw} is not a prerelease`);
+            }
+            this.prerelease.length = 0;
+            break;
+          case "major":
+            if (this.minor !== 0 || this.patch !== 0 || this.prerelease.length === 0) {
+              this.major++;
+            }
+            this.minor = 0;
+            this.patch = 0;
+            this.prerelease = [];
+            break;
+          case "minor":
+            if (this.patch !== 0 || this.prerelease.length === 0) {
+              this.minor++;
+            }
+            this.patch = 0;
+            this.prerelease = [];
+            break;
+          case "patch":
+            if (this.prerelease.length === 0) {
+              this.patch++;
+            }
+            this.prerelease = [];
+            break;
+          // This probably shouldn't be used publicly.
+          // 1.0.0 'pre' would become 1.0.0-0 which is the wrong direction.
+          case "pre": {
+            const base = Number(identifierBase) ? 1 : 0;
+            if (this.prerelease.length === 0) {
+              this.prerelease = [base];
+            } else {
+              let i = this.prerelease.length;
+              while (--i >= 0) {
+                if (typeof this.prerelease[i] === "number") {
+                  this.prerelease[i]++;
+                  i = -2;
+                }
+              }
+              if (i === -1) {
+                if (identifier === this.prerelease.join(".") && identifierBase === false) {
+                  throw new Error("invalid increment argument: identifier already exists");
+                }
+                this.prerelease.push(base);
+              }
+            }
+            if (identifier) {
+              let prerelease = [identifier, base];
+              if (identifierBase === false) {
+                prerelease = [identifier];
+              }
+              if (isPrereleaseIdentifier(this.prerelease, identifier)) {
+                const prereleaseBase = this.prerelease[identifier.split(".").length];
+                if (isNaN(prereleaseBase)) {
+                  this.prerelease = prerelease;
+                }
+              } else {
+                this.prerelease = prerelease;
+              }
+            }
+            break;
+          }
+          default:
+            throw new Error(`invalid increment argument: ${release}`);
+        }
+        this.raw = this.format();
+        if (this.build.length) {
+          this.raw += `+${this.build.join(".")}`;
+        }
+        return this;
+      }
+    };
+    module2.exports = SemVer;
+  }
+});
+
+// node_modules/semver/functions/parse.js
+var require_parse3 = __commonJS({
+  "node_modules/semver/functions/parse.js"(exports2, module2) {
+    "use strict";
+    var SemVer = require_semver();
+    var parse4 = (version, options, throwErrors = false) => {
+      if (version instanceof SemVer) {
+        return version;
+      }
+      try {
+        return new SemVer(version, options);
+      } catch (er) {
+        if (!throwErrors) {
+          return null;
+        }
+        throw er;
+      }
+    };
+    module2.exports = parse4;
+  }
+});
+
+// node_modules/semver/functions/valid.js
+var require_valid = __commonJS({
+  "node_modules/semver/functions/valid.js"(exports2, module2) {
+    "use strict";
+    var parse4 = require_parse3();
+    var valid2 = (version, options) => {
+      const v2 = parse4(version, options);
+      return v2 ? v2.version : null;
+    };
+    module2.exports = valid2;
+  }
+});
+
+// node_modules/semver/functions/clean.js
+var require_clean = __commonJS({
+  "node_modules/semver/functions/clean.js"(exports2, module2) {
+    "use strict";
+    var parse4 = require_parse3();
+    var clean = (version, options) => {
+      const s = parse4(version.trim().replace(/^[=v]+/, ""), options);
+      return s ? s.version : null;
+    };
+    module2.exports = clean;
+  }
+});
+
+// node_modules/semver/functions/inc.js
+var require_inc = __commonJS({
+  "node_modules/semver/functions/inc.js"(exports2, module2) {
+    "use strict";
+    var SemVer = require_semver();
+    var inc = (version, release, options, identifier, identifierBase) => {
+      if (typeof options === "string") {
+        identifierBase = identifier;
+        identifier = options;
+        options = void 0;
+      }
+      try {
+        return new SemVer(
+          version instanceof SemVer ? version.version : version,
+          options
+        ).inc(release, identifier, identifierBase).version;
+      } catch (er) {
+        return null;
+      }
+    };
+    module2.exports = inc;
+  }
+});
+
+// node_modules/semver/functions/diff.js
+var require_diff = __commonJS({
+  "node_modules/semver/functions/diff.js"(exports2, module2) {
+    "use strict";
+    var parse4 = require_parse3();
+    var diff = (version1, version2) => {
+      const v1 = parse4(version1, null, true);
+      const v2 = parse4(version2, null, true);
+      const comparison = v1.compare(v2);
+      if (comparison === 0) {
+        return null;
+      }
+      const v1Higher = comparison > 0;
+      const highVersion = v1Higher ? v1 : v2;
+      const lowVersion = v1Higher ? v2 : v1;
+      const highHasPre = !!highVersion.prerelease.length;
+      const lowHasPre = !!lowVersion.prerelease.length;
+      if (lowHasPre && !highHasPre) {
+        if (!lowVersion.patch && !lowVersion.minor) {
+          return "major";
+        }
+        if (lowVersion.compareMain(highVersion) === 0) {
+          if (lowVersion.minor && !lowVersion.patch) {
+            return "minor";
+          }
+          return "patch";
+        }
+      }
+      const prefix = highHasPre ? "pre" : "";
+      if (v1.major !== v2.major) {
+        return prefix + "major";
+      }
+      if (v1.minor !== v2.minor) {
+        return prefix + "minor";
+      }
+      if (v1.patch !== v2.patch) {
+        return prefix + "patch";
+      }
+      return "prerelease";
+    };
+    module2.exports = diff;
+  }
+});
+
+// node_modules/semver/functions/major.js
+var require_major = __commonJS({
+  "node_modules/semver/functions/major.js"(exports2, module2) {
+    "use strict";
+    var SemVer = require_semver();
+    var major2 = (a, loose) => new SemVer(a, loose).major;
+    module2.exports = major2;
+  }
+});
+
+// node_modules/semver/functions/minor.js
+var require_minor = __commonJS({
+  "node_modules/semver/functions/minor.js"(exports2, module2) {
+    "use strict";
+    var SemVer = require_semver();
+    var minor = (a, loose) => new SemVer(a, loose).minor;
+    module2.exports = minor;
+  }
+});
+
+// node_modules/semver/functions/patch.js
+var require_patch = __commonJS({
+  "node_modules/semver/functions/patch.js"(exports2, module2) {
+    "use strict";
+    var SemVer = require_semver();
+    var patch = (a, loose) => new SemVer(a, loose).patch;
+    module2.exports = patch;
+  }
+});
+
+// node_modules/semver/functions/prerelease.js
+var require_prerelease = __commonJS({
+  "node_modules/semver/functions/prerelease.js"(exports2, module2) {
+    "use strict";
+    var parse4 = require_parse3();
+    var prerelease = (version, options) => {
+      const parsed = parse4(version, options);
+      return parsed && parsed.prerelease.length ? parsed.prerelease : null;
+    };
+    module2.exports = prerelease;
+  }
+});
+
+// node_modules/semver/functions/compare.js
+var require_compare = __commonJS({
+  "node_modules/semver/functions/compare.js"(exports2, module2) {
+    "use strict";
+    var SemVer = require_semver();
+    var compare2 = (a, b, loose) => new SemVer(a, loose).compare(new SemVer(b, loose));
+    module2.exports = compare2;
+  }
+});
+
+// node_modules/semver/functions/rcompare.js
+var require_rcompare = __commonJS({
+  "node_modules/semver/functions/rcompare.js"(exports2, module2) {
+    "use strict";
+    var compare2 = require_compare();
+    var rcompare = (a, b, loose) => compare2(b, a, loose);
+    module2.exports = rcompare;
+  }
+});
+
+// node_modules/semver/functions/compare-loose.js
+var require_compare_loose = __commonJS({
+  "node_modules/semver/functions/compare-loose.js"(exports2, module2) {
+    "use strict";
+    var compare2 = require_compare();
+    var compareLoose = (a, b) => compare2(a, b, true);
+    module2.exports = compareLoose;
+  }
+});
+
+// node_modules/semver/functions/compare-build.js
+var require_compare_build = __commonJS({
+  "node_modules/semver/functions/compare-build.js"(exports2, module2) {
+    "use strict";
+    var SemVer = require_semver();
+    var compareBuild = (a, b, loose) => {
+      const versionA = new SemVer(a, loose);
+      const versionB = new SemVer(b, loose);
+      return versionA.compare(versionB) || versionA.compareBuild(versionB);
+    };
+    module2.exports = compareBuild;
+  }
+});
+
+// node_modules/semver/functions/sort.js
+var require_sort = __commonJS({
+  "node_modules/semver/functions/sort.js"(exports2, module2) {
+    "use strict";
+    var compareBuild = require_compare_build();
+    var sort = (list, loose) => list.sort((a, b) => compareBuild(a, b, loose));
+    module2.exports = sort;
+  }
+});
+
+// node_modules/semver/functions/rsort.js
+var require_rsort = __commonJS({
+  "node_modules/semver/functions/rsort.js"(exports2, module2) {
+    "use strict";
+    var compareBuild = require_compare_build();
+    var rsort = (list, loose) => list.sort((a, b) => compareBuild(b, a, loose));
+    module2.exports = rsort;
+  }
+});
+
+// node_modules/semver/functions/gt.js
+var require_gt = __commonJS({
+  "node_modules/semver/functions/gt.js"(exports2, module2) {
+    "use strict";
+    var compare2 = require_compare();
+    var gt2 = (a, b, loose) => compare2(a, b, loose) > 0;
+    module2.exports = gt2;
+  }
+});
+
+// node_modules/semver/functions/lt.js
+var require_lt = __commonJS({
+  "node_modules/semver/functions/lt.js"(exports2, module2) {
+    "use strict";
+    var compare2 = require_compare();
+    var lt2 = (a, b, loose) => compare2(a, b, loose) < 0;
+    module2.exports = lt2;
+  }
+});
+
+// node_modules/semver/functions/eq.js
+var require_eq = __commonJS({
+  "node_modules/semver/functions/eq.js"(exports2, module2) {
+    "use strict";
+    var compare2 = require_compare();
+    var eq = (a, b, loose) => compare2(a, b, loose) === 0;
+    module2.exports = eq;
+  }
+});
+
+// node_modules/semver/functions/neq.js
+var require_neq = __commonJS({
+  "node_modules/semver/functions/neq.js"(exports2, module2) {
+    "use strict";
+    var compare2 = require_compare();
+    var neq = (a, b, loose) => compare2(a, b, loose) !== 0;
+    module2.exports = neq;
+  }
+});
+
+// node_modules/semver/functions/gte.js
+var require_gte = __commonJS({
+  "node_modules/semver/functions/gte.js"(exports2, module2) {
+    "use strict";
+    var compare2 = require_compare();
+    var gte = (a, b, loose) => compare2(a, b, loose) >= 0;
+    module2.exports = gte;
+  }
+});
+
+// node_modules/semver/functions/lte.js
+var require_lte = __commonJS({
+  "node_modules/semver/functions/lte.js"(exports2, module2) {
+    "use strict";
+    var compare2 = require_compare();
+    var lte = (a, b, loose) => compare2(a, b, loose) <= 0;
+    module2.exports = lte;
+  }
+});
+
+// node_modules/semver/functions/cmp.js
+var require_cmp = __commonJS({
+  "node_modules/semver/functions/cmp.js"(exports2, module2) {
+    "use strict";
+    var eq = require_eq();
+    var neq = require_neq();
+    var gt2 = require_gt();
+    var gte = require_gte();
+    var lt2 = require_lt();
+    var lte = require_lte();
+    var cmp = (a, op, b, loose) => {
+      switch (op) {
+        case "===":
+          if (typeof a === "object") {
+            a = a.version;
+          }
+          if (typeof b === "object") {
+            b = b.version;
+          }
+          return a === b;
+        case "!==":
+          if (typeof a === "object") {
+            a = a.version;
+          }
+          if (typeof b === "object") {
+            b = b.version;
+          }
+          return a !== b;
+        case "":
+        case "=":
+        case "==":
+          return eq(a, b, loose);
+        case "!=":
+          return neq(a, b, loose);
+        case ">":
+          return gt2(a, b, loose);
+        case ">=":
+          return gte(a, b, loose);
+        case "<":
+          return lt2(a, b, loose);
+        case "<=":
+          return lte(a, b, loose);
+        default:
+          throw new TypeError(`Invalid operator: ${op}`);
+      }
+    };
+    module2.exports = cmp;
+  }
+});
+
+// node_modules/semver/functions/coerce.js
+var require_coerce = __commonJS({
+  "node_modules/semver/functions/coerce.js"(exports2, module2) {
+    "use strict";
+    var SemVer = require_semver();
+    var parse4 = require_parse3();
+    var { safeRe: re3, t } = require_re();
+    var coerce2 = (version, options) => {
+      if (version instanceof SemVer) {
+        return version;
+      }
+      if (typeof version === "number") {
+        version = String(version);
+      }
+      if (typeof version !== "string") {
+        return null;
+      }
+      options = options || {};
+      let match = null;
+      if (!options.rtl) {
+        match = version.match(options.includePrerelease ? re3[t.COERCEFULL] : re3[t.COERCE]);
+      } else {
+        const coerceRtlRegex = options.includePrerelease ? re3[t.COERCERTLFULL] : re3[t.COERCERTL];
+        let next;
+        while ((next = coerceRtlRegex.exec(version)) && (!match || match.index + match[0].length !== version.length)) {
+          if (!match || next.index + next[0].length !== match.index + match[0].length) {
+            match = next;
+          }
+          coerceRtlRegex.lastIndex = next.index + next[1].length + next[2].length;
+        }
+        coerceRtlRegex.lastIndex = -1;
+      }
+      if (match === null) {
+        return null;
+      }
+      const major2 = match[2];
+      const minor = match[3] || "0";
+      const patch = match[4] || "0";
+      const prerelease = options.includePrerelease && match[5] ? `-${match[5]}` : "";
+      const build = options.includePrerelease && match[6] ? `+${match[6]}` : "";
+      return parse4(`${major2}.${minor}.${patch}${prerelease}${build}`, options);
+    };
+    module2.exports = coerce2;
+  }
+});
+
+// node_modules/semver/functions/truncate.js
+var require_truncate = __commonJS({
+  "node_modules/semver/functions/truncate.js"(exports2, module2) {
+    "use strict";
+    var parse4 = require_parse3();
+    var constants3 = require_constants11();
+    var SemVer = require_semver();
+    var truncate = (version, truncation, options) => {
+      if (!constants3.RELEASE_TYPES.includes(truncation)) {
+        return null;
+      }
+      const clonedVersion = cloneInputVersion(version, options);
+      return clonedVersion && doTruncation(clonedVersion, truncation);
+    };
+    var cloneInputVersion = (version, options) => {
+      const versionStringToParse = version instanceof SemVer ? version.version : version;
+      return parse4(versionStringToParse, options);
+    };
+    var doTruncation = (version, truncation) => {
+      if (isPrerelease(truncation)) {
+        return version.version;
+      }
+      version.prerelease = [];
+      switch (truncation) {
+        case "major":
+          version.minor = 0;
+          version.patch = 0;
+          break;
+        case "minor":
+          version.patch = 0;
+          break;
+      }
+      return version.format();
+    };
+    var isPrerelease = (type) => {
+      return type.startsWith("pre");
+    };
+    module2.exports = truncate;
+  }
+});
+
+// node_modules/semver/internal/lrucache.js
+var require_lrucache = __commonJS({
+  "node_modules/semver/internal/lrucache.js"(exports2, module2) {
+    "use strict";
+    var LRUCache = class {
+      constructor() {
+        this.max = 1e3;
+        this.map = /* @__PURE__ */ new Map();
+      }
+      get(key) {
+        const value = this.map.get(key);
+        if (value === void 0) {
+          return void 0;
+        } else {
+          this.map.delete(key);
+          this.map.set(key, value);
+          return value;
+        }
+      }
+      delete(key) {
+        return this.map.delete(key);
+      }
+      set(key, value) {
+        const deleted = this.delete(key);
+        if (!deleted && value !== void 0) {
+          if (this.map.size >= this.max) {
+            const firstKey = this.map.keys().next().value;
+            this.delete(firstKey);
+          }
+          this.map.set(key, value);
+        }
+        return this;
+      }
+    };
+    module2.exports = LRUCache;
+  }
+});
+
+// node_modules/semver/classes/range.js
+var require_range = __commonJS({
+  "node_modules/semver/classes/range.js"(exports2, module2) {
+    "use strict";
+    var SPACE_CHARACTERS = /\s+/g;
+    var Range = class _Range {
+      constructor(range2, options) {
+        options = parseOptions(options);
+        if (range2 instanceof _Range) {
+          if (range2.loose === !!options.loose && range2.includePrerelease === !!options.includePrerelease) {
+            return range2;
+          } else {
+            return new _Range(range2.raw, options);
+          }
+        }
+        if (range2 instanceof Comparator) {
+          this.raw = range2.value;
+          this.set = [[range2]];
+          this.formatted = void 0;
+          return this;
+        }
+        this.options = options;
+        this.loose = !!options.loose;
+        this.includePrerelease = !!options.includePrerelease;
+        this.raw = range2.trim().replace(SPACE_CHARACTERS, " ");
+        this.set = this.raw.split("||").map((r) => this.parseRange(r.trim())).filter((c) => c.length);
+        if (!this.set.length) {
+          throw new TypeError(`Invalid SemVer Range: ${this.raw}`);
+        }
+        if (this.set.length > 1) {
+          const first = this.set[0];
+          this.set = this.set.filter((c) => !isNullSet(c[0]));
+          if (this.set.length === 0) {
+            this.set = [first];
+          } else if (this.set.length > 1) {
+            for (const c of this.set) {
+              if (c.length === 1 && isAny(c[0])) {
+                this.set = [c];
+                break;
+              }
+            }
+          }
+        }
+        this.formatted = void 0;
+      }
+      get range() {
+        if (this.formatted === void 0) {
+          this.formatted = "";
+          for (let i = 0; i < this.set.length; i++) {
+            if (i > 0) {
+              this.formatted += "||";
+            }
+            const comps = this.set[i];
+            for (let k2 = 0; k2 < comps.length; k2++) {
+              if (k2 > 0) {
+                this.formatted += " ";
+              }
+              this.formatted += comps[k2].toString().trim();
+            }
+          }
+        }
+        return this.formatted;
+      }
+      format() {
+        return this.range;
+      }
+      toString() {
+        return this.range;
+      }
+      parseRange(range2) {
+        range2 = range2.replace(BUILDSTRIPRE, "");
+        const memoOpts = (this.options.includePrerelease && FLAG_INCLUDE_PRERELEASE) | (this.options.loose && FLAG_LOOSE);
+        const memoKey = memoOpts + ":" + range2;
+        const cached = cache.get(memoKey);
+        if (cached) {
+          return cached;
+        }
+        const loose = this.options.loose;
+        const hr = loose ? re3[t.HYPHENRANGELOOSE] : re3[t.HYPHENRANGE];
+        range2 = range2.replace(hr, hyphenReplace(this.options.includePrerelease));
+        debug2("hyphen replace", range2);
+        range2 = range2.replace(re3[t.COMPARATORTRIM], comparatorTrimReplace);
+        debug2("comparator trim", range2);
+        range2 = range2.replace(re3[t.TILDETRIM], tildeTrimReplace);
+        debug2("tilde trim", range2);
+        range2 = range2.replace(re3[t.CARETTRIM], caretTrimReplace);
+        debug2("caret trim", range2);
+        let rangeList = range2.split(" ").map((comp) => parseComparator(comp, this.options)).join(" ").split(/\s+/).map((comp) => replaceGTE0(comp, this.options));
+        if (loose) {
+          rangeList = rangeList.filter((comp) => {
+            debug2("loose invalid filter", comp, this.options);
+            return !!comp.match(re3[t.COMPARATORLOOSE]);
+          });
+        }
+        debug2("range list", rangeList);
+        const rangeMap = /* @__PURE__ */ new Map();
+        const comparators = rangeList.map((comp) => new Comparator(comp, this.options));
+        for (const comp of comparators) {
+          if (isNullSet(comp)) {
+            return [comp];
+          }
+          rangeMap.set(comp.value, comp);
+        }
+        if (rangeMap.size > 1 && rangeMap.has("")) {
+          rangeMap.delete("");
+        }
+        const result = [...rangeMap.values()];
+        cache.set(memoKey, result);
+        return result;
+      }
+      intersects(range2, options) {
+        if (!(range2 instanceof _Range)) {
+          throw new TypeError("a Range is required");
+        }
+        return this.set.some((thisComparators) => {
+          return isSatisfiable(thisComparators, options) && range2.set.some((rangeComparators) => {
+            return isSatisfiable(rangeComparators, options) && thisComparators.every((thisComparator) => {
+              return rangeComparators.every((rangeComparator) => {
+                return thisComparator.intersects(rangeComparator, options);
+              });
+            });
+          });
+        });
+      }
+      // if ANY of the sets match ALL of its comparators, then pass
+      test(version) {
+        if (!version) {
+          return false;
+        }
+        if (typeof version === "string") {
+          try {
+            version = new SemVer(version, this.options);
+          } catch (er) {
+            return false;
+          }
+        }
+        for (let i = 0; i < this.set.length; i++) {
+          if (testSet(this.set[i], version, this.options)) {
+            return true;
+          }
+        }
+        return false;
+      }
+    };
+    module2.exports = Range;
+    var LRU = require_lrucache();
+    var cache = new LRU();
+    var parseOptions = require_parse_options();
+    var Comparator = require_comparator();
+    var debug2 = require_debug();
+    var SemVer = require_semver();
+    var {
+      safeRe: re3,
+      src,
+      t,
+      comparatorTrimReplace,
+      tildeTrimReplace,
+      caretTrimReplace
+    } = require_re();
+    var { FLAG_INCLUDE_PRERELEASE, FLAG_LOOSE } = require_constants11();
+    var BUILDSTRIPRE = new RegExp(src[t.BUILD], "g");
+    var isNullSet = (c) => c.value === "<0.0.0-0";
+    var isAny = (c) => c.value === "";
+    var isSatisfiable = (comparators, options) => {
+      let result = true;
+      const remainingComparators = comparators.slice();
+      let testComparator = remainingComparators.pop();
+      while (result && remainingComparators.length) {
+        result = remainingComparators.every((otherComparator) => {
+          return testComparator.intersects(otherComparator, options);
+        });
+        testComparator = remainingComparators.pop();
+      }
+      return result;
+    };
+    var parseComparator = (comp, options) => {
+      comp = comp.replace(re3[t.BUILD], "");
+      debug2("comp", comp, options);
+      comp = replaceCarets(comp, options);
+      debug2("caret", comp);
+      comp = replaceTildes(comp, options);
+      debug2("tildes", comp);
+      comp = replaceXRanges(comp, options);
+      debug2("xrange", comp);
+      comp = replaceStars(comp, options);
+      debug2("stars", comp);
+      return comp;
+    };
+    var isX = (id) => !id || id.toLowerCase() === "x" || id === "*";
+    var invalidXRangeOrder = (M2, m, p) => isX(M2) && !isX(m) || isX(m) && p && !isX(p);
+    var replaceTildes = (comp, options) => {
+      return comp.trim().split(/\s+/).map((c) => replaceTilde(c, options)).join(" ");
+    };
+    var replaceTilde = (comp, options) => {
+      const r = options.loose ? re3[t.TILDELOOSE] : re3[t.TILDE];
+      const z = options.includePrerelease ? "-0" : "";
+      return comp.replace(r, (_2, M2, m, p, pr) => {
+        debug2("tilde", comp, _2, M2, m, p, pr);
+        let ret;
+        if (isX(M2)) {
+          ret = "";
+        } else if (isX(m)) {
+          ret = `>=${M2}.0.0${z} <${+M2 + 1}.0.0-0`;
+        } else if (isX(p)) {
+          ret = `>=${M2}.${m}.0${z} <${M2}.${+m + 1}.0-0`;
+        } else if (pr) {
+          debug2("replaceTilde pr", pr);
+          ret = `>=${M2}.${m}.${p}-${pr} <${M2}.${+m + 1}.0-0`;
+        } else {
+          ret = `>=${M2}.${m}.${p} <${M2}.${+m + 1}.0-0`;
+        }
+        debug2("tilde return", ret);
+        return ret;
+      });
+    };
+    var replaceCarets = (comp, options) => {
+      return comp.trim().split(/\s+/).map((c) => replaceCaret(c, options)).join(" ");
+    };
+    var replaceCaret = (comp, options) => {
+      debug2("caret", comp, options);
+      const r = options.loose ? re3[t.CARETLOOSE] : re3[t.CARET];
+      const z = options.includePrerelease ? "-0" : "";
+      return comp.replace(r, (_2, M2, m, p, pr) => {
+        debug2("caret", comp, _2, M2, m, p, pr);
+        let ret;
+        if (isX(M2)) {
+          ret = "";
+        } else if (isX(m)) {
+          ret = `>=${M2}.0.0${z} <${+M2 + 1}.0.0-0`;
+        } else if (isX(p)) {
+          if (M2 === "0") {
+            ret = `>=${M2}.${m}.0${z} <${M2}.${+m + 1}.0-0`;
+          } else {
+            ret = `>=${M2}.${m}.0${z} <${+M2 + 1}.0.0-0`;
+          }
+        } else if (pr) {
+          debug2("replaceCaret pr", pr);
+          if (M2 === "0") {
+            if (m === "0") {
+              ret = `>=${M2}.${m}.${p}-${pr} <${M2}.${m}.${+p + 1}-0`;
+            } else {
+              ret = `>=${M2}.${m}.${p}-${pr} <${M2}.${+m + 1}.0-0`;
+            }
+          } else {
+            ret = `>=${M2}.${m}.${p}-${pr} <${+M2 + 1}.0.0-0`;
+          }
+        } else {
+          debug2("no pr");
+          if (M2 === "0") {
+            if (m === "0") {
+              ret = `>=${M2}.${m}.${p} <${M2}.${m}.${+p + 1}-0`;
+            } else {
+              ret = `>=${M2}.${m}.${p} <${M2}.${+m + 1}.0-0`;
+            }
+          } else {
+            ret = `>=${M2}.${m}.${p} <${+M2 + 1}.0.0-0`;
+          }
+        }
+        debug2("caret return", ret);
+        return ret;
+      });
+    };
+    var replaceXRanges = (comp, options) => {
+      debug2("replaceXRanges", comp, options);
+      return comp.split(/\s+/).map((c) => replaceXRange(c, options)).join(" ");
+    };
+    var replaceXRange = (comp, options) => {
+      comp = comp.trim();
+      const r = options.loose ? re3[t.XRANGELOOSE] : re3[t.XRANGE];
+      return comp.replace(r, (ret, gtlt, M2, m, p, pr) => {
+        debug2("xRange", comp, ret, gtlt, M2, m, p, pr);
+        if (invalidXRangeOrder(M2, m, p)) {
+          return comp;
+        }
+        const xM = isX(M2);
+        const xm = xM || isX(m);
+        const xp = xm || isX(p);
+        const anyX = xp;
+        if (gtlt === "=" && anyX) {
+          gtlt = "";
+        }
+        pr = options.includePrerelease ? "-0" : "";
+        if (xM) {
+          if (gtlt === ">" || gtlt === "<") {
+            ret = "<0.0.0-0";
+          } else {
+            ret = "*";
+          }
+        } else if (gtlt && anyX) {
+          if (xm) {
+            m = 0;
+          }
+          p = 0;
+          if (gtlt === ">") {
+            gtlt = ">=";
+            if (xm) {
+              M2 = +M2 + 1;
+              m = 0;
+              p = 0;
+            } else {
+              m = +m + 1;
+              p = 0;
+            }
+          } else if (gtlt === "<=") {
+            gtlt = "<";
+            if (xm) {
+              M2 = +M2 + 1;
+            } else {
+              m = +m + 1;
+            }
+          }
+          if (gtlt === "<") {
+            pr = "-0";
+          }
+          ret = `${gtlt + M2}.${m}.${p}${pr}`;
+        } else if (xm) {
+          ret = `>=${M2}.0.0${pr} <${+M2 + 1}.0.0-0`;
+        } else if (xp) {
+          ret = `>=${M2}.${m}.0${pr} <${M2}.${+m + 1}.0-0`;
+        }
+        debug2("xRange return", ret);
+        return ret;
+      });
+    };
+    var replaceStars = (comp, options) => {
+      debug2("replaceStars", comp, options);
+      return comp.trim().replace(re3[t.STAR], "");
+    };
+    var replaceGTE0 = (comp, options) => {
+      debug2("replaceGTE0", comp, options);
+      return comp.trim().replace(re3[options.includePrerelease ? t.GTE0PRE : t.GTE0], "");
+    };
+    var hyphenReplace = (incPr) => ($0, from, fM, fm, fp, fpr, fb, to, tM, tm, tp, tpr) => {
+      if (isX(fM)) {
+        from = "";
+      } else if (isX(fm)) {
+        from = `>=${fM}.0.0${incPr ? "-0" : ""}`;
+      } else if (isX(fp)) {
+        from = `>=${fM}.${fm}.0${incPr ? "-0" : ""}`;
+      } else if (fpr) {
+        from = `>=${from}`;
+      } else {
+        from = `>=${from}${incPr ? "-0" : ""}`;
+      }
+      if (isX(tM)) {
+        to = "";
+      } else if (isX(tm)) {
+        to = `<${+tM + 1}.0.0-0`;
+      } else if (isX(tp)) {
+        to = `<${tM}.${+tm + 1}.0-0`;
+      } else if (tpr) {
+        to = `<=${tM}.${tm}.${tp}-${tpr}`;
+      } else if (incPr) {
+        to = `<${tM}.${tm}.${+tp + 1}-0`;
+      } else {
+        to = `<=${to}`;
+      }
+      return `${from} ${to}`.trim();
+    };
+    var testSet = (set, version, options) => {
+      for (let i = 0; i < set.length; i++) {
+        if (!set[i].test(version)) {
+          return false;
+        }
+      }
+      if (version.prerelease.length && !options.includePrerelease) {
+        for (let i = 0; i < set.length; i++) {
+          debug2(set[i].semver);
+          if (set[i].semver === Comparator.ANY) {
+            continue;
+          }
+          if (set[i].semver.prerelease.length > 0) {
+            const allowed = set[i].semver;
+            if (allowed.major === version.major && allowed.minor === version.minor && allowed.patch === version.patch) {
+              return true;
+            }
+          }
+        }
+        return false;
+      }
+      return true;
+    };
+  }
+});
+
+// node_modules/semver/classes/comparator.js
+var require_comparator = __commonJS({
+  "node_modules/semver/classes/comparator.js"(exports2, module2) {
+    "use strict";
+    var ANY = /* @__PURE__ */ Symbol("SemVer ANY");
+    var Comparator = class _Comparator {
+      static get ANY() {
+        return ANY;
+      }
+      constructor(comp, options) {
+        options = parseOptions(options);
+        if (comp instanceof _Comparator) {
+          if (comp.loose === !!options.loose) {
+            return comp;
+          } else {
+            comp = comp.value;
+          }
+        }
+        comp = comp.trim().split(/\s+/).join(" ");
+        debug2("comparator", comp, options);
+        this.options = options;
+        this.loose = !!options.loose;
+        this.parse(comp);
+        if (this.semver === ANY) {
+          this.value = "";
+        } else {
+          this.value = this.operator + this.semver.version;
+        }
+        debug2("comp", this);
+      }
+      parse(comp) {
+        const r = this.options.loose ? re3[t.COMPARATORLOOSE] : re3[t.COMPARATOR];
+        const m = comp.match(r);
+        if (!m) {
+          throw new TypeError(`Invalid comparator: ${comp}`);
+        }
+        this.operator = m[1] !== void 0 ? m[1] : "";
+        if (this.operator === "=") {
+          this.operator = "";
+        }
+        if (!m[2]) {
+          this.semver = ANY;
+        } else {
+          this.semver = new SemVer(m[2], this.options.loose);
+        }
+      }
+      toString() {
+        return this.value;
+      }
+      test(version) {
+        debug2("Comparator.test", version, this.options.loose);
+        if (this.semver === ANY || version === ANY) {
+          return true;
+        }
+        if (typeof version === "string") {
+          try {
+            version = new SemVer(version, this.options);
+          } catch (er) {
+            return false;
+          }
+        }
+        return cmp(version, this.operator, this.semver, this.options);
+      }
+      intersects(comp, options) {
+        if (!(comp instanceof _Comparator)) {
+          throw new TypeError("a Comparator is required");
+        }
+        if (this.operator === "") {
+          if (this.value === "") {
+            return true;
+          }
+          return new Range(comp.value, options).test(this.value);
+        } else if (comp.operator === "") {
+          if (comp.value === "") {
+            return true;
+          }
+          return new Range(this.value, options).test(comp.semver);
+        }
+        options = parseOptions(options);
+        if (options.includePrerelease && (this.value === "<0.0.0-0" || comp.value === "<0.0.0-0")) {
+          return false;
+        }
+        if (!options.includePrerelease && (this.value.startsWith("<0.0.0") || comp.value.startsWith("<0.0.0"))) {
+          return false;
+        }
+        if (this.operator.startsWith(">") && comp.operator.startsWith(">")) {
+          return true;
+        }
+        if (this.operator.startsWith("<") && comp.operator.startsWith("<")) {
+          return true;
+        }
+        if (this.semver.version === comp.semver.version && this.operator.includes("=") && comp.operator.includes("=")) {
+          return true;
+        }
+        if (cmp(this.semver, "<", comp.semver, options) && this.operator.startsWith(">") && comp.operator.startsWith("<")) {
+          return true;
+        }
+        if (cmp(this.semver, ">", comp.semver, options) && this.operator.startsWith("<") && comp.operator.startsWith(">")) {
+          return true;
+        }
+        return false;
+      }
+    };
+    module2.exports = Comparator;
+    var parseOptions = require_parse_options();
+    var { safeRe: re3, t } = require_re();
+    var cmp = require_cmp();
+    var debug2 = require_debug();
+    var SemVer = require_semver();
+    var Range = require_range();
+  }
+});
+
+// node_modules/semver/functions/satisfies.js
+var require_satisfies = __commonJS({
+  "node_modules/semver/functions/satisfies.js"(exports2, module2) {
+    "use strict";
+    var Range = require_range();
+    var satisfies = (version, range2, options) => {
+      try {
+        range2 = new Range(range2, options);
+      } catch (er) {
+        return false;
+      }
+      return range2.test(version);
+    };
+    module2.exports = satisfies;
+  }
+});
+
+// node_modules/semver/ranges/to-comparators.js
+var require_to_comparators = __commonJS({
+  "node_modules/semver/ranges/to-comparators.js"(exports2, module2) {
+    "use strict";
+    var Range = require_range();
+    var toComparators = (range2, options) => new Range(range2, options).set.map((comp) => comp.map((c) => c.value).join(" ").trim().split(" "));
+    module2.exports = toComparators;
+  }
+});
+
+// node_modules/semver/ranges/max-satisfying.js
+var require_max_satisfying = __commonJS({
+  "node_modules/semver/ranges/max-satisfying.js"(exports2, module2) {
+    "use strict";
+    var SemVer = require_semver();
+    var Range = require_range();
+    var maxSatisfying = (versions, range2, options) => {
+      let max = null;
+      let maxSV = null;
+      let rangeObj = null;
+      try {
+        rangeObj = new Range(range2, options);
+      } catch (er) {
+        return null;
+      }
+      versions.forEach((v2) => {
+        if (rangeObj.test(v2)) {
+          if (!max || maxSV.compare(v2) === -1) {
+            max = v2;
+            maxSV = new SemVer(max, options);
+          }
+        }
+      });
+      return max;
+    };
+    module2.exports = maxSatisfying;
+  }
+});
+
+// node_modules/semver/ranges/min-satisfying.js
+var require_min_satisfying = __commonJS({
+  "node_modules/semver/ranges/min-satisfying.js"(exports2, module2) {
+    "use strict";
+    var SemVer = require_semver();
+    var Range = require_range();
+    var minSatisfying = (versions, range2, options) => {
+      let min = null;
+      let minSV = null;
+      let rangeObj = null;
+      try {
+        rangeObj = new Range(range2, options);
+      } catch (er) {
+        return null;
+      }
+      versions.forEach((v2) => {
+        if (rangeObj.test(v2)) {
+          if (!min || minSV.compare(v2) === 1) {
+            min = v2;
+            minSV = new SemVer(min, options);
+          }
+        }
+      });
+      return min;
+    };
+    module2.exports = minSatisfying;
+  }
+});
+
+// node_modules/semver/ranges/min-version.js
+var require_min_version = __commonJS({
+  "node_modules/semver/ranges/min-version.js"(exports2, module2) {
+    "use strict";
+    var SemVer = require_semver();
+    var Range = require_range();
+    var gt2 = require_gt();
+    var minVersion = (range2, loose) => {
+      range2 = new Range(range2, loose);
+      let minver = new SemVer("0.0.0");
+      if (range2.test(minver)) {
+        return minver;
+      }
+      minver = new SemVer("0.0.0-0");
+      if (range2.test(minver)) {
+        return minver;
+      }
+      minver = null;
+      for (let i = 0; i < range2.set.length; ++i) {
+        const comparators = range2.set[i];
+        let setMin = null;
+        comparators.forEach((comparator) => {
+          const compver = new SemVer(comparator.semver.version);
+          switch (comparator.operator) {
+            case ">":
+              if (compver.prerelease.length === 0) {
+                compver.patch++;
+              } else {
+                compver.prerelease.push(0);
+              }
+              compver.raw = compver.format();
+            /* fallthrough */
+            case "":
+            case ">=":
+              if (!setMin || gt2(compver, setMin)) {
+                setMin = compver;
+              }
+              break;
+            case "<":
+            case "<=":
+              break;
+            /* istanbul ignore next */
+            default:
+              throw new Error(`Unexpected operation: ${comparator.operator}`);
+          }
+        });
+        if (setMin && (!minver || gt2(minver, setMin))) {
+          minver = setMin;
+        }
+      }
+      if (minver && range2.test(minver)) {
+        return minver;
+      }
+      return null;
+    };
+    module2.exports = minVersion;
+  }
+});
+
+// node_modules/semver/ranges/valid.js
+var require_valid2 = __commonJS({
+  "node_modules/semver/ranges/valid.js"(exports2, module2) {
+    "use strict";
+    var Range = require_range();
+    var validRange = (range2, options) => {
+      try {
+        return new Range(range2, options).range || "*";
+      } catch (er) {
+        return null;
+      }
+    };
+    module2.exports = validRange;
+  }
+});
+
+// node_modules/semver/ranges/outside.js
+var require_outside = __commonJS({
+  "node_modules/semver/ranges/outside.js"(exports2, module2) {
+    "use strict";
+    var SemVer = require_semver();
+    var Comparator = require_comparator();
+    var { ANY } = Comparator;
+    var Range = require_range();
+    var satisfies = require_satisfies();
+    var gt2 = require_gt();
+    var lt2 = require_lt();
+    var lte = require_lte();
+    var gte = require_gte();
+    var outside = (version, range2, hilo, options) => {
+      version = new SemVer(version, options);
+      range2 = new Range(range2, options);
+      let gtfn, ltefn, ltfn, comp, ecomp;
+      switch (hilo) {
+        case ">":
+          gtfn = gt2;
+          ltefn = lte;
+          ltfn = lt2;
+          comp = ">";
+          ecomp = ">=";
+          break;
+        case "<":
+          gtfn = lt2;
+          ltefn = gte;
+          ltfn = gt2;
+          comp = "<";
+          ecomp = "<=";
+          break;
+        default:
+          throw new TypeError('Must provide a hilo val of "<" or ">"');
+      }
+      if (satisfies(version, range2, options)) {
+        return false;
+      }
+      for (let i = 0; i < range2.set.length; ++i) {
+        const comparators = range2.set[i];
+        let high = null;
+        let low = null;
+        comparators.forEach((comparator) => {
+          if (comparator.semver === ANY) {
+            comparator = new Comparator(">=0.0.0");
+          }
+          high = high || comparator;
+          low = low || comparator;
+          if (gtfn(comparator.semver, high.semver, options)) {
+            high = comparator;
+          } else if (ltfn(comparator.semver, low.semver, options)) {
+            low = comparator;
+          }
+        });
+        if (high.operator === comp || high.operator === ecomp) {
+          return false;
+        }
+        if ((!low.operator || low.operator === comp) && ltefn(version, low.semver)) {
+          return false;
+        } else if (low.operator === ecomp && ltfn(version, low.semver)) {
+          return false;
+        }
+      }
+      return true;
+    };
+    module2.exports = outside;
+  }
+});
+
+// node_modules/semver/ranges/gtr.js
+var require_gtr = __commonJS({
+  "node_modules/semver/ranges/gtr.js"(exports2, module2) {
+    "use strict";
+    var outside = require_outside();
+    var gtr = (version, range2, options) => outside(version, range2, ">", options);
+    module2.exports = gtr;
+  }
+});
+
+// node_modules/semver/ranges/ltr.js
+var require_ltr = __commonJS({
+  "node_modules/semver/ranges/ltr.js"(exports2, module2) {
+    "use strict";
+    var outside = require_outside();
+    var ltr = (version, range2, options) => outside(version, range2, "<", options);
+    module2.exports = ltr;
+  }
+});
+
+// node_modules/semver/ranges/intersects.js
+var require_intersects = __commonJS({
+  "node_modules/semver/ranges/intersects.js"(exports2, module2) {
+    "use strict";
+    var Range = require_range();
+    var intersects = (r1, r2, options) => {
+      r1 = new Range(r1, options);
+      r2 = new Range(r2, options);
+      return r1.intersects(r2, options);
+    };
+    module2.exports = intersects;
+  }
+});
+
+// node_modules/semver/ranges/simplify.js
+var require_simplify = __commonJS({
+  "node_modules/semver/ranges/simplify.js"(exports2, module2) {
+    "use strict";
+    var satisfies = require_satisfies();
+    var compare2 = require_compare();
+    module2.exports = (versions, range2, options) => {
+      const set = [];
+      let first = null;
+      let prev = null;
+      const v2 = versions.sort((a, b) => compare2(a, b, options));
+      for (const version of v2) {
+        const included = satisfies(version, range2, options);
+        if (included) {
+          prev = version;
+          if (!first) {
+            first = version;
+          }
+        } else {
+          if (prev) {
+            set.push([first, prev]);
+          }
+          prev = null;
+          first = null;
+        }
+      }
+      if (first) {
+        set.push([first, null]);
+      }
+      const ranges = [];
+      for (const [min, max] of set) {
+        if (min === max) {
+          ranges.push(min);
+        } else if (!max && min === v2[0]) {
+          ranges.push("*");
+        } else if (!max) {
+          ranges.push(`>=${min}`);
+        } else if (min === v2[0]) {
+          ranges.push(`<=${max}`);
+        } else {
+          ranges.push(`${min} - ${max}`);
+        }
+      }
+      const simplified = ranges.join(" || ");
+      const original = typeof range2.raw === "string" ? range2.raw : String(range2);
+      return simplified.length < original.length ? simplified : range2;
+    };
+  }
+});
+
+// node_modules/semver/ranges/subset.js
+var require_subset = __commonJS({
+  "node_modules/semver/ranges/subset.js"(exports2, module2) {
+    "use strict";
+    var Range = require_range();
+    var Comparator = require_comparator();
+    var { ANY } = Comparator;
+    var satisfies = require_satisfies();
+    var compare2 = require_compare();
+    var subset = (sub, dom, options = {}) => {
+      if (sub === dom) {
+        return true;
+      }
+      sub = new Range(sub, options);
+      dom = new Range(dom, options);
+      let sawNonNull = false;
+      OUTER: for (const simpleSub of sub.set) {
+        for (const simpleDom of dom.set) {
+          const isSub = simpleSubset(simpleSub, simpleDom, options);
+          sawNonNull = sawNonNull || isSub !== null;
+          if (isSub) {
+            continue OUTER;
+          }
+        }
+        if (sawNonNull) {
+          return false;
+        }
+      }
+      return true;
+    };
+    var minimumVersionWithPreRelease = [new Comparator(">=0.0.0-0")];
+    var minimumVersion = [new Comparator(">=0.0.0")];
+    var simpleSubset = (sub, dom, options) => {
+      if (sub === dom) {
+        return true;
+      }
+      if (sub.length === 1 && sub[0].semver === ANY) {
+        if (dom.length === 1 && dom[0].semver === ANY) {
+          return true;
+        } else if (options.includePrerelease) {
+          sub = minimumVersionWithPreRelease;
+        } else {
+          sub = minimumVersion;
+        }
+      }
+      if (dom.length === 1 && dom[0].semver === ANY) {
+        if (options.includePrerelease) {
+          return true;
+        } else {
+          dom = minimumVersion;
+        }
+      }
+      const eqSet = /* @__PURE__ */ new Set();
+      let gt2, lt2;
+      for (const c of sub) {
+        if (c.operator === ">" || c.operator === ">=") {
+          gt2 = higherGT(gt2, c, options);
+        } else if (c.operator === "<" || c.operator === "<=") {
+          lt2 = lowerLT(lt2, c, options);
+        } else {
+          eqSet.add(c.semver);
+        }
+      }
+      if (eqSet.size > 1) {
+        return null;
+      }
+      let gtltComp;
+      if (gt2 && lt2) {
+        gtltComp = compare2(gt2.semver, lt2.semver, options);
+        if (gtltComp > 0) {
+          return null;
+        } else if (gtltComp === 0 && (gt2.operator !== ">=" || lt2.operator !== "<=")) {
+          return null;
+        }
+      }
+      for (const eq of eqSet) {
+        if (gt2 && !satisfies(eq, String(gt2), options)) {
+          return null;
+        }
+        if (lt2 && !satisfies(eq, String(lt2), options)) {
+          return null;
+        }
+        for (const c of dom) {
+          if (!satisfies(eq, String(c), options)) {
+            return false;
+          }
+        }
+        return true;
+      }
+      let higher, lower;
+      let hasDomLT, hasDomGT;
+      let needDomLTPre = lt2 && !options.includePrerelease && lt2.semver.prerelease.length ? lt2.semver : false;
+      let needDomGTPre = gt2 && !options.includePrerelease && gt2.semver.prerelease.length ? gt2.semver : false;
+      if (needDomLTPre && needDomLTPre.prerelease.length === 1 && lt2.operator === "<" && needDomLTPre.prerelease[0] === 0) {
+        needDomLTPre = false;
+      }
+      for (const c of dom) {
+        hasDomGT = hasDomGT || c.operator === ">" || c.operator === ">=";
+        hasDomLT = hasDomLT || c.operator === "<" || c.operator === "<=";
+        if (gt2) {
+          if (needDomGTPre) {
+            if (c.semver.prerelease && c.semver.prerelease.length && c.semver.major === needDomGTPre.major && c.semver.minor === needDomGTPre.minor && c.semver.patch === needDomGTPre.patch) {
+              needDomGTPre = false;
+            }
+          }
+          if (c.operator === ">" || c.operator === ">=") {
+            higher = higherGT(gt2, c, options);
+            if (higher === c && higher !== gt2) {
+              return false;
+            }
+          } else if (gt2.operator === ">=" && !c.test(gt2.semver)) {
+            return false;
+          }
+        }
+        if (lt2) {
+          if (needDomLTPre) {
+            if (c.semver.prerelease && c.semver.prerelease.length && c.semver.major === needDomLTPre.major && c.semver.minor === needDomLTPre.minor && c.semver.patch === needDomLTPre.patch) {
+              needDomLTPre = false;
+            }
+          }
+          if (c.operator === "<" || c.operator === "<=") {
+            lower = lowerLT(lt2, c, options);
+            if (lower === c && lower !== lt2) {
+              return false;
+            }
+          } else if (lt2.operator === "<=" && !c.test(lt2.semver)) {
+            return false;
+          }
+        }
+        if (!c.operator && (lt2 || gt2) && gtltComp !== 0) {
+          return false;
+        }
+      }
+      if (gt2 && hasDomLT && !lt2 && gtltComp !== 0) {
+        return false;
+      }
+      if (lt2 && hasDomGT && !gt2 && gtltComp !== 0) {
+        return false;
+      }
+      if (needDomGTPre || needDomLTPre) {
+        return false;
+      }
+      return true;
+    };
+    var higherGT = (a, b, options) => {
+      if (!a) {
+        return b;
+      }
+      const comp = compare2(a.semver, b.semver, options);
+      return comp > 0 ? a : comp < 0 ? b : b.operator === ">" && a.operator === ">=" ? b : a;
+    };
+    var lowerLT = (a, b, options) => {
+      if (!a) {
+        return b;
+      }
+      const comp = compare2(a.semver, b.semver, options);
+      return comp < 0 ? a : comp > 0 ? b : b.operator === "<" && a.operator === "<=" ? b : a;
+    };
+    module2.exports = subset;
+  }
+});
+
+// node_modules/semver/index.js
+var require_semver2 = __commonJS({
+  "node_modules/semver/index.js"(exports2, module2) {
+    "use strict";
+    var internalRe = require_re();
+    var constants3 = require_constants11();
+    var SemVer = require_semver();
+    var identifiers = require_identifiers();
+    var parse4 = require_parse3();
+    var valid2 = require_valid();
+    var clean = require_clean();
+    var inc = require_inc();
+    var diff = require_diff();
+    var major2 = require_major();
+    var minor = require_minor();
+    var patch = require_patch();
+    var prerelease = require_prerelease();
+    var compare2 = require_compare();
+    var rcompare = require_rcompare();
+    var compareLoose = require_compare_loose();
+    var compareBuild = require_compare_build();
+    var sort = require_sort();
+    var rsort = require_rsort();
+    var gt2 = require_gt();
+    var lt2 = require_lt();
+    var eq = require_eq();
+    var neq = require_neq();
+    var gte = require_gte();
+    var lte = require_lte();
+    var cmp = require_cmp();
+    var coerce2 = require_coerce();
+    var truncate = require_truncate();
+    var Comparator = require_comparator();
+    var Range = require_range();
+    var satisfies = require_satisfies();
+    var toComparators = require_to_comparators();
+    var maxSatisfying = require_max_satisfying();
+    var minSatisfying = require_min_satisfying();
+    var minVersion = require_min_version();
+    var validRange = require_valid2();
+    var outside = require_outside();
+    var gtr = require_gtr();
+    var ltr = require_ltr();
+    var intersects = require_intersects();
+    var simplifyRange = require_simplify();
+    var subset = require_subset();
+    module2.exports = {
+      parse: parse4,
+      valid: valid2,
+      clean,
+      inc,
+      diff,
+      major: major2,
+      minor,
+      patch,
+      prerelease,
+      compare: compare2,
+      rcompare,
+      compareLoose,
+      compareBuild,
+      sort,
+      rsort,
+      gt: gt2,
+      lt: lt2,
+      eq,
+      neq,
+      gte,
+      lte,
+      cmp,
+      coerce: coerce2,
+      truncate,
+      Comparator,
+      Range,
+      satisfies,
+      toComparators,
+      maxSatisfying,
+      minSatisfying,
+      minVersion,
+      validRange,
+      outside,
+      gtr,
+      ltr,
+      intersects,
+      simplifyRange,
+      subset,
+      SemVer,
+      re: internalRe.re,
+      src: internalRe.src,
+      tokens: internalRe.t,
+      SEMVER_SPEC_VERSION: constants3.SEMVER_SPEC_VERSION,
+      RELEASE_TYPES: constants3.RELEASE_TYPES,
+      compareIdentifiers: identifiers.compareIdentifiers,
+      rcompareIdentifiers: identifiers.rcompareIdentifiers
+    };
   }
 });
 
@@ -61916,7 +63945,7 @@ var require_inversify = __commonJS({
 });
 
 // node_modules/inversify-binding-decorators/lib/constants.js
-var require_constants11 = __commonJS({
+var require_constants12 = __commonJS({
   "node_modules/inversify-binding-decorators/lib/constants.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
@@ -61933,7 +63962,7 @@ var require_provide = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     var inversify_1 = require_inversify();
-    var constants_1 = require_constants11();
+    var constants_1 = require_constants12();
     function provide(serviceIdentifier, force) {
       return function(target) {
         var isAlreadyDecorated = Reflect.hasOwnMetadata(inversify_1.METADATA_KEY.PARAM_TYPES, target);
@@ -62069,7 +64098,7 @@ var require_provide_done_syntax = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     var inversify_1 = require_inversify();
     var inversify_2 = require_inversify();
-    var constants_1 = require_constants11();
+    var constants_1 = require_constants12();
     var ProvideDoneSyntax = (
       /** @class */
       (function() {
@@ -62421,7 +64450,7 @@ var require_module_factory = __commonJS({
   "node_modules/inversify-binding-decorators/lib/factory/module_factory.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    var constants_1 = require_constants11();
+    var constants_1 = require_constants12();
     var inversify_1 = require_inversify();
     function buildProviderModule2() {
       return new inversify_1.ContainerModule(function(bind2, unbind) {
@@ -62451,2000 +64480,6 @@ var require_lib2 = __commonJS({
     exports2.fluentProvide = fluent_provide_1.default;
     var module_factory_1 = require_module_factory();
     exports2.buildProviderModule = module_factory_1.default;
-  }
-});
-
-// node_modules/semver/internal/constants.js
-var require_constants12 = __commonJS({
-  "node_modules/semver/internal/constants.js"(exports2, module2) {
-    "use strict";
-    var SEMVER_SPEC_VERSION = "2.0.0";
-    var MAX_LENGTH = 256;
-    var MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER || /* istanbul ignore next */
-    9007199254740991;
-    var MAX_SAFE_COMPONENT_LENGTH = 16;
-    var MAX_SAFE_BUILD_LENGTH = MAX_LENGTH - 6;
-    var RELEASE_TYPES = [
-      "major",
-      "premajor",
-      "minor",
-      "preminor",
-      "patch",
-      "prepatch",
-      "prerelease"
-    ];
-    module2.exports = {
-      MAX_LENGTH,
-      MAX_SAFE_COMPONENT_LENGTH,
-      MAX_SAFE_BUILD_LENGTH,
-      MAX_SAFE_INTEGER,
-      RELEASE_TYPES,
-      SEMVER_SPEC_VERSION,
-      FLAG_INCLUDE_PRERELEASE: 1,
-      FLAG_LOOSE: 2
-    };
-  }
-});
-
-// node_modules/semver/internal/debug.js
-var require_debug = __commonJS({
-  "node_modules/semver/internal/debug.js"(exports2, module2) {
-    "use strict";
-    var debug2 = typeof process === "object" && process.env && process.env.NODE_DEBUG && /\bsemver\b/i.test(process.env.NODE_DEBUG) ? (...args) => console.error("SEMVER", ...args) : () => {
-    };
-    module2.exports = debug2;
-  }
-});
-
-// node_modules/semver/internal/re.js
-var require_re = __commonJS({
-  "node_modules/semver/internal/re.js"(exports2, module2) {
-    "use strict";
-    var {
-      MAX_SAFE_COMPONENT_LENGTH,
-      MAX_SAFE_BUILD_LENGTH,
-      MAX_LENGTH
-    } = require_constants12();
-    var debug2 = require_debug();
-    exports2 = module2.exports = {};
-    var re3 = exports2.re = [];
-    var safeRe = exports2.safeRe = [];
-    var src = exports2.src = [];
-    var safeSrc = exports2.safeSrc = [];
-    var t = exports2.t = {};
-    var R2 = 0;
-    var LETTERDASHNUMBER = "[a-zA-Z0-9-]";
-    var safeRegexReplacements = [
-      ["\\s", 1],
-      ["\\d", MAX_LENGTH],
-      [LETTERDASHNUMBER, MAX_SAFE_BUILD_LENGTH]
-    ];
-    var makeSafeRegex = (value) => {
-      for (const [token, max] of safeRegexReplacements) {
-        value = value.split(`${token}*`).join(`${token}{0,${max}}`).split(`${token}+`).join(`${token}{1,${max}}`);
-      }
-      return value;
-    };
-    var createToken = (name, value, isGlobal) => {
-      const safe = makeSafeRegex(value);
-      const index = R2++;
-      debug2(name, index, value);
-      t[name] = index;
-      src[index] = value;
-      safeSrc[index] = safe;
-      re3[index] = new RegExp(value, isGlobal ? "g" : void 0);
-      safeRe[index] = new RegExp(safe, isGlobal ? "g" : void 0);
-    };
-    createToken("NUMERICIDENTIFIER", "0|[1-9]\\d*");
-    createToken("NUMERICIDENTIFIERLOOSE", "\\d+");
-    createToken("NONNUMERICIDENTIFIER", `\\d*[a-zA-Z-]${LETTERDASHNUMBER}*`);
-    createToken("MAINVERSION", `(${src[t.NUMERICIDENTIFIER]})\\.(${src[t.NUMERICIDENTIFIER]})\\.(${src[t.NUMERICIDENTIFIER]})`);
-    createToken("MAINVERSIONLOOSE", `(${src[t.NUMERICIDENTIFIERLOOSE]})\\.(${src[t.NUMERICIDENTIFIERLOOSE]})\\.(${src[t.NUMERICIDENTIFIERLOOSE]})`);
-    createToken("PRERELEASEIDENTIFIER", `(?:${src[t.NONNUMERICIDENTIFIER]}|${src[t.NUMERICIDENTIFIER]})`);
-    createToken("PRERELEASEIDENTIFIERLOOSE", `(?:${src[t.NONNUMERICIDENTIFIER]}|${src[t.NUMERICIDENTIFIERLOOSE]})`);
-    createToken("PRERELEASE", `(?:-(${src[t.PRERELEASEIDENTIFIER]}(?:\\.${src[t.PRERELEASEIDENTIFIER]})*))`);
-    createToken("PRERELEASELOOSE", `(?:-?(${src[t.PRERELEASEIDENTIFIERLOOSE]}(?:\\.${src[t.PRERELEASEIDENTIFIERLOOSE]})*))`);
-    createToken("BUILDIDENTIFIER", `${LETTERDASHNUMBER}+`);
-    createToken("BUILD", `(?:\\+(${src[t.BUILDIDENTIFIER]}(?:\\.${src[t.BUILDIDENTIFIER]})*))`);
-    createToken("FULLPLAIN", `v?${src[t.MAINVERSION]}${src[t.PRERELEASE]}?${src[t.BUILD]}?`);
-    createToken("FULL", `^${src[t.FULLPLAIN]}$`);
-    createToken("LOOSEPLAIN", `[v=\\s]*${src[t.MAINVERSIONLOOSE]}${src[t.PRERELEASELOOSE]}?${src[t.BUILD]}?`);
-    createToken("LOOSE", `^${src[t.LOOSEPLAIN]}$`);
-    createToken("GTLT", "((?:<|>)?=?)");
-    createToken("XRANGEIDENTIFIERLOOSE", `${src[t.NUMERICIDENTIFIERLOOSE]}|x|X|\\*`);
-    createToken("XRANGEIDENTIFIER", `${src[t.NUMERICIDENTIFIER]}|x|X|\\*`);
-    createToken("XRANGEPLAIN", `[v=\\s]*(${src[t.XRANGEIDENTIFIER]})(?:\\.(${src[t.XRANGEIDENTIFIER]})(?:\\.(${src[t.XRANGEIDENTIFIER]})(?:${src[t.PRERELEASE]})?${src[t.BUILD]}?)?)?`);
-    createToken("XRANGEPLAINLOOSE", `[v=\\s]*(${src[t.XRANGEIDENTIFIERLOOSE]})(?:\\.(${src[t.XRANGEIDENTIFIERLOOSE]})(?:\\.(${src[t.XRANGEIDENTIFIERLOOSE]})(?:${src[t.PRERELEASELOOSE]})?${src[t.BUILD]}?)?)?`);
-    createToken("XRANGE", `^${src[t.GTLT]}\\s*${src[t.XRANGEPLAIN]}$`);
-    createToken("XRANGELOOSE", `^${src[t.GTLT]}\\s*${src[t.XRANGEPLAINLOOSE]}$`);
-    createToken("COERCEPLAIN", `${"(^|[^\\d])(\\d{1,"}${MAX_SAFE_COMPONENT_LENGTH}})(?:\\.(\\d{1,${MAX_SAFE_COMPONENT_LENGTH}}))?(?:\\.(\\d{1,${MAX_SAFE_COMPONENT_LENGTH}}))?`);
-    createToken("COERCE", `${src[t.COERCEPLAIN]}(?:$|[^\\d])`);
-    createToken("COERCEFULL", src[t.COERCEPLAIN] + `(?:${src[t.PRERELEASE]})?(?:${src[t.BUILD]})?(?:$|[^\\d])`);
-    createToken("COERCERTL", src[t.COERCE], true);
-    createToken("COERCERTLFULL", src[t.COERCEFULL], true);
-    createToken("LONETILDE", "(?:~>?)");
-    createToken("TILDETRIM", `(\\s*)${src[t.LONETILDE]}\\s+`, true);
-    exports2.tildeTrimReplace = "$1~";
-    createToken("TILDE", `^${src[t.LONETILDE]}${src[t.XRANGEPLAIN]}$`);
-    createToken("TILDELOOSE", `^${src[t.LONETILDE]}${src[t.XRANGEPLAINLOOSE]}$`);
-    createToken("LONECARET", "(?:\\^)");
-    createToken("CARETTRIM", `(\\s*)${src[t.LONECARET]}\\s+`, true);
-    exports2.caretTrimReplace = "$1^";
-    createToken("CARET", `^${src[t.LONECARET]}${src[t.XRANGEPLAIN]}$`);
-    createToken("CARETLOOSE", `^${src[t.LONECARET]}${src[t.XRANGEPLAINLOOSE]}$`);
-    createToken("COMPARATORLOOSE", `^${src[t.GTLT]}\\s*(${src[t.LOOSEPLAIN]})$|^$`);
-    createToken("COMPARATOR", `^${src[t.GTLT]}\\s*(${src[t.FULLPLAIN]})$|^$`);
-    createToken("COMPARATORTRIM", `(\\s*)${src[t.GTLT]}\\s*(${src[t.LOOSEPLAIN]}|${src[t.XRANGEPLAIN]})`, true);
-    exports2.comparatorTrimReplace = "$1$2$3";
-    createToken("HYPHENRANGE", `^\\s*(${src[t.XRANGEPLAIN]})\\s+-\\s+(${src[t.XRANGEPLAIN]})\\s*$`);
-    createToken("HYPHENRANGELOOSE", `^\\s*(${src[t.XRANGEPLAINLOOSE]})\\s+-\\s+(${src[t.XRANGEPLAINLOOSE]})\\s*$`);
-    createToken("STAR", "(<|>)?=?\\s*\\*");
-    createToken("GTE0", "^\\s*>=\\s*0\\.0\\.0\\s*$");
-    createToken("GTE0PRE", "^\\s*>=\\s*0\\.0\\.0-0\\s*$");
-  }
-});
-
-// node_modules/semver/internal/parse-options.js
-var require_parse_options = __commonJS({
-  "node_modules/semver/internal/parse-options.js"(exports2, module2) {
-    "use strict";
-    var looseOption = Object.freeze({ loose: true });
-    var emptyOpts = Object.freeze({});
-    var parseOptions = (options) => {
-      if (!options) {
-        return emptyOpts;
-      }
-      if (typeof options !== "object") {
-        return looseOption;
-      }
-      return options;
-    };
-    module2.exports = parseOptions;
-  }
-});
-
-// node_modules/semver/internal/identifiers.js
-var require_identifiers = __commonJS({
-  "node_modules/semver/internal/identifiers.js"(exports2, module2) {
-    "use strict";
-    var numeric = /^[0-9]+$/;
-    var compareIdentifiers = (a, b) => {
-      if (typeof a === "number" && typeof b === "number") {
-        return a === b ? 0 : a < b ? -1 : 1;
-      }
-      const anum = numeric.test(a);
-      const bnum = numeric.test(b);
-      if (anum && bnum) {
-        a = +a;
-        b = +b;
-      }
-      return a === b ? 0 : anum && !bnum ? -1 : bnum && !anum ? 1 : a < b ? -1 : 1;
-    };
-    var rcompareIdentifiers = (a, b) => compareIdentifiers(b, a);
-    module2.exports = {
-      compareIdentifiers,
-      rcompareIdentifiers
-    };
-  }
-});
-
-// node_modules/semver/classes/semver.js
-var require_semver = __commonJS({
-  "node_modules/semver/classes/semver.js"(exports2, module2) {
-    "use strict";
-    var debug2 = require_debug();
-    var { MAX_LENGTH, MAX_SAFE_INTEGER } = require_constants12();
-    var { safeRe: re3, t } = require_re();
-    var parseOptions = require_parse_options();
-    var { compareIdentifiers } = require_identifiers();
-    var isPrereleaseIdentifier = (prerelease, identifier) => {
-      const identifiers = identifier.split(".");
-      if (identifiers.length > prerelease.length) {
-        return false;
-      }
-      for (let i = 0; i < identifiers.length; i++) {
-        if (compareIdentifiers(prerelease[i], identifiers[i]) !== 0) {
-          return false;
-        }
-      }
-      return true;
-    };
-    var SemVer = class _SemVer {
-      constructor(version, options) {
-        options = parseOptions(options);
-        if (version instanceof _SemVer) {
-          if (version.loose === !!options.loose && version.includePrerelease === !!options.includePrerelease) {
-            return version;
-          } else {
-            version = version.version;
-          }
-        } else if (typeof version !== "string") {
-          throw new TypeError(`Invalid version. Must be a string. Got type "${typeof version}".`);
-        }
-        if (version.length > MAX_LENGTH) {
-          throw new TypeError(
-            `version is longer than ${MAX_LENGTH} characters`
-          );
-        }
-        debug2("SemVer", version, options);
-        this.options = options;
-        this.loose = !!options.loose;
-        this.includePrerelease = !!options.includePrerelease;
-        const m = version.trim().match(options.loose ? re3[t.LOOSE] : re3[t.FULL]);
-        if (!m) {
-          throw new TypeError(`Invalid Version: ${version}`);
-        }
-        this.raw = version;
-        this.major = +m[1];
-        this.minor = +m[2];
-        this.patch = +m[3];
-        if (this.major > MAX_SAFE_INTEGER || this.major < 0) {
-          throw new TypeError("Invalid major version");
-        }
-        if (this.minor > MAX_SAFE_INTEGER || this.minor < 0) {
-          throw new TypeError("Invalid minor version");
-        }
-        if (this.patch > MAX_SAFE_INTEGER || this.patch < 0) {
-          throw new TypeError("Invalid patch version");
-        }
-        if (!m[4]) {
-          this.prerelease = [];
-        } else {
-          this.prerelease = m[4].split(".").map((id) => {
-            if (/^[0-9]+$/.test(id)) {
-              const num = +id;
-              if (num >= 0 && num < MAX_SAFE_INTEGER) {
-                return num;
-              }
-            }
-            return id;
-          });
-        }
-        this.build = m[5] ? m[5].split(".") : [];
-        this.format();
-      }
-      format() {
-        this.version = `${this.major}.${this.minor}.${this.patch}`;
-        if (this.prerelease.length) {
-          this.version += `-${this.prerelease.join(".")}`;
-        }
-        return this.version;
-      }
-      toString() {
-        return this.version;
-      }
-      compare(other) {
-        debug2("SemVer.compare", this.version, this.options, other);
-        if (!(other instanceof _SemVer)) {
-          if (typeof other === "string" && other === this.version) {
-            return 0;
-          }
-          other = new _SemVer(other, this.options);
-        }
-        if (other.version === this.version) {
-          return 0;
-        }
-        return this.compareMain(other) || this.comparePre(other);
-      }
-      compareMain(other) {
-        if (!(other instanceof _SemVer)) {
-          other = new _SemVer(other, this.options);
-        }
-        if (this.major < other.major) {
-          return -1;
-        }
-        if (this.major > other.major) {
-          return 1;
-        }
-        if (this.minor < other.minor) {
-          return -1;
-        }
-        if (this.minor > other.minor) {
-          return 1;
-        }
-        if (this.patch < other.patch) {
-          return -1;
-        }
-        if (this.patch > other.patch) {
-          return 1;
-        }
-        return 0;
-      }
-      comparePre(other) {
-        if (!(other instanceof _SemVer)) {
-          other = new _SemVer(other, this.options);
-        }
-        if (this.prerelease.length && !other.prerelease.length) {
-          return -1;
-        } else if (!this.prerelease.length && other.prerelease.length) {
-          return 1;
-        } else if (!this.prerelease.length && !other.prerelease.length) {
-          return 0;
-        }
-        let i = 0;
-        do {
-          const a = this.prerelease[i];
-          const b = other.prerelease[i];
-          debug2("prerelease compare", i, a, b);
-          if (a === void 0 && b === void 0) {
-            return 0;
-          } else if (b === void 0) {
-            return 1;
-          } else if (a === void 0) {
-            return -1;
-          } else if (a === b) {
-            continue;
-          } else {
-            return compareIdentifiers(a, b);
-          }
-        } while (++i);
-      }
-      compareBuild(other) {
-        if (!(other instanceof _SemVer)) {
-          other = new _SemVer(other, this.options);
-        }
-        let i = 0;
-        do {
-          const a = this.build[i];
-          const b = other.build[i];
-          debug2("build compare", i, a, b);
-          if (a === void 0 && b === void 0) {
-            return 0;
-          } else if (b === void 0) {
-            return 1;
-          } else if (a === void 0) {
-            return -1;
-          } else if (a === b) {
-            continue;
-          } else {
-            return compareIdentifiers(a, b);
-          }
-        } while (++i);
-      }
-      // preminor will bump the version up to the next minor release, and immediately
-      // down to pre-release. premajor and prepatch work the same way.
-      inc(release, identifier, identifierBase) {
-        if (release.startsWith("pre")) {
-          if (!identifier && identifierBase === false) {
-            throw new Error("invalid increment argument: identifier is empty");
-          }
-          if (identifier) {
-            const match = `-${identifier}`.match(this.options.loose ? re3[t.PRERELEASELOOSE] : re3[t.PRERELEASE]);
-            if (!match || match[1] !== identifier) {
-              throw new Error(`invalid identifier: ${identifier}`);
-            }
-          }
-        }
-        switch (release) {
-          case "premajor":
-            this.prerelease.length = 0;
-            this.patch = 0;
-            this.minor = 0;
-            this.major++;
-            this.inc("pre", identifier, identifierBase);
-            break;
-          case "preminor":
-            this.prerelease.length = 0;
-            this.patch = 0;
-            this.minor++;
-            this.inc("pre", identifier, identifierBase);
-            break;
-          case "prepatch":
-            this.prerelease.length = 0;
-            this.inc("patch", identifier, identifierBase);
-            this.inc("pre", identifier, identifierBase);
-            break;
-          // If the input is a non-prerelease version, this acts the same as
-          // prepatch.
-          case "prerelease":
-            if (this.prerelease.length === 0) {
-              this.inc("patch", identifier, identifierBase);
-            }
-            this.inc("pre", identifier, identifierBase);
-            break;
-          case "release":
-            if (this.prerelease.length === 0) {
-              throw new Error(`version ${this.raw} is not a prerelease`);
-            }
-            this.prerelease.length = 0;
-            break;
-          case "major":
-            if (this.minor !== 0 || this.patch !== 0 || this.prerelease.length === 0) {
-              this.major++;
-            }
-            this.minor = 0;
-            this.patch = 0;
-            this.prerelease = [];
-            break;
-          case "minor":
-            if (this.patch !== 0 || this.prerelease.length === 0) {
-              this.minor++;
-            }
-            this.patch = 0;
-            this.prerelease = [];
-            break;
-          case "patch":
-            if (this.prerelease.length === 0) {
-              this.patch++;
-            }
-            this.prerelease = [];
-            break;
-          // This probably shouldn't be used publicly.
-          // 1.0.0 'pre' would become 1.0.0-0 which is the wrong direction.
-          case "pre": {
-            const base = Number(identifierBase) ? 1 : 0;
-            if (this.prerelease.length === 0) {
-              this.prerelease = [base];
-            } else {
-              let i = this.prerelease.length;
-              while (--i >= 0) {
-                if (typeof this.prerelease[i] === "number") {
-                  this.prerelease[i]++;
-                  i = -2;
-                }
-              }
-              if (i === -1) {
-                if (identifier === this.prerelease.join(".") && identifierBase === false) {
-                  throw new Error("invalid increment argument: identifier already exists");
-                }
-                this.prerelease.push(base);
-              }
-            }
-            if (identifier) {
-              let prerelease = [identifier, base];
-              if (identifierBase === false) {
-                prerelease = [identifier];
-              }
-              if (isPrereleaseIdentifier(this.prerelease, identifier)) {
-                const prereleaseBase = this.prerelease[identifier.split(".").length];
-                if (isNaN(prereleaseBase)) {
-                  this.prerelease = prerelease;
-                }
-              } else {
-                this.prerelease = prerelease;
-              }
-            }
-            break;
-          }
-          default:
-            throw new Error(`invalid increment argument: ${release}`);
-        }
-        this.raw = this.format();
-        if (this.build.length) {
-          this.raw += `+${this.build.join(".")}`;
-        }
-        return this;
-      }
-    };
-    module2.exports = SemVer;
-  }
-});
-
-// node_modules/semver/functions/parse.js
-var require_parse3 = __commonJS({
-  "node_modules/semver/functions/parse.js"(exports2, module2) {
-    "use strict";
-    var SemVer = require_semver();
-    var parse3 = (version, options, throwErrors = false) => {
-      if (version instanceof SemVer) {
-        return version;
-      }
-      try {
-        return new SemVer(version, options);
-      } catch (er) {
-        if (!throwErrors) {
-          return null;
-        }
-        throw er;
-      }
-    };
-    module2.exports = parse3;
-  }
-});
-
-// node_modules/semver/functions/valid.js
-var require_valid = __commonJS({
-  "node_modules/semver/functions/valid.js"(exports2, module2) {
-    "use strict";
-    var parse3 = require_parse3();
-    var valid2 = (version, options) => {
-      const v2 = parse3(version, options);
-      return v2 ? v2.version : null;
-    };
-    module2.exports = valid2;
-  }
-});
-
-// node_modules/semver/functions/clean.js
-var require_clean = __commonJS({
-  "node_modules/semver/functions/clean.js"(exports2, module2) {
-    "use strict";
-    var parse3 = require_parse3();
-    var clean = (version, options) => {
-      const s = parse3(version.trim().replace(/^[=v]+/, ""), options);
-      return s ? s.version : null;
-    };
-    module2.exports = clean;
-  }
-});
-
-// node_modules/semver/functions/inc.js
-var require_inc = __commonJS({
-  "node_modules/semver/functions/inc.js"(exports2, module2) {
-    "use strict";
-    var SemVer = require_semver();
-    var inc = (version, release, options, identifier, identifierBase) => {
-      if (typeof options === "string") {
-        identifierBase = identifier;
-        identifier = options;
-        options = void 0;
-      }
-      try {
-        return new SemVer(
-          version instanceof SemVer ? version.version : version,
-          options
-        ).inc(release, identifier, identifierBase).version;
-      } catch (er) {
-        return null;
-      }
-    };
-    module2.exports = inc;
-  }
-});
-
-// node_modules/semver/functions/diff.js
-var require_diff = __commonJS({
-  "node_modules/semver/functions/diff.js"(exports2, module2) {
-    "use strict";
-    var parse3 = require_parse3();
-    var diff = (version1, version2) => {
-      const v1 = parse3(version1, null, true);
-      const v2 = parse3(version2, null, true);
-      const comparison = v1.compare(v2);
-      if (comparison === 0) {
-        return null;
-      }
-      const v1Higher = comparison > 0;
-      const highVersion = v1Higher ? v1 : v2;
-      const lowVersion = v1Higher ? v2 : v1;
-      const highHasPre = !!highVersion.prerelease.length;
-      const lowHasPre = !!lowVersion.prerelease.length;
-      if (lowHasPre && !highHasPre) {
-        if (!lowVersion.patch && !lowVersion.minor) {
-          return "major";
-        }
-        if (lowVersion.compareMain(highVersion) === 0) {
-          if (lowVersion.minor && !lowVersion.patch) {
-            return "minor";
-          }
-          return "patch";
-        }
-      }
-      const prefix = highHasPre ? "pre" : "";
-      if (v1.major !== v2.major) {
-        return prefix + "major";
-      }
-      if (v1.minor !== v2.minor) {
-        return prefix + "minor";
-      }
-      if (v1.patch !== v2.patch) {
-        return prefix + "patch";
-      }
-      return "prerelease";
-    };
-    module2.exports = diff;
-  }
-});
-
-// node_modules/semver/functions/major.js
-var require_major = __commonJS({
-  "node_modules/semver/functions/major.js"(exports2, module2) {
-    "use strict";
-    var SemVer = require_semver();
-    var major2 = (a, loose) => new SemVer(a, loose).major;
-    module2.exports = major2;
-  }
-});
-
-// node_modules/semver/functions/minor.js
-var require_minor = __commonJS({
-  "node_modules/semver/functions/minor.js"(exports2, module2) {
-    "use strict";
-    var SemVer = require_semver();
-    var minor = (a, loose) => new SemVer(a, loose).minor;
-    module2.exports = minor;
-  }
-});
-
-// node_modules/semver/functions/patch.js
-var require_patch = __commonJS({
-  "node_modules/semver/functions/patch.js"(exports2, module2) {
-    "use strict";
-    var SemVer = require_semver();
-    var patch = (a, loose) => new SemVer(a, loose).patch;
-    module2.exports = patch;
-  }
-});
-
-// node_modules/semver/functions/prerelease.js
-var require_prerelease = __commonJS({
-  "node_modules/semver/functions/prerelease.js"(exports2, module2) {
-    "use strict";
-    var parse3 = require_parse3();
-    var prerelease = (version, options) => {
-      const parsed = parse3(version, options);
-      return parsed && parsed.prerelease.length ? parsed.prerelease : null;
-    };
-    module2.exports = prerelease;
-  }
-});
-
-// node_modules/semver/functions/compare.js
-var require_compare = __commonJS({
-  "node_modules/semver/functions/compare.js"(exports2, module2) {
-    "use strict";
-    var SemVer = require_semver();
-    var compare2 = (a, b, loose) => new SemVer(a, loose).compare(new SemVer(b, loose));
-    module2.exports = compare2;
-  }
-});
-
-// node_modules/semver/functions/rcompare.js
-var require_rcompare = __commonJS({
-  "node_modules/semver/functions/rcompare.js"(exports2, module2) {
-    "use strict";
-    var compare2 = require_compare();
-    var rcompare = (a, b, loose) => compare2(b, a, loose);
-    module2.exports = rcompare;
-  }
-});
-
-// node_modules/semver/functions/compare-loose.js
-var require_compare_loose = __commonJS({
-  "node_modules/semver/functions/compare-loose.js"(exports2, module2) {
-    "use strict";
-    var compare2 = require_compare();
-    var compareLoose = (a, b) => compare2(a, b, true);
-    module2.exports = compareLoose;
-  }
-});
-
-// node_modules/semver/functions/compare-build.js
-var require_compare_build = __commonJS({
-  "node_modules/semver/functions/compare-build.js"(exports2, module2) {
-    "use strict";
-    var SemVer = require_semver();
-    var compareBuild = (a, b, loose) => {
-      const versionA = new SemVer(a, loose);
-      const versionB = new SemVer(b, loose);
-      return versionA.compare(versionB) || versionA.compareBuild(versionB);
-    };
-    module2.exports = compareBuild;
-  }
-});
-
-// node_modules/semver/functions/sort.js
-var require_sort = __commonJS({
-  "node_modules/semver/functions/sort.js"(exports2, module2) {
-    "use strict";
-    var compareBuild = require_compare_build();
-    var sort = (list, loose) => list.sort((a, b) => compareBuild(a, b, loose));
-    module2.exports = sort;
-  }
-});
-
-// node_modules/semver/functions/rsort.js
-var require_rsort = __commonJS({
-  "node_modules/semver/functions/rsort.js"(exports2, module2) {
-    "use strict";
-    var compareBuild = require_compare_build();
-    var rsort = (list, loose) => list.sort((a, b) => compareBuild(b, a, loose));
-    module2.exports = rsort;
-  }
-});
-
-// node_modules/semver/functions/gt.js
-var require_gt = __commonJS({
-  "node_modules/semver/functions/gt.js"(exports2, module2) {
-    "use strict";
-    var compare2 = require_compare();
-    var gt2 = (a, b, loose) => compare2(a, b, loose) > 0;
-    module2.exports = gt2;
-  }
-});
-
-// node_modules/semver/functions/lt.js
-var require_lt = __commonJS({
-  "node_modules/semver/functions/lt.js"(exports2, module2) {
-    "use strict";
-    var compare2 = require_compare();
-    var lt2 = (a, b, loose) => compare2(a, b, loose) < 0;
-    module2.exports = lt2;
-  }
-});
-
-// node_modules/semver/functions/eq.js
-var require_eq = __commonJS({
-  "node_modules/semver/functions/eq.js"(exports2, module2) {
-    "use strict";
-    var compare2 = require_compare();
-    var eq = (a, b, loose) => compare2(a, b, loose) === 0;
-    module2.exports = eq;
-  }
-});
-
-// node_modules/semver/functions/neq.js
-var require_neq = __commonJS({
-  "node_modules/semver/functions/neq.js"(exports2, module2) {
-    "use strict";
-    var compare2 = require_compare();
-    var neq = (a, b, loose) => compare2(a, b, loose) !== 0;
-    module2.exports = neq;
-  }
-});
-
-// node_modules/semver/functions/gte.js
-var require_gte = __commonJS({
-  "node_modules/semver/functions/gte.js"(exports2, module2) {
-    "use strict";
-    var compare2 = require_compare();
-    var gte = (a, b, loose) => compare2(a, b, loose) >= 0;
-    module2.exports = gte;
-  }
-});
-
-// node_modules/semver/functions/lte.js
-var require_lte = __commonJS({
-  "node_modules/semver/functions/lte.js"(exports2, module2) {
-    "use strict";
-    var compare2 = require_compare();
-    var lte = (a, b, loose) => compare2(a, b, loose) <= 0;
-    module2.exports = lte;
-  }
-});
-
-// node_modules/semver/functions/cmp.js
-var require_cmp = __commonJS({
-  "node_modules/semver/functions/cmp.js"(exports2, module2) {
-    "use strict";
-    var eq = require_eq();
-    var neq = require_neq();
-    var gt2 = require_gt();
-    var gte = require_gte();
-    var lt2 = require_lt();
-    var lte = require_lte();
-    var cmp = (a, op, b, loose) => {
-      switch (op) {
-        case "===":
-          if (typeof a === "object") {
-            a = a.version;
-          }
-          if (typeof b === "object") {
-            b = b.version;
-          }
-          return a === b;
-        case "!==":
-          if (typeof a === "object") {
-            a = a.version;
-          }
-          if (typeof b === "object") {
-            b = b.version;
-          }
-          return a !== b;
-        case "":
-        case "=":
-        case "==":
-          return eq(a, b, loose);
-        case "!=":
-          return neq(a, b, loose);
-        case ">":
-          return gt2(a, b, loose);
-        case ">=":
-          return gte(a, b, loose);
-        case "<":
-          return lt2(a, b, loose);
-        case "<=":
-          return lte(a, b, loose);
-        default:
-          throw new TypeError(`Invalid operator: ${op}`);
-      }
-    };
-    module2.exports = cmp;
-  }
-});
-
-// node_modules/semver/functions/coerce.js
-var require_coerce = __commonJS({
-  "node_modules/semver/functions/coerce.js"(exports2, module2) {
-    "use strict";
-    var SemVer = require_semver();
-    var parse3 = require_parse3();
-    var { safeRe: re3, t } = require_re();
-    var coerce2 = (version, options) => {
-      if (version instanceof SemVer) {
-        return version;
-      }
-      if (typeof version === "number") {
-        version = String(version);
-      }
-      if (typeof version !== "string") {
-        return null;
-      }
-      options = options || {};
-      let match = null;
-      if (!options.rtl) {
-        match = version.match(options.includePrerelease ? re3[t.COERCEFULL] : re3[t.COERCE]);
-      } else {
-        const coerceRtlRegex = options.includePrerelease ? re3[t.COERCERTLFULL] : re3[t.COERCERTL];
-        let next;
-        while ((next = coerceRtlRegex.exec(version)) && (!match || match.index + match[0].length !== version.length)) {
-          if (!match || next.index + next[0].length !== match.index + match[0].length) {
-            match = next;
-          }
-          coerceRtlRegex.lastIndex = next.index + next[1].length + next[2].length;
-        }
-        coerceRtlRegex.lastIndex = -1;
-      }
-      if (match === null) {
-        return null;
-      }
-      const major2 = match[2];
-      const minor = match[3] || "0";
-      const patch = match[4] || "0";
-      const prerelease = options.includePrerelease && match[5] ? `-${match[5]}` : "";
-      const build = options.includePrerelease && match[6] ? `+${match[6]}` : "";
-      return parse3(`${major2}.${minor}.${patch}${prerelease}${build}`, options);
-    };
-    module2.exports = coerce2;
-  }
-});
-
-// node_modules/semver/functions/truncate.js
-var require_truncate = __commonJS({
-  "node_modules/semver/functions/truncate.js"(exports2, module2) {
-    "use strict";
-    var parse3 = require_parse3();
-    var constants3 = require_constants12();
-    var SemVer = require_semver();
-    var truncate = (version, truncation, options) => {
-      if (!constants3.RELEASE_TYPES.includes(truncation)) {
-        return null;
-      }
-      const clonedVersion = cloneInputVersion(version, options);
-      return clonedVersion && doTruncation(clonedVersion, truncation);
-    };
-    var cloneInputVersion = (version, options) => {
-      const versionStringToParse = version instanceof SemVer ? version.version : version;
-      return parse3(versionStringToParse, options);
-    };
-    var doTruncation = (version, truncation) => {
-      if (isPrerelease(truncation)) {
-        return version.version;
-      }
-      version.prerelease = [];
-      switch (truncation) {
-        case "major":
-          version.minor = 0;
-          version.patch = 0;
-          break;
-        case "minor":
-          version.patch = 0;
-          break;
-      }
-      return version.format();
-    };
-    var isPrerelease = (type) => {
-      return type.startsWith("pre");
-    };
-    module2.exports = truncate;
-  }
-});
-
-// node_modules/semver/internal/lrucache.js
-var require_lrucache = __commonJS({
-  "node_modules/semver/internal/lrucache.js"(exports2, module2) {
-    "use strict";
-    var LRUCache = class {
-      constructor() {
-        this.max = 1e3;
-        this.map = /* @__PURE__ */ new Map();
-      }
-      get(key) {
-        const value = this.map.get(key);
-        if (value === void 0) {
-          return void 0;
-        } else {
-          this.map.delete(key);
-          this.map.set(key, value);
-          return value;
-        }
-      }
-      delete(key) {
-        return this.map.delete(key);
-      }
-      set(key, value) {
-        const deleted = this.delete(key);
-        if (!deleted && value !== void 0) {
-          if (this.map.size >= this.max) {
-            const firstKey = this.map.keys().next().value;
-            this.delete(firstKey);
-          }
-          this.map.set(key, value);
-        }
-        return this;
-      }
-    };
-    module2.exports = LRUCache;
-  }
-});
-
-// node_modules/semver/classes/range.js
-var require_range = __commonJS({
-  "node_modules/semver/classes/range.js"(exports2, module2) {
-    "use strict";
-    var SPACE_CHARACTERS = /\s+/g;
-    var Range = class _Range {
-      constructor(range2, options) {
-        options = parseOptions(options);
-        if (range2 instanceof _Range) {
-          if (range2.loose === !!options.loose && range2.includePrerelease === !!options.includePrerelease) {
-            return range2;
-          } else {
-            return new _Range(range2.raw, options);
-          }
-        }
-        if (range2 instanceof Comparator) {
-          this.raw = range2.value;
-          this.set = [[range2]];
-          this.formatted = void 0;
-          return this;
-        }
-        this.options = options;
-        this.loose = !!options.loose;
-        this.includePrerelease = !!options.includePrerelease;
-        this.raw = range2.trim().replace(SPACE_CHARACTERS, " ");
-        this.set = this.raw.split("||").map((r) => this.parseRange(r.trim())).filter((c) => c.length);
-        if (!this.set.length) {
-          throw new TypeError(`Invalid SemVer Range: ${this.raw}`);
-        }
-        if (this.set.length > 1) {
-          const first = this.set[0];
-          this.set = this.set.filter((c) => !isNullSet(c[0]));
-          if (this.set.length === 0) {
-            this.set = [first];
-          } else if (this.set.length > 1) {
-            for (const c of this.set) {
-              if (c.length === 1 && isAny(c[0])) {
-                this.set = [c];
-                break;
-              }
-            }
-          }
-        }
-        this.formatted = void 0;
-      }
-      get range() {
-        if (this.formatted === void 0) {
-          this.formatted = "";
-          for (let i = 0; i < this.set.length; i++) {
-            if (i > 0) {
-              this.formatted += "||";
-            }
-            const comps = this.set[i];
-            for (let k2 = 0; k2 < comps.length; k2++) {
-              if (k2 > 0) {
-                this.formatted += " ";
-              }
-              this.formatted += comps[k2].toString().trim();
-            }
-          }
-        }
-        return this.formatted;
-      }
-      format() {
-        return this.range;
-      }
-      toString() {
-        return this.range;
-      }
-      parseRange(range2) {
-        range2 = range2.replace(BUILDSTRIPRE, "");
-        const memoOpts = (this.options.includePrerelease && FLAG_INCLUDE_PRERELEASE) | (this.options.loose && FLAG_LOOSE);
-        const memoKey = memoOpts + ":" + range2;
-        const cached = cache.get(memoKey);
-        if (cached) {
-          return cached;
-        }
-        const loose = this.options.loose;
-        const hr = loose ? re3[t.HYPHENRANGELOOSE] : re3[t.HYPHENRANGE];
-        range2 = range2.replace(hr, hyphenReplace(this.options.includePrerelease));
-        debug2("hyphen replace", range2);
-        range2 = range2.replace(re3[t.COMPARATORTRIM], comparatorTrimReplace);
-        debug2("comparator trim", range2);
-        range2 = range2.replace(re3[t.TILDETRIM], tildeTrimReplace);
-        debug2("tilde trim", range2);
-        range2 = range2.replace(re3[t.CARETTRIM], caretTrimReplace);
-        debug2("caret trim", range2);
-        let rangeList = range2.split(" ").map((comp) => parseComparator(comp, this.options)).join(" ").split(/\s+/).map((comp) => replaceGTE0(comp, this.options));
-        if (loose) {
-          rangeList = rangeList.filter((comp) => {
-            debug2("loose invalid filter", comp, this.options);
-            return !!comp.match(re3[t.COMPARATORLOOSE]);
-          });
-        }
-        debug2("range list", rangeList);
-        const rangeMap = /* @__PURE__ */ new Map();
-        const comparators = rangeList.map((comp) => new Comparator(comp, this.options));
-        for (const comp of comparators) {
-          if (isNullSet(comp)) {
-            return [comp];
-          }
-          rangeMap.set(comp.value, comp);
-        }
-        if (rangeMap.size > 1 && rangeMap.has("")) {
-          rangeMap.delete("");
-        }
-        const result = [...rangeMap.values()];
-        cache.set(memoKey, result);
-        return result;
-      }
-      intersects(range2, options) {
-        if (!(range2 instanceof _Range)) {
-          throw new TypeError("a Range is required");
-        }
-        return this.set.some((thisComparators) => {
-          return isSatisfiable(thisComparators, options) && range2.set.some((rangeComparators) => {
-            return isSatisfiable(rangeComparators, options) && thisComparators.every((thisComparator) => {
-              return rangeComparators.every((rangeComparator) => {
-                return thisComparator.intersects(rangeComparator, options);
-              });
-            });
-          });
-        });
-      }
-      // if ANY of the sets match ALL of its comparators, then pass
-      test(version) {
-        if (!version) {
-          return false;
-        }
-        if (typeof version === "string") {
-          try {
-            version = new SemVer(version, this.options);
-          } catch (er) {
-            return false;
-          }
-        }
-        for (let i = 0; i < this.set.length; i++) {
-          if (testSet(this.set[i], version, this.options)) {
-            return true;
-          }
-        }
-        return false;
-      }
-    };
-    module2.exports = Range;
-    var LRU = require_lrucache();
-    var cache = new LRU();
-    var parseOptions = require_parse_options();
-    var Comparator = require_comparator();
-    var debug2 = require_debug();
-    var SemVer = require_semver();
-    var {
-      safeRe: re3,
-      src,
-      t,
-      comparatorTrimReplace,
-      tildeTrimReplace,
-      caretTrimReplace
-    } = require_re();
-    var { FLAG_INCLUDE_PRERELEASE, FLAG_LOOSE } = require_constants12();
-    var BUILDSTRIPRE = new RegExp(src[t.BUILD], "g");
-    var isNullSet = (c) => c.value === "<0.0.0-0";
-    var isAny = (c) => c.value === "";
-    var isSatisfiable = (comparators, options) => {
-      let result = true;
-      const remainingComparators = comparators.slice();
-      let testComparator = remainingComparators.pop();
-      while (result && remainingComparators.length) {
-        result = remainingComparators.every((otherComparator) => {
-          return testComparator.intersects(otherComparator, options);
-        });
-        testComparator = remainingComparators.pop();
-      }
-      return result;
-    };
-    var parseComparator = (comp, options) => {
-      comp = comp.replace(re3[t.BUILD], "");
-      debug2("comp", comp, options);
-      comp = replaceCarets(comp, options);
-      debug2("caret", comp);
-      comp = replaceTildes(comp, options);
-      debug2("tildes", comp);
-      comp = replaceXRanges(comp, options);
-      debug2("xrange", comp);
-      comp = replaceStars(comp, options);
-      debug2("stars", comp);
-      return comp;
-    };
-    var isX = (id) => !id || id.toLowerCase() === "x" || id === "*";
-    var invalidXRangeOrder = (M2, m, p) => isX(M2) && !isX(m) || isX(m) && p && !isX(p);
-    var replaceTildes = (comp, options) => {
-      return comp.trim().split(/\s+/).map((c) => replaceTilde(c, options)).join(" ");
-    };
-    var replaceTilde = (comp, options) => {
-      const r = options.loose ? re3[t.TILDELOOSE] : re3[t.TILDE];
-      const z = options.includePrerelease ? "-0" : "";
-      return comp.replace(r, (_2, M2, m, p, pr) => {
-        debug2("tilde", comp, _2, M2, m, p, pr);
-        let ret;
-        if (isX(M2)) {
-          ret = "";
-        } else if (isX(m)) {
-          ret = `>=${M2}.0.0${z} <${+M2 + 1}.0.0-0`;
-        } else if (isX(p)) {
-          ret = `>=${M2}.${m}.0${z} <${M2}.${+m + 1}.0-0`;
-        } else if (pr) {
-          debug2("replaceTilde pr", pr);
-          ret = `>=${M2}.${m}.${p}-${pr} <${M2}.${+m + 1}.0-0`;
-        } else {
-          ret = `>=${M2}.${m}.${p} <${M2}.${+m + 1}.0-0`;
-        }
-        debug2("tilde return", ret);
-        return ret;
-      });
-    };
-    var replaceCarets = (comp, options) => {
-      return comp.trim().split(/\s+/).map((c) => replaceCaret(c, options)).join(" ");
-    };
-    var replaceCaret = (comp, options) => {
-      debug2("caret", comp, options);
-      const r = options.loose ? re3[t.CARETLOOSE] : re3[t.CARET];
-      const z = options.includePrerelease ? "-0" : "";
-      return comp.replace(r, (_2, M2, m, p, pr) => {
-        debug2("caret", comp, _2, M2, m, p, pr);
-        let ret;
-        if (isX(M2)) {
-          ret = "";
-        } else if (isX(m)) {
-          ret = `>=${M2}.0.0${z} <${+M2 + 1}.0.0-0`;
-        } else if (isX(p)) {
-          if (M2 === "0") {
-            ret = `>=${M2}.${m}.0${z} <${M2}.${+m + 1}.0-0`;
-          } else {
-            ret = `>=${M2}.${m}.0${z} <${+M2 + 1}.0.0-0`;
-          }
-        } else if (pr) {
-          debug2("replaceCaret pr", pr);
-          if (M2 === "0") {
-            if (m === "0") {
-              ret = `>=${M2}.${m}.${p}-${pr} <${M2}.${m}.${+p + 1}-0`;
-            } else {
-              ret = `>=${M2}.${m}.${p}-${pr} <${M2}.${+m + 1}.0-0`;
-            }
-          } else {
-            ret = `>=${M2}.${m}.${p}-${pr} <${+M2 + 1}.0.0-0`;
-          }
-        } else {
-          debug2("no pr");
-          if (M2 === "0") {
-            if (m === "0") {
-              ret = `>=${M2}.${m}.${p} <${M2}.${m}.${+p + 1}-0`;
-            } else {
-              ret = `>=${M2}.${m}.${p} <${M2}.${+m + 1}.0-0`;
-            }
-          } else {
-            ret = `>=${M2}.${m}.${p} <${+M2 + 1}.0.0-0`;
-          }
-        }
-        debug2("caret return", ret);
-        return ret;
-      });
-    };
-    var replaceXRanges = (comp, options) => {
-      debug2("replaceXRanges", comp, options);
-      return comp.split(/\s+/).map((c) => replaceXRange(c, options)).join(" ");
-    };
-    var replaceXRange = (comp, options) => {
-      comp = comp.trim();
-      const r = options.loose ? re3[t.XRANGELOOSE] : re3[t.XRANGE];
-      return comp.replace(r, (ret, gtlt, M2, m, p, pr) => {
-        debug2("xRange", comp, ret, gtlt, M2, m, p, pr);
-        if (invalidXRangeOrder(M2, m, p)) {
-          return comp;
-        }
-        const xM = isX(M2);
-        const xm = xM || isX(m);
-        const xp = xm || isX(p);
-        const anyX = xp;
-        if (gtlt === "=" && anyX) {
-          gtlt = "";
-        }
-        pr = options.includePrerelease ? "-0" : "";
-        if (xM) {
-          if (gtlt === ">" || gtlt === "<") {
-            ret = "<0.0.0-0";
-          } else {
-            ret = "*";
-          }
-        } else if (gtlt && anyX) {
-          if (xm) {
-            m = 0;
-          }
-          p = 0;
-          if (gtlt === ">") {
-            gtlt = ">=";
-            if (xm) {
-              M2 = +M2 + 1;
-              m = 0;
-              p = 0;
-            } else {
-              m = +m + 1;
-              p = 0;
-            }
-          } else if (gtlt === "<=") {
-            gtlt = "<";
-            if (xm) {
-              M2 = +M2 + 1;
-            } else {
-              m = +m + 1;
-            }
-          }
-          if (gtlt === "<") {
-            pr = "-0";
-          }
-          ret = `${gtlt + M2}.${m}.${p}${pr}`;
-        } else if (xm) {
-          ret = `>=${M2}.0.0${pr} <${+M2 + 1}.0.0-0`;
-        } else if (xp) {
-          ret = `>=${M2}.${m}.0${pr} <${M2}.${+m + 1}.0-0`;
-        }
-        debug2("xRange return", ret);
-        return ret;
-      });
-    };
-    var replaceStars = (comp, options) => {
-      debug2("replaceStars", comp, options);
-      return comp.trim().replace(re3[t.STAR], "");
-    };
-    var replaceGTE0 = (comp, options) => {
-      debug2("replaceGTE0", comp, options);
-      return comp.trim().replace(re3[options.includePrerelease ? t.GTE0PRE : t.GTE0], "");
-    };
-    var hyphenReplace = (incPr) => ($0, from, fM, fm, fp, fpr, fb, to, tM, tm, tp, tpr) => {
-      if (isX(fM)) {
-        from = "";
-      } else if (isX(fm)) {
-        from = `>=${fM}.0.0${incPr ? "-0" : ""}`;
-      } else if (isX(fp)) {
-        from = `>=${fM}.${fm}.0${incPr ? "-0" : ""}`;
-      } else if (fpr) {
-        from = `>=${from}`;
-      } else {
-        from = `>=${from}${incPr ? "-0" : ""}`;
-      }
-      if (isX(tM)) {
-        to = "";
-      } else if (isX(tm)) {
-        to = `<${+tM + 1}.0.0-0`;
-      } else if (isX(tp)) {
-        to = `<${tM}.${+tm + 1}.0-0`;
-      } else if (tpr) {
-        to = `<=${tM}.${tm}.${tp}-${tpr}`;
-      } else if (incPr) {
-        to = `<${tM}.${tm}.${+tp + 1}-0`;
-      } else {
-        to = `<=${to}`;
-      }
-      return `${from} ${to}`.trim();
-    };
-    var testSet = (set, version, options) => {
-      for (let i = 0; i < set.length; i++) {
-        if (!set[i].test(version)) {
-          return false;
-        }
-      }
-      if (version.prerelease.length && !options.includePrerelease) {
-        for (let i = 0; i < set.length; i++) {
-          debug2(set[i].semver);
-          if (set[i].semver === Comparator.ANY) {
-            continue;
-          }
-          if (set[i].semver.prerelease.length > 0) {
-            const allowed = set[i].semver;
-            if (allowed.major === version.major && allowed.minor === version.minor && allowed.patch === version.patch) {
-              return true;
-            }
-          }
-        }
-        return false;
-      }
-      return true;
-    };
-  }
-});
-
-// node_modules/semver/classes/comparator.js
-var require_comparator = __commonJS({
-  "node_modules/semver/classes/comparator.js"(exports2, module2) {
-    "use strict";
-    var ANY = /* @__PURE__ */ Symbol("SemVer ANY");
-    var Comparator = class _Comparator {
-      static get ANY() {
-        return ANY;
-      }
-      constructor(comp, options) {
-        options = parseOptions(options);
-        if (comp instanceof _Comparator) {
-          if (comp.loose === !!options.loose) {
-            return comp;
-          } else {
-            comp = comp.value;
-          }
-        }
-        comp = comp.trim().split(/\s+/).join(" ");
-        debug2("comparator", comp, options);
-        this.options = options;
-        this.loose = !!options.loose;
-        this.parse(comp);
-        if (this.semver === ANY) {
-          this.value = "";
-        } else {
-          this.value = this.operator + this.semver.version;
-        }
-        debug2("comp", this);
-      }
-      parse(comp) {
-        const r = this.options.loose ? re3[t.COMPARATORLOOSE] : re3[t.COMPARATOR];
-        const m = comp.match(r);
-        if (!m) {
-          throw new TypeError(`Invalid comparator: ${comp}`);
-        }
-        this.operator = m[1] !== void 0 ? m[1] : "";
-        if (this.operator === "=") {
-          this.operator = "";
-        }
-        if (!m[2]) {
-          this.semver = ANY;
-        } else {
-          this.semver = new SemVer(m[2], this.options.loose);
-        }
-      }
-      toString() {
-        return this.value;
-      }
-      test(version) {
-        debug2("Comparator.test", version, this.options.loose);
-        if (this.semver === ANY || version === ANY) {
-          return true;
-        }
-        if (typeof version === "string") {
-          try {
-            version = new SemVer(version, this.options);
-          } catch (er) {
-            return false;
-          }
-        }
-        return cmp(version, this.operator, this.semver, this.options);
-      }
-      intersects(comp, options) {
-        if (!(comp instanceof _Comparator)) {
-          throw new TypeError("a Comparator is required");
-        }
-        if (this.operator === "") {
-          if (this.value === "") {
-            return true;
-          }
-          return new Range(comp.value, options).test(this.value);
-        } else if (comp.operator === "") {
-          if (comp.value === "") {
-            return true;
-          }
-          return new Range(this.value, options).test(comp.semver);
-        }
-        options = parseOptions(options);
-        if (options.includePrerelease && (this.value === "<0.0.0-0" || comp.value === "<0.0.0-0")) {
-          return false;
-        }
-        if (!options.includePrerelease && (this.value.startsWith("<0.0.0") || comp.value.startsWith("<0.0.0"))) {
-          return false;
-        }
-        if (this.operator.startsWith(">") && comp.operator.startsWith(">")) {
-          return true;
-        }
-        if (this.operator.startsWith("<") && comp.operator.startsWith("<")) {
-          return true;
-        }
-        if (this.semver.version === comp.semver.version && this.operator.includes("=") && comp.operator.includes("=")) {
-          return true;
-        }
-        if (cmp(this.semver, "<", comp.semver, options) && this.operator.startsWith(">") && comp.operator.startsWith("<")) {
-          return true;
-        }
-        if (cmp(this.semver, ">", comp.semver, options) && this.operator.startsWith("<") && comp.operator.startsWith(">")) {
-          return true;
-        }
-        return false;
-      }
-    };
-    module2.exports = Comparator;
-    var parseOptions = require_parse_options();
-    var { safeRe: re3, t } = require_re();
-    var cmp = require_cmp();
-    var debug2 = require_debug();
-    var SemVer = require_semver();
-    var Range = require_range();
-  }
-});
-
-// node_modules/semver/functions/satisfies.js
-var require_satisfies = __commonJS({
-  "node_modules/semver/functions/satisfies.js"(exports2, module2) {
-    "use strict";
-    var Range = require_range();
-    var satisfies = (version, range2, options) => {
-      try {
-        range2 = new Range(range2, options);
-      } catch (er) {
-        return false;
-      }
-      return range2.test(version);
-    };
-    module2.exports = satisfies;
-  }
-});
-
-// node_modules/semver/ranges/to-comparators.js
-var require_to_comparators = __commonJS({
-  "node_modules/semver/ranges/to-comparators.js"(exports2, module2) {
-    "use strict";
-    var Range = require_range();
-    var toComparators = (range2, options) => new Range(range2, options).set.map((comp) => comp.map((c) => c.value).join(" ").trim().split(" "));
-    module2.exports = toComparators;
-  }
-});
-
-// node_modules/semver/ranges/max-satisfying.js
-var require_max_satisfying = __commonJS({
-  "node_modules/semver/ranges/max-satisfying.js"(exports2, module2) {
-    "use strict";
-    var SemVer = require_semver();
-    var Range = require_range();
-    var maxSatisfying = (versions, range2, options) => {
-      let max = null;
-      let maxSV = null;
-      let rangeObj = null;
-      try {
-        rangeObj = new Range(range2, options);
-      } catch (er) {
-        return null;
-      }
-      versions.forEach((v2) => {
-        if (rangeObj.test(v2)) {
-          if (!max || maxSV.compare(v2) === -1) {
-            max = v2;
-            maxSV = new SemVer(max, options);
-          }
-        }
-      });
-      return max;
-    };
-    module2.exports = maxSatisfying;
-  }
-});
-
-// node_modules/semver/ranges/min-satisfying.js
-var require_min_satisfying = __commonJS({
-  "node_modules/semver/ranges/min-satisfying.js"(exports2, module2) {
-    "use strict";
-    var SemVer = require_semver();
-    var Range = require_range();
-    var minSatisfying = (versions, range2, options) => {
-      let min = null;
-      let minSV = null;
-      let rangeObj = null;
-      try {
-        rangeObj = new Range(range2, options);
-      } catch (er) {
-        return null;
-      }
-      versions.forEach((v2) => {
-        if (rangeObj.test(v2)) {
-          if (!min || minSV.compare(v2) === 1) {
-            min = v2;
-            minSV = new SemVer(min, options);
-          }
-        }
-      });
-      return min;
-    };
-    module2.exports = minSatisfying;
-  }
-});
-
-// node_modules/semver/ranges/min-version.js
-var require_min_version = __commonJS({
-  "node_modules/semver/ranges/min-version.js"(exports2, module2) {
-    "use strict";
-    var SemVer = require_semver();
-    var Range = require_range();
-    var gt2 = require_gt();
-    var minVersion = (range2, loose) => {
-      range2 = new Range(range2, loose);
-      let minver = new SemVer("0.0.0");
-      if (range2.test(minver)) {
-        return minver;
-      }
-      minver = new SemVer("0.0.0-0");
-      if (range2.test(minver)) {
-        return minver;
-      }
-      minver = null;
-      for (let i = 0; i < range2.set.length; ++i) {
-        const comparators = range2.set[i];
-        let setMin = null;
-        comparators.forEach((comparator) => {
-          const compver = new SemVer(comparator.semver.version);
-          switch (comparator.operator) {
-            case ">":
-              if (compver.prerelease.length === 0) {
-                compver.patch++;
-              } else {
-                compver.prerelease.push(0);
-              }
-              compver.raw = compver.format();
-            /* fallthrough */
-            case "":
-            case ">=":
-              if (!setMin || gt2(compver, setMin)) {
-                setMin = compver;
-              }
-              break;
-            case "<":
-            case "<=":
-              break;
-            /* istanbul ignore next */
-            default:
-              throw new Error(`Unexpected operation: ${comparator.operator}`);
-          }
-        });
-        if (setMin && (!minver || gt2(minver, setMin))) {
-          minver = setMin;
-        }
-      }
-      if (minver && range2.test(minver)) {
-        return minver;
-      }
-      return null;
-    };
-    module2.exports = minVersion;
-  }
-});
-
-// node_modules/semver/ranges/valid.js
-var require_valid2 = __commonJS({
-  "node_modules/semver/ranges/valid.js"(exports2, module2) {
-    "use strict";
-    var Range = require_range();
-    var validRange = (range2, options) => {
-      try {
-        return new Range(range2, options).range || "*";
-      } catch (er) {
-        return null;
-      }
-    };
-    module2.exports = validRange;
-  }
-});
-
-// node_modules/semver/ranges/outside.js
-var require_outside = __commonJS({
-  "node_modules/semver/ranges/outside.js"(exports2, module2) {
-    "use strict";
-    var SemVer = require_semver();
-    var Comparator = require_comparator();
-    var { ANY } = Comparator;
-    var Range = require_range();
-    var satisfies = require_satisfies();
-    var gt2 = require_gt();
-    var lt2 = require_lt();
-    var lte = require_lte();
-    var gte = require_gte();
-    var outside = (version, range2, hilo, options) => {
-      version = new SemVer(version, options);
-      range2 = new Range(range2, options);
-      let gtfn, ltefn, ltfn, comp, ecomp;
-      switch (hilo) {
-        case ">":
-          gtfn = gt2;
-          ltefn = lte;
-          ltfn = lt2;
-          comp = ">";
-          ecomp = ">=";
-          break;
-        case "<":
-          gtfn = lt2;
-          ltefn = gte;
-          ltfn = gt2;
-          comp = "<";
-          ecomp = "<=";
-          break;
-        default:
-          throw new TypeError('Must provide a hilo val of "<" or ">"');
-      }
-      if (satisfies(version, range2, options)) {
-        return false;
-      }
-      for (let i = 0; i < range2.set.length; ++i) {
-        const comparators = range2.set[i];
-        let high = null;
-        let low = null;
-        comparators.forEach((comparator) => {
-          if (comparator.semver === ANY) {
-            comparator = new Comparator(">=0.0.0");
-          }
-          high = high || comparator;
-          low = low || comparator;
-          if (gtfn(comparator.semver, high.semver, options)) {
-            high = comparator;
-          } else if (ltfn(comparator.semver, low.semver, options)) {
-            low = comparator;
-          }
-        });
-        if (high.operator === comp || high.operator === ecomp) {
-          return false;
-        }
-        if ((!low.operator || low.operator === comp) && ltefn(version, low.semver)) {
-          return false;
-        } else if (low.operator === ecomp && ltfn(version, low.semver)) {
-          return false;
-        }
-      }
-      return true;
-    };
-    module2.exports = outside;
-  }
-});
-
-// node_modules/semver/ranges/gtr.js
-var require_gtr = __commonJS({
-  "node_modules/semver/ranges/gtr.js"(exports2, module2) {
-    "use strict";
-    var outside = require_outside();
-    var gtr = (version, range2, options) => outside(version, range2, ">", options);
-    module2.exports = gtr;
-  }
-});
-
-// node_modules/semver/ranges/ltr.js
-var require_ltr = __commonJS({
-  "node_modules/semver/ranges/ltr.js"(exports2, module2) {
-    "use strict";
-    var outside = require_outside();
-    var ltr = (version, range2, options) => outside(version, range2, "<", options);
-    module2.exports = ltr;
-  }
-});
-
-// node_modules/semver/ranges/intersects.js
-var require_intersects = __commonJS({
-  "node_modules/semver/ranges/intersects.js"(exports2, module2) {
-    "use strict";
-    var Range = require_range();
-    var intersects = (r1, r2, options) => {
-      r1 = new Range(r1, options);
-      r2 = new Range(r2, options);
-      return r1.intersects(r2, options);
-    };
-    module2.exports = intersects;
-  }
-});
-
-// node_modules/semver/ranges/simplify.js
-var require_simplify = __commonJS({
-  "node_modules/semver/ranges/simplify.js"(exports2, module2) {
-    "use strict";
-    var satisfies = require_satisfies();
-    var compare2 = require_compare();
-    module2.exports = (versions, range2, options) => {
-      const set = [];
-      let first = null;
-      let prev = null;
-      const v2 = versions.sort((a, b) => compare2(a, b, options));
-      for (const version of v2) {
-        const included = satisfies(version, range2, options);
-        if (included) {
-          prev = version;
-          if (!first) {
-            first = version;
-          }
-        } else {
-          if (prev) {
-            set.push([first, prev]);
-          }
-          prev = null;
-          first = null;
-        }
-      }
-      if (first) {
-        set.push([first, null]);
-      }
-      const ranges = [];
-      for (const [min, max] of set) {
-        if (min === max) {
-          ranges.push(min);
-        } else if (!max && min === v2[0]) {
-          ranges.push("*");
-        } else if (!max) {
-          ranges.push(`>=${min}`);
-        } else if (min === v2[0]) {
-          ranges.push(`<=${max}`);
-        } else {
-          ranges.push(`${min} - ${max}`);
-        }
-      }
-      const simplified = ranges.join(" || ");
-      const original = typeof range2.raw === "string" ? range2.raw : String(range2);
-      return simplified.length < original.length ? simplified : range2;
-    };
-  }
-});
-
-// node_modules/semver/ranges/subset.js
-var require_subset = __commonJS({
-  "node_modules/semver/ranges/subset.js"(exports2, module2) {
-    "use strict";
-    var Range = require_range();
-    var Comparator = require_comparator();
-    var { ANY } = Comparator;
-    var satisfies = require_satisfies();
-    var compare2 = require_compare();
-    var subset = (sub, dom, options = {}) => {
-      if (sub === dom) {
-        return true;
-      }
-      sub = new Range(sub, options);
-      dom = new Range(dom, options);
-      let sawNonNull = false;
-      OUTER: for (const simpleSub of sub.set) {
-        for (const simpleDom of dom.set) {
-          const isSub = simpleSubset(simpleSub, simpleDom, options);
-          sawNonNull = sawNonNull || isSub !== null;
-          if (isSub) {
-            continue OUTER;
-          }
-        }
-        if (sawNonNull) {
-          return false;
-        }
-      }
-      return true;
-    };
-    var minimumVersionWithPreRelease = [new Comparator(">=0.0.0-0")];
-    var minimumVersion = [new Comparator(">=0.0.0")];
-    var simpleSubset = (sub, dom, options) => {
-      if (sub === dom) {
-        return true;
-      }
-      if (sub.length === 1 && sub[0].semver === ANY) {
-        if (dom.length === 1 && dom[0].semver === ANY) {
-          return true;
-        } else if (options.includePrerelease) {
-          sub = minimumVersionWithPreRelease;
-        } else {
-          sub = minimumVersion;
-        }
-      }
-      if (dom.length === 1 && dom[0].semver === ANY) {
-        if (options.includePrerelease) {
-          return true;
-        } else {
-          dom = minimumVersion;
-        }
-      }
-      const eqSet = /* @__PURE__ */ new Set();
-      let gt2, lt2;
-      for (const c of sub) {
-        if (c.operator === ">" || c.operator === ">=") {
-          gt2 = higherGT(gt2, c, options);
-        } else if (c.operator === "<" || c.operator === "<=") {
-          lt2 = lowerLT(lt2, c, options);
-        } else {
-          eqSet.add(c.semver);
-        }
-      }
-      if (eqSet.size > 1) {
-        return null;
-      }
-      let gtltComp;
-      if (gt2 && lt2) {
-        gtltComp = compare2(gt2.semver, lt2.semver, options);
-        if (gtltComp > 0) {
-          return null;
-        } else if (gtltComp === 0 && (gt2.operator !== ">=" || lt2.operator !== "<=")) {
-          return null;
-        }
-      }
-      for (const eq of eqSet) {
-        if (gt2 && !satisfies(eq, String(gt2), options)) {
-          return null;
-        }
-        if (lt2 && !satisfies(eq, String(lt2), options)) {
-          return null;
-        }
-        for (const c of dom) {
-          if (!satisfies(eq, String(c), options)) {
-            return false;
-          }
-        }
-        return true;
-      }
-      let higher, lower;
-      let hasDomLT, hasDomGT;
-      let needDomLTPre = lt2 && !options.includePrerelease && lt2.semver.prerelease.length ? lt2.semver : false;
-      let needDomGTPre = gt2 && !options.includePrerelease && gt2.semver.prerelease.length ? gt2.semver : false;
-      if (needDomLTPre && needDomLTPre.prerelease.length === 1 && lt2.operator === "<" && needDomLTPre.prerelease[0] === 0) {
-        needDomLTPre = false;
-      }
-      for (const c of dom) {
-        hasDomGT = hasDomGT || c.operator === ">" || c.operator === ">=";
-        hasDomLT = hasDomLT || c.operator === "<" || c.operator === "<=";
-        if (gt2) {
-          if (needDomGTPre) {
-            if (c.semver.prerelease && c.semver.prerelease.length && c.semver.major === needDomGTPre.major && c.semver.minor === needDomGTPre.minor && c.semver.patch === needDomGTPre.patch) {
-              needDomGTPre = false;
-            }
-          }
-          if (c.operator === ">" || c.operator === ">=") {
-            higher = higherGT(gt2, c, options);
-            if (higher === c && higher !== gt2) {
-              return false;
-            }
-          } else if (gt2.operator === ">=" && !c.test(gt2.semver)) {
-            return false;
-          }
-        }
-        if (lt2) {
-          if (needDomLTPre) {
-            if (c.semver.prerelease && c.semver.prerelease.length && c.semver.major === needDomLTPre.major && c.semver.minor === needDomLTPre.minor && c.semver.patch === needDomLTPre.patch) {
-              needDomLTPre = false;
-            }
-          }
-          if (c.operator === "<" || c.operator === "<=") {
-            lower = lowerLT(lt2, c, options);
-            if (lower === c && lower !== lt2) {
-              return false;
-            }
-          } else if (lt2.operator === "<=" && !c.test(lt2.semver)) {
-            return false;
-          }
-        }
-        if (!c.operator && (lt2 || gt2) && gtltComp !== 0) {
-          return false;
-        }
-      }
-      if (gt2 && hasDomLT && !lt2 && gtltComp !== 0) {
-        return false;
-      }
-      if (lt2 && hasDomGT && !gt2 && gtltComp !== 0) {
-        return false;
-      }
-      if (needDomGTPre || needDomLTPre) {
-        return false;
-      }
-      return true;
-    };
-    var higherGT = (a, b, options) => {
-      if (!a) {
-        return b;
-      }
-      const comp = compare2(a.semver, b.semver, options);
-      return comp > 0 ? a : comp < 0 ? b : b.operator === ">" && a.operator === ">=" ? b : a;
-    };
-    var lowerLT = (a, b, options) => {
-      if (!a) {
-        return b;
-      }
-      const comp = compare2(a.semver, b.semver, options);
-      return comp < 0 ? a : comp > 0 ? b : b.operator === "<" && a.operator === "<=" ? b : a;
-    };
-    module2.exports = subset;
-  }
-});
-
-// node_modules/semver/index.js
-var require_semver2 = __commonJS({
-  "node_modules/semver/index.js"(exports2, module2) {
-    "use strict";
-    var internalRe = require_re();
-    var constants3 = require_constants12();
-    var SemVer = require_semver();
-    var identifiers = require_identifiers();
-    var parse3 = require_parse3();
-    var valid2 = require_valid();
-    var clean = require_clean();
-    var inc = require_inc();
-    var diff = require_diff();
-    var major2 = require_major();
-    var minor = require_minor();
-    var patch = require_patch();
-    var prerelease = require_prerelease();
-    var compare2 = require_compare();
-    var rcompare = require_rcompare();
-    var compareLoose = require_compare_loose();
-    var compareBuild = require_compare_build();
-    var sort = require_sort();
-    var rsort = require_rsort();
-    var gt2 = require_gt();
-    var lt2 = require_lt();
-    var eq = require_eq();
-    var neq = require_neq();
-    var gte = require_gte();
-    var lte = require_lte();
-    var cmp = require_cmp();
-    var coerce2 = require_coerce();
-    var truncate = require_truncate();
-    var Comparator = require_comparator();
-    var Range = require_range();
-    var satisfies = require_satisfies();
-    var toComparators = require_to_comparators();
-    var maxSatisfying = require_max_satisfying();
-    var minSatisfying = require_min_satisfying();
-    var minVersion = require_min_version();
-    var validRange = require_valid2();
-    var outside = require_outside();
-    var gtr = require_gtr();
-    var ltr = require_ltr();
-    var intersects = require_intersects();
-    var simplifyRange = require_simplify();
-    var subset = require_subset();
-    module2.exports = {
-      parse: parse3,
-      valid: valid2,
-      clean,
-      inc,
-      diff,
-      major: major2,
-      minor,
-      patch,
-      prerelease,
-      compare: compare2,
-      rcompare,
-      compareLoose,
-      compareBuild,
-      sort,
-      rsort,
-      gt: gt2,
-      lt: lt2,
-      eq,
-      neq,
-      gte,
-      lte,
-      cmp,
-      coerce: coerce2,
-      truncate,
-      Comparator,
-      Range,
-      satisfies,
-      toComparators,
-      maxSatisfying,
-      minSatisfying,
-      minVersion,
-      validRange,
-      outside,
-      gtr,
-      ltr,
-      intersects,
-      simplifyRange,
-      subset,
-      SemVer,
-      re: internalRe.re,
-      src: internalRe.src,
-      tokens: internalRe.t,
-      SEMVER_SPEC_VERSION: constants3.SEMVER_SPEC_VERSION,
-      RELEASE_TYPES: constants3.RELEASE_TYPES,
-      compareIdentifiers: identifiers.compareIdentifiers,
-      rcompareIdentifiers: identifiers.rcompareIdentifiers
-    };
   }
 });
 
@@ -66569,7 +66604,7 @@ var require_extension = __commonJS({
       if (dest[name] === void 0) dest[name] = [elem];
       else dest[name].push(elem);
     }
-    function parse3(header) {
+    function parse4(header) {
       const offers = /* @__PURE__ */ Object.create(null);
       let params = /* @__PURE__ */ Object.create(null);
       let mustUnescape = false;
@@ -66709,7 +66744,7 @@ var require_extension = __commonJS({
         }).join(", ");
       }).join(", ");
     }
-    module2.exports = { format, parse: parse3 };
+    module2.exports = { format, parse: parse4 };
   }
 });
 
@@ -66743,7 +66778,7 @@ var require_websocket3 = __commonJS({
     var {
       EventTarget: { addEventListener, removeEventListener }
     } = require_event_target();
-    var { format, parse: parse3 } = require_extension();
+    var { format, parse: parse4 } = require_extension();
     var { toBuffer } = require_buffer_util();
     var kAborted = /* @__PURE__ */ Symbol("kAborted");
     var protocolVersions = [8, 13];
@@ -67420,7 +67455,7 @@ var require_websocket3 = __commonJS({
           }
           let extensions;
           try {
-            extensions = parse3(secWebSocketExtensions);
+            extensions = parse4(secWebSocketExtensions);
           } catch (err) {
             const message = "Invalid Sec-WebSocket-Extensions header";
             abortHandshake(websocket, socket, message);
@@ -67712,7 +67747,7 @@ var require_subprotocol = __commonJS({
   "node_modules/ws/lib/subprotocol.js"(exports2, module2) {
     "use strict";
     var { tokenChars } = require_validation();
-    function parse3(header) {
+    function parse4(header) {
       const protocols = /* @__PURE__ */ new Set();
       let start = -1;
       let end = -1;
@@ -67748,7 +67783,7 @@ var require_subprotocol = __commonJS({
       protocols.add(protocol);
       return protocols;
     }
-    module2.exports = { parse: parse3 };
+    module2.exports = { parse: parse4 };
   }
 });
 
@@ -69070,9 +69105,9 @@ var require_combined_stream = __commonJS({
   }
 });
 
-// node_modules/form-data/node_modules/mime-db/db.json
+// node_modules/mime-db/db.json
 var require_db = __commonJS({
-  "node_modules/form-data/node_modules/mime-db/db.json"(exports2, module2) {
+  "node_modules/mime-db/db.json"(exports2, module2) {
     module2.exports = {
       "application/1d-interleaved-parityfec": {
         source: "iana"
@@ -77595,9 +77630,9 @@ var require_db = __commonJS({
   }
 });
 
-// node_modules/form-data/node_modules/mime-db/index.js
+// node_modules/mime-db/index.js
 var require_mime_db = __commonJS({
-  "node_modules/form-data/node_modules/mime-db/index.js"(exports2, module2) {
+  "node_modules/mime-db/index.js"(exports2, module2) {
     module2.exports = require_db();
   }
 });
@@ -78778,6 +78813,9 @@ var require_form_data = __commonJS({
     var setToStringTag = require_es_set_tostringtag();
     var hasOwn = require_hasown();
     var populate = require_populate();
+    function escapeHeaderParam(str) {
+      return String(str).replace(/\r/g, "%0D").replace(/\n/g, "%0A").replace(/"/g, "%22");
+    }
     function FormData2(options) {
       if (!(this instanceof FormData2)) {
         return new FormData2(options);
@@ -78867,7 +78905,7 @@ var require_form_data = __commonJS({
       var contents = "";
       var headers = {
         // add custom disposition as third element or keep it two elements if not
-        "Content-Disposition": ["form-data", 'name="' + field + '"'].concat(contentDisposition || []),
+        "Content-Disposition": ["form-data", 'name="' + escapeHeaderParam(field) + '"'].concat(contentDisposition || []),
         // if no content type. allow it to be empty array
         "Content-Type": [].concat(contentType || [])
       };
@@ -78901,7 +78939,7 @@ var require_form_data = __commonJS({
         filename = path2.basename(value.client._httpMessage.path || "");
       }
       if (filename) {
-        return 'filename="' + filename + '"';
+        return 'filename="' + escapeHeaderParam(filename) + '"';
       }
     };
     FormData2.prototype._getContentType = function(value, options) {
@@ -79092,7 +79130,7 @@ var require_ms = __commonJS({
       options = options || {};
       var type = typeof val;
       if (type === "string" && val.length > 0) {
-        return parse3(val);
+        return parse4(val);
       } else if (type === "number" && isFinite(val)) {
         return options.long ? fmtLong(val) : fmtShort(val);
       }
@@ -79100,7 +79138,7 @@ var require_ms = __commonJS({
         "val is not a non-empty string or a valid number. val=" + JSON.stringify(val)
       );
     };
-    function parse3(str) {
+    function parse4(str) {
       str = String(str);
       if (str.length > 100) {
         return;
@@ -80159,7 +80197,7 @@ var require_agent3 = __commonJS({
 });
 
 // node_modules/axios/node_modules/https-proxy-agent/dist/index.js
-var require_dist = __commonJS({
+var require_dist2 = __commonJS({
   "node_modules/axios/node_modules/https-proxy-agent/dist/index.js"(exports2, module2) {
     "use strict";
     var __importDefault = exports2 && exports2.__importDefault || function(mod) {
@@ -80715,7 +80753,7 @@ var require_axios = __commonJS({
     var FormData$1 = require_form_data();
     var crypto2 = require("crypto");
     var url = require("url");
-    var HttpsProxyAgent = require_dist();
+    var HttpsProxyAgent = require_dist2();
     var http = require("http");
     var https = require("https");
     var http2 = require("http2");
@@ -80818,6 +80856,7 @@ var require_axios = __commonJS({
     var isReactNative = (formData) => formData && typeof formData.getParts !== "undefined";
     var isBlob = kindOfTest("Blob");
     var isFileList = kindOfTest("FileList");
+    var isSet = kindOfTest("Set");
     var isStream = (val) => isObject2(val) && isFunction$1(val.pipe);
     function getGlobal2() {
       if (typeof globalThis !== "undefined") return globalThis;
@@ -81115,11 +81154,20 @@ var require_axios = __commonJS({
           }
           if (!("toJSON" in source)) {
             visited.add(source);
-            const target = isArray(source) ? [] : {};
-            forEach(source, (value, key) => {
-              const reducedValue = visit(value);
-              !isUndefined(reducedValue) && (target[key] = reducedValue);
-            });
+            let target;
+            if (isSet(source)) {
+              target = [];
+              for (const value of source) {
+                const reducedValue = visit(value);
+                !isUndefined(reducedValue) && target.push(reducedValue);
+              }
+            } else {
+              target = isArray(source) ? [] : {};
+              forEach(source, (value, key) => {
+                const reducedValue = visit(value);
+                !isUndefined(reducedValue) && (target[key] = reducedValue);
+              });
+            }
             visited.delete(source);
             return target;
           }
@@ -81227,17 +81275,18 @@ var require_axios = __commonJS({
         i = line.indexOf(":");
         key = line.substring(0, i).trim().toLowerCase();
         val = line.substring(i + 1).trim();
-        if (!key || parsed[key] && ignoreDuplicateOf[key]) {
+        const hasKey = utils$1.hasOwnProp(parsed, key);
+        if (!key || hasKey && utils$1.hasOwnProp(ignoreDuplicateOf, key)) {
           return;
         }
         if (key === "set-cookie") {
-          if (parsed[key]) {
+          if (hasKey) {
             parsed[key].push(val);
           } else {
             parsed[key] = [val];
           }
         } else {
-          parsed[key] = parsed[key] ? parsed[key] + ", " + val : val;
+          parsed[key] = hasKey ? parsed[key] + ", " + val : val;
         }
       });
       return parsed;
@@ -81296,6 +81345,90 @@ var require_axios = __commonJS({
         tokens[match[1]] = match[2];
       }
       return tokens;
+    }
+    var parameterNameRE = /^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/;
+    function trimOWS(value) {
+      let start = 0;
+      let end = value.length;
+      while (start < end) {
+        const code = value.charCodeAt(start);
+        if (code !== 9 && code !== 32) {
+          break;
+        }
+        start += 1;
+      }
+      while (end > start) {
+        const code = value.charCodeAt(end - 1);
+        if (code !== 9 && code !== 32) {
+          break;
+        }
+        end -= 1;
+      }
+      return start === 0 && end === value.length ? value : value.slice(start, end);
+    }
+    function decodeQuotedString(value) {
+      const last = value.length - 1;
+      if (last < 1 || value.charCodeAt(0) !== 34 || value.charCodeAt(last) !== 34) {
+        return value;
+      }
+      let decoded = "";
+      for (let i = 1; i < last; i++) {
+        const code = value.charCodeAt(i);
+        if (code === 34) {
+          return value;
+        }
+        if (code === 92) {
+          i += 1;
+          if (i >= last) {
+            return value;
+          }
+        }
+        decoded += value[i];
+      }
+      return decoded;
+    }
+    function parseParameters(value) {
+      const parameters = /* @__PURE__ */ Object.create(null);
+      const str = String(value);
+      let start = 0;
+      let quoted = false;
+      let escaped = false;
+      function parseParameter(end) {
+        const part = trimOWS(str.slice(start, end));
+        const equals = part.indexOf("=");
+        if (equals < 1) {
+          return;
+        }
+        const name = trimOWS(part.slice(0, equals));
+        if (!parameterNameRE.test(name)) {
+          return;
+        }
+        const normalizedName = name.toLowerCase();
+        if (normalizedName === "__proto__" || normalizedName === "constructor" || normalizedName === "prototype") {
+          return;
+        }
+        const parameterValue = trimOWS(part.slice(equals + 1));
+        parameters[normalizedName] = decodeQuotedString(parameterValue);
+      }
+      for (let i = 0; i < str.length; i++) {
+        const code = str.charCodeAt(i);
+        if (quoted) {
+          if (escaped) {
+            escaped = false;
+          } else if (code === 92) {
+            escaped = true;
+          } else if (code === 34) {
+            quoted = false;
+          }
+        } else if (code === 34) {
+          quoted = true;
+        } else if (code === 44 || code === 59) {
+          parseParameter(i);
+          start = i + 1;
+        }
+      }
+      parseParameter(str.length);
+      return parameters;
     }
     var isValidHeaderName = (str) => /^[-_a-zA-Z0-9^`|~,!#$%&'*+.]+$/.test(str.trim());
     function matchHeaderValue(context4, value, header, filter, isHeaderNameFilter) {
@@ -81472,13 +81605,17 @@ var require_axios = __commonJS({
         return Object.entries(this.toJSON()).map(([header, value]) => header + ": " + value).join("\n");
       }
       getSetCookie() {
-        return this.get("set-cookie") || [];
+        const value = this.get("set-cookie");
+        return utils$1.isArray(value) ? value : value == null || value === false ? [] : [value];
       }
       get [Symbol.toStringTag]() {
         return "AxiosHeaders";
       }
       static from(thing) {
         return thing instanceof this ? thing : new this(thing);
+      }
+      static parseParameters(value) {
+        return parseParameters(value);
       }
       static concat(first, ...targets) {
         const computed = new this(first);
@@ -81567,9 +81704,30 @@ var require_axios = __commonJS({
       };
       return visit(config);
     }
+    function stringifySafely$1(value) {
+      try {
+        return String(value);
+      } catch (err) {
+        return "";
+      }
+    }
+    function aggregateErrorMessage(error) {
+      const message = error.errors.map((entry) => {
+        try {
+          return entry && entry.message ? stringifySafely$1(entry.message) : stringifySafely$1(entry);
+        } catch (err) {
+          return "";
+        }
+      }).filter(Boolean).join("; ");
+      return message || error.name || "AggregateError";
+    }
     var AxiosError = class _AxiosError extends Error {
       static from(error, code, config, request2, response, customProps) {
-        const axiosError = new _AxiosError(error.message, code || error.code, config, request2, response);
+        let message = error.message;
+        if (!message && utils$1.isArray(error.errors) && error.errors.length) {
+          message = aggregateErrorMessage(error);
+        }
+        const axiosError = new _AxiosError(message, code || error.code, config, request2, response);
         Object.defineProperty(axiosError, "cause", {
           __proto__: null,
           value: error,
@@ -81653,6 +81811,14 @@ var require_axios = __commonJS({
     AxiosError.ERR_NOT_SUPPORT = "ERR_NOT_SUPPORT";
     AxiosError.ERR_INVALID_URL = "ERR_INVALID_URL";
     AxiosError.ERR_FORM_DATA_DEPTH_EXCEEDED = "ERR_FORM_DATA_DEPTH_EXCEEDED";
+    var PlatformBuffer = {
+      isBufferAvailable() {
+        return typeof Buffer !== "undefined";
+      },
+      from(value) {
+        return Buffer.from(value);
+      }
+    };
     var DEFAULT_FORM_DATA_MAX_DEPTH = 100;
     function isVisitable(thing) {
       return utils$1.isPlainObject(thing) || utils$1.isArray(thing);
@@ -81711,8 +81877,8 @@ var require_axios = __commonJS({
           if (useBlob && typeof _Blob === "function") {
             return new _Blob([value]);
           }
-          if (typeof Buffer !== "undefined") {
-            return Buffer.from(value);
+          if (PlatformBuffer && PlatformBuffer.isBufferAvailable()) {
+            return PlatformBuffer.from(value);
           }
           throw new AxiosError("Blob is not supported. Use a Buffer instead.", AxiosError.ERR_NOT_SUPPORT);
         }
@@ -81990,7 +82156,7 @@ var require_axios = __commonJS({
     }
     function parsePropPath(name) {
       const path3 = [];
-      const pattern = /\w+|\[(\w*)]/g;
+      const pattern = /[^.[\]]+|\[([^.[\]]*)]/g;
       let match;
       while ((match = pattern.exec(name)) !== null) {
         throwIfDepthExceeded(path3.length);
@@ -82197,7 +82363,14 @@ var require_axios = __commonJS({
       return /^([a-z][a-z\d+\-.]*:)?\/\//i.test(url2);
     }
     function combineURLs(baseURL, relativeURL) {
-      return relativeURL ? baseURL.replace(/\/?\/$/, "") + "/" + relativeURL.replace(/^\/+/, "") : baseURL;
+      if (!relativeURL) {
+        return baseURL;
+      }
+      let end = baseURL.length;
+      while (end > 0 && baseURL.charCodeAt(end - 1) === 47) {
+        end--;
+      }
+      return baseURL.slice(0, end) + "/" + relativeURL.replace(/^\/+/, "");
     }
     var malformedHttpProtocol = /^https?:(?!\/\/)/i;
     var httpProtocolControlCharacters = /[\t\n\r]/g;
@@ -82211,9 +82384,30 @@ var require_axios = __commonJS({
     function normalizeURLForProtocolCheck(url2) {
       return stripLeadingC0ControlOrSpace(url2).replace(httpProtocolControlCharacters, "");
     }
+    function redactFragment(fragment) {
+      if (!fragment) {
+        return fragment;
+      }
+      return fragment.replace(/(^|&)([^=&]*=)?[^&]+/g, (match, separator, parameterName = "") => {
+        return `${separator}${parameterName}${REDACTED}`;
+      });
+    }
+    function redactSensitiveURLParts(url2) {
+      const redactedURL = url2.replace(/^(https?:\/{0,2})[^/?#]*@/i, `$1${REDACTED}@`);
+      const fragmentIndex = redactedURL.indexOf("#");
+      const urlWithoutFragment = fragmentIndex === -1 ? redactedURL : redactedURL.slice(0, fragmentIndex);
+      const redactedURLWithoutFragment = urlWithoutFragment.replace(/([?&][^=&#]*=)[^&#]*/g, `$1${REDACTED}`);
+      if (fragmentIndex === -1) {
+        return redactedURLWithoutFragment;
+      }
+      return `${redactedURLWithoutFragment}#${redactFragment(redactedURL.slice(fragmentIndex + 1))}`;
+    }
     function assertValidHttpProtocolURL(url2, config) {
-      if (typeof url2 === "string" && malformedHttpProtocol.test(normalizeURLForProtocolCheck(url2))) {
-        throw new AxiosError('Invalid URL: missing "//" after protocol', AxiosError.ERR_INVALID_URL, config);
+      if (typeof url2 === "string") {
+        const normalizedURL = normalizeURLForProtocolCheck(url2);
+        if (malformedHttpProtocol.test(normalizedURL)) {
+          throw new AxiosError(`Invalid URL ${JSON.stringify(redactSensitiveURLParts(normalizedURL))}: missing "//" after protocol`, AxiosError.ERR_INVALID_URL, config);
+        }
       }
     }
     function buildFullPath(baseURL, requestedURL, allowAbsoluteUrls, config) {
@@ -82290,7 +82484,7 @@ var require_axios = __commonJS({
     function getEnv2(key) {
       return process.env[key.toLowerCase()] || process.env[key.toUpperCase()] || "";
     }
-    var VERSION10 = "1.18.1";
+    var VERSION10 = "1.19.0";
     function parseProtocol(url2) {
       const match = /^([-+\w]{1,25}):(?:\/\/)?/.exec(url2);
       return match && match[1] || "";
@@ -82330,6 +82524,18 @@ var require_axios = __commonJS({
         return buffer;
       }
       throw new AxiosError("Unsupported protocol " + protocol, AxiosError.ERR_NOT_SUPPORT);
+    }
+    var FORM_DATA_CONTENT_HEADERS = ["content-type", "content-length"];
+    function setFormDataHeaders(headers, formHeaders, policy) {
+      if (policy !== "content-only") {
+        headers.set(formHeaders);
+        return;
+      }
+      Object.entries(formHeaders || {}).forEach(([key, val]) => {
+        if (FORM_DATA_CONTENT_HEADERS.includes(key.toLowerCase())) {
+          headers.set(key, val);
+        }
+      });
     }
     var kInternals = /* @__PURE__ */ Symbol("internals");
     var AxiosTransformStream = class extends stream2.Transform {
@@ -82649,6 +82855,60 @@ var require_axios = __commonJS({
       if (parts[0] !== "127") return false;
       return parts.every((p) => /^\d+$/.test(p) && Number(p) >= 0 && Number(p) <= 255);
     };
+    var parseIPv4Octet = (text) => {
+      if (/^0[xX][0-9a-fA-F]+$/.test(text)) {
+        const n7 = parseInt(text.slice(2), 16);
+        return Number.isFinite(n7) ? n7 : null;
+      }
+      if (text.length > 1 && /^0[0-7]+$/.test(text)) {
+        const n7 = parseInt(text, 8);
+        return Number.isFinite(n7) ? n7 : null;
+      }
+      if (text.length > 1 && /^0[0-9]+$/.test(text)) {
+        return null;
+      }
+      if (/^[0-9]+$/.test(text)) {
+        const n7 = parseInt(text, 10);
+        return Number.isFinite(n7) ? n7 : null;
+      }
+      return null;
+    };
+    var normalizeIPAddress = (host) => {
+      if (typeof host !== "string" || !host || host.indexOf(":") !== -1) {
+        return host;
+      }
+      let h = host;
+      if (h.charAt(0) === "[" && h.charAt(h.length - 1) === "]") {
+        h = h.slice(1, -1);
+      }
+      h = h.replace(/\.+$/, "");
+      if (!/^[0-9.xXa-fA-F]+$/.test(h)) return host;
+      const parts = h.split(".");
+      if (parts.some((p) => p === "")) return host;
+      if (parts.length === 4) {
+        const octets = parts.map(parseIPv4Octet);
+        if (octets.some((n7) => n7 === null || n7 < 0 || n7 > 255)) return host;
+        return octets.join(".");
+      }
+      if (parts.length > 4) {
+        return host;
+      }
+      if (parts.length === 1) return host;
+      const literalOctets = parts.slice(0, -1);
+      const tail = parts[parts.length - 1];
+      const tailSlots = 4 - literalOctets.length;
+      const tailValue = parseIPv4Octet(tail);
+      if (tailValue === null) return host;
+      const maxTail = (1 << 8 * tailSlots) - 1;
+      if (tailValue < 0 || tailValue > maxTail) return host;
+      const tailOctets = new Array(tailSlots).fill(0);
+      for (let i = tailSlots - 1, v2 = tailValue; i >= 0; i--, v2 >>= 8) {
+        tailOctets[i] = v2 & 255;
+      }
+      const literal = literalOctets.map(parseIPv4Octet);
+      if (literal.some((n7) => n7 === null || n7 < 0 || n7 > 255)) return host;
+      return [...literal, ...tailOctets].join(".");
+    };
     var isIPv6ZeroGroup = (group) => /^0{1,4}$/.test(group);
     var isIPv6Unspecified = (host) => {
       if (host === "::") return true;
@@ -82740,7 +83000,12 @@ var require_axios = __commonJS({
       if (hostname.charAt(0) === "[" && hostname.charAt(hostname.length - 1) === "]") {
         hostname = hostname.slice(1, -1);
       }
-      return unmapIPv4MappedIPv6(hostname.replace(/\.+$/, ""));
+      const trimmed = hostname.replace(/\.+$/, "");
+      const ipv4 = normalizeIPAddress(trimmed);
+      if (ipv4 !== trimmed) {
+        return ipv4;
+      }
+      return unmapIPv4MappedIPv6(trimmed);
     };
     function shouldBypassProxy(location) {
       let parsed;
@@ -82761,6 +83026,9 @@ var require_axios = __commonJS({
       return noProxy.split(/[\s,]+/).some((entry) => {
         if (!entry) {
           return false;
+        }
+        if (entry === "*") {
+          return true;
         }
         let [entryHost, entryPort] = parseNoProxyEntry(entry);
         entryHost = normalizeNoProxyHost(entryHost);
@@ -82853,7 +83121,7 @@ var require_axios = __commonJS({
         }
         const rawLoaded = e.loaded;
         const total = e.lengthComputable ? e.total : void 0;
-        const loaded = total != null ? Math.min(rawLoaded, total) : rawLoaded;
+        const loaded = Math.max(0, total != null ? Math.min(rawLoaded, total) : rawLoaded);
         const progressBytes = Math.max(0, loaded - bytesNotified);
         const rate = _speedometer(progressBytes);
         bytesNotified = Math.max(bytesNotified, loaded);
@@ -82879,10 +83147,64 @@ var require_axios = __commonJS({
         loaded
       }), throttled[1]];
     };
-    var asyncDecorator = (fn) => (...args) => utils$1.asap(() => fn(...args));
+    var asyncDecorator = (fn, scheduler = utils$1.asap) => (...args) => scheduler(() => fn(...args));
     var isHexDigit = (charCode) => charCode >= 48 && charCode <= 57 || charCode >= 65 && charCode <= 70 || charCode >= 97 && charCode <= 102;
     var isPercentEncodedByte = (str, i, len) => i + 2 < len && isHexDigit(str.charCodeAt(i + 1)) && isHexDigit(str.charCodeAt(i + 2));
-    function estimateDataURLDecodedBytes(url2) {
+    var hexValue = (charCode) => charCode <= 57 ? charCode - 48 : (charCode & 223) - 55;
+    var isBase64Char = (charCode) => charCode >= 65 && charCode <= 90 || // A-Z
+    charCode >= 97 && charCode <= 122 || // a-z
+    charCode >= 48 && charCode <= 57 || // 0-9
+    charCode === 43 || // +
+    charCode === 47 || // /
+    charCode === 45 || // - (base64url)
+    charCode === 95;
+    var isBase64Whitespace = (charCode) => charCode === 9 || charCode === 10 || charCode === 12 || charCode === 13 || charCode === 32;
+    var base64Bytes = (significant) => {
+      const groups = Math.floor(significant / 4);
+      const remainder = significant % 4;
+      return groups * 3 + (remainder === 2 ? 1 : remainder === 3 ? 2 : 0);
+    };
+    var estimateBase64BufferAllocation = (body) => {
+      const len = body.length;
+      let padding = 0;
+      if (len > 0 && body.charCodeAt(len - 1) === 61) {
+        padding++;
+        if (len > 1 && body.charCodeAt(len - 2) === 61) {
+          padding++;
+        }
+      }
+      return Math.floor((len - padding) * 3 / 4);
+    };
+    var estimatePercentDecodedBase64Bytes = (body) => {
+      const len = body.length;
+      let significant = 0;
+      let padding = 0;
+      let invalid2 = false;
+      for (let i = 0; i < len; i++) {
+        let code = body.charCodeAt(i);
+        if (code === 37 && isPercentEncodedByte(body, i, len)) {
+          code = hexValue(body.charCodeAt(i + 1)) * 16 + hexValue(body.charCodeAt(i + 2));
+          i += 2;
+        }
+        if (isBase64Whitespace(code)) {
+          continue;
+        }
+        if (code === 61) {
+          padding++;
+          continue;
+        }
+        if (!isBase64Char(code) || padding > 0) {
+          invalid2 = true;
+          continue;
+        }
+        significant++;
+      }
+      if (invalid2 || padding > 2 || padding > 0 && (significant + padding) % 4 !== 0 || significant % 4 === 1) {
+        return estimateBase64BufferAllocation(body);
+      }
+      return base64Bytes(significant);
+    };
+    var estimateDataURLBytes = (url2, estimateBase64) => {
       if (!url2 || typeof url2 !== "string") return 0;
       if (!url2.startsWith("data:")) return 0;
       const comma = url2.indexOf(",");
@@ -82891,43 +83213,7 @@ var require_axios = __commonJS({
       const body = url2.slice(comma + 1);
       const isBase64 = /;base64/i.test(meta);
       if (isBase64) {
-        let effectiveLen = body.length;
-        const len = body.length;
-        for (let i = 0; i < len; i++) {
-          if (body.charCodeAt(i) === 37 && i + 2 < len) {
-            const a = body.charCodeAt(i + 1);
-            const b = body.charCodeAt(i + 2);
-            const isHex2 = isHexDigit(a) && isHexDigit(b);
-            if (isHex2) {
-              effectiveLen -= 2;
-              i += 2;
-            }
-          }
-        }
-        let pad = 0;
-        let idx = len - 1;
-        const tailIsPct3D = (j2) => j2 >= 2 && body.charCodeAt(j2 - 2) === 37 && // '%'
-        body.charCodeAt(j2 - 1) === 51 && // '3'
-        (body.charCodeAt(j2) === 68 || body.charCodeAt(j2) === 100);
-        if (idx >= 0) {
-          if (body.charCodeAt(idx) === 61) {
-            pad++;
-            idx--;
-          } else if (tailIsPct3D(idx)) {
-            pad++;
-            idx -= 3;
-          }
-        }
-        if (pad === 1 && idx >= 0) {
-          if (body.charCodeAt(idx) === 61) {
-            pad++;
-          } else if (tailIsPct3D(idx)) {
-            pad++;
-          }
-        }
-        const groups = Math.floor(effectiveLen / 4);
-        const bytes3 = groups * 3 - (pad || 0);
-        return bytes3 > 0 ? bytes3 : 0;
+        return estimateBase64(body);
       }
       let bytes2 = 0;
       for (let i = 0, len = body.length; i < len; i++) {
@@ -82952,6 +83238,13 @@ var require_axios = __commonJS({
         }
       }
       return bytes2;
+    };
+    function estimateDataURLDecodedBytes(url2) {
+      const fragmentIndex = typeof url2 === "string" ? url2.indexOf("#") : -1;
+      return estimateDataURLBytes(fragmentIndex === -1 ? url2 : url2.slice(0, fragmentIndex), estimatePercentDecodedBase64Bytes);
+    }
+    function estimateDataURLBufferAllocation(url2) {
+      return estimateDataURLBytes(url2, estimateBase64BufferAllocation);
     }
     var zlibOptions = {
       flush: zlib.constants.Z_SYNC_FLUSH,
@@ -82969,23 +83262,12 @@ var require_axios = __commonJS({
     var isZstdSupported = utils$1.isFunction(zlib.createZstdDecompress);
     var ACCEPT_ENCODING = "gzip, compress, deflate" + (isBrotliSupported ? ", br" : "");
     var ACCEPT_ENCODING_WITH_ZSTD = ACCEPT_ENCODING + (isZstdSupported ? ", zstd" : "");
+    var scheduleProgress = typeof process !== "undefined" && process.nextTick ? process.nextTick.bind(process) : utils$1.asap;
     var {
       http: httpFollow,
       https: httpsFollow
     } = followRedirects;
     var isHttps = /https:?/;
-    var FORM_DATA_CONTENT_HEADERS$1 = ["content-type", "content-length"];
-    function setFormDataHeaders$1(headers, formHeaders, policy) {
-      if (policy !== "content-only") {
-        headers.set(formHeaders);
-        return;
-      }
-      Object.entries(formHeaders).forEach(([key, val]) => {
-        if (FORM_DATA_CONTENT_HEADERS$1.includes(key.toLowerCase())) {
-          headers.set(key, val);
-        }
-      });
-    }
     var kAxiosSocketListener = /* @__PURE__ */ Symbol("axios.http.socketListener");
     var kAxiosCurrentReq = /* @__PURE__ */ Symbol("axios.http.currentReq");
     var kAxiosInstalledTunnel = /* @__PURE__ */ Symbol("axios.http.installedTunnel");
@@ -83096,7 +83378,7 @@ var require_axios = __commonJS({
         return false;
       }
     }
-    function setProxy(options, configProxy, location, isRedirect, configHttpsAgent, configHttpAgent) {
+    function setProxy(options, configProxy, location, isRedirect2, configHttpsAgent, configHttpAgent) {
       let proxy = configProxy;
       const proxyEnvAgent = getProxyEnvAgent(options, configHttpAgent, configHttpsAgent);
       if (!proxy && proxy !== false && !isNodeEnvProxyEnabled(proxyEnvAgent)) {
@@ -83107,14 +83389,14 @@ var require_axios = __commonJS({
           }
         }
       }
-      if (isRedirect && options.headers) {
+      if (isRedirect2 && options.headers) {
         for (const name of Object.keys(options.headers)) {
           if (name.toLowerCase() === "proxy-authorization") {
             delete options.headers[name];
           }
         }
       }
-      if (isRedirect && options.agent && options.agent[kAxiosInstalledTunnel]) {
+      if (isRedirect2 && options.agent && options.agent[kAxiosInstalledTunnel]) {
         options.agent = void 0;
       }
       if (proxy) {
@@ -83376,7 +83658,7 @@ var require_axios = __commonJS({
         if (protocol === "data:") {
           if (maxContentLength > -1) {
             const dataUrl = String(own2("url") || fullPath || "");
-            const estimated = estimateDataURLDecodedBytes(dataUrl);
+            const estimated = estimateDataURLBufferAllocation(dataUrl);
             if (estimated > maxContentLength) {
               return reject(new AxiosError("maxContentLength size of " + maxContentLength + " exceeded", AxiosError.ERR_BAD_RESPONSE, config));
             }
@@ -83434,7 +83716,7 @@ var require_axios = __commonJS({
             boundary: userBoundary && userBoundary[1] || void 0
           });
         } else if (utils$1.isFormData(data) && utils$1.isFunction(data.getHeaders) && data.getHeaders !== Object.prototype.getHeaders) {
-          setFormDataHeaders$1(headers, data.getHeaders(), own2("formDataHeaderPolicy"));
+          setFormDataHeaders(headers, data.getHeaders(), own2("formDataHeaderPolicy"));
           if (!headers.hasContentLength()) {
             try {
               const knownLength = await util.promisify(data.getLength).call(data);
@@ -83476,7 +83758,7 @@ var require_axios = __commonJS({
           data = stream2.pipeline([data, new AxiosTransformStream({
             maxRate: utils$1.toFiniteNumber(maxUploadRate)
           })], utils$1.noop);
-          onUploadProgress && data.on("progress", flushOnFinish(data, progressEventDecorator(contentLength, progressEventReducer(asyncDecorator(onUploadProgress), false, 3))));
+          onUploadProgress && data.on("progress", flushOnFinish(data, progressEventDecorator(contentLength, progressEventReducer(asyncDecorator(onUploadProgress, scheduleProgress), false, 3))));
         }
         let auth2 = void 0;
         const configAuth = own2("auth");
@@ -83613,7 +83895,7 @@ var require_axios = __commonJS({
             const transformStream = new AxiosTransformStream({
               maxRate: utils$1.toFiniteNumber(maxDownloadRate)
             });
-            onDownloadProgress && transformStream.on("progress", flushOnFinish(transformStream, progressEventDecorator(responseLength, progressEventReducer(asyncDecorator(onDownloadProgress), true, 3))));
+            onDownloadProgress && transformStream.on("progress", flushOnFinish(transformStream, progressEventDecorator(responseLength, progressEventReducer(asyncDecorator(onDownloadProgress, scheduleProgress), true, 3))));
             streams.push(transformStream);
           }
           let responseStream = res;
@@ -83879,6 +84161,12 @@ var require_axios = __commonJS({
     var headersToObject = (thing) => thing instanceof AxiosHeaders ? {
       ...thing
     } : thing;
+    var ownEnumerableKeys = (thing) => {
+      if (Object.getOwnPropertySymbols && Object.getOwnPropertyDescriptor) {
+        return Object.keys(thing).concat(Object.getOwnPropertySymbols(thing).filter((symbol) => Object.getOwnPropertyDescriptor(thing, symbol).enumerable));
+      }
+      return Object.keys(thing);
+    };
     function mergeConfig(config1, config2) {
       config1 = config1 || {};
       config2 = config2 || {};
@@ -83979,7 +84267,7 @@ var require_axios = __commonJS({
         validateStatus: mergeDirectKeys,
         headers: (a, b, prop) => mergeDeepProperties(headersToObject(a), headersToObject(b), prop, true)
       };
-      utils$1.forEach(Object.keys({
+      utils$1.forEach(ownEnumerableKeys({
         ...config1,
         ...config2
       }), function computeConfigValue(prop) {
@@ -83998,18 +84286,6 @@ var require_axios = __commonJS({
         }
       }
       return config;
-    }
-    var FORM_DATA_CONTENT_HEADERS = ["content-type", "content-length"];
-    function setFormDataHeaders(headers, formHeaders, policy) {
-      if (policy !== "content-only") {
-        headers.set(formHeaders);
-        return;
-      }
-      Object.entries(formHeaders || {}).forEach(([key, val]) => {
-        if (FORM_DATA_CONTENT_HEADERS.includes(key.toLowerCase())) {
-          headers.set(key, val);
-        }
-      });
     }
     var encodeUTF8$1 = (str) => encodeURIComponent(str).replace(/%([0-9A-F]{2})/gi, (_2, hex) => String.fromCharCode(parseInt(hex, 16)));
     function resolveConfig(config) {
@@ -84216,9 +84492,18 @@ var require_axios = __commonJS({
         });
         signals = null;
       };
-      signals.forEach((signal2) => signal2.addEventListener("abort", onabort, {
-        once: true
-      }));
+      signals.forEach((signal2) => {
+        if (aborted) {
+          return;
+        }
+        if (signal2.aborted) {
+          onabort.call(signal2);
+          return;
+        }
+        signal2.addEventListener("abort", onabort, {
+          once: true
+        });
+      });
       const {
         signal
       } = controller;
@@ -84964,16 +85249,29 @@ var require_axios = __commonJS({
           const onFulfilled = requestInterceptorChain[i++];
           const onRejected = requestInterceptorChain[i++];
           try {
-            newConfig = onFulfilled(newConfig);
+            newConfig = onFulfilled ? onFulfilled(newConfig) : newConfig;
           } catch (error) {
-            onRejected.call(this, error);
+            if (!onRejected) {
+              promise = Promise.reject(error);
+              break;
+            }
+            try {
+              const rejectedResult = onRejected.call(this, error);
+              if (utils$1.isThenable(rejectedResult)) {
+                promise = Promise.resolve(rejectedResult).then(() => dispatchRequest.call(this, newConfig));
+              }
+            } catch (rejectedError) {
+              promise = Promise.reject(rejectedError);
+            }
             break;
           }
         }
-        try {
-          promise = dispatchRequest.call(this, newConfig);
-        } catch (error) {
-          return Promise.reject(error);
+        if (!promise) {
+          try {
+            promise = dispatchRequest.call(this, newConfig);
+          } catch (error) {
+            promise = Promise.reject(error);
+          }
         }
         i = 0;
         len = responseInterceptorChain.length;
@@ -85182,6 +85480,7 @@ var require_axios = __commonJS({
       LoopDetected: 508,
       NotExtended: 510,
       NetworkAuthenticationRequired: 511,
+      WebServerReturnsAnUnknownError: 520,
       WebServerIsDown: 521,
       ConnectionTimedOut: 522,
       OriginIsUnreachable: 523,
@@ -87121,13 +87420,13 @@ var require_jwk_to_key = __commonJS({
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     var node_crypto_1 = require("node:crypto");
-    var parse3 = (key) => {
+    var parse4 = (key) => {
       if (key.d) {
         return (0, node_crypto_1.createPrivateKey)({ format: "jwk", key });
       }
       return (0, node_crypto_1.createPublicKey)({ format: "jwk", key });
     };
-    exports2.default = parse3;
+    exports2.default = parse4;
   }
 });
 
@@ -93076,7 +93375,7 @@ var require_client3 = __commonJS({
 });
 
 // node_modules/@openfga/sdk/dist/index.js
-var require_dist2 = __commonJS({
+var require_dist3 = __commonJS({
   "node_modules/@openfga/sdk/dist/index.js"(exports2) {
     "use strict";
     var __createBinding = exports2 && exports2.__createBinding || (Object.create ? (function(o, m, k2, k22) {
@@ -93173,7 +93472,7 @@ var require_parse4 = __commonJS({
     var token;
     var key;
     var root;
-    module2.exports = function parse3(text, reviver) {
+    module2.exports = function parse4(text, reviver) {
       source = String(text);
       parseState = "start";
       stack = [];
@@ -94229,10 +94528,10 @@ var require_stringify = __commonJS({
 // node_modules/json5/lib/index.js
 var require_lib3 = __commonJS({
   "node_modules/json5/lib/index.js"(exports2, module2) {
-    var parse3 = require_parse4();
+    var parse4 = require_parse4();
     var stringify = require_stringify();
     var JSON5 = {
-      parse: parse3,
+      parse: parse4,
       stringify
     };
     module2.exports = JSON5;
@@ -101466,7 +101765,7 @@ var require_public_api = __commonJS({
       }
       return doc;
     }
-    function parse3(src, reviver, options) {
+    function parse4(src, reviver, options) {
       let _reviver = void 0;
       if (typeof reviver === "function") {
         _reviver = reviver;
@@ -101507,7 +101806,7 @@ var require_public_api = __commonJS({
         return value.toString(options);
       return new Document.Document(value, _replacer, options).toString(options);
     }
-    exports2.parse = parse3;
+    exports2.parse = parse4;
     exports2.parseAllDocuments = parseAllDocuments;
     exports2.parseDocument = parseDocument;
     exports2.stringify = stringify;
@@ -101515,7 +101814,7 @@ var require_public_api = __commonJS({
 });
 
 // node_modules/yaml/dist/index.js
-var require_dist3 = __commonJS({
+var require_dist4 = __commonJS({
   "node_modules/yaml/dist/index.js"(exports2) {
     "use strict";
     var composer = require_composer();
@@ -102110,7 +102409,7 @@ var require_compile = __commonJS({
       const walk = (node, parent = {}) => {
         const invalidBlock = utils.isInvalidBrace(parent);
         const invalidNode = node.invalid === true && options.escapeInvalid === true;
-        const invalid = invalidBlock === true || invalidNode === true;
+        const invalid2 = invalidBlock === true || invalidNode === true;
         const prefix = options.escapeInvalid === true ? "\\" : "";
         let output = "";
         if (node.isOpen === true) {
@@ -102121,13 +102420,13 @@ var require_compile = __commonJS({
           return prefix + node.value;
         }
         if (node.type === "open") {
-          return invalid ? prefix + node.value : "(";
+          return invalid2 ? prefix + node.value : "(";
         }
         if (node.type === "close") {
-          return invalid ? prefix + node.value : ")";
+          return invalid2 ? prefix + node.value : ")";
         }
         if (node.type === "comma") {
-          return node.prev.type === "comma" ? "" : invalid ? node.value : "|";
+          return node.prev.type === "comma" ? "" : invalid2 ? node.value : "|";
         }
         if (node.value) {
           return node.value;
@@ -102381,7 +102680,7 @@ var require_parse5 = __commonJS({
       CHAR_NO_BREAK_SPACE,
       CHAR_ZERO_WIDTH_NOBREAK_SPACE
     } = require_constants15();
-    var parse3 = (input, options = {}) => {
+    var parse4 = (input, options = {}) => {
       if (typeof input !== "string") {
         throw new TypeError("Expected a string");
       }
@@ -102581,7 +102880,7 @@ var require_parse5 = __commonJS({
       push({ type: "eos" });
       return ast;
     };
-    module2.exports = parse3;
+    module2.exports = parse4;
   }
 });
 
@@ -102592,7 +102891,7 @@ var require_braces = __commonJS({
     var stringify = require_stringify3();
     var compile2 = require_compile();
     var expand2 = require_expand();
-    var parse3 = require_parse5();
+    var parse4 = require_parse5();
     var braces = (input, options = {}) => {
       let output = [];
       if (Array.isArray(input)) {
@@ -102612,7 +102911,7 @@ var require_braces = __commonJS({
       }
       return output;
     };
-    braces.parse = (input, options = {}) => parse3(input, options);
+    braces.parse = (input, options = {}) => parse4(input, options);
     braces.stringify = (input, options = {}) => {
       if (typeof input === "string") {
         return stringify(braces.parse(input, options), options);
@@ -103476,7 +103775,7 @@ var require_parse6 = __commonJS({
       }
       return { risky: false };
     };
-    var parse3 = (input, options) => {
+    var parse4 = (input, options) => {
       if (typeof input !== "string") {
         throw new TypeError("Expected a string");
       }
@@ -103647,7 +103946,7 @@ var require_parse6 = __commonJS({
             output = token.close = `)$))${extglobStar}`;
           }
           if (token.inner.includes("*") && (rest = remaining()) && /^\.[^\\/.]+$/.test(rest)) {
-            const expression = parse3(rest, { ...options, fastpaths: false }).output;
+            const expression = parse4(rest, { ...options, fastpaths: false }).output;
             output = token.close = `)${expression})${extglobStar})`;
           }
           if (token.prev.type === "bos") {
@@ -104172,7 +104471,7 @@ var require_parse6 = __commonJS({
       }
       return state;
     };
-    parse3.fastpaths = (input, options) => {
+    parse4.fastpaths = (input, options) => {
       const opts = { ...options };
       const max = typeof opts.maxLength === "number" ? Math.min(MAX_LENGTH, opts.maxLength) : MAX_LENGTH;
       const len = input.length;
@@ -104238,7 +104537,7 @@ var require_parse6 = __commonJS({
       }
       return source;
     };
-    module2.exports = parse3;
+    module2.exports = parse4;
   }
 });
 
@@ -104248,7 +104547,7 @@ var require_picomatch = __commonJS({
     "use strict";
     var path2 = require("path");
     var scan = require_scan();
-    var parse3 = require_parse6();
+    var parse4 = require_parse6();
     var utils = require_utils5();
     var constants3 = require_constants16();
     var isObject2 = (val) => val && typeof val === "object" && !Array.isArray(val);
@@ -104336,7 +104635,7 @@ var require_picomatch = __commonJS({
     picomatch.isMatch = (str, patterns, options) => picomatch(patterns, options)(str);
     picomatch.parse = (pattern, options) => {
       if (Array.isArray(pattern)) return pattern.map((p) => picomatch.parse(p, options));
-      return parse3(pattern, { ...options, fastpaths: false });
+      return parse4(pattern, { ...options, fastpaths: false });
     };
     picomatch.scan = (input, options) => scan(input, options);
     picomatch.compileRe = (state, options, returnOutput = false, returnState = false) => {
@@ -104362,10 +104661,10 @@ var require_picomatch = __commonJS({
       }
       let parsed = { negated: false, fastpaths: true };
       if (options.fastpaths !== false && (input[0] === "." || input[0] === "*")) {
-        parsed.output = parse3.fastpaths(input, options);
+        parsed.output = parse4.fastpaths(input, options);
       }
       if (!parsed.output) {
-        parsed = parse3(input, options);
+        parsed = parse4(input, options);
       }
       return picomatch.compileRe(parsed, options, returnOutput, returnState);
     };
@@ -104778,7 +105077,7 @@ var require_postgres_interval = __commonJS({
       if (!(this instanceof PostgresInterval)) {
         return new PostgresInterval(raw);
       }
-      extend(this, parse3(raw));
+      extend(this, parse4(raw));
     }
     var properties = ["seconds", "minutes", "hours", "days", "months", "years"];
     PostgresInterval.prototype.toPostgres = function() {
@@ -104839,7 +105138,7 @@ var require_postgres_interval = __commonJS({
       var microseconds = fraction + "000000".slice(fraction.length);
       return parseInt(microseconds, 10) / 1e3;
     }
-    function parse3(interval) {
+    function parse4(interval) {
       if (!interval) return {};
       var matches = INTERVAL.exec(interval);
       var isNegative = matches[8] === "-";
@@ -105325,13 +105624,13 @@ var require_binaryParsers = __commonJS({
           console.log("ERROR: ElementType not implemented: " + elementType2);
         }
       };
-      var parse3 = function(dimension, elementType2) {
+      var parse4 = function(dimension, elementType2) {
         var array = [];
         var i2;
         if (dimension.length > 1) {
           var count = dimension.shift();
           for (i2 = 0; i2 < count; i2++) {
-            array[i2] = parse3(dimension, elementType2);
+            array[i2] = parse4(dimension, elementType2);
           }
           dimension.unshift(count);
         } else {
@@ -105341,7 +105640,7 @@ var require_binaryParsers = __commonJS({
         }
         return array;
       };
-      return parse3(dims, elementType);
+      return parse4(dims, elementType);
     };
     var parseText = function(value) {
       return value.toString("utf8");
@@ -106088,7 +106387,7 @@ var require_type_overrides = __commonJS({
 var require_pg_connection_string = __commonJS({
   "node_modules/pg-connection-string/index.js"(exports2, module2) {
     "use strict";
-    function parse3(str, options = {}) {
+    function parse4(str, options = {}) {
       if (str.charAt(0) === "/") {
         const config2 = str.split(" ");
         return { host: config2[0], database: config2[1] };
@@ -106250,7 +106549,7 @@ var require_pg_connection_string = __commonJS({
       return poolConfig;
     }
     function parseIntoClientConfig(str) {
-      return toClientConfig(parse3(str));
+      return toClientConfig(parse4(str));
     }
     function deprecatedSslModeWarning(sslmode) {
       if (!deprecatedSslModeWarning.warned && typeof process !== "undefined" && process.emitWarning) {
@@ -106265,10 +106564,10 @@ To prepare for this change:
 See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.`);
       }
     }
-    module2.exports = parse3;
-    parse3.parse = parse3;
-    parse3.toClientConfig = toClientConfig;
-    parse3.parseIntoClientConfig = parseIntoClientConfig;
+    module2.exports = parse4;
+    parse4.parse = parse4;
+    parse4.toClientConfig = toClientConfig;
+    parse4.parseIntoClientConfig = parseIntoClientConfig;
   }
 });
 
@@ -106278,7 +106577,7 @@ var require_connection_parameters = __commonJS({
     "use strict";
     var dns = require("dns");
     var defaults3 = require_defaults();
-    var parse3 = require_pg_connection_string().parse;
+    var parse4 = require_pg_connection_string().parse;
     var val = function(key, config, envVar) {
       if (config[key]) {
         return config[key];
@@ -106316,9 +106615,9 @@ var require_connection_parameters = __commonJS({
     };
     var ConnectionParameters = class {
       constructor(config) {
-        config = typeof config === "string" ? parse3(config) : config || {};
+        config = typeof config === "string" ? parse4(config) : config || {};
         if (config.connectionString) {
-          config = Object.assign({}, config, parse3(config.connectionString));
+          config = Object.assign({}, config, parse4(config.connectionString));
         }
         this.user = val("user", config);
         this.database = val("database", config);
@@ -107032,7 +107331,7 @@ var require_serializer = __commonJS({
       );
     };
     var emptyArray = [];
-    var parse3 = (query2) => {
+    var parse4 = (query2) => {
       const name = query2.name || "";
       if (name.length > 63) {
         console.error("Warning! Postgres only supports 63 characters for query names.");
@@ -107187,7 +107486,7 @@ var require_serializer = __commonJS({
       sendSASLInitialResponseMessage,
       sendSCRAMClientFinalMessage,
       query,
-      parse: parse3,
+      parse: parse4,
       bind: bind2,
       execute,
       describe,
@@ -107571,12 +107870,12 @@ var require_parser2 = __commonJS({
 });
 
 // node_modules/pg-protocol/dist/index.js
-var require_dist4 = __commonJS({
+var require_dist5 = __commonJS({
   "node_modules/pg-protocol/dist/index.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.DatabaseError = exports2.serialize = void 0;
-    exports2.parse = parse3;
+    exports2.parse = parse4;
     var messages_1 = require_messages();
     Object.defineProperty(exports2, "DatabaseError", { enumerable: true, get: function() {
       return messages_1.DatabaseError;
@@ -107586,7 +107885,7 @@ var require_dist4 = __commonJS({
       return serializer_1.serialize;
     } });
     var parser_1 = require_parser2();
-    function parse3(stream2, callback) {
+    function parse4(stream2, callback) {
       const parser = new parser_1.Parser();
       stream2.on("data", (buffer) => parser.parse(buffer, callback));
       return new Promise((resolve2) => stream2.on("end", () => resolve2()));
@@ -107674,7 +107973,7 @@ var require_connection3 = __commonJS({
   "node_modules/pg/lib/connection.js"(exports2, module2) {
     "use strict";
     var EventEmitter = require("events").EventEmitter;
-    var { parse: parse3, serialize } = require_dist4();
+    var { parse: parse4, serialize } = require_dist5();
     var stream2 = require_stream2();
     var { getStream } = stream2;
     var flushBuffer = serialize.flush();
@@ -107774,7 +108073,7 @@ var require_connection3 = __commonJS({
         self2.emit("sslconnect");
       }
       attachListeners(stream3) {
-        parse3(stream3, (msg) => {
+        parse4(stream3, (msg) => {
           const eventName = msg.name === "error" ? "errorMessage" : msg.name;
           if (this._emitMessage) {
             this.emit("message", msg);
@@ -107866,9 +108165,9 @@ var require_connection3 = __commonJS({
   }
 });
 
-// node_modules/pgpass/node_modules/split2/index.js
+// node_modules/split2/index.js
 var require_split2 = __commonJS({
-  "node_modules/pgpass/node_modules/split2/index.js"(exports2, module2) {
+  "node_modules/split2/index.js"(exports2, module2) {
     "use strict";
     var { Transform } = require("stream");
     var { StringDecoder } = require("string_decoder");
@@ -108632,8 +108931,8 @@ var require_client4 = __commonJS({
         }
         return data;
       }
-      cancel(client, query) {
-        if (client.activeQuery === query) {
+      cancel(client2, query) {
+        if (client2.activeQuery === query) {
           const con = this.connection;
           if (this.host && this.host.indexOf("/") === 0) {
             con.connect(this.host + "/.s.PGSQL." + this.port);
@@ -108641,10 +108940,10 @@ var require_client4 = __commonJS({
             con.connect(this.port, this.host);
           }
           con.on("connect", function() {
-            con.cancel(client.processID, client.secretKey);
+            con.cancel(client2.processID, client2.secretKey);
           });
-        } else if (client._queryQueue.indexOf(query) !== -1) {
-          client._queryQueue.splice(client._queryQueue.indexOf(query), 1);
+        } else if (client2._queryQueue.indexOf(query) !== -1) {
+          client2._queryQueue.splice(client2._queryQueue.indexOf(query), 1);
         }
       }
       setTypeParser(oid, format, parseFn) {
@@ -108813,8 +109112,8 @@ var require_pg_pool = __commonJS({
       return i === -1 ? void 0 : list.splice(i, 1)[0];
     };
     var IdleItem = class {
-      constructor(client, idleListener, timeoutId) {
-        this.client = client;
+      constructor(client2, idleListener, timeoutId) {
+        this.client = client2;
         this.idleListener = idleListener;
         this.timeoutId = timeoutId;
       }
@@ -108833,8 +109132,8 @@ var require_pg_pool = __commonJS({
       }
       let rej;
       let res;
-      const cb = function(err, client) {
-        err ? rej(err) : res(client);
+      const cb = function(err, client2) {
+        err ? rej(err) : res(client2);
       };
       const result = new Promise2(function(resolve2, reject) {
         res = resolve2;
@@ -108845,15 +109144,15 @@ var require_pg_pool = __commonJS({
       });
       return { callback: cb, result };
     }
-    function makeIdleListener(pool, client) {
+    function makeIdleListener(pool, client2) {
       return function idleListener(err) {
-        err.client = client;
-        client.removeListener("error", idleListener);
-        client.on("error", () => {
+        err.client = client2;
+        client2.removeListener("error", idleListener);
+        client2.on("error", () => {
           pool.log("additional client error after disconnection due to error", err);
         });
-        pool._remove(client);
-        pool.emit("error", err, client);
+        pool._remove(client2);
+        pool.emit("error", err, client2);
       };
     }
     var Pool2 = class extends EventEmitter {
@@ -108936,25 +109235,25 @@ var require_pg_pool = __commonJS({
         if (this._idle.length) {
           const idleItem = this._idle.pop();
           clearTimeout(idleItem.timeoutId);
-          const client = idleItem.client;
-          client.ref && client.ref();
+          const client2 = idleItem.client;
+          client2.ref && client2.ref();
           const idleListener = idleItem.idleListener;
-          return this._acquireClient(client, pendingItem, idleListener, false);
+          return this._acquireClient(client2, pendingItem, idleListener, false);
         }
         if (!this._isFull()) {
           return this.newClient(pendingItem);
         }
         throw new Error("unexpected condition");
       }
-      _remove(client, callback) {
-        const removed = removeWhere(this._idle, (item) => item.client === client);
+      _remove(client2, callback) {
+        const removed = removeWhere(this._idle, (item) => item.client === client2);
         if (removed !== void 0) {
           clearTimeout(removed.timeoutId);
         }
-        this._clients = this._clients.filter((c) => c !== client);
+        this._clients = this._clients.filter((c) => c !== client2);
         const context4 = this;
-        client.end(() => {
-          context4.emit("remove", client);
+        client2.end(() => {
+          context4.emit("remove", client2);
           if (typeof callback === "function") {
             callback();
           }
@@ -108995,34 +109294,34 @@ var require_pg_pool = __commonJS({
         return result;
       }
       newClient(pendingItem) {
-        const client = new this.Client(this.options);
-        this._clients.push(client);
-        const idleListener = makeIdleListener(this, client);
+        const client2 = new this.Client(this.options);
+        this._clients.push(client2);
+        const idleListener = makeIdleListener(this, client2);
         this.log("checking client timeout");
         let tid;
         let timeoutHit = false;
         if (this.options.connectionTimeoutMillis) {
           tid = setTimeout(() => {
-            if (client.connection) {
+            if (client2.connection) {
               this.log("ending client due to timeout");
               timeoutHit = true;
-              client.connection.stream.destroy();
-            } else if (!client.isConnected()) {
+              client2.connection.stream.destroy();
+            } else if (!client2.isConnected()) {
               this.log("ending client due to timeout");
               timeoutHit = true;
-              client.end();
+              client2.end();
             }
           }, this.options.connectionTimeoutMillis);
         }
         this.log("connecting new client");
-        client.connect((err) => {
+        client2.connect((err) => {
           if (tid) {
             clearTimeout(tid);
           }
-          client.on("error", idleListener);
+          client2.on("error", idleListener);
           if (err) {
             this.log("client failed to connect", err);
-            this._clients = this._clients.filter((c) => c !== client);
+            this._clients = this._clients.filter((c) => c !== client2);
             if (timeoutHit) {
               err = new Error("Connection terminated due to connection timeout", { cause: err });
             }
@@ -109033,13 +109332,13 @@ var require_pg_pool = __commonJS({
           } else {
             this.log("new client connected");
             if (this.options.onConnect) {
-              this._promiseTry(() => this.options.onConnect(client)).then(
+              this._promiseTry(() => this.options.onConnect(client2)).then(
                 () => {
-                  this._afterConnect(client, pendingItem, idleListener);
+                  this._afterConnect(client2, pendingItem, idleListener);
                 },
                 (hookErr) => {
-                  this._clients = this._clients.filter((c) => c !== client);
-                  client.end(() => {
+                  this._clients = this._clients.filter((c) => c !== client2);
+                  client2.end(() => {
                     this._pulseQueue();
                     if (!pendingItem.timedOut) {
                       pendingItem.callback(hookErr, void 0, NOOP);
@@ -109049,93 +109348,93 @@ var require_pg_pool = __commonJS({
               );
               return;
             }
-            return this._afterConnect(client, pendingItem, idleListener);
+            return this._afterConnect(client2, pendingItem, idleListener);
           }
         });
       }
-      _afterConnect(client, pendingItem, idleListener) {
+      _afterConnect(client2, pendingItem, idleListener) {
         if (this.options.maxLifetimeSeconds !== 0) {
           const maxLifetimeTimeout = setTimeout(() => {
             this.log("ending client due to expired lifetime");
-            this._expired.add(client);
-            const idleIndex = this._idle.findIndex((idleItem) => idleItem.client === client);
+            this._expired.add(client2);
+            const idleIndex = this._idle.findIndex((idleItem) => idleItem.client === client2);
             if (idleIndex !== -1) {
               this._acquireClient(
-                client,
-                new PendingItem((err, client2, clientRelease) => clientRelease()),
+                client2,
+                new PendingItem((err, client3, clientRelease) => clientRelease()),
                 idleListener,
                 false
               );
             }
           }, this.options.maxLifetimeSeconds * 1e3);
           maxLifetimeTimeout.unref();
-          client.once("end", () => clearTimeout(maxLifetimeTimeout));
+          client2.once("end", () => clearTimeout(maxLifetimeTimeout));
         }
-        return this._acquireClient(client, pendingItem, idleListener, true);
+        return this._acquireClient(client2, pendingItem, idleListener, true);
       }
       // acquire a client for a pending work item
-      _acquireClient(client, pendingItem, idleListener, isNew) {
+      _acquireClient(client2, pendingItem, idleListener, isNew) {
         if (isNew) {
-          this.emit("connect", client);
+          this.emit("connect", client2);
         }
-        this.emit("acquire", client);
-        client.release = this._releaseOnce(client, idleListener);
-        client.removeListener("error", idleListener);
+        this.emit("acquire", client2);
+        client2.release = this._releaseOnce(client2, idleListener);
+        client2.removeListener("error", idleListener);
         if (!pendingItem.timedOut) {
           if (isNew && this.options.verify) {
-            this.options.verify(client, (err) => {
+            this.options.verify(client2, (err) => {
               if (err) {
-                client.release(err);
+                client2.release(err);
                 return pendingItem.callback(err, void 0, NOOP);
               }
-              pendingItem.callback(void 0, client, client.release);
+              pendingItem.callback(void 0, client2, client2.release);
             });
           } else {
-            pendingItem.callback(void 0, client, client.release);
+            pendingItem.callback(void 0, client2, client2.release);
           }
         } else {
           if (isNew && this.options.verify) {
-            this.options.verify(client, client.release);
+            this.options.verify(client2, client2.release);
           } else {
-            client.release();
+            client2.release();
           }
         }
       }
       // returns a function that wraps _release and throws if called more than once
-      _releaseOnce(client, idleListener) {
+      _releaseOnce(client2, idleListener) {
         let released = false;
         return (err) => {
           if (released) {
             throwOnDoubleRelease();
           }
           released = true;
-          this._release(client, idleListener, err);
+          this._release(client2, idleListener, err);
         };
       }
       // release a client back to the poll, include an error
       // to remove it from the pool
-      _release(client, idleListener, err) {
-        client.on("error", idleListener);
-        client._poolUseCount = (client._poolUseCount || 0) + 1;
-        this.emit("release", err, client);
-        if (err || this.ending || !client._queryable || client._ending || client._poolUseCount >= this.options.maxUses) {
-          if (client._poolUseCount >= this.options.maxUses) {
+      _release(client2, idleListener, err) {
+        client2.on("error", idleListener);
+        client2._poolUseCount = (client2._poolUseCount || 0) + 1;
+        this.emit("release", err, client2);
+        if (err || this.ending || !client2._queryable || client2._ending || client2._poolUseCount >= this.options.maxUses) {
+          if (client2._poolUseCount >= this.options.maxUses) {
             this.log("remove expended client");
           }
-          return this._remove(client, this._pulseQueue.bind(this));
+          return this._remove(client2, this._pulseQueue.bind(this));
         }
-        const isExpired2 = this._expired.has(client);
+        const isExpired2 = this._expired.has(client2);
         if (isExpired2) {
           this.log("remove expired client");
-          this._expired.delete(client);
-          return this._remove(client, this._pulseQueue.bind(this));
+          this._expired.delete(client2);
+          return this._remove(client2, this._pulseQueue.bind(this));
         }
         let tid;
         if (this.options.idleTimeoutMillis && this._isAboveMin()) {
           tid = setTimeout(() => {
             if (this._isAboveMin()) {
               this.log("remove idle client");
-              this._remove(client, this._pulseQueue.bind(this));
+              this._remove(client2, this._pulseQueue.bind(this));
             }
           }, this.options.idleTimeoutMillis);
           if (this.options.allowExitOnIdle) {
@@ -109143,9 +109442,9 @@ var require_pg_pool = __commonJS({
           }
         }
         if (this.options.allowExitOnIdle) {
-          client.unref();
+          client2.unref();
         }
-        this._idle.push(new IdleItem(client, idleListener, tid));
+        this._idle.push(new IdleItem(client2, idleListener, tid));
         this._pulseQueue();
       }
       query(text, values, cb) {
@@ -109162,7 +109461,7 @@ var require_pg_pool = __commonJS({
         }
         const response = promisify(this.Promise, cb);
         cb = response.callback;
-        this.connect((err, client) => {
+        this.connect((err, client2) => {
           if (err) {
             return cb(err);
           }
@@ -109172,27 +109471,27 @@ var require_pg_pool = __commonJS({
               return;
             }
             clientReleased = true;
-            client.release(err2);
+            client2.release(err2);
             cb(err2);
           };
-          client.once("error", onError);
+          client2.once("error", onError);
           this.log("dispatching query");
           try {
-            client.query(text, values, (err2, res) => {
+            client2.query(text, values, (err2, res) => {
               this.log("query dispatched");
-              client.removeListener("error", onError);
+              client2.removeListener("error", onError);
               if (clientReleased) {
                 return;
               }
               clientReleased = true;
-              client.release(err2);
+              client2.release(err2);
               if (err2) {
                 return cb(err2);
               }
               return cb(void 0, res);
             });
           } catch (err2) {
-            client.release(err2);
+            client2.release(err2);
             return cb(err2);
           }
         });
@@ -109217,7 +109516,7 @@ var require_pg_pool = __commonJS({
         return this._idle.length;
       }
       get expiredCount() {
-        return this._clients.reduce((acc, client) => acc + (this._expired.has(client) ? 1 : 0), 0);
+        return this._clients.reduce((acc, client2) => acc + (this._expired.has(client2) ? 1 : 0), 0);
       }
       get totalCount() {
         return this._clients.length;
@@ -109298,13 +109597,13 @@ var require_query2 = __commonJS({
       );
       return this._promise;
     };
-    NativeQuery.prototype.submit = function(client) {
+    NativeQuery.prototype.submit = function(client2) {
       this.state = "running";
       const self2 = this;
-      this.native = client.native;
-      client.native.arrayMode = this._arrayMode;
+      this.native = client2.native;
+      client2.native.arrayMode = this._arrayMode;
       let after = function(err, rows, results) {
-        client.native.arrayMode = false;
+        client2.native.arrayMode = false;
         setImmediate(function() {
           self2.emit("_done");
         });
@@ -109340,16 +109639,16 @@ var require_query2 = __commonJS({
           console.error("This can cause conflicts and silent errors executing queries");
         }
         const values = (this.values || []).map(utils.prepareValue);
-        if (client.namedQueries[this.name]) {
-          if (this.text && client.namedQueries[this.name] !== this.text) {
+        if (client2.namedQueries[this.name]) {
+          if (this.text && client2.namedQueries[this.name] !== this.text) {
             const err = new Error(`Prepared statements must be unique - '${this.name}' was used for a different statement`);
             return after(err);
           }
-          return client.native.execute(this.name, values, after);
+          return client2.native.execute(this.name, values, after);
         }
-        return client.native.prepare(this.name, this.text, values.length, function(err) {
+        return client2.native.prepare(this.name, this.text, values.length, function(err) {
           if (err) return after(err);
-          client.namedQueries[self2.name] = self2.text;
+          client2.namedQueries[self2.name] = self2.text;
           return self2.native.execute(self2.name, values, after);
         });
       } else if (this.values) {
@@ -109358,11 +109657,11 @@ var require_query2 = __commonJS({
           return after(err);
         }
         const vals = this.values.map(utils.prepareValue);
-        client.native.query(this.text, vals, after);
+        client2.native.query(this.text, vals, after);
       } else if (this.queryMode === "extended") {
-        client.native.query(this.text, [], after);
+        client2.native.query(this.text, [], after);
       } else {
-        client.native.query(this.text, after);
+        client2.native.query(this.text, after);
       }
     };
   }
@@ -109646,7 +109945,7 @@ var require_lib5 = __commonJS({
     var utils = require_utils6();
     var Pool2 = require_pg_pool();
     var TypeOverrides2 = require_type_overrides();
-    var { DatabaseError: DatabaseError2 } = require_dist4();
+    var { DatabaseError: DatabaseError2 } = require_dist5();
     var { escapeIdentifier: escapeIdentifier2, escapeLiteral: escapeLiteral2 } = require_utils6();
     var poolFactory = (Client3) => {
       return class BoundPool extends Pool2 {
@@ -113530,21 +113829,21 @@ var require_fast_uri = __commonJS({
         normalizeString(uri, options);
       } else if (typeof uri === "object") {
         uri = /** @type {T} */
-        parse3(serialize(uri, options), options);
+        parse4(serialize(uri, options), options);
       }
       return uri;
     }
     function resolve2(baseURI, relativeURI, options) {
       const schemelessOptions = options ? Object.assign({ scheme: "null" }, options) : { scheme: "null" };
-      const resolved = resolveComponent(parse3(baseURI, schemelessOptions), parse3(relativeURI, schemelessOptions), schemelessOptions, true);
+      const resolved = resolveComponent(parse4(baseURI, schemelessOptions), parse4(relativeURI, schemelessOptions), schemelessOptions, true);
       schemelessOptions.skipEscape = true;
       return serialize(resolved, schemelessOptions);
     }
     function resolveComponent(base, relative2, options, skipNormalization) {
       const target = {};
       if (!skipNormalization) {
-        base = parse3(serialize(base, options), options);
-        relative2 = parse3(serialize(relative2, options), options);
+        base = parse4(serialize(base, options), options);
+        relative2 = parse4(serialize(relative2, options), options);
       }
       options = options || {};
       if (!options.tolerant && relative2.scheme) {
@@ -113767,7 +114066,7 @@ var require_fast_uri = __commonJS({
       }
       return { parsed, malformedAuthorityOrPort };
     }
-    function parse3(uri, opts) {
+    function parse4(uri, opts) {
       return parseWithStatus(uri, opts).parsed;
     }
     function normalizeString(uri, opts) {
@@ -113796,7 +114095,7 @@ var require_fast_uri = __commonJS({
       resolveComponent,
       equal,
       serialize,
-      parse: parse3
+      parse: parse4
     };
     module2.exports = fastUri;
     module2.exports.default = fastUri;
@@ -114636,8 +114935,8 @@ var require_multipleOf = __commonJS({
         const { gen, data, schemaCode, it: it2 } = cxt;
         const prec = it2.opts.multipleOfPrecision;
         const res = gen.let("res");
-        const invalid = prec ? (0, codegen_1._)`Math.abs(Math.round(${res}) - ${res}) > 1e-${prec}` : (0, codegen_1._)`${res} !== parseInt(${res})`;
-        cxt.fail$data((0, codegen_1._)`(${schemaCode} === 0 || (${res} = ${data}/${schemaCode}, ${invalid}))`);
+        const invalid2 = prec ? (0, codegen_1._)`Math.abs(Math.round(${res}) - ${res}) > 1e-${prec}` : (0, codegen_1._)`${res} !== parseInt(${res})`;
+        cxt.fail$data((0, codegen_1._)`(${schemaCode} === 0 || (${res} = ${data}/${schemaCode}, ${invalid2}))`);
       }
     };
     exports2.default = def;
@@ -116740,7 +117039,7 @@ var require_limit = __commonJS({
 });
 
 // node_modules/ajv-formats/dist/index.js
-var require_dist5 = __commonJS({
+var require_dist6 = __commonJS({
   "node_modules/ajv-formats/dist/index.js"(exports2, module2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
@@ -117231,7 +117530,7 @@ function withDefaults(oldDefaults, newDefaults) {
 var endpoint = withDefaults(null, DEFAULTS);
 
 // node_modules/@octokit/request/dist-bundle/index.js
-var import_fast_content_type_parse = __toESM(require_fast_content_type_parse(), 1);
+var import_content_type = __toESM(require_dist(), 1);
 
 // node_modules/json-with-bigint/json-with-bigint.js
 var intRegex = /^-?\d+$/;
@@ -117359,7 +117658,7 @@ var RequestError = class extends Error {
 };
 
 // node_modules/@octokit/request/dist-bundle/index.js
-var VERSION2 = "10.0.8";
+var VERSION2 = "10.0.13";
 var defaults_default = {
   headers: {
     "user-agent": `octokit-request.js/${VERSION2} ${getUserAgent2()}`
@@ -117477,7 +117776,7 @@ async function getResponseData(response) {
   if (!contentType) {
     return response.text().catch(noop);
   }
-  const mimetype = (0, import_fast_content_type_parse.safeParse)(contentType);
+  const mimetype = (0, import_content_type.parse)(contentType);
   if (isJSONResponse(mimetype)) {
     let text = "";
     try {
@@ -117486,7 +117785,10 @@ async function getResponseData(response) {
     } catch (err) {
       return text;
     }
-  } else if (mimetype.type.startsWith("text/") || mimetype.parameters.charset?.toLowerCase() === "utf-8") {
+  } else if (mimetype.type.startsWith("text/") || // `application/octet-stream` is the canonical "arbitrary binary" type
+  // (RFC 2046) and must never be decoded as text, even when the response
+  // carries a (misleading) `charset=utf-8` parameter — see #751.
+  mimetype.parameters.charset?.toLowerCase() === "utf-8" && mimetype.type !== "application/octet-stream") {
     return response.text().catch(noop);
   } else {
     return response.arrayBuffer().catch(
@@ -117505,9 +117807,10 @@ function toErrorMessage(data) {
   if (data instanceof ArrayBuffer) {
     return "Unknown error";
   }
-  if ("message" in data) {
-    const suffix = "documentation_url" in data ? ` - ${data.documentation_url}` : "";
-    return Array.isArray(data.errors) ? `${data.message}: ${data.errors.map((v2) => JSON.stringify(v2)).join(", ")}${suffix}` : `${data.message}${suffix}`;
+  if (typeof data === "object" && data !== null && "message" in data) {
+    const objectData = data;
+    const suffix = "documentation_url" in objectData ? ` - ${objectData.documentation_url}` : "";
+    return Array.isArray(objectData.errors) ? `${objectData.message}: ${objectData.errors.map((v2) => JSON.stringify(v2)).join(", ")}${suffix}` : `${objectData.message}${suffix}`;
   }
   return `Unknown error: ${JSON.stringify(data)}`;
 }
@@ -117565,6 +117868,9 @@ var GraphqlResponseError = class extends Error {
       Error.captureStackTrace(this, this.constructor);
     }
   }
+  request;
+  headers;
+  response;
   name = "GraphqlResponseError";
   errors;
   data;
@@ -117700,7 +118006,7 @@ var createTokenAuth = function createTokenAuth2(token) {
 };
 
 // node_modules/@octokit/core/dist-src/version.js
-var VERSION4 = "7.0.6";
+var VERSION4 = "7.0.7";
 
 // node_modules/@octokit/core/dist-src/index.js
 var noop2 = () => {
@@ -121149,6 +121455,18 @@ function range(s, end) {
   const size2 = isFinite(rawSize) && !isNaN(rawSize) ? rawSize : 0;
   return Array.from(Array(size2).keys()).map((i) => i + (void 0 !== end ? s : 0));
 }
+var hasDuplicates = (arr) => new Set(arr).size < arr.length;
+var findDuplicates = (values) => {
+  const seen = /* @__PURE__ */ new Set();
+  const duplicates = /* @__PURE__ */ new Set();
+  for (const value of values) {
+    if (seen.has(value)) {
+      duplicates.add(value);
+    }
+    seen.add(value);
+  }
+  return [...duplicates];
+};
 
 // packages/http/common/lib/HttpStatusCode.js
 var HttpStatusCode;
@@ -121682,6 +122000,28 @@ var fetchJson = async (url, options) => {
     throw e;
   }
 };
+var messageSeparator = "\n\n";
+var readServerSentEvents = async (body, onMessage) => {
+  const reader = body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        return;
+      }
+      const messages = (buffer + decoder.decode(value, { stream: true })).split(messageSeparator);
+      buffer = messages.pop() ?? "";
+      for (const message of messages) {
+        onMessage(message);
+      }
+    }
+  } finally {
+    await ignoreErrorAsync(() => reader.cancel());
+  }
+};
+var toBearer = (token) => `Bearer ${token}`;
 
 // packages/utils/node/lib/gitProviders/github.js
 var gitHubUrl = (repo) => ["https://github.com", repo.owner, `${repo.name}.git`].join("/");
@@ -122420,210 +122760,250 @@ var runMain = (main2) => {
   void runMainAsync(main2);
 };
 
-// packages/integrations/lib/deploy.js
-var import_path5 = __toESM(require("path"), 1);
-
-// packages/deployment-service/common/lib/api/replica.js
-var import_inversify2 = __toESM(require_inversify(), 1);
-
-// packages/utils/common/lib/injectable.js
-var import_inversify_binding_decorators = __toESM(require_lib2(), 1);
-var serviceId = (name) => Symbol.for(name);
-
-// packages/streamy/common/lib/api.js
-var StreamStatus;
-(function(StreamStatus2) {
-  StreamStatus2[StreamStatus2["Aborted"] = 0] = "Aborted";
-  StreamStatus2[StreamStatus2["Completed"] = 1] = "Completed";
-  StreamStatus2[StreamStatus2["Open"] = 2] = "Open";
-  StreamStatus2[StreamStatus2["NotStarted"] = 3] = "NotStarted";
-})(StreamStatus || (StreamStatus = {}));
-var defaultRpcOptions = Object.freeze({
-  timeout: duration({ seconds: 5 })
+// packages/integrations/lib/deployConfig.js
+var import_path = __toESM(require("path"), 1);
+var deploymentLinkTypes = ["dev-domain", "preview"];
+var toDeploymentLinkType = toUndefOr(toNullOr(toLiteralUnion("DeploymentLinkType", deploymentLinkTypes)));
+var toApiTokenAuthentication = toObject({
+  apiToken: toNonEmptyString
 });
-var requestId = 1;
-var nextRequestId = () => requestId++;
-
-// packages/streamy/common/lib/exceptions.js
-var Closed = class extends Exception {
+var toPasswordAuthentication = toObject({
+  email: toNonEmptyString,
+  password: toNonEmptyString
+});
+var toConfiguredAuthentication = toOr(toApiTokenAuthentication, toPasswordAuthentication);
+var toAuthentication = (input) => rethrow(() => toConfiguredAuthentication(input), [
+  TypeConversionFailure,
+  () => new InvalidArgument3("No Codesphere credentials configured. Set an API token (recommended) or an email and a password.")
+]);
+var logStatusReporter = () => ({
+  setPending: async () => logI("Deployment pending."),
+  setStarted: async () => logI("Deployment started."),
+  setFailed: async () => logE("Deployment failed."),
+  setDeployed: async (environmentUrl2, msg) => logI(`Deployment successful. ${msg ?? ""} ${environmentUrl2}`),
+  setInactive: async () => logI("Deployment inactive."),
+  delete: async () => logI("Deployment deleted.")
+});
+var workspaceName = (repoName, prNumber) => `${repoName}-#${prNumber}`;
+var codesphereWorkspaceUrl = (apiUrl, w) => {
+  return new URL(import_path.default.posix.join(apiUrl.pathname, `/ide/teams/${w.teamId}/workspaces/${w.id}`), apiUrl);
 };
-var RpcException = class extends Exception {
+var codespherePreviewUrl = (apiUrl, w) => {
+  const wsUrl = codesphereWorkspaceUrl(apiUrl, w);
+  return new URL(`${wsUrl.pathname}/preview`, wsUrl);
 };
-var RpcThrew = class extends RpcException {
-};
-var RpcTimedOut = class extends RpcException {
-};
-var StreamClosed = class extends Exception {
-  constructor(id, method, recvStatus, sendStatus, reason, cause) {
-    super([
-      `stream id=${id}, method=${method},`,
-      ` recv status=${StreamStatus[recvStatus]},`,
-      ` send status=${StreamStatus[sendStatus]}`,
-      `: ${reason}`
-    ].join(""));
-    this.id = id;
-    this.method = method;
-    this.recvStatus = recvStatus;
-    this.sendStatus = sendStatus;
-    this.reason = reason;
-    this.cause = cause;
-  }
-  get wasNormal() {
-    return StreamStatus.Completed === this.recvStatus && StreamStatus.Completed === this.sendStatus;
-  }
-  isFor(stream2) {
-    return this.id === stream2.id;
-  }
-};
-
-// packages/streamy/common/lib/spec.js
-var rpc = (spec) => ({ ...spec, kind: "rpc" });
-var stream = (spec) => ({ ...spec, kind: "stream" });
-var BaseStub = class {
-  constructor(client) {
-    this.client = client;
-  }
-  setContext(context4) {
-    this.context = context4;
-  }
-};
-var createStubSubClass = ({ spec, base, call, stream: stream2 }) => {
-  class Klass extends base {
-  }
-  const p = Klass.prototype;
-  for (const [name, m] of Object.entries(spec.methods)) {
-    switch (m.kind) {
-      case "rpc":
-        p[name] = async function(req, opts) {
-          const finalOpts = m.defaultOptions || opts ? { ...m.defaultOptions, ...opts } : void 0;
-          return call({
-            stub: this,
-            client: this.client,
-            context: () => this.context,
-            methodName: name,
-            methodSpec: m,
-            reqData: req,
-            finalOpts
-          });
-        };
-        break;
-      case "stream":
-        p[name] = async function() {
-          return stream2({
-            stub: this,
-            client: this.client,
-            context: () => this.context,
-            methodName: name,
-            methodSpec: m
-          });
-        };
-        break;
+var isProviderSupportedBy = (repo, providers) => {
+  const repoUrl = new URL(repo.url);
+  repoUrl.username = "";
+  repoUrl.password = "";
+  return providers.some((provider) => {
+    const p = new URL(provider.url);
+    if (repoUrl.hostname === p.hostname && repoUrl.pathname.startsWith(p.pathname)) {
+      return true;
     }
-  }
-  return Klass;
+  });
 };
+var findPlan = (plans, planTitle, onDemand = false) => {
+  const availablePlans = plans.filter((p) => !p.deprecated && p.characteristics.onDemand === onDemand);
+  const planByName = availablePlans.find((p) => p.title === planTitle);
+  if (has(planTitle) && !has(planByName)) {
+    throw new InvalidArgument3(`Unknown plan ${planTitle}. Available plans: ${planTitles(availablePlans)}`);
+  }
+  if (planByName) {
+    return planByName;
+  }
+  const smallestPlan = availablePlans.reduce((smallest, current) => !has(smallest) || current.characteristics.CPU < smallest.characteristics.CPU ? current : smallest, void 0);
+  if (!has(smallestPlan)) {
+    throw new InvalidArgument3(`No plan to deploy to. Available plans: ${planTitles(plans)}`);
+  }
+  return smallestPlan;
+};
+var planTitles = (plans) => plans.map((p) => p.title).join(", ");
 
-// packages/streamy/common/lib/extensions/spec.js
-var refreshTokenContainer = {
-  refreshToken: readOnly(toString)
-};
-var toRefreshTokenContainer = toObject(refreshTokenContainer);
-var accessTokenContainer = {
-  accessToken: readOnly(toString)
-};
-var toAccessTokenContainer = toObject(accessTokenContainer);
-var toCredentials = toObject({
-  ...refreshTokenContainer,
-  ...accessTokenContainer
-});
-var AuthnStub = class extends BaseStub {
-  async authenticate(creds) {
-    this.context = {
-      requestHeaders: {
-        Authorization: `Bearer ${creds.accessToken}`
-      },
-      responseHeaders: {},
-      httpStatusCode: 200
-    };
-  }
-  setRefreshTokenOpts(refreshTokenOpts) {
-    this.refreshTokenOpts = refreshTokenOpts;
+// packages/integrations/lib/pipeline.js
+var processCleanupWaitTime = duration({ seconds: 15 });
+var PipelineStageFailed = class extends Exception {
+  constructor(stage) {
+    super(`Pipeline stage ${stage} failed.`);
   }
 };
-var isTokenExpired = (e, expiredException) => {
-  if (e instanceof expiredException) {
-    return true;
+var PipelineStageAborted = class extends Exception {
+  constructor(stage) {
+    super(`Pipeline stage ${stage} aborted.`);
   }
-  if (e instanceof StreamClosed && e.cause instanceof expiredException) {
-    return true;
-  }
-  return false;
 };
-var callAndMaybeRefreshToken = async (f, refreshOpts) => {
-  const refreshTokenOpts = refreshOpts();
-  if (!refreshTokenOpts) {
-    return f();
+var runWorkspacePipeline = async (api, workspaceId, profile) => {
+  logI("Running Pipeline");
+  await runPipelineStage(api, workspaceId, "prepare", "success", profile);
+  await runPipelineStage(api, workspaceId, "run", void 0, profile);
+};
+var runPipelineStage = async (api, workspaceId, stage, targetState, profile) => {
+  logI(`Running pipeline stage "${stage}" with ${profile} profile.`);
+  const before = await api.pipelineStatus(workspaceId, stage);
+  await api.stopPipelineStage(workspaceId, stage);
+  await wait(processCleanupWaitTime);
+  await api.startPipelineStage(workspaceId, stage, profile);
+  if (!targetState) {
+    logI(`Started ${stage} stage.`);
+    return;
   }
+  logI(`Waiting for stage "${stage}" to be in ${targetState}.`);
+  await waitForStageSuccess(api, workspaceId, stage, before);
+  logI(`Stage "${stage}" successfully finished.`);
+};
+var waitForStageSuccess = async (api, workspaceId, stage, before) => {
+  const logs = new PipelineLogs(api, workspaceId, stage);
   try {
-    return await f();
-  } catch (e) {
-    if (isTokenExpired(e, refreshTokenOpts.expiredException)) {
-      const creds = await refreshTokenOpts.refreshToken();
-      await refreshTokenOpts.authenticate(creds);
-      logD("AutnStub: Refreshed access token. Now retrying call.");
-      return f();
-    }
-    throw e;
+    await retryWithBackoff(async () => {
+      const infos = (await api.pipelineStatus(workspaceId, stage)).filter((i) => isCurrentExecution(i, before));
+      if (!infos.length) {
+        logD(`Waiting for stage "${stage}" to start.`);
+        return false;
+      }
+      logs.follow(infos);
+      if (infos.some((i) => "failure" === i.state)) {
+        throw new PipelineStageFailed(stage);
+      }
+      if (infos.some((i) => "aborted" === i.state)) {
+        throw new PipelineStageAborted(stage);
+      }
+      if (infos.every((i) => "success" === i.state)) {
+        return true;
+      }
+      logD(`Waiting for stage "${stage}" to finish. Stage is in state: ${infos.map((i) => i.state)}.`);
+      return false;
+    }, {
+      initialWait: duration({ seconds: 1 }),
+      factor: 1.2,
+      maxWait: duration({ seconds: 15 }),
+      timeout: duration({ hours: 1 }),
+      errMessage: `Waiting for pipeline stage "${stage}"`
+    });
+  } finally {
+    await logErrorAsync(() => logs.close());
   }
 };
-var createAuthnStubSubClass = (spec, base) => createStubSubClass({
-  spec,
-  base,
-  call: async ({ stub, client, context: context4, methodSpec, methodName, reqData: data, finalOpts }) => callAndMaybeRefreshToken(async () => methodSpec.response(await client.call({
-    service: spec.name,
-    method: methodName,
-    data,
-    context: context4(),
-    opts: finalOpts
-  })), () => !!stub.refreshTokenOpts ? {
-    ...stub.refreshTokenOpts,
-    authenticate: stub.authenticate.bind(stub)
-  } : void 0),
-  stream: ({ stub, client, context: context4, methodSpec, methodName }) => callAndMaybeRefreshToken(() => client.stream({
-    service: spec.name,
-    method: methodName,
-    toQuery: methodSpec.request,
-    toResponse: methodSpec.response,
-    context: context4()
-  }), () => !!stub.refreshTokenOpts ? {
-    ...stub.refreshTokenOpts,
-    authenticate: stub.authenticate.bind(stub)
-  } : void 0)
-});
-var createAuthnStubClass = (name, spec) => {
-  const klass = createAuthnStubSubClass(spec, AuthnStub);
-  klass.ID = serviceId(name);
-  return klass;
+var isCurrentExecution = (info, before) => {
+  const previous = before.find((i) => i.replica === info.replica);
+  return has(info.startedAt) && previous?.startedAt?.getTime() !== info.startedAt.getTime();
+};
+var PipelineLogs = class {
+  constructor(api, workspaceId, stage) {
+    this.api = api;
+    this.workspaceId = workspaceId;
+    this.stage = stage;
+    this.streams = /* @__PURE__ */ new Map();
+  }
+  follow(infos) {
+    infos.forEach((info) => range(info.steps.length).forEach((step) => {
+      const replica = "run" === this.stage ? info.replica : void 0;
+      const key = `${replica ?? ""}:${step}`;
+      if (this.streams.has(key)) {
+        return;
+      }
+      const label = has(replica) ? `${this.stage}[${step}] ${info.server}` : `${this.stage}[${step}]`;
+      this.streams.set(key, this.api.logs({
+        workspaceId: this.workspaceId,
+        stage: this.stage,
+        step,
+        replica
+      }, (entries) => entries.forEach((e) => logI(`[Pipeline ${label}] ${e.data}`))));
+    }));
+  }
+  async close() {
+    const streams = [...this.streams.values()];
+    await ignoreErrorAsync(() => throwOnTimeout({
+      label: `Logs of stage ${this.stage}`,
+      timeoutMs: duration({ seconds: 30 }).asMilliseconds(),
+      promise: allThrowRejected(streams.map((s) => s.done))
+    }));
+    await mapAsync(streams, (s) => s.close());
+    this.streams.clear();
+  }
 };
 
-// packages/streamy/common/lib/extensions/typing.js
-var toStringOrArray = toOr(toString, toArray(toString));
-var toHeaders = toRecord(toUndefOr(toStringOrArray));
-var httpContext = {
-  requestHeaders: toHeaders,
-  responseHeaders: toRecord(toOr(toStringOrArray, toNumber)),
-  httpStatusCode: toNumericEnum("HttpStatusCode", HttpStatusCode)
+// packages/http/common/lib/HttpMethod.js
+var HttpMethod;
+(function(HttpMethod2) {
+  HttpMethod2["Connect"] = "connect";
+  HttpMethod2["Delete"] = "delete";
+  HttpMethod2["Get"] = "get";
+  HttpMethod2["Head"] = "head";
+  HttpMethod2["Options"] = "options";
+  HttpMethod2["Patch"] = "patch";
+  HttpMethod2["Post"] = "post";
+  HttpMethod2["Put"] = "put";
+})(HttpMethod || (HttpMethod = {}));
+
+// packages/utils/common/lib/url.js
+var devDomainRegex = /^(?:ide-|preview-)?(?<wsId>\d+)(?:-(?<port>\d+))?(?<server>-[a-z0-9-]*)?\./;
+var csInCsDomains = [
+  ".dev.5.codesphere.com",
+  ".cloud.codesphere.com",
+  ".2.codesphere.com",
+  ".dev-codesphere.com"
+];
+var isWorkspaceDomainWithWsId = (host) => {
+  const hostname = host.split(":")[0];
+  return devDomainRegex.test(hostname) && csInCsDomains.some((d) => hostname.endsWith(d));
 };
-var toHttpContext = (x2) => {
-  const ctx = asObjectNoCopy(httpContext)(x2);
-  for (const [k2, v2] of Object.entries(ctx.requestHeaders)) {
-    ctx.requestHeaders[k2.toLocaleLowerCase()] = v2;
+var isLocalHost = (host) => host.split(":")[0] === "localhost" || host.split(":")[0] === "127.0.0.1";
+var isDevHost = (host) => [
+  ".dev.codesphere.com",
+  "3.codesphere.com",
+  "5.codesphere.com",
+  ".dev-codesphere.com"
+].some((s) => host.endsWith(s));
+var isQaHost = (host) => host.endsWith("qa.dev-codesphere.com");
+var createBaseUrl = (protocol, host, dc) => {
+  if (host.includes("://")) {
+    throw new InvalidArgument3("Host should not contain protocol.");
   }
-  for (const [k2, v2] of Object.entries(ctx.responseHeaders)) {
-    ctx.responseHeaders[k2.toLocaleLowerCase()] = v2;
-  }
-  return ctx;
+  const p = isLocalHost(host) ? protocol : `${protocol}s`;
+  const prefix = !has(dc) || isLocalHost(host) || host.startsWith(`${dc}.`) || isWorkspaceDomainWithWsId(host) ? "" : `${dc}${isDevHost(host) && !isQaHost(host) ? "-" : "."}`;
+  return new URL(`${p}://${prefix}${host}`);
 };
+var createServiceUrl = (protocol, host, servicePath, dc) => {
+  const u = createBaseUrl(protocol, host, dc);
+  u.pathname = servicePath;
+  return u;
+};
+var getHeader = (headers, name) => {
+  const lowerName = name.toLowerCase();
+  for (const [key, value] of Object.entries(headers)) {
+    if (key.toLowerCase() === lowerName) {
+      return value;
+    }
+  }
+  return void 0;
+};
+var joinPath = (...segments) => {
+  return [
+    segments[0] === "/" ? "" : segments[0],
+    ...segments.slice(1).map((s) => trimPrefix(s, "/"))
+  ].join("/");
+};
+var toHttpUrl = (url) => {
+  const u = new URL(url);
+  if (!["http:", "https:", "ws:", "wss:"].includes(u.protocol)) {
+    throw new TypeError(`Can only convert ws and wss not ${u.protocol}`);
+  }
+  if (u.protocol === "ws:") {
+    u.protocol = "http:";
+  }
+  if (u.protocol === "wss:") {
+    u.protocol = "https:";
+  }
+  return u;
+};
+
+// packages/workspace-agent/common/lib/pipeline/logging.js
+var toLogKind = toLiteralUnion("kind", ["E", "I"]);
+var toLogEntry = toObject({
+  timestamp: toDate,
+  kind: toLogKind,
+  data: toString
+});
 
 // packages/utils/common/lib/keys.js
 var keys = Object.keys;
@@ -122930,6 +123310,1212 @@ var planMap = {
   [PlanId.Gpu]: gpuPlan
 };
 
+// packages/utils/common/lib/flags.js
+var MAINTENANCE_MODE_INTERNAL_FLAG_NAME = "maintenance-mode";
+var AVAILABLE_INTERNAL_FLAGS = [
+  "cimg-private-registry",
+  "cluster-admin",
+  "coco-secrets",
+  "custom-service-image",
+  "gateway-domains",
+  "gpu-plan",
+  "headless-services",
+  "hermetic",
+  MAINTENANCE_MODE_INTERNAL_FLAG_NAME,
+  "merged-sync-run",
+  "ms-in-ls",
+  "msd",
+  "native-deploy",
+  "o11y",
+  "openfga-authz-primary",
+  "overview-cockpit",
+  "overview-react",
+  "persistent-logs",
+  "persistent-nix",
+  "recaptcha-v3",
+  "selectable-resources",
+  "single-workspace-mode",
+  "team-container-registries",
+  "time-sameDc",
+  "vcluster",
+  "virtual-machines",
+  "vpn"
+];
+var availableInternalFlags = [...AVAILABLE_INTERNAL_FLAGS];
+var AVAILABLE_PREVIEW_FLAGS = [
+  "openfga-authz",
+  "preview-comments",
+  "privileged-ports",
+  "secret-management",
+  "sub-path-mount",
+  "tcp-udp",
+  "workspace-ssh"
+];
+var availablePreviewFlags = [...AVAILABLE_PREVIEW_FLAGS];
+var AVAILABLE_FEATURES = [
+  "avatar-upload",
+  "billing",
+  "dev-domains-port",
+  "email-signin",
+  "email-signup",
+  "run-as-root-insecure",
+  "standalone-teams"
+];
+var availableFeatures = [...AVAILABLE_FEATURES];
+var allAvailableFlags = [
+  ...AVAILABLE_INTERNAL_FLAGS,
+  ...AVAILABLE_PREVIEW_FLAGS,
+  ...AVAILABLE_FEATURES
+];
+var toInternalFlagName = toLiteralUnion("InternalFlagName", availableInternalFlags);
+var toPreviewFlagName = toLiteralUnion("PreviewFlagName", availablePreviewFlags);
+var toFlagName = toLiteralUnion("FlagName", allAvailableFlags);
+var toFeatureName = toLiteralUnion("FeatureName", availableFeatures);
+var toFlags = toObject({
+  internal: toObject({
+    available: toReadOnly(toArray(toInternalFlagName)),
+    enabled: toReadOnly(toArray(toInternalFlagName))
+  }),
+  preview: toObject({
+    available: toReadOnly(toArray(toPreviewFlagName)),
+    enabled: toReadOnly(toArray(toPreviewFlagName))
+  }),
+  features: toObject({
+    available: toReadOnly(toArray(toFeatureName)),
+    enabled: toReadOnly(toArray(toFeatureName))
+  })
+});
+var enabledFlags;
+var isEnabled = (name) => {
+  if (!enabledFlags) {
+    throw new Uninitialized("initFlags() was not called");
+  }
+  return enabledFlags.has(name);
+};
+var allEnabled = () => {
+  if (!enabledFlags) {
+    throw new Uninitialized("initFlags() was not called");
+  }
+  const enabledFlagList = [...enabledFlags];
+  const enabledInternal = enabledFlagList.filter((x2) => availableInternalFlags.includes(x2));
+  const enabledPreview = enabledFlagList.filter((x2) => availablePreviewFlags.includes(x2));
+  const featureFlags = enabledFlagList.filter((x2) => availableFeatures.includes(x2));
+  return {
+    internal: {
+      available: Object.freeze([...availableInternalFlags]),
+      enabled: Object.freeze(enabledInternal)
+    },
+    preview: {
+      available: Object.freeze([...availablePreviewFlags]),
+      enabled: Object.freeze(enabledPreview)
+    },
+    features: {
+      available: Object.freeze([...availableFeatures]),
+      enabled: Object.freeze(featureFlags)
+    }
+  };
+};
+var splitInternalConfig = (internal) => {
+  const knownInternal = internal.filter((x2) => availableInternalFlags.includes(x2));
+  const knownPreview = internal.filter((x2) => availablePreviewFlags.includes(x2));
+  const knownFeatures = internal.filter((x2) => availableFeatures.includes(x2));
+  const unknown = internal.filter((x2) => !availableInternalFlags.includes(x2) && !availablePreviewFlags.includes(x2) && !availableFeatures.includes(x2));
+  return {
+    unknown,
+    knownInternal,
+    knownPreview,
+    knownFeatures
+  };
+};
+var splitPreviewConfig = (preview) => {
+  const knownPreview = preview.filter((x2) => availablePreviewFlags.includes(x2));
+  const knownFeatures = preview.filter((x2) => availableFeatures.includes(x2));
+  const unknown = preview.filter((x2) => !availablePreviewFlags.includes(x2) && !availableFeatures.includes(x2));
+  return {
+    unknown,
+    knownPreview,
+    knownFeatures
+  };
+};
+var setEnabledFlags = ({ internal, preview, features }) => {
+  const { unknown, knownInternal, knownPreview: knownPreviewFromInternal, knownFeatures: knownFeaturesFromInternal } = splitInternalConfig(internal ?? []);
+  if (0 !== unknown.length) {
+    logW(jj`unknown internal flags provided: ${unknown}`);
+  }
+  if (0 !== knownPreviewFromInternal.length) {
+    logW(jj`preview flags provided in internal config, please move to preview: ${knownPreviewFromInternal}`);
+  }
+  if (0 !== knownFeaturesFromInternal.length) {
+    logW(jj`feature flags provided in internal config, please move to features: ${knownFeaturesFromInternal}`);
+  }
+  const { unknown: unknownPreview, knownPreview, knownFeatures: knownFeaturesFromPreview } = splitPreviewConfig(preview ?? []);
+  if (0 !== unknownPreview.length) {
+    logW(jj`unknown preview flags provided: ${unknownPreview}`);
+  }
+  if (0 !== knownFeaturesFromPreview.length) {
+    logW(jj`feature flags provided in preview config, please move to features: ${knownFeaturesFromPreview}`);
+  }
+  const [unknownFeatures, knownFeatures] = filterSplit(features ?? [], (x2) => availableFeatures.includes(x2));
+  if (0 !== unknownFeatures.length) {
+    logW(jj`unknown features provided: ${unknownFeatures}`);
+  }
+  const currentFlags = [...enabledFlags?.values() ?? []];
+  const keptInternal = internal === void 0 ? currentFlags.filter((x2) => availableInternalFlags.includes(x2)) : [];
+  const keptPreview = preview === void 0 ? currentFlags.filter((x2) => availablePreviewFlags.includes(x2)) : [];
+  const keptFeatures = features === void 0 ? currentFlags.filter((x2) => availableFeatures.includes(x2)) : [];
+  enabledFlags = /* @__PURE__ */ new Set([
+    ...keptInternal,
+    ...keptPreview,
+    ...keptFeatures,
+    ...knownInternal,
+    ...knownPreviewFromInternal,
+    ...knownPreview,
+    ...knownFeaturesFromInternal,
+    ...knownFeaturesFromPreview,
+    ...knownFeatures
+  ]);
+  return allEnabled();
+};
+
+// packages/utils/common/lib/features.js
+var toFeatures = toObject({
+  available: toReadOnly(toArray(toFeatureName)),
+  enabled: toReadOnly(toArray(toFeatureName))
+});
+var isFeatureEnabled = (name) => {
+  return isEnabled(name);
+};
+var initFeatures = (features = []) => {
+  const result = setEnabledFlags({ features });
+  return {
+    available: result.features.available,
+    enabled: result.features.enabled
+  };
+};
+
+// packages/utils/common/lib/path.js
+var import_path2 = require("path");
+var POSIX_PATH_REGEX = new RegExp("^/?(?:[^/\0]+/?)*$");
+var toPosixPath2 = (p) => {
+  const s = toString(p);
+  if (!POSIX_PATH_REGEX.test(s)) {
+    throw new TypeConversionFailure("POSIX path", p);
+  }
+  return s;
+};
+var toPathWithoutTraversal = (p) => {
+  const s = toPosixPath2(p);
+  if (s.split(import_path2.sep).includes("..")) {
+    throw new TypeConversionFailure("path without ..", p);
+  }
+  return s;
+};
+
+// packages/utils/common/lib/typing/semver.js
+var import_semver2 = __toESM(require_semver2(), 1);
+var toSemVer = (x2) => {
+  let s;
+  try {
+    s = (0, import_semver2.parse)(toString(x2), false, true).toString();
+  } catch (e) {
+    throw new TypeConversionFailure("semver", x2, void 0, {
+      cause: e
+    });
+  }
+  if (s !== x2) {
+    throw new TypeConversionFailure("semver", x2, void 0, {
+      cause: new AmbiguousArgument(`Parser would have produced: ${s}`)
+    });
+  }
+  return s;
+};
+
+// packages/utils/common/lib/typing/url.js
+var prepareUrlPathRegex = () => {
+  const unReservedCharsGroup = "-._~a-zA-Z0-9";
+  const subDelims = "!$&'()*+,;=";
+  const other = ":@";
+  const pathDelimiter = "/";
+  const singleCharsClass = [
+    "[",
+    unReservedCharsGroup,
+    subDelims,
+    other,
+    pathDelimiter,
+    "]"
+  ].join("");
+  const regexp = [
+    "^\\/",
+    "(?:",
+    singleCharsClass,
+    "|",
+    "%[0-9A-F]{2}",
+    ")*$"
+  ].join("");
+  return new RegExp(regexp);
+};
+var validUrlPathRegex = prepareUrlPathRegex();
+var toUrlPath = toStringMatchingRegex("UrlPath", validUrlPathRegex);
+var prepareFullUrlRegex = () => {
+  const unReservedCharsGroup = "-._~a-zA-Z0-9";
+  const subDelims = "!$&'()*+,;=";
+  const other = ":@";
+  const dot = "\\.";
+  const labelInner = `[a-zA-Z0-9-]`;
+  const labelEdge = `[a-zA-Z0-9]`;
+  const label = `${labelEdge}(?:${labelInner}*${labelEdge})?`;
+  const pathSegmentCharsClass = [
+    "[",
+    unReservedCharsGroup,
+    subDelims,
+    other,
+    ".?]"
+  ].join("");
+  const knownProtocols = "https?|ftps?|wss?";
+  const regexp = [
+    `^(?:${knownProtocols})://`,
+    `${label}`,
+    `(?:${dot}${label})*`,
+    "(?::\\d+)?",
+    `(?:/(?:${pathSegmentCharsClass}+(?:/${pathSegmentCharsClass}+)*/?)?)?`,
+    "$"
+  ].join("");
+  return new RegExp(regexp);
+};
+var validFullUrlRegex = prepareFullUrlRegex();
+var toFullUrlByRegex = toStringMatchingRegex("FullUrl", validFullUrlRegex);
+var toFullUrl = (x2) => {
+  try {
+    const url = new URL(toFullUrlByRegex(x2));
+    return toString(x2);
+  } catch {
+    throw new TypeConversionFailure("URL string", x2);
+  }
+};
+
+// packages/workspace-agent/common/lib/pipeline/deployStageV03Validation.js
+var validateDeployStageV03 = (stage) => {
+  const routers = Object.entries(stage).filter(([name, service]) => isRouterService(service));
+  if (routers.length > 1) {
+    throw invalid(routers, `Landscape must configure at most one router service, found ${routers.length}: ${routers.map(([name]) => name).join(", ")}.`);
+  }
+  const servers = Object.entries(stage).filter(([name, service]) => isDeployStageServerV02(service));
+  for (const [name, service] of servers) {
+    validateUniquePorts(name, service);
+  }
+  validateAtMostOneLandscapeGateway(stage);
+  for (const [name, service] of servers) {
+    validateLandscapeGatewayHttpPort(name, service);
+  }
+  if (has(routers[0])) {
+    const [name, router] = routers[0];
+    validateRouterPaths(stage, name, router);
+  }
+};
+var validateUniquePorts = (name, service) => {
+  const duplicates = findDuplicates(service.network.ports);
+  if (hasDuplicates(service.network.ports)) {
+    throw invalid(service, `Service '${name}' must not configure the same port more than once, but port(s) ${duplicates.join(", ")} are duplicated.`);
+  }
+};
+var validateAtMostOneLandscapeGateway = (deployStage) => {
+  const gatewayNames = Object.entries(deployStage).filter(([_2, service]) => isDeployStageServerV02(service) && has(service.network.landscapeGateway) || isRouterService(service) && service.network.isLandscapeGateway).map(([name, _2]) => name);
+  if (gatewayNames.length > 1) {
+    throw invalid(gatewayNames, `Landscape must configure at most one landscape gateway, found ${gatewayNames.length}: ${gatewayNames.join(", ")}.`);
+  }
+};
+var validateLandscapeGatewayHttpPort = (name, service) => {
+  const { landscapeGateway, ports } = service.network;
+  if (!has(landscapeGateway)) {
+    return;
+  }
+  if (!ports.includes(landscapeGateway.httpPort)) {
+    throw invalid(service, `Service '${name}' is configured as the landscape gateway with httpPort ${landscapeGateway.httpPort}, which is not one of its configured ports (${ports.join(", ")}).`);
+  }
+};
+var validateRouterPaths = (stage, routerName, router) => {
+  const paths = router.network.paths ?? [];
+  const externalTargets = router.network.externalTargets ?? [];
+  const duplicatePaths = findDuplicates([
+    ...paths.map(({ path: path2 }) => path2),
+    ...externalTargets.map(({ path: path2 }) => path2)
+  ]);
+  if (duplicatePaths.length > 0) {
+    throw invalid([...paths, ...externalTargets], `Router service '${routerName}' must not configure the same path more than once, but path(s) ${duplicatePaths.join(", ")} are duplicated.`);
+  }
+  for (const path2 of paths) {
+    const target = stage[path2.service];
+    if (void 0 === target) {
+      throw invalid(path2, `Router service '${routerName}' has a path '${path2.path}' that refers to service '${path2.service}', but no such service is configured.`);
+    }
+    if (!isDeployStageServerV02(target) || !target.network.ports.includes(path2.port)) {
+      throw invalid(path2, `Router service '${routerName}' has a path '${path2.path}' that refers to port ${path2.port} of service '${path2.service}', but that service does not configure this port.`);
+    }
+  }
+};
+var invalid = (value, message) => new TypeConversionFailure("DeployStageV03", value, void 0, {
+  customErrorMessage: message
+});
+
+// packages/workspace-agent/common/lib/pipeline/execution.js
+var import_path3 = require("path");
+var CODESPHERE_INTERNAL_DIR = ".codesphere-internal";
+var INTERNAL_CI_CONFIGS_DIR = (0, import_path3.join)(CODESPHERE_INTERNAL_DIR, "ci-configs");
+var STATIC_BUILD_CONFIG_DIR = (0, import_path3.join)(INTERNAL_CI_CONFIGS_DIR, "static-build");
+
+// packages/workspace-agent/common/lib/pipeline/types.js
+var singleRunningStageKinds = ["prepare", "test"];
+var multiRunningStageKinds = ["run"];
+var stageKinds = [
+  ...singleRunningStageKinds,
+  ...multiRunningStageKinds
+];
+var toStageKind = toLiteralUnion("stageKind", stageKinds);
+var toStep = toObject({
+  name: toUndefOr(toString),
+  command: toString
+});
+var toUrl = (x2) => {
+  if (x2 instanceof URL) {
+    return x2;
+  }
+  try {
+    return new URL(toString(x2));
+  } catch {
+    throw new TypeConversionFailure("URL string", x2);
+  }
+};
+var toStage = toObject({
+  steps: toArray(toStep),
+  healthEndpoint: toUndefOr(toUrl)
+});
+var toBuildService = toObject({
+  context: toUndefOr(toNonEmptyString),
+  copy: toUndefOr(toRecord(toNonEmptyString)),
+  steps: toUndefOr(toArray(toStep))
+});
+var toBuildStage = toRecord(toBuildService);
+var toEnvValue = toOr(toString, toNumber);
+var toEnv = toRecord(toEnvValue);
+var toSimpleNetworkConfig = toObject({
+  path: toUrlPath,
+  stripPath: toUndefOr(toBoolean)
+});
+var toPortConfig = toObject({
+  port: toPositiveInteger,
+  isPublic: toBoolean
+});
+var toPathConfig = toObject({
+  port: toPositiveInteger,
+  path: toUrlPath,
+  stripPath: toUndefOr(toBoolean)
+});
+var toLandscapeGatewayConfig = toObject({
+  httpPort: toPositiveInteger
+});
+var toRoutedNetworkConfig = toObject({
+  ports: toNonEmptyArray(toPortConfig),
+  paths: toArray(toPathConfig),
+  landscapeGateway: toUndef
+});
+var toLandscapeGatewayNetworkConfig = toObject({
+  ports: toNonEmptyArray(toPortConfig),
+  landscapeGateway: toLandscapeGatewayConfig
+});
+var toAdvancedNetworkConfig = toOr(toRoutedNetworkConfig, toLandscapeGatewayNetworkConfig);
+var toNetworkConfig = toOr(toSimpleNetworkConfig, toAdvancedNetworkConfig);
+var MAX_USER_GROUP_ID = 2 ** 31 - 1;
+var toUserGroupId = ({ forceAllowRoot = false } = {}) => toRestrictedNumber("toUserGroupId", (n7) => {
+  const allowRoot = forceAllowRoot || isFeatureEnabled("run-as-root-insecure");
+  return n7 >= (allowRoot ? 0 : 1) && n7 <= MAX_USER_GROUP_ID;
+});
+var toVolumeMounts = toArray(toObject({
+  name: toLiteral("_workspace"),
+  mountPath: toString,
+  workspacePath: toPathWithoutTraversal
+}));
+var toDeployStageServerCommonFields = {
+  healthEndpoint: toUndefOr(toUrl),
+  plan: toUndefOr(toPlanId),
+  replicas: toUndefOr(toPositiveInteger),
+  isPublic: toUndefOr(toBoolean),
+  network: toUndefOr(toNetworkConfig),
+  env: toUndefOr(toEnv),
+  runAsUser: toUndefOr(toUserGroupId({ forceAllowRoot: true })),
+  runAsGroup: toUndefOr(toUserGroupId({ forceAllowRoot: true })),
+  volumeMounts: toUndefOr(toVolumeMounts)
+};
+var deployStageServerReactiveFields = {
+  ...toDeployStageServerCommonFields,
+  steps: toArray(toStep),
+  image: toUndefOr(toNonEmptyString)
+};
+var toDeployStageServerReactive = toObject(deployStageServerReactiveFields);
+var deployStageServerContainerRuntimeFields = {
+  ...toDeployStageServerCommonFields,
+  steps: toUndef,
+  image: toNonEmptyString,
+  command: toUndefOr(toArray(toString))
+};
+var toDeployStageServerContainerRuntime = toObject(deployStageServerContainerRuntimeFields);
+var toDeployStageServer = toOr(toDeployStageServerReactive, toDeployStageServerContainerRuntime);
+var isDeployStageServer = (x2) => isOfType(x2, toDeployStageServer);
+var toManagedServiceConfigV01 = toObject({
+  provider: toObject({
+    name: toString,
+    version: toString
+  }),
+  plan: toObject({
+    id: toNonNegativeInteger,
+    parameters: toRecord(toInteger)
+  }),
+  config: toRecord(toUnknown),
+  secrets: toRecord(toUnknown)
+});
+var toManagedServiceConfigFieldsV02 = {
+  provider: toObject({
+    name: toString,
+    schemaVersion: toString
+  }),
+  plan: toObject({
+    id: toNonNegativeInteger,
+    parameters: toRecord(toInteger)
+  }),
+  config: toRecord(toUnknown),
+  secrets: toRecord(toUnknown),
+  version: toUndefOr(toSemVer)
+};
+var toManagedServiceConfigV02 = toObject(toManagedServiceConfigFieldsV02);
+var toManagedServiceConfigFieldsLatest = toManagedServiceConfigFieldsV02;
+var toManagedServiceConfigLatest = toObject(toManagedServiceConfigFieldsLatest);
+var toManagedServiceConfig = toOr(toManagedServiceConfigV01, toManagedServiceConfigV02);
+var toHeadlessPath = toObject({
+  path: toUrlPath,
+  stripPath: toBoolean,
+  target: toString
+});
+var toHeadlessServiceConfig = toObject({
+  network: toObject({
+    paths: toArray(toHeadlessPath)
+  })
+});
+var toVirtualMachineConfig = toObject({
+  cpu: toPositiveNumber,
+  diskImageUrl: toNonEmptyString,
+  memoryGib: toPositiveNumber,
+  storageGib: toPositiveNumber,
+  cloudInitUserDataBase64: toUndefOr(toString)
+});
+var toRouterPath = toObject({
+  path: toUrlPath,
+  stripPath: toBoolean,
+  service: toString,
+  port: toNumber
+});
+var toRouterService = toObject({
+  type: toLiteral("router"),
+  plan: toUndefOr(toPlanId),
+  replicaCount: toPositiveInteger,
+  network: toObject({
+    isLandscapeGateway: toUndefOr(toBoolean),
+    paths: toUndefOr(toArray(toRouterPath)),
+    externalTargets: toUndefOr(toArray(toHeadlessPath))
+  })
+});
+var isRouterService = (x2) => isOfType(x2, toRouterService);
+var toDeployStageServerNetworkV02 = toObject({
+  ports: toNonEmptyArray(toPositiveInteger),
+  landscapeGateway: toUndefOr(toLandscapeGatewayConfig)
+});
+var toDeployStageServerReactiveV02 = toObject({
+  ...deployStageServerReactiveFields,
+  network: toDeployStageServerNetworkV02
+});
+var toDeployStageServerContainerRuntimeV02 = toObject({
+  ...deployStageServerContainerRuntimeFields,
+  network: toDeployStageServerNetworkV02
+});
+var toDeployStageServerV02 = toOr(toDeployStageServerReactiveV02, toDeployStageServerContainerRuntimeV02);
+var isDeployStageServerV02 = (x2) => isOfType(x2, toDeployStageServerV02);
+var toDeployStageV01 = toRecord(toOr(toDeployStageServer, toManagedServiceConfigV01, toHeadlessServiceConfig, toVirtualMachineConfig));
+var toDeployStageV02 = toRecord(toOr(toDeployStageServer, toManagedServiceConfigV02, toHeadlessServiceConfig, toVirtualMachineConfig));
+var toDeployStageV03Record = toRecord(toOr(toDeployStageServerReactiveV02, toDeployStageServerContainerRuntimeV02, toRouterService, toManagedServiceConfigV02, toVirtualMachineConfig));
+var toDeployStageV03 = (x2) => {
+  const stage = toDeployStageV03Record(x2);
+  validateDeployStageV03(stage);
+  return stage;
+};
+var toDeployStage = toOr(toDeployStageV01, toDeployStageV02, toDeployStageV03);
+var isDeployStage = (x2) => isOfType(x2, toDeployStage);
+var toPipelineConfigV02 = toObject({
+  schemaVersion: toLiteral("v0.2"),
+  prepare: toStage,
+  test: toStage,
+  run: toDeployStageV01
+});
+var toPipelineConfigV03 = toObject({
+  schemaVersion: toLiteral("v0.3"),
+  prepare: toStage,
+  test: toStage,
+  run: toDeployStageV01
+});
+var toPipelineConfigV04 = toObject({
+  schemaVersion: toLiteral("v0.4"),
+  prepare: toStage,
+  test: toStage,
+  run: toDeployStageV02,
+  build: toUndefOr(toBuildStage)
+});
+var toPipelineConfigV05 = toObject({
+  schemaVersion: toLiteral("v0.5"),
+  prepare: toStage,
+  test: toStage,
+  run: toDeployStageV03,
+  build: toUndefOr(toBuildStage)
+});
+var toPipelineConfig = toOr(toPipelineConfigV05, toPipelineConfigV04, toPipelineConfigV03, toPipelineConfigV02);
+var pipelineProcessingStates = [
+  "waiting",
+  "running",
+  "success",
+  "failure",
+  "aborted"
+];
+var executionInfo = {
+  state: toLiteralUnion("state", pipelineProcessingStates),
+  startedAt: toUndefOr(toDate),
+  finishedAt: toUndefOr(toDate)
+};
+var toExecutionInfo = toObject(executionInfo);
+var stageExecutionInfo = {
+  ...executionInfo,
+  steps: toArray(toExecutionInfo)
+};
+var toStageExecutionInfo = toObject(stageExecutionInfo);
+var isAdvancedNetworkConfig = (c) => isOfType(c, toAdvancedNetworkConfig);
+
+// packages/integrations/lib/publicApiClient.js
+var toTeam = toObject({
+  id: toNonNegativeInteger,
+  name: toString
+});
+var toWorkspace = toObject({
+  id: toNonNegativeInteger,
+  teamId: toNonNegativeInteger,
+  name: toString,
+  replicas: toPositiveInteger,
+  devDomain: toUndefOr(toString)
+});
+var toWorkspacePlan = toObject({
+  id: toNonNegativeInteger,
+  title: toString,
+  deprecated: toBoolean,
+  characteristics: toObject({
+    CPU: toNumber,
+    onDemand: toBoolean
+  })
+});
+var toGitProvider = toObject({
+  url: toString
+});
+var toWorkspaceStatus = toObject({
+  isRunning: toBoolean
+});
+var toFinishedProcess = toObject({
+  output: toString,
+  error: toString
+});
+var toGitHead = toObject({
+  head: toString
+});
+var executionInfo2 = {
+  state: toLiteralUnion("pipelineProcessingState", pipelineProcessingStates),
+  startedAt: toUndefOr(toDate)
+};
+var toExecutionInfo2 = toObject(executionInfo2);
+var toStageExecutionInfo2 = toObject({
+  ...executionInfo2,
+  steps: toArray(toExecutionInfo2),
+  server: toString,
+  replica: toString
+});
+var PublicApiRequestFailed = class extends Exception {
+  constructor(status, msg) {
+    super(msg);
+    this.status = status;
+  }
+};
+var requestTimeout = duration({ seconds: 30 });
+var SSE_DATA_EVENT = "data";
+var PublicApiClient = class {
+  constructor(apiUrl, apiToken) {
+    this.apiToken = apiToken;
+    this.baseUrl = new URL(joinPath(apiUrl.pathname, "api"), apiUrl);
+  }
+  async listTeams() {
+    return await this.get("teams", toArray(toTeam));
+  }
+  async listWorkspacePlans() {
+    return await this.get("metadata/workspace-plans", toArray(toWorkspacePlan));
+  }
+  async listGitProviders() {
+    return await this.get("metadata/git-providers", toArray(toGitProvider));
+  }
+  async listWorkspaces(teamId) {
+    return await this.get(`workspaces/team/${teamId}`, toArray(toWorkspace));
+  }
+  async createWorkspace(args) {
+    return await this.send({
+      method: HttpMethod.Post,
+      path: "workspaces",
+      body: args,
+      converter: toWorkspace
+    });
+  }
+  async updateWorkspace(workspaceId, args) {
+    await this.send({
+      method: HttpMethod.Patch,
+      path: `workspaces/${workspaceId}`,
+      body: args
+    });
+  }
+  async deleteWorkspace(workspaceId) {
+    await this.send({
+      method: HttpMethod.Delete,
+      path: `workspaces/${workspaceId}`
+    });
+  }
+  async isWorkspaceRunning(workspaceId) {
+    return (await this.get(`workspaces/${workspaceId}/status`, toWorkspaceStatus)).isRunning;
+  }
+  async execute(workspaceId, command) {
+    const { output } = await this.send({
+      method: HttpMethod.Post,
+      path: `workspaces/${workspaceId}/execute`,
+      body: { command },
+      converter: toFinishedProcess
+    });
+    return output;
+  }
+  async gitHead(workspaceId) {
+    return (await this.get(`workspaces/${workspaceId}/git/head`, toGitHead)).head;
+  }
+  async deployLandscape(workspaceId, profile) {
+    await this.send({
+      method: HttpMethod.Post,
+      path: withProfile(`workspaces/${workspaceId}/landscape/deploy`, profile)
+    });
+  }
+  async startPipelineStage(workspaceId, stage, profile) {
+    await this.send({
+      method: HttpMethod.Post,
+      path: withProfile(`workspaces/${workspaceId}/pipeline/${stage}/start`, profile)
+    });
+  }
+  async stopPipelineStage(workspaceId, stage) {
+    await this.send({
+      method: HttpMethod.Post,
+      path: `workspaces/${workspaceId}/pipeline/${stage}/stop`
+    });
+  }
+  async pipelineStatus(workspaceId, stage) {
+    return await this.get(`workspaces/${workspaceId}/pipeline/${stage}`, toArray(toStageExecutionInfo2));
+  }
+  logs({ workspaceId, stage, step, replica }, onLogs) {
+    const path2 = has(replica) ? `workspaces/${workspaceId}/logs/run/${step}/replica/${replica}` : `workspaces/${workspaceId}/logs/${stage}/${step}`;
+    const controller = new AbortController();
+    const done = (async () => {
+      try {
+        await this.listen(path2, toArray(toLogEntry), onLogs, controller);
+      } catch (e) {
+        if (controller.signal.aborted) {
+          return;
+        }
+        logW(`Log stream ${path2} failed.`, { cause: e });
+      } finally {
+        controller.abort();
+      }
+    })();
+    return {
+      close: async () => {
+        controller.abort();
+        await done;
+      },
+      done
+    };
+  }
+  async get(path2, converter) {
+    return await this.send({ method: HttpMethod.Get, path: path2, converter });
+  }
+  async send({ method, path: path2, body, converter }) {
+    const url = this.url(path2);
+    logD(`${method} ${url}`);
+    const res = await this.fetchFollowingRedirects(url, {
+      method,
+      headers: this.headers(has(body)),
+      ...has(body) ? { body: JSON.stringify(body) } : {},
+      timeout: requestTimeout
+    });
+    if (!res.ok) {
+      throw await requestFailed(method, url, res);
+    }
+    if (!converter) {
+      return void 0;
+    }
+    return converter(await res.json());
+  }
+  async listen(path2, converter, onEvent, controller) {
+    const url = this.url(path2);
+    logD(`Listening on ${url}`);
+    const res = await this.fetchFollowingRedirects(url, {
+      headers: { ...this.headers(), Accept: "text/event-stream" },
+      signal: controller.signal,
+      timeout: requestTimeout
+    });
+    if (!res.ok || !res.body) {
+      throw await requestFailed(HttpMethod.Get, url, res);
+    }
+    await readServerSentEvents(res.body, (message) => {
+      const data = eventData(message);
+      if (has(data)) {
+        onEvent(converter(JSON.parse(data)));
+      }
+    });
+  }
+  async fetchFollowingRedirects(url, options, redirectsLeft = 5) {
+    const res = await fetch2(url, { ...options, redirect: "manual" });
+    const location = res.headers.get("location");
+    if (!isRedirect(res.status) || !has(location)) {
+      return res;
+    }
+    if (0 === redirectsLeft) {
+      throw new PublicApiRequestFailed(res.status, `Too many redirects for ${url}.`);
+    }
+    logD(`Following redirect to ${location}`);
+    return await this.fetchFollowingRedirects(new URL(location, url), options, redirectsLeft - 1);
+  }
+  url(path2) {
+    return new URL(joinPath(this.baseUrl.pathname, path2), this.baseUrl);
+  }
+  headers(hasBody = false) {
+    return {
+      Authorization: toBearer(this.apiToken),
+      ...hasBody ? { "Content-Type": "application/json" } : {}
+    };
+  }
+};
+var isRedirect = (status) => [
+  HttpStatusCode.TemporaryRedirect,
+  HttpStatusCode.PermanentRedirect
+].includes(status);
+var withProfile = (path2, profile) => has(profile) ? `${path2}/${profile}` : path2;
+var eventData = (message) => {
+  const parsed = /^event:\s*(?<event>.+)\ndata:\s*(?<data>.+)$/ms.exec(message);
+  const event = parsed?.groups?.event;
+  if (SSE_DATA_EVENT !== event) {
+    logD(`Ignoring server sent event: ${message}`);
+    return void 0;
+  }
+  return parsed?.groups?.data;
+};
+var requestFailed = async (method, url, res) => {
+  const problem = await ignoreErrorAsync(() => res.text());
+  const msg = `${method} ${url} failed with ${res.status}: ${problem ?? ""}`;
+  if (HttpStatusCode.NotFound === res.status) {
+    return new NotFound(msg);
+  }
+  return new PublicApiRequestFailed(res.status, msg);
+};
+
+// packages/integrations/lib/workspaceCommands.js
+var netrcPath = "/home/user/.netrc";
+var updateRepositoryInWorkspace = async (api, w, c) => {
+  const pr = c.pullRequest;
+  const head = await api.gitHead(w.id);
+  if (head.startsWith(pr.headCommitSha)) {
+    logI(`Head of workspace is already at ${head}. Not updating`);
+    return false;
+  }
+  logI(`Head of workspace is at ${head} but expected ${pr.headCommitSha}. Updating`);
+  const gitHost = new URL(c.repository.url).hostname;
+  const netrc = `machine ${gitHost}
+  login ${c.gitAuth.username}
+  password ${c.gitAuth.token}
+`;
+  const insteadOf = `url.https://${gitHost}/.insteadOf`;
+  try {
+    await api.execute(w.id, `echo ${singleQuoted(netrc)} > ${netrcPath}`);
+    await api.execute(w.id, `git config --global --add ${insteadOf} ${singleQuoted(`git@${gitHost}:`)}`);
+    logI("Fetching repository upstream");
+    await runInBackground(api, w.id, "git fetch", { minutes: 30 });
+    logI(`Setting repository to origin/${pr.branch}.`);
+    await runInBackground(api, w.id, `git reset --hard origin/${singleQuoted(pr.branch)}`, { minutes: 2 });
+    if (c.recurseSubmodules ?? true) {
+      await runInBackground(api, w.id, "git submodule update --recursive --init", { minutes: 30 });
+    }
+    return true;
+  } finally {
+    await logErrorAsync(() => api.execute(w.id, `rm ${netrcPath}`));
+    await logErrorAsync(() => api.execute(w.id, `git config --global --unset-all ${insteadOf}`));
+  }
+};
+var WorkspaceCommandFailed = class extends Exception {
+  constructor(command, exitCode, output) {
+    super(`Command "${command}" failed with exit code ${exitCode}: ${output}`);
+  }
+};
+var runInBackground = async (api, workspaceId, command, timeout) => {
+  const dir = `/tmp/codesphere-deployment/${randomString()}`;
+  const exitCodePath = `${dir}/exitCode`;
+  const outputPath = `${dir}/output`;
+  logD(`Running "${command}" in the background of workspace ${workspaceId}.`);
+  await api.execute(workspaceId, `mkdir -p ${dir} && nohup bash -c ${singleQuoted(`${command} > ${outputPath} 2>&1; echo $? > ${exitCodePath}`)} > /dev/null 2>&1 &`);
+  let exitCode = "";
+  try {
+    await retryWithBackoff(async () => {
+      exitCode = (await api.execute(workspaceId, `cat ${exitCodePath} 2>/dev/null || true`)).trim();
+      return "" !== exitCode;
+    }, {
+      initialWait: duration({ seconds: 2 }),
+      factor: 1.2,
+      maxWait: duration({ seconds: 5 }),
+      timeout,
+      errMessage: `Waiting for "${command}" to finish`
+    });
+    if ("0" !== exitCode) {
+      throw new WorkspaceCommandFailed(command, exitCode, await api.execute(workspaceId, `tail -c 4000 ${outputPath}`));
+    }
+  } finally {
+    await logErrorAsync(() => api.execute(workspaceId, `rm -rf ${dir}`));
+  }
+};
+var singleQuoted = (value) => `'${value.replaceAll("'", `'\\''`)}'`;
+
+// packages/integrations/lib/publicApiDeploy.js
+var MultipleMatchesFound = class extends Exception {
+};
+var runWithPublicApi = async (config, status) => await runWithClient(client(config), config, status);
+var client = (config) => new PublicApiClient(config.apiUrl, config.authentication.apiToken);
+var runWithClient = async (api, config, status) => {
+  const team2 = await getTeam(api, config.teamName);
+  if (config.pullRequest.open) {
+    await createDeployment(api, team2, config, status);
+    return;
+  }
+  await removeDeployment(api, team2, config, status);
+};
+var getTeam = async (api, name) => {
+  logI(`Fetching team ${name} from Codesphere.`);
+  const teams = (await api.listTeams()).filter((t) => t.name === name);
+  if (0 === teams.length) {
+    throw new NotFound(`Team ${name} does not exist.`);
+  }
+  if (teams.length > 1) {
+    throw new MultipleMatchesFound(`Found ${teams.length} teams with the exact name ${name}.`);
+  }
+  return teams[0];
+};
+var createDeployment = async (api, team2, c, status) => {
+  await status.setPending();
+  try {
+    await status.setStarted();
+    const w = await deployWorkspace(api, team2, c);
+    await updateRepositoryInWorkspace(api, w, c);
+    logD("Deploying landscape of the run stage.");
+    await api.deployLandscape(w.id, c.profile);
+    await runWorkspacePipeline(api, w.id, c.profile);
+    await status.setDeployed(environmentUrl(c, w));
+  } catch (e) {
+    await logErrorAsync(() => status.setFailed("Deployment to Codesphere failed."));
+    throw e;
+  }
+};
+var removeDeployment = async (api, team2, c, status) => {
+  await status.setInactive();
+  await deleteWorkspace(api, team2, c.workspaceName ?? workspaceName(c.repository.name, c.pullRequest.number));
+  await status.delete();
+  logI("Deployment successfully deleted.");
+};
+var deployWorkspace = async (api, team2, c) => {
+  logI("Starting deployment to Codesphere");
+  const name = c.workspaceName ?? workspaceName(c.repository.name, c.pullRequest.number);
+  const existing = await findWorkspace(api, team2, name);
+  if (existing) {
+    logI(`Workspace ${name} (id: ${existing.id}) already exists.`);
+  }
+  const w = existing ?? await createWorkspace(api, team2, c, name);
+  if (existing) {
+    logI(`Starting workspace ${name} (id: ${w.id}).`);
+    await api.updateWorkspace(w.id, { replicas: w.replicas });
+  }
+  await waitUntilWorkspaceRunning(api, w.id);
+  return w;
+};
+var findWorkspace = async (api, team2, name) => (await api.listWorkspaces(team2.id)).find((w) => w.name === name);
+var createWorkspace = async (api, team2, c, name) => {
+  if (!isProviderSupportedBy(c.repository, await api.listGitProviders())) {
+    throw new InvalidState(`Codesphere can't clone from the git provider of ${c.repository.url}.`);
+  }
+  const plan = findPlan(await api.listWorkspacePlans(), c.planTitle, c.onDemand);
+  logI(`Creating workspace ${name} in Codesphere.`);
+  const workspace2 = await api.createWorkspace({
+    teamId: team2.id,
+    name,
+    planId: plan.id,
+    replicas: 1,
+    baseImage: c.baseImage,
+    gitUrl: c.repository.url,
+    gitRef: c.pullRequest.branch,
+    isPrivateRepo: c.repository.private,
+    cloneDepth: c.cloneDepth,
+    skipLfs: c.skipLfs,
+    recurseSubmodules: c.recurseSubmodules,
+    restricted: c.restricted,
+    vpnConfig: c.vpnConfigName,
+    sharedVaultName: c.sharedVaultName,
+    env: Object.entries(c.envVars).map(([name2, value]) => ({ name: name2, value }))
+  });
+  logI(`Created workspace ${name} (id: ${workspace2.id}).`);
+  return workspace2;
+};
+var waitUntilWorkspaceRunning = async (api, workspaceId) => {
+  await retryWithBackoff(async () => await logErrorAsync(() => api.isWorkspaceRunning(workspaceId)) ?? false, {
+    initialWait: duration({ seconds: 1 }),
+    factor: 1.2,
+    maxWait: duration({ seconds: 15 }),
+    timeout: duration({ minutes: 20 }),
+    errMessage: `Waiting for workspace ${workspaceId} to be running`
+  });
+  logI(`Workspace ${workspaceId} is ready.`);
+};
+var deleteWorkspace = async (api, team2, name) => {
+  logI(`Deleting workspace ${name} in Codesphere.`);
+  const w = await findWorkspace(api, team2, name);
+  if (!w) {
+    logI(`Workspace ${name} doesn't exist. Nothing to delete.`);
+    return;
+  }
+  try {
+    await api.deleteWorkspace(w.id);
+  } catch (e) {
+    if (!(e instanceof NotFound)) {
+      throw e;
+    }
+  }
+  logI(`Workspace ${name} successfully deleted.`);
+};
+var environmentUrl = (c, w) => {
+  if ("preview" === c.deploymentLinkType) {
+    return codespherePreviewUrl(c.apiUrl, w).toString();
+  }
+  if (!has(w.devDomain)) {
+    throw new InvalidState(`Workspace ${w.id} has no dev domain.`);
+  }
+  return `https://${w.devDomain}`;
+};
+
+// packages/deployment-service/common/lib/api/replica.js
+var import_inversify2 = __toESM(require_inversify(), 1);
+
+// packages/utils/common/lib/injectable.js
+var import_inversify_binding_decorators = __toESM(require_lib2(), 1);
+var serviceId = (name) => Symbol.for(name);
+
+// packages/streamy/common/lib/api.js
+var StreamStatus;
+(function(StreamStatus2) {
+  StreamStatus2[StreamStatus2["Aborted"] = 0] = "Aborted";
+  StreamStatus2[StreamStatus2["Completed"] = 1] = "Completed";
+  StreamStatus2[StreamStatus2["Open"] = 2] = "Open";
+  StreamStatus2[StreamStatus2["NotStarted"] = 3] = "NotStarted";
+})(StreamStatus || (StreamStatus = {}));
+var defaultRpcOptions = Object.freeze({
+  timeout: duration({ seconds: 5 })
+});
+var requestId = 1;
+var nextRequestId = () => requestId++;
+
+// packages/streamy/common/lib/exceptions.js
+var Closed = class extends Exception {
+};
+var RpcException = class extends Exception {
+};
+var RpcThrew = class extends RpcException {
+};
+var RpcTimedOut = class extends RpcException {
+};
+var StreamClosed = class extends Exception {
+  constructor(id, method, recvStatus, sendStatus, reason, cause) {
+    super([
+      `stream id=${id}, method=${method},`,
+      ` recv status=${StreamStatus[recvStatus]},`,
+      ` send status=${StreamStatus[sendStatus]}`,
+      `: ${reason}`
+    ].join(""));
+    this.id = id;
+    this.method = method;
+    this.recvStatus = recvStatus;
+    this.sendStatus = sendStatus;
+    this.reason = reason;
+    this.cause = cause;
+  }
+  get wasNormal() {
+    return StreamStatus.Completed === this.recvStatus && StreamStatus.Completed === this.sendStatus;
+  }
+  isFor(stream2) {
+    return this.id === stream2.id;
+  }
+};
+
+// packages/streamy/common/lib/spec.js
+var rpc = (spec) => ({ ...spec, kind: "rpc" });
+var stream = (spec) => ({ ...spec, kind: "stream" });
+var BaseStub = class {
+  constructor(client2) {
+    this.client = client2;
+  }
+  setContext(context4) {
+    this.context = context4;
+  }
+};
+var createStubSubClass = ({ spec, base, call, stream: stream2 }) => {
+  class Klass extends base {
+  }
+  const p = Klass.prototype;
+  for (const [name, m] of Object.entries(spec.methods)) {
+    switch (m.kind) {
+      case "rpc":
+        p[name] = async function(req, opts) {
+          const finalOpts = m.defaultOptions || opts ? { ...m.defaultOptions, ...opts } : void 0;
+          return call({
+            stub: this,
+            client: this.client,
+            context: () => this.context,
+            methodName: name,
+            methodSpec: m,
+            reqData: req,
+            finalOpts
+          });
+        };
+        break;
+      case "stream":
+        p[name] = async function() {
+          return stream2({
+            stub: this,
+            client: this.client,
+            context: () => this.context,
+            methodName: name,
+            methodSpec: m
+          });
+        };
+        break;
+    }
+  }
+  return Klass;
+};
+
+// packages/streamy/common/lib/extensions/spec.js
+var refreshTokenContainer = {
+  refreshToken: readOnly(toString)
+};
+var toRefreshTokenContainer = toObject(refreshTokenContainer);
+var accessTokenContainer = {
+  accessToken: readOnly(toString)
+};
+var toAccessTokenContainer = toObject(accessTokenContainer);
+var toCredentials = toObject({
+  ...refreshTokenContainer,
+  ...accessTokenContainer
+});
+var AuthnStub = class extends BaseStub {
+  async authenticate(creds) {
+    this.context = {
+      requestHeaders: {
+        Authorization: `Bearer ${creds.accessToken}`
+      },
+      responseHeaders: {},
+      httpStatusCode: 200
+    };
+  }
+  setRefreshTokenOpts(refreshTokenOpts) {
+    this.refreshTokenOpts = refreshTokenOpts;
+  }
+};
+var isTokenExpired = (e, expiredException) => {
+  if (e instanceof expiredException) {
+    return true;
+  }
+  if (e instanceof StreamClosed && e.cause instanceof expiredException) {
+    return true;
+  }
+  return false;
+};
+var callAndMaybeRefreshToken = async (f, refreshOpts) => {
+  const refreshTokenOpts = refreshOpts();
+  if (!refreshTokenOpts) {
+    return f();
+  }
+  try {
+    return await f();
+  } catch (e) {
+    if (isTokenExpired(e, refreshTokenOpts.expiredException)) {
+      const creds = await refreshTokenOpts.refreshToken();
+      await refreshTokenOpts.authenticate(creds);
+      logD("AutnStub: Refreshed access token. Now retrying call.");
+      return f();
+    }
+    throw e;
+  }
+};
+var createAuthnStubSubClass = (spec, base) => createStubSubClass({
+  spec,
+  base,
+  call: async ({ stub, client: client2, context: context4, methodSpec, methodName, reqData: data, finalOpts }) => callAndMaybeRefreshToken(async () => methodSpec.response(await client2.call({
+    service: spec.name,
+    method: methodName,
+    data,
+    context: context4(),
+    opts: finalOpts
+  })), () => !!stub.refreshTokenOpts ? {
+    ...stub.refreshTokenOpts,
+    authenticate: stub.authenticate.bind(stub)
+  } : void 0),
+  stream: ({ stub, client: client2, context: context4, methodSpec, methodName }) => callAndMaybeRefreshToken(() => client2.stream({
+    service: spec.name,
+    method: methodName,
+    toQuery: methodSpec.request,
+    toResponse: methodSpec.response,
+    context: context4()
+  }), () => !!stub.refreshTokenOpts ? {
+    ...stub.refreshTokenOpts,
+    authenticate: stub.authenticate.bind(stub)
+  } : void 0)
+});
+var createAuthnStubClass = (name, spec) => {
+  const klass = createAuthnStubSubClass(spec, AuthnStub);
+  klass.ID = serviceId(name);
+  return klass;
+};
+
+// packages/streamy/common/lib/extensions/typing.js
+var toStringOrArray = toOr(toString, toArray(toString));
+var toHeaders = toRecord(toUndefOr(toStringOrArray));
+var httpContext = {
+  requestHeaders: toHeaders,
+  responseHeaders: toRecord(toOr(toStringOrArray, toNumber)),
+  httpStatusCode: toNumericEnum("HttpStatusCode", HttpStatusCode)
+};
+var toHttpContext = (x2) => {
+  const ctx = asObjectNoCopy(httpContext)(x2);
+  for (const [k2, v2] of Object.entries(ctx.requestHeaders)) {
+    ctx.requestHeaders[k2.toLocaleLowerCase()] = v2;
+  }
+  for (const [k2, v2] of Object.entries(ctx.responseHeaders)) {
+    ctx.responseHeaders[k2.toLocaleLowerCase()] = v2;
+  }
+  return ctx;
+};
+
 // packages/team-service/common/lib/model/TeamServiceTypes.js
 var Role;
 (function(Role2) {
@@ -122949,7 +124535,7 @@ var team = {
   createdAt: toUndefOr(toDate),
   organizationId: toUndefOr(toUuid)
 };
-var toTeam = toObject(team);
+var toTeam2 = toObject(team);
 var toTeamWithRole = toObject({
   ...team,
   role: readOnly(toRole)
@@ -123130,7 +124716,7 @@ var WorkspaceStatus;
   WorkspaceStatus2["AgentRestart"] = "Workspace encountered an error. Restarting";
   WorkspaceStatus2["Unknown"] = "Waiting for workspace status";
 })(WorkspaceStatus || (WorkspaceStatus = {}));
-var toWorkspaceStatus = toStringEnum("WorkspaceStatus", WorkspaceStatus);
+var toWorkspaceStatus2 = toStringEnum("WorkspaceStatus", WorkspaceStatus);
 var LandscapeStatus;
 (function(LandscapeStatus2) {
   LandscapeStatus2["StartServers"] = "Received deployment request";
@@ -123156,7 +124742,7 @@ var errorStatus = {
 };
 var toErrorStatus = toObject(errorStatus);
 var toWorkspaceInfo = toObject({
-  status: toWorkspaceStatus,
+  status: toWorkspaceStatus2,
   role: toLiteralUnion("role", workspaceStatusRoles)
 });
 var toWorkspaceErrorStatus = toObject({
@@ -123171,7 +124757,7 @@ var toReplicaErrorStatus = toObject({
   server: toUndefOr(toString)
 });
 var toReplicaInfo = toObject({
-  status: toWorkspaceStatus,
+  status: toWorkspaceStatus2,
   hostname: toString,
   role: toLiteralUnion("role", replicaStatusRoles),
   server: toUndefOr(toString)
@@ -123232,580 +124818,26 @@ ReplicaStub = __decorate3([
 // packages/deployment-service/common/lib/api/workspaceDeployment.js
 var import_inversify3 = __toESM(require_inversify(), 1);
 
-// packages/utils/common/lib/flags.js
-var MAINTENANCE_MODE_INTERNAL_FLAG_NAME = "maintenance-mode";
-var AVAILABLE_INTERNAL_FLAGS = [
-  "cimg-private-registry",
-  "cluster-admin",
-  "coco-secrets",
-  "custom-service-image",
-  "gateway-domains",
-  "gpu-plan",
-  "headless-services",
-  "hermetic",
-  MAINTENANCE_MODE_INTERNAL_FLAG_NAME,
-  "merged-sync-run",
-  "ms-in-ls",
-  "msd",
-  "native-deploy",
-  "o11y",
-  "openfga-authz-primary",
-  "overview-cockpit",
-  "overview-react",
-  "persistent-logs",
-  "persistent-nix",
-  "recaptcha-v3",
-  "rest-providers-api",
-  "selectable-resources",
-  "single-workspace-mode",
-  "team-container-registries",
-  "time-sameDc",
-  "vcluster",
-  "virtual-machines",
-  "vpn"
-];
-var availableInternalFlags = [...AVAILABLE_INTERNAL_FLAGS];
-var AVAILABLE_PREVIEW_FLAGS = [
-  "openfga-authz",
-  "preview-comments",
-  "privileged-ports",
-  "secret-management",
-  "sub-path-mount",
-  "tcp-udp",
-  "workspace-ssh"
-];
-var availablePreviewFlags = [...AVAILABLE_PREVIEW_FLAGS];
-var AVAILABLE_FEATURES = [
-  "avatar-upload",
-  "billing",
-  "dev-domains-port",
-  "email-signin",
-  "email-signup",
-  "run-as-root-insecure",
-  "standalone-teams"
-];
-var availableFeatures = [...AVAILABLE_FEATURES];
-var allAvailableFlags = [
-  ...AVAILABLE_INTERNAL_FLAGS,
-  ...AVAILABLE_PREVIEW_FLAGS,
-  ...AVAILABLE_FEATURES
-];
-var toInternalFlagName = toLiteralUnion("InternalFlagName", availableInternalFlags);
-var toPreviewFlagName = toLiteralUnion("PreviewFlagName", availablePreviewFlags);
-var toFlagName = toLiteralUnion("FlagName", allAvailableFlags);
-var toFeatureName = toLiteralUnion("FeatureName", availableFeatures);
-var toFlags = toObject({
-  internal: toObject({
-    available: toReadOnly(toArray(toInternalFlagName)),
-    enabled: toReadOnly(toArray(toInternalFlagName))
-  }),
-  preview: toObject({
-    available: toReadOnly(toArray(toPreviewFlagName)),
-    enabled: toReadOnly(toArray(toPreviewFlagName))
-  }),
-  features: toObject({
-    available: toReadOnly(toArray(toFeatureName)),
-    enabled: toReadOnly(toArray(toFeatureName))
-  })
+// packages/workspace-agent/common/lib/pipeline/config.js
+var pipelineConfigPath = "ci.yml";
+var toCustomImage = toObject({
+  entrypoint: toUndefOr(toArray(toString)),
+  cmd: toUndefOr(toArray(toString)),
+  workingDir: toUndefOr(toString)
 });
-var enabledFlags;
-var isEnabled = (name) => {
-  if (!enabledFlags) {
-    throw new Uninitialized("initFlags() was not called");
-  }
-  return enabledFlags.has(name);
-};
-var allEnabled = () => {
-  if (!enabledFlags) {
-    throw new Uninitialized("initFlags() was not called");
-  }
-  const enabledFlagList = [...enabledFlags];
-  const enabledInternal = enabledFlagList.filter((x2) => availableInternalFlags.includes(x2));
-  const enabledPreview = enabledFlagList.filter((x2) => availablePreviewFlags.includes(x2));
-  const featureFlags = enabledFlagList.filter((x2) => availableFeatures.includes(x2));
-  return {
-    internal: {
-      available: Object.freeze([...availableInternalFlags]),
-      enabled: Object.freeze(enabledInternal)
-    },
-    preview: {
-      available: Object.freeze([...availablePreviewFlags]),
-      enabled: Object.freeze(enabledPreview)
-    },
-    features: {
-      available: Object.freeze([...availableFeatures]),
-      enabled: Object.freeze(featureFlags)
-    }
-  };
-};
-var splitInternalConfig = (internal) => {
-  const knownInternal = internal.filter((x2) => availableInternalFlags.includes(x2));
-  const knownPreview = internal.filter((x2) => availablePreviewFlags.includes(x2));
-  const knownFeatures = internal.filter((x2) => availableFeatures.includes(x2));
-  const unknown = internal.filter((x2) => !availableInternalFlags.includes(x2) && !availablePreviewFlags.includes(x2) && !availableFeatures.includes(x2));
-  return {
-    unknown,
-    knownInternal,
-    knownPreview,
-    knownFeatures
-  };
-};
-var splitPreviewConfig = (preview) => {
-  const knownPreview = preview.filter((x2) => availablePreviewFlags.includes(x2));
-  const knownFeatures = preview.filter((x2) => availableFeatures.includes(x2));
-  const unknown = preview.filter((x2) => !availablePreviewFlags.includes(x2) && !availableFeatures.includes(x2));
-  return {
-    unknown,
-    knownPreview,
-    knownFeatures
-  };
-};
-var setEnabledFlags = ({ internal, preview, features }) => {
-  const { unknown, knownInternal, knownPreview: knownPreviewFromInternal, knownFeatures: knownFeaturesFromInternal } = splitInternalConfig(internal ?? []);
-  if (0 !== unknown.length) {
-    logW(jj`unknown internal flags provided: ${unknown}`);
-  }
-  if (0 !== knownPreviewFromInternal.length) {
-    logW(jj`preview flags provided in internal config, please move to preview: ${knownPreviewFromInternal}`);
-  }
-  if (0 !== knownFeaturesFromInternal.length) {
-    logW(jj`feature flags provided in internal config, please move to features: ${knownFeaturesFromInternal}`);
-  }
-  const { unknown: unknownPreview, knownPreview, knownFeatures: knownFeaturesFromPreview } = splitPreviewConfig(preview ?? []);
-  if (0 !== unknownPreview.length) {
-    logW(jj`unknown preview flags provided: ${unknownPreview}`);
-  }
-  if (0 !== knownFeaturesFromPreview.length) {
-    logW(jj`feature flags provided in preview config, please move to features: ${knownFeaturesFromPreview}`);
-  }
-  const [unknownFeatures, knownFeatures] = filterSplit(features ?? [], (x2) => availableFeatures.includes(x2));
-  if (0 !== unknownFeatures.length) {
-    logW(jj`unknown features provided: ${unknownFeatures}`);
-  }
-  const currentFlags = [...enabledFlags?.values() ?? []];
-  const keptInternal = internal === void 0 ? currentFlags.filter((x2) => availableInternalFlags.includes(x2)) : [];
-  const keptPreview = preview === void 0 ? currentFlags.filter((x2) => availablePreviewFlags.includes(x2)) : [];
-  const keptFeatures = features === void 0 ? currentFlags.filter((x2) => availableFeatures.includes(x2)) : [];
-  enabledFlags = /* @__PURE__ */ new Set([
-    ...keptInternal,
-    ...keptPreview,
-    ...keptFeatures,
-    ...knownInternal,
-    ...knownPreviewFromInternal,
-    ...knownPreview,
-    ...knownFeaturesFromInternal,
-    ...knownFeaturesFromPreview,
-    ...knownFeatures
-  ]);
-  return allEnabled();
-};
-
-// packages/utils/common/lib/features.js
-var toFeatures = toObject({
-  available: toReadOnly(toArray(toFeatureName)),
-  enabled: toReadOnly(toArray(toFeatureName))
+var toPipelineMetaConfig = toObject({
+  configRootDir: toString,
+  workingDirectory: toString,
+  internalDataDir: toString,
+  maxLogsPerStep: toNumber,
+  envVars: toRecord(toString),
+  replicaId: toString,
+  serverName: toString,
+  workspaceId: toUndefOr(toNonNegativeInteger),
+  otelLogCollectorHostname: toUndefOr(toString),
+  persistentLogs: toUndefOr(toBoolean),
+  customImage: toUndefOr(toCustomImage)
 });
-var isFeatureEnabled = (name) => {
-  return isEnabled(name);
-};
-var initFeatures = (features = []) => {
-  const result = setEnabledFlags({ features });
-  return {
-    available: result.features.available,
-    enabled: result.features.enabled
-  };
-};
-
-// packages/utils/common/lib/typing/url.js
-var prepareUrlPathRegex = () => {
-  const unReservedCharsGroup = "-._~a-zA-Z0-9";
-  const subDelims = "!$&'()*+,;=";
-  const other = ":@";
-  const pathDelimiter = "/";
-  const singleCharsClass = [
-    "[",
-    unReservedCharsGroup,
-    subDelims,
-    other,
-    pathDelimiter,
-    "]"
-  ].join("");
-  const regexp = [
-    "^\\/",
-    "(?:",
-    singleCharsClass,
-    "|",
-    "%[0-9A-F]{2}",
-    ")*$"
-  ].join("");
-  return new RegExp(regexp);
-};
-var validUrlPathRegex = prepareUrlPathRegex();
-var toUrlPath = toStringMatchingRegex("UrlPath", validUrlPathRegex);
-var prepareFullUrlRegex = () => {
-  const unReservedCharsGroup = "-._~a-zA-Z0-9";
-  const subDelims = "!$&'()*+,;=";
-  const other = ":@";
-  const dot = "\\.";
-  const labelInner = `[a-zA-Z0-9-]`;
-  const labelEdge = `[a-zA-Z0-9]`;
-  const label = `${labelEdge}(?:${labelInner}*${labelEdge})?`;
-  const pathSegmentCharsClass = [
-    "[",
-    unReservedCharsGroup,
-    subDelims,
-    other,
-    ".?]"
-  ].join("");
-  const knownProtocols = "https?|ftps?|wss?";
-  const regexp = [
-    `^(?:${knownProtocols})://`,
-    `${label}`,
-    `(?:${dot}${label})*`,
-    "(?::\\d+)?",
-    `(?:/(?:${pathSegmentCharsClass}+(?:/${pathSegmentCharsClass}+)*/?)?)?`,
-    "$"
-  ].join("");
-  return new RegExp(regexp);
-};
-var validFullUrlRegex = prepareFullUrlRegex();
-var toFullUrlByRegex = toStringMatchingRegex("FullUrl", validFullUrlRegex);
-var toFullUrl = (x2) => {
-  try {
-    const url = new URL(toFullUrlByRegex(x2));
-    return toString(x2);
-  } catch {
-    throw new TypeConversionFailure("URL string", x2);
-  }
-};
-
-// packages/utils/common/lib/url.js
-var devDomainRegex = /^(?:ide-|preview-)?(?<wsId>\d+)(?:-(?<port>\d+))?(?<server>-[a-z0-9-]*)?\./;
-var csInCsDomains = [
-  ".dev.5.codesphere.com",
-  ".cloud.codesphere.com",
-  ".2.codesphere.com",
-  ".dev-codesphere.com"
-];
-var isWorkspaceDomainWithWsId = (host) => {
-  const hostname = host.split(":")[0];
-  return devDomainRegex.test(hostname) && csInCsDomains.some((d) => hostname.endsWith(d));
-};
-var isLocalHost = (host) => host.split(":")[0] === "localhost" || host.split(":")[0] === "127.0.0.1";
-var isDevHost = (host) => [
-  ".dev.codesphere.com",
-  "3.codesphere.com",
-  "5.codesphere.com",
-  ".dev-codesphere.com"
-].some((s) => host.endsWith(s));
-var isQaHost = (host) => host.endsWith("qa.dev-codesphere.com");
-var createBaseUrl = (protocol, host, dc) => {
-  if (host.includes("://")) {
-    throw new InvalidArgument3("Host should not contain protocol.");
-  }
-  const p = isLocalHost(host) ? protocol : `${protocol}s`;
-  const prefix = !has(dc) || isLocalHost(host) || host.startsWith(`${dc}.`) || isWorkspaceDomainWithWsId(host) ? "" : `${dc}${isDevHost(host) && !isQaHost(host) ? "-" : "."}`;
-  return new URL(`${p}://${prefix}${host}`);
-};
-var createServiceUrl = (protocol, host, servicePath, dc) => {
-  const u = createBaseUrl(protocol, host, dc);
-  u.pathname = servicePath;
-  return u;
-};
-var getHeader = (headers, name) => {
-  const lowerName = name.toLowerCase();
-  for (const [key, value] of Object.entries(headers)) {
-    if (key.toLowerCase() === lowerName) {
-      return value;
-    }
-  }
-  return void 0;
-};
-var joinPath = (...segments) => {
-  return [
-    segments[0] === "/" ? "" : segments[0],
-    ...segments.slice(1).map((s) => trimPrefix(s, "/"))
-  ].join("/");
-};
-var toHttpUrl = (url) => {
-  const u = new URL(url);
-  if (!["http:", "https:", "ws:", "wss:"].includes(u.protocol)) {
-    throw new TypeError(`Can only convert ws and wss not ${u.protocol}`);
-  }
-  if (u.protocol === "ws:") {
-    u.protocol = "http:";
-  }
-  if (u.protocol === "wss:") {
-    u.protocol = "https:";
-  }
-  return u;
-};
-
-// packages/utils/common/lib/path.js
-var import_path = require("path");
-var POSIX_PATH_REGEX = new RegExp("^/?(?:[^/\0]+/?)*$");
-var toPosixPath2 = (p) => {
-  const s = toString(p);
-  if (!POSIX_PATH_REGEX.test(s)) {
-    throw new TypeConversionFailure("POSIX path", p);
-  }
-  return s;
-};
-var toPathWithoutTraversal = (p) => {
-  const s = toPosixPath2(p);
-  if (s.split(import_path.sep).includes("..")) {
-    throw new TypeConversionFailure("path without ..", p);
-  }
-  return s;
-};
-
-// packages/utils/common/lib/typing/semver.js
-var import_semver2 = __toESM(require_semver2(), 1);
-var toSemVer = (x2) => {
-  let s;
-  try {
-    s = (0, import_semver2.parse)(toString(x2), false, true).toString();
-  } catch (e) {
-    throw new TypeConversionFailure("semver", x2, void 0, {
-      cause: e
-    });
-  }
-  if (s !== x2) {
-    throw new TypeConversionFailure("semver", x2, void 0, {
-      cause: new AmbiguousArgument(`Parser would have produced: ${s}`)
-    });
-  }
-  return s;
-};
-
-// packages/workspace-agent/common/lib/pipeline/execution.js
-var import_path2 = require("path");
-var CODESPHERE_INTERNAL_DIR = ".codesphere-internal";
-var INTERNAL_CI_CONFIGS_DIR = (0, import_path2.join)(CODESPHERE_INTERNAL_DIR, "ci-configs");
-var STATIC_BUILD_CONFIG_DIR = (0, import_path2.join)(INTERNAL_CI_CONFIGS_DIR, "static-build");
-
-// packages/workspace-agent/common/lib/pipeline/types.js
-var singleRunningStageKinds = ["prepare", "test"];
-var multiRunningStageKinds = ["run"];
-var stageKinds = [
-  ...singleRunningStageKinds,
-  ...multiRunningStageKinds
-];
-var toStageKind = toLiteralUnion("stageKind", stageKinds);
-var toStep = toObject({
-  name: toUndefOr(toString),
-  command: toString
-});
-var toUrl = (x2) => {
-  if (x2 instanceof URL) {
-    return x2;
-  }
-  try {
-    return new URL(toString(x2));
-  } catch {
-    throw new TypeConversionFailure("URL string", x2);
-  }
-};
-var toStage = toObject({
-  steps: toArray(toStep),
-  healthEndpoint: toUndefOr(toUrl)
-});
-var toBuildService = toObject({
-  context: toUndefOr(toNonEmptyString),
-  copy: toUndefOr(toRecord(toNonEmptyString)),
-  steps: toUndefOr(toArray(toStep))
-});
-var toBuildStage = toRecord(toBuildService);
-var toEnvValue = toOr(toString, toNumber);
-var toEnv = toRecord(toEnvValue);
-var toSimpleNetworkConfig = toObject({
-  path: toUrlPath,
-  stripPath: toUndefOr(toBoolean)
-});
-var toPortConfig = toObject({
-  port: toPositiveInteger,
-  isPublic: toBoolean
-});
-var toPathConfig = toObject({
-  port: toPositiveInteger,
-  path: toUrlPath,
-  stripPath: toUndefOr(toBoolean)
-});
-var toLandscapeGatewayConfig = toObject({
-  httpPort: toPositiveInteger
-});
-var toRoutedNetworkConfig = toObject({
-  ports: toNonEmptyArray(toPortConfig),
-  paths: toArray(toPathConfig),
-  landscapeGateway: toUndef
-});
-var toLandscapeGatewayNetworkConfig = toObject({
-  ports: toNonEmptyArray(toPortConfig),
-  landscapeGateway: toLandscapeGatewayConfig
-});
-var toAdvancedNetworkConfig = toOr(toRoutedNetworkConfig, toLandscapeGatewayNetworkConfig);
-var toNetworkConfig = toOr(toSimpleNetworkConfig, toAdvancedNetworkConfig);
-var MAX_USER_GROUP_ID = 2 ** 31 - 1;
-var toUserGroupId = ({ forceAllowRoot = false } = {}) => toRestrictedNumber("toUserGroupId", (n7) => {
-  const allowRoot = forceAllowRoot || isFeatureEnabled("run-as-root-insecure");
-  return n7 >= (allowRoot ? 0 : 1) && n7 <= MAX_USER_GROUP_ID;
-});
-var toVolumeMounts = toArray(toObject({
-  name: toLiteral("_workspace"),
-  mountPath: toString,
-  workspacePath: toPathWithoutTraversal
-}));
-var toDeployStageServerCommonFields = {
-  healthEndpoint: toUndefOr(toUrl),
-  plan: toUndefOr(toPlanId),
-  replicas: toUndefOr(toPositiveInteger),
-  isPublic: toUndefOr(toBoolean),
-  network: toUndefOr(toNetworkConfig),
-  env: toUndefOr(toEnv),
-  runAsUser: toUndefOr(toUserGroupId({ forceAllowRoot: true })),
-  runAsGroup: toUndefOr(toUserGroupId({ forceAllowRoot: true })),
-  volumeMounts: toUndefOr(toVolumeMounts)
-};
-var deployStageServerReactiveFields = {
-  ...toDeployStageServerCommonFields,
-  steps: toArray(toStep),
-  image: toUndefOr(toNonEmptyString)
-};
-var toDeployStageServerReactive = toObject(deployStageServerReactiveFields);
-var deployStageServerContainerRuntimeFields = {
-  ...toDeployStageServerCommonFields,
-  steps: toUndef,
-  image: toNonEmptyString,
-  command: toUndefOr(toArray(toString))
-};
-var toDeployStageServerContainerRuntime = toObject(deployStageServerContainerRuntimeFields);
-var toDeployStageServer = toOr(toDeployStageServerReactive, toDeployStageServerContainerRuntime);
-var isDeployStageServer = (x2) => isOfType(x2, toDeployStageServer);
-var toManagedServiceConfigV01 = toObject({
-  provider: toObject({
-    name: toString,
-    version: toString
-  }),
-  plan: toObject({
-    id: toNonNegativeInteger,
-    parameters: toRecord(toInteger)
-  }),
-  config: toRecord(toUnknown),
-  secrets: toRecord(toUnknown)
-});
-var toManagedServiceConfigFieldsV02 = {
-  provider: toObject({
-    name: toString,
-    schemaVersion: toString
-  }),
-  plan: toObject({
-    id: toNonNegativeInteger,
-    parameters: toRecord(toInteger)
-  }),
-  config: toRecord(toUnknown),
-  secrets: toRecord(toUnknown),
-  version: toUndefOr(toSemVer)
-};
-var toManagedServiceConfigV02 = toObject(toManagedServiceConfigFieldsV02);
-var toManagedServiceConfigFieldsLatest = toManagedServiceConfigFieldsV02;
-var toManagedServiceConfigLatest = toObject(toManagedServiceConfigFieldsLatest);
-var toManagedServiceConfig = toOr(toManagedServiceConfigV01, toManagedServiceConfigV02);
-var toHeadlessPath = toObject({
-  path: toUrlPath,
-  stripPath: toBoolean,
-  target: toString
-});
-var toHeadlessServiceConfig = toObject({
-  network: toObject({
-    paths: toArray(toHeadlessPath)
-  })
-});
-var toVirtualMachineConfig = toObject({
-  cpu: toPositiveNumber,
-  diskImageUrl: toNonEmptyString,
-  memoryGib: toPositiveNumber,
-  storageGib: toPositiveNumber,
-  cloudInitUserDataBase64: toUndefOr(toString)
-});
-var toRouterPath = toObject({
-  path: toUrlPath,
-  stripPath: toBoolean,
-  service: toString,
-  port: toNumber
-});
-var toRouterService = toObject({
-  type: toLiteral("router"),
-  plan: toUndefOr(toPlanId),
-  replicaCount: toPositiveInteger,
-  network: toObject({
-    isLandscapeGateway: toUndefOr(toBoolean),
-    paths: toUndefOr(toArray(toRouterPath)),
-    externalTargets: toUndefOr(toArray(toHeadlessPath))
-  })
-});
-var toDeployStageServerNetworkV02 = toObject({
-  ports: toNonEmptyArray(toPositiveInteger),
-  landscapeGateway: toUndefOr(toLandscapeGatewayConfig)
-});
-var toDeployStageServerReactiveV02 = toObject({
-  ...deployStageServerReactiveFields,
-  network: toDeployStageServerNetworkV02
-});
-var toDeployStageServerContainerRuntimeV02 = toObject({
-  ...deployStageServerContainerRuntimeFields,
-  network: toDeployStageServerNetworkV02
-});
-var toDeployStageV01 = toRecord(toOr(toDeployStageServer, toManagedServiceConfigV01, toHeadlessServiceConfig, toVirtualMachineConfig));
-var toDeployStageV02 = toRecord(toOr(toDeployStageServer, toManagedServiceConfigV02, toHeadlessServiceConfig, toVirtualMachineConfig));
-var toDeployStageV03 = toRecord(toOr(toDeployStageServerReactiveV02, toDeployStageServerContainerRuntimeV02, toRouterService, toManagedServiceConfigV02, toVirtualMachineConfig));
-var toDeployStage = toOr(toDeployStageV01, toDeployStageV02);
-var isDeployStage = (x2) => isOfType(x2, toDeployStage);
-var toPipelineConfigV02 = toObject({
-  schemaVersion: toLiteral("v0.2"),
-  prepare: toStage,
-  test: toStage,
-  run: toDeployStageV01
-});
-var toPipelineConfigV03 = toObject({
-  schemaVersion: toLiteral("v0.3"),
-  prepare: toStage,
-  test: toStage,
-  run: toDeployStageV01
-});
-var toPipelineConfigV04 = toObject({
-  schemaVersion: toLiteral("v0.4"),
-  prepare: toStage,
-  test: toStage,
-  run: toDeployStageV02,
-  build: toUndefOr(toBuildStage)
-});
-var toPipelineConfigV05 = toObject({
-  schemaVersion: toLiteral("v0.5"),
-  prepare: toStage,
-  test: toStage,
-  run: toDeployStageV03,
-  build: toUndefOr(toBuildStage)
-});
-var toPipelineConfig = toOr(toPipelineConfigV04, toPipelineConfigV03, toPipelineConfigV02);
-var pipelineProcessingStates = [
-  "waiting",
-  "running",
-  "success",
-  "failure",
-  "aborted"
-];
-var executionInfo = {
-  state: toLiteralUnion("state", pipelineProcessingStates),
-  startedAt: toUndefOr(toDate),
-  finishedAt: toUndefOr(toDate)
-};
-var toExecutionInfo = toObject(executionInfo);
-var stageExecutionInfo = {
-  ...executionInfo,
-  steps: toArray(toExecutionInfo)
-};
-var toStageExecutionInfo = toObject(stageExecutionInfo);
-var isAdvancedNetworkConfig = (c) => isOfType(c, toAdvancedNetworkConfig);
 
 // packages/workspace-service/common/lib/Workspace.js
 var GitProvider;
@@ -123814,7 +124846,8 @@ var GitProvider;
   GitProvider2["GitLab"] = "gitlab";
   GitProvider2["Bitbucket"] = "bitbucket";
 })(GitProvider || (GitProvider = {}));
-var toGitProvider = toStringEnum("GitProvider", GitProvider);
+var toGitProvider2 = toStringEnum("GitProvider", GitProvider);
+var SHARED_VOLUME_MOUNT_PATH = "/home/user/app";
 var workspace = {
   id: readOnly(toNonNegativeInteger),
   dataCenterId: readOnly(toNumber),
@@ -123842,7 +124875,7 @@ var workspace = {
   storageMib: toUndefOr(toPositiveInteger),
   sharedVaultName: toUndefOr(toString)
 };
-var toWorkspace = toObject(workspace);
+var toWorkspace2 = toObject(workspace);
 var validServerNameRegex = new RegExp("^(?:[a-z]|[a-z][-a-z0-9]{0,30}[a-z0-9])$");
 var toMsdServerName = toStringMatchingRegex("MsdServerName", validServerNameRegex);
 var toServerPath = toObject({
@@ -123895,6 +124928,9 @@ var serverV1 = {
 var toServerV1 = toObject(serverV1);
 var IDE_SERVER_NAME = "codesphere-ide";
 var DEFAULT_PORT = 3e3;
+var ROUTER_BASE_IMAGE = "workspace-router";
+var ROUTER_CONFIG_MOUNT_PATH = "/etc/router/ci.yml";
+var ROUTER_USER_GROUP_ID = 101;
 var workspaceDevDomain = (workspaceId, workspaceHostingBaseDomain) => `${workspaceId}${isFeatureEnabled("dev-domains-port") ? `-${DEFAULT_PORT}` : ""}.${workspaceHostingBaseDomain}`;
 var simpleNetworkToServerNetwork = (networkConfig, isPublic) => ({
   ports: [
@@ -123918,11 +124954,55 @@ var advancedNetworkToServerNetwork = (networkConfig) => ({
 var isLandscapeGatewayNetworkConfig = (networkConfig) => isAdvancedNetworkConfig(networkConfig) && networkConfig.landscapeGateway !== void 0;
 var configToLandscape = (config, profile) => {
   return Object.entries(config).map(([k2, v2]) => {
+    if (isRouterService(v2)) {
+      return routerServiceToServer(k2, v2, profile);
+    }
+    if (isDeployStageServerV02(v2)) {
+      return v05ServerToServer(k2, v2, profile);
+    }
     if (!isDeployStageServer(v2)) {
       return;
     }
     return deployStageServerToLandscape(k2, v2, profile);
   }).filter((x2) => x2 !== void 0);
+};
+var routerServiceToServer = (name, config, profile) => {
+  const isLandscapeGateway = config.network.isLandscapeGateway === true;
+  return toServer({
+    name,
+    planId: config.plan,
+    replicas: config.replicaCount,
+    baseImage: ROUTER_BASE_IMAGE,
+    runAsUser: ROUTER_USER_GROUP_ID,
+    runAsGroup: ROUTER_USER_GROUP_ID,
+    volumeMounts: [
+      {
+        name: "_workspace",
+        mountPath: SHARED_VOLUME_MOUNT_PATH,
+        workspacePath: ""
+      },
+      {
+        name: "_workspace",
+        mountPath: ROUTER_CONFIG_MOUNT_PATH,
+        workspacePath: profile ?? pipelineConfigPath
+      }
+    ],
+    profile,
+    isLandscapeGateway: isLandscapeGateway ? true : void 0,
+    landscapeGatewayHttpPort: isLandscapeGateway ? DEFAULT_PORT : void 0,
+    network: {
+      ports: [{ port: DEFAULT_PORT, isPublic: false }],
+      paths: []
+    }
+  });
+};
+var v05ServerToServer = (name, config, profile) => {
+  const ports = config.network.ports.map((port) => ({
+    port,
+    isPublic: false
+  }));
+  const network = config.network.landscapeGateway ? { ports, landscapeGateway: config.network.landscapeGateway } : { ports, paths: [] };
+  return deployStageServerToLandscape(name, { ...config, network }, profile);
 };
 var deployStageServerToLandscape = (name, config, profile) => {
   const network = config.network;
@@ -124387,7 +125467,7 @@ var gitProvider = {
   url: toString,
   kind: toGitProviderKind
 };
-var toGitProvider2 = toObject(gitProvider);
+var toGitProvider3 = toObject(gitProvider);
 var authMethods = [
   "client_secret_basic",
   "client_secret_post",
@@ -124481,9 +125561,9 @@ var toAuthCode = readOnly(toObject({
   code: toString,
   provider: toGitProviderKind
 }));
-var toGitProviders = readOnly(toArray(toGitProvider2));
+var toGitProviders = readOnly(toArray(toGitProvider3));
 var toGitAuthUrls = readOnly(toArray(toObject({
-  provider: toGitProvider2,
+  provider: toGitProvider3,
   auth: toString,
   configure: toUndefOr(toString)
 })));
@@ -124622,7 +125702,7 @@ var workspacePlan = {
   characteristics: toReadOnly(toPlanCharacteristic),
   maxReplicas: toPositiveInteger
 };
-var toWorkspacePlan = toObject(workspacePlan);
+var toWorkspacePlan2 = toObject(workspacePlan);
 var wsO11yComponent = {
   cpu: toPositiveNumber,
   ramGiB: toPositiveNumber,
@@ -124665,7 +125745,7 @@ var productsService = {
   context: toHttpContext,
   methods: {
     listHostingPlans: rpc({
-      response: toArray(toWorkspacePlan),
+      response: toArray(toWorkspacePlan2),
       request: toVoid
     }),
     listDatabasePlans: rpc({
@@ -124758,8 +125838,8 @@ var toSessionInfo = toObject({
   firstSignin: readOnly(toBoolean)
 });
 var toDeactivateUserInfo = toObject({
-  teamsNeedAdmin: readOnly(toArray(toTeam)),
-  teamsWithManagedResources: readOnly(toArray(toTeam))
+  teamsNeedAdmin: readOnly(toArray(toTeam2)),
+  teamsWithManagedResources: readOnly(toArray(toTeam2))
 });
 var toDeactivateUserArgs = toObject({
   dryRun: toBoolean
@@ -124850,6 +125930,10 @@ var devDomainAuthResponse = {
   userToken: toString
 };
 var toDevDomainAuthResponse = toObject(devDomainAuthResponse);
+var devDomainTeamRequest = {
+  workspaceId: toNumber
+};
+var toDevDomainTeamRequest = toObject(devDomainTeamRequest);
 var DeactivateUserFailed = DeactivateUserFailed_1 = class DeactivateUserFailed2 extends SimpleSerializableException {
   static create(opts) {
     return new DeactivateUserFailed_1("Failed to delete the user preliminarily. You still have teams which are not ready to be shut down.", opts);
@@ -124921,6 +126005,10 @@ var authService = {
     authForDevDomain: rpc({
       request: toDevDomainAuthRequest,
       response: toDevDomainAuthResponse
+    }),
+    getInvitedTeamIdForDevDomain: rpc({
+      request: toDevDomainTeamRequest,
+      response: toUndefOr(toNumber)
     })
   }
 };
@@ -126318,14 +127406,14 @@ var doCreateStubUtils = (opts) => {
     });
   };
   const withStreamyClient = async (resolver, f) => {
-    const client = StreamyClient.createForAddress(new URL(await resolver()), opts);
+    const client2 = StreamyClient.createForAddress(new URL(await resolver()), opts);
     try {
-      return await f(client);
+      return await f(client2);
     } finally {
-      await client.close();
+      await client2.close();
     }
   };
-  const withStub = async (stubClass, resolver, f) => withStreamyClient(resolver, (client) => f(new stubClass(client)));
+  const withStub = async (stubClass, resolver, f) => withStreamyClient(resolver, (client2) => f(new stubClass(client2)));
   const withStubForAddress2 = (stubClass, address, f) => withStub(stubClass, async () => address, f);
   return {
     withAuthnStub: withAuthnStub2,
@@ -126333,19 +127421,6 @@ var doCreateStubUtils = (opts) => {
     withStubForAddress: withStubForAddress2
   };
 };
-
-// packages/http/common/lib/HttpMethod.js
-var HttpMethod;
-(function(HttpMethod2) {
-  HttpMethod2["Connect"] = "connect";
-  HttpMethod2["Delete"] = "delete";
-  HttpMethod2["Get"] = "get";
-  HttpMethod2["Head"] = "head";
-  HttpMethod2["Options"] = "options";
-  HttpMethod2["Patch"] = "patch";
-  HttpMethod2["Post"] = "post";
-  HttpMethod2["Put"] = "put";
-})(HttpMethod || (HttpMethod = {}));
 
 // packages/streamy/common/lib/http.js
 var PROCEDURE_NOT_EXPOSED_MARKER = "is not exposed by the server";
@@ -126487,26 +127562,6 @@ var { withAuthnStub, withStubForAddress } = createStubUtils({
 // packages/workspace-agent/common/lib/api/pipeline.js
 var import_inversify8 = __toESM(require_inversify(), 1);
 
-// packages/workspace-agent/common/lib/pipeline/config.js
-var toCustomImage = toObject({
-  entrypoint: toUndefOr(toArray(toString)),
-  cmd: toUndefOr(toArray(toString)),
-  workingDir: toUndefOr(toString)
-});
-var toPipelineMetaConfig = toObject({
-  configRootDir: toString,
-  workingDirectory: toString,
-  internalDataDir: toString,
-  maxLogsPerStep: toNumber,
-  envVars: toRecord(toString),
-  replicaId: toString,
-  serverName: toString,
-  workspaceId: toUndefOr(toNonNegativeInteger),
-  otelLogCollectorHostname: toUndefOr(toString),
-  persistentLogs: toUndefOr(toBoolean),
-  customImage: toUndefOr(toCustomImage)
-});
-
 // packages/workspace-agent/common/lib/pipeline/Exceptions.js
 var __decorate10 = function(decorators, target, key, desc) {
   var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -126547,14 +127602,6 @@ var PipelineAlreadyInitialized = class PipelineAlreadyInitialized2 extends Simpl
 PipelineAlreadyInitialized = __decorate10([
   registerError()
 ], PipelineAlreadyInitialized);
-
-// packages/workspace-agent/common/lib/pipeline/logging.js
-var toLogKind = toLiteralUnion("kind", ["E", "I"]);
-var toLogEntry = toObject({
-  timestamp: toDate,
-  kind: toLogKind,
-  data: toString
-});
 
 // packages/workspace-agent/common/lib/api/pipeline.js
 var __decorate11 = function(decorators, target, key, desc) {
@@ -126706,11 +127753,11 @@ FreeWorkspaceLimitReached = __decorate12([
 var import_node_cache = __toESM(require_node_cache2(), 1);
 
 // packages/stubs/node/lib/auth/auth.js
-var import_sdk = __toESM(require_dist2(), 1);
+var import_sdk = __toESM(require_dist3(), 1);
 
 // packages/utils/node/lib/filesystem.js
 var import_json5 = __toESM(require_lib3(), 1);
-var import_yaml = __toESM(require_dist3(), 1);
+var import_yaml = __toESM(require_dist4(), 1);
 
 // node_modules/glob/dist/esm/index.min.js
 var import_node_url = require("node:url");
@@ -129712,6 +130759,11 @@ var toSingleFsPermission = toLiteralUnion("SingleFsPermission", [
 var fgaCluster = (clusterId) => `cluster:${clusterId}`;
 var CLUSTER = fgaCluster("default");
 
+// packages/stubs/node/lib/storage/database/squily/databaseApi.js
+var Database = class {
+};
+Database.ID = /* @__PURE__ */ Symbol.for("Database");
+
 // node_modules/pg/esm/index.mjs
 var import_lib = __toESM(require_lib5(), 1);
 var Client = import_lib.default.Client;
@@ -129725,6 +130777,46 @@ var escapeLiteral = import_lib.default.escapeLiteral;
 var Result = import_lib.default.Result;
 var TypeOverrides = import_lib.default.TypeOverrides;
 var defaults2 = import_lib.default.defaults;
+
+// packages/stubs/node/lib/storage/database/squily/nameTransformer.js
+var CamelCaseTransformer = class _CamelCaseTransformer {
+  dbToTs(s) {
+    if (_CamelCaseTransformer.ignored.includes(s)) {
+      return s;
+    }
+    return s.replace(/_([a-z])/g, (_2, c) => c.toUpperCase());
+  }
+  tsToDb(s) {
+    if (_CamelCaseTransformer.ignored.includes(s)) {
+      return s;
+    }
+    return s.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`);
+  }
+};
+CamelCaseTransformer.ignored = ["teamService", "workspaceService"];
+
+// packages/stubs/node/lib/storage/database/squily/sql/comparison.js
+var toEqualsComparison = toObject({ "==": toAny }, { strict: true });
+var toGreaterThanComparison = toObject({ ">": toAny }, { strict: true });
+var toGreaterThanEqualsComparison = toObject({ ">=": toAny }, { strict: true });
+var toLessThanComparison = toObject({ "<": toAny }, { strict: true });
+var toLessThanEqualsComparison = toObject({ "<=": toAny }, { strict: true });
+var toNotEqualsComparison = toObject({ "!=": toAny }, { strict: true });
+var toBetweenComparison = toObject({
+  between: toObject({ lower: toAny, upper: toAny })
+}, { strict: true });
+var toLikeComparison = toObject({ like: toAny }, { strict: true });
+var toInComparison = toObject({ in: toArray(toAny) }, { strict: true });
+var toComparison = toOr(toEqualsComparison, toGreaterThanComparison, toGreaterThanEqualsComparison, toLessThanComparison, toLessThanEqualsComparison, toNotEqualsComparison, toBetweenComparison, toLikeComparison, toInComparison);
+
+// packages/stubs/node/lib/storage/database/squily/sql/join.js
+var toEqualsJoinComparison = toObject({ "==": toTuple(toString, toString) });
+var toOnConditionAnd = toObject({
+  and: toArray(toOr(toEqualsJoinComparison, toTuple(toAny, toAny)))
+});
+var toOnConditionOr = toObject({
+  or: toArray(toOr(toEqualsJoinComparison, toTuple(toAny, toAny)))
+});
 
 // packages/utils/common/lib/timing.js
 var TimeTracker = class {
@@ -129754,46 +130846,7 @@ var TimeTracker = class {
 };
 TimeTracker.instance = new TimeTracker();
 
-// packages/stubs/node/lib/storage/database/squily/nameTransformer.js
-var CamelCaseTransformer = class _CamelCaseTransformer {
-  dbToTs(s) {
-    if (_CamelCaseTransformer.ignored.includes(s)) {
-      return s;
-    }
-    return s.replace(/_([a-z])/g, (_2, c) => c.toUpperCase());
-  }
-  tsToDb(s) {
-    if (_CamelCaseTransformer.ignored.includes(s)) {
-      return s;
-    }
-    return s.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`);
-  }
-};
-CamelCaseTransformer.ignored = ["teamService", "workspaceService"];
-
-// packages/stubs/node/lib/storage/database/squily/database.js
-var toEqualsComparison = toObject({ "==": toAny }, { strict: true });
-var toGreaterThanComparison = toObject({ ">": toAny }, { strict: true });
-var toGreaterThanEqualsComparison = toObject({ ">=": toAny }, { strict: true });
-var toLessThanComparison = toObject({ "<": toAny }, { strict: true });
-var toLessThanEqualsComparison = toObject({ "<=": toAny }, { strict: true });
-var toNotEqualsComparison = toObject({ "!=": toAny }, { strict: true });
-var toBetweenComparison = toObject({
-  between: toObject({ lower: toAny, upper: toAny })
-}, { strict: true });
-var toLikeComparison = toObject({ like: toAny }, { strict: true });
-var toInComparison = toObject({ in: toArray(toAny) }, { strict: true });
-var toComparison = toOr(toEqualsComparison, toGreaterThanComparison, toGreaterThanEqualsComparison, toLessThanComparison, toLessThanEqualsComparison, toNotEqualsComparison, toBetweenComparison, toLikeComparison, toInComparison);
-var toEqualsJoinComparison = toObject({ "==": toTuple(toString, toString) });
-var toOnConditionAnd = toObject({
-  and: toArray(toOr(toEqualsJoinComparison, toTuple(toAny, toAny)))
-});
-var toOnConditionOr = toObject({
-  or: toArray(toOr(toEqualsJoinComparison, toTuple(toAny, toAny)))
-});
-var Database = class {
-};
-Database.ID = /* @__PURE__ */ Symbol.for("Database");
+// packages/stubs/node/lib/storage/database/squily/pgFactory.js
 var toPgConfig = toOr(toObject({
   user: toString,
   password: toString,
@@ -130205,7 +131258,7 @@ var workspacesService = {
   methods: {
     createWorkspace: rpc({
       request: toCreateWorkspaceServiceArgs,
-      response: toWorkspace,
+      response: toWorkspace2,
       defaultOptions: { timeout: duration({ seconds: 60 }) }
     }),
     deleteWorkspace: rpc({
@@ -130215,11 +131268,11 @@ var workspacesService = {
     }),
     getWorkspace: rpc({
       request: toGetWorkspaceServiceArgs,
-      response: toWorkspace
+      response: toWorkspace2
     }),
     getByManagedService: rpc({
       request: toGetByManagedServiceArgs,
-      response: toWorkspace
+      response: toWorkspace2
     }),
     hasAccess: rpc({
       request: toHasAccessArgs,
@@ -130235,11 +131288,11 @@ var workspacesService = {
     }),
     listWorkspaces: rpc({
       request: toTeamServiceArgs,
-      response: toArray(toWorkspace)
+      response: toArray(toWorkspace2)
     }),
     listManagedServiceWorkspaces: rpc({
       request: toVoid,
-      response: toArray(toWorkspace)
+      response: toArray(toWorkspace2)
     }),
     updateWorkspace: rpc({
       request: toUpdateWorkspaceServiceArgs,
@@ -130247,7 +131300,7 @@ var workspacesService = {
       defaultOptions: { timeout: duration({ seconds: 10 }) }
     }),
     workspacesStream: stream({
-      response: toArray(toWorkspace),
+      response: toArray(toWorkspace2),
       request: toTeamServiceArgs
     })
   }
@@ -130313,19 +131366,19 @@ var CodesphereRequestFailed = class extends Exception {
     super(msg);
   }
 };
-var PipelineStageFailed = class extends CodesphereRequestFailed {
+var PipelineStageFailed2 = class extends CodesphereRequestFailed {
   constructor(stage) {
     super(`Pipeline stage ${stage} failed.`);
   }
 };
 var StartWorkspaceFailed = class extends CodesphereRequestFailed {
 };
-var PipelineStageAborted = class extends CodesphereRequestFailed {
+var PipelineStageAborted2 = class extends CodesphereRequestFailed {
   constructor(stage) {
     super(`Pipeline stage ${stage} aborted.`);
   }
 };
-var MultipleMatchesFound = class extends Exception {
+var MultipleMatchesFound2 = class extends Exception {
   constructor(msg) {
     super(msg);
   }
@@ -130342,11 +131395,11 @@ var authenticate = async (authUrl, email, password) => {
     ...session
   };
 };
-var deleteWorkspace = async (workspaces, teamId, wsName) => {
+var deleteWorkspace2 = async (workspaces, teamId, wsName) => {
   logI(`Deleting workspace ${wsName} in Codesphere.`);
   try {
     await workspaces.deleteWorkspace({
-      workspaceId: (await findWorkspace(workspaces, teamId, wsName)).id
+      workspaceId: (await findWorkspace2(workspaces, teamId, wsName)).id
     });
     logI(`Workspace ${wsName} successfully deleted.`);
     return;
@@ -130384,18 +131437,18 @@ var createWorkspaceIfNotExist = async (workspaces, { teamId, planId, workspaceNa
     };
   } catch (e) {
     if (e instanceof RpcThrew && isWorkspaceAlreadyExists(e, workspaceName2)) {
-      const ws2 = await findWorkspace(workspaces, teamId, workspaceName2);
+      const ws2 = await findWorkspace2(workspaces, teamId, workspaceName2);
       logI(`Workspace ${workspaceName2} (id: ${ws2.id}) already exists.`);
       return { ws: ws2, created: false };
     }
     throw e;
   }
 };
-var findWorkspace = async (workspaces, teamId, name) => getFirst((await workspaces.listWorkspaces({ teamId })).filter((w) => w.name === name));
+var findWorkspace2 = async (workspaces, teamId, name) => getFirst((await workspaces.listWorkspaces({ teamId })).filter((w) => w.name === name));
 var isWorkspaceAlreadyExists = (e, workspaceName2) => [workspaceAlreadyExists(workspaceName2), ALREADY_EXISTS_ERROR].some((m) => e.message === m);
-var deployWorkspace = async (workspaces, deployment, pipeline, replica, args) => {
+var deployWorkspace2 = async (workspaces, deployment, replica, args) => {
   logI("Starting deployment to Codesphere");
-  const { ws: ws2, created } = await createWorkspaceIfNotExist(workspaces, args);
+  const { ws: ws2 } = await createWorkspaceIfNotExist(workspaces, args);
   try {
     logI(await deployment.startWorkspace({ workspaceId: ws2.id }));
   } catch (e) {
@@ -130404,29 +131457,23 @@ var deployWorkspace = async (workspaces, deployment, pipeline, replica, args) =>
     }
   }
   await waitForWorkspaceStatus(replica, ws2.id, (info) => isReplicaInfo(info) && info.server === IDE_SERVER_NAME && info.status === WorkspaceStatus.Running);
-  if (created && args.runPrepareOnCreation) {
-    await runPipelineStage("prepare", "success", pipeline, ws2.id, {
-      processCleanupWaitTime: args.processCleanupWaitTime,
-      profile: args.profile
-    });
-  }
   return ws2;
 };
-var getTeam = async (team2, name) => {
+var getTeam2 = async (team2, name) => {
   logI(`Fetching team ${name} from Codesphere.`);
   const teams = (await team2.listTeams()).filter((t) => t.name === name);
   if (0 === teams.length) {
     throw new NotFound(`Team ${name} does not exist.`);
   }
   if (teams.length > 1) {
-    throw new MultipleMatchesFound(`Found ${teams.length} teams with the exact name ${name}.`);
+    throw new MultipleMatchesFound2(`Found ${teams.length} teams with the exact name ${name}.`);
   }
   return teams[0];
 };
-var runPipelineStage = async (stage, targetState, pipeline, workspaceId, { processCleanupWaitTime = duration({ seconds: 15 }), profile } = {}) => {
+var runPipelineStage2 = async (stage, targetState, pipeline, workspaceId, { processCleanupWaitTime: processCleanupWaitTime2 = duration({ seconds: 15 }), profile } = {}) => {
   logI(`Running pipeline stage "${stage}" with ${profile} profile.`);
   await pipeline.abortPipeline({ workspaceId, stage }, { timeout: duration({ seconds: 30 }) });
-  await wait(processCleanupWaitTime);
+  await wait(processCleanupWaitTime2);
   await pipeline.startPipeline({ workspaceId, stage, profile }, { timeout: duration({ seconds: 30 }) });
   const info = await pipeline.getLastExecutedStageConfig({
     workspaceId,
@@ -130470,10 +131517,10 @@ var waitForPipelineState = (pipeline, workspaceId, stage, targetState) => {
       const info = await s.recv();
       const step = getCurrentPipelineStep(info);
       if ("failure" === info.state) {
-        throw new PipelineStageFailed(stage);
+        throw new PipelineStageFailed2(stage);
       }
       if ("aborted" === info.state) {
-        throw new PipelineStageAborted(stage);
+        throw new PipelineStageAborted2(stage);
       }
       if ("success" === targetState && info.state === targetState) {
         return;
@@ -131017,7 +132064,7 @@ var executeArgsSpec = {
   timeoutMs: toUndefOr(toNumber)
 };
 var toExecuteArgs = toObject(executeArgsSpec);
-var toFinishedProcess = toObject({
+var toFinishedProcess2 = toObject({
   command: toString,
   workingDir: toString,
   output: toString,
@@ -131047,7 +132094,7 @@ var processService = {
   context: toHttpContext,
   methods: {
     execute: rpc({
-      response: toFinishedProcess,
+      response: toFinishedProcess2,
       request: toExecuteArgs,
       defaultOptions: {
         timeout: duration({ seconds: 5 })
@@ -131078,7 +132125,7 @@ var processProxyService = {
   context: toHttpContext,
   methods: {
     execute: rpc({
-      response: toFinishedProcess,
+      response: toFinishedProcess2,
       request: toExecuteArgs2
     })
   }
@@ -131130,7 +132177,7 @@ var toEvent = toObject({
 
 // packages/utils/common/lib/typing/jsonSchema.js
 var import_ajv = __toESM(require_ajv(), 1);
-var import_ajv_formats = __toESM(require_dist5(), 1);
+var import_ajv_formats = __toESM(require_dist6(), 1);
 var import_semver4 = __toESM(require_semver2(), 1);
 var addFormats = import_ajv_formats.default;
 var UpdateConstraint;
@@ -131510,7 +132557,7 @@ var toManagedServiceLandscapeProvider = (x2) => {
   assertLandscapeHasVersion(prov);
   return prov;
 };
-var toPartialManagedServiceLandscapeProvider = toObject({
+var partialProviderProperties = {
   author: toUndefOr(toString),
   backups: toUndefOr(toObject({
     configSchema: toSchemaObject,
@@ -131524,9 +132571,21 @@ var toPartialManagedServiceLandscapeProvider = toObject({
   description: toUndefOr(toString),
   displayName: toUndefOr(toString),
   iconUrl: toUndefOr(toString),
-  plans: toUndefOr(toArray(toManagedServicePlan)),
+  plans: toUndefOr(toArray(toManagedServicePlan))
+};
+var toPartialLandscapeProvider = toObject({
+  ...partialProviderProperties,
   backend: toUndefOr(toLandscapeSettings),
   versions: toUndefOr(toVersions)
+});
+var toPartialRestProvider = toObject({
+  ...partialProviderProperties,
+  backend: toUndefOr(toObject({
+    api: toObject({
+      endpoint: toString,
+      secret: toUndefOr(toRestBackendSecret)
+    })
+  }))
 });
 var toManagedServiceProvider = (x2) => {
   const prov = toOr(toManagedServiceRestProvider, toManagedServiceLandscapeProvider)(x2);
@@ -131539,6 +132598,12 @@ var toRestBackendConfig = toObject({
   api: toObject({
     endpoint: toString,
     secret: toUndefOr(toString)
+  })
+});
+var toStoredRestBackend = toObject({
+  api: toObject({
+    endpoint: toString,
+    secretRevision: toUndefOr(toString)
   })
 });
 var partialManagedServiceProviderConfigProperties = {
@@ -131621,12 +132686,12 @@ var toCreateProviderArgs = toObject({
   provider: toOr(toCreateLandscapeProviderObject, toManagedServiceRestProvider),
   scope: toUndefOr(toProviderScopeArgs)
 });
-var toCreateLandscapeProviderByGitArgs = toObject({
+var toCreateProviderByGitArgs = toObject({
   gitUrl: toFullUrl,
   gitRef: toUndefOr(toString),
   scope: toUndefOr(toProviderScopeArgs)
 });
-var toUpsertLandscapeProviderArgs = toOr(toCreateLandscapeProviderArgs, toCreateLandscapeProviderByGitArgs);
+var toUpsertProviderArgs = toOr(toCreateProviderArgs, toCreateProviderByGitArgs);
 var toProvider = toObject({
   name: toProviderName,
   schemaVersion: toProviderSchemaVersion
@@ -131634,7 +132699,19 @@ var toProvider = toObject({
 var toUpdateLandscapeProviderArgs = toObject({
   name: toProviderName,
   schemaVersion: toProviderSchemaVersion,
-  provider: toPartialManagedServiceLandscapeProvider,
+  provider: toPartialLandscapeProvider,
+  scope: toUndefOr(toProviderScopeArgs)
+});
+var toUpdateRestProviderArgs = toObject({
+  name: toProviderName,
+  schemaVersion: toProviderSchemaVersion,
+  provider: toPartialRestProvider,
+  scope: toUndefOr(toProviderScopeArgs)
+});
+var toUpdateProviderArgs = toObject({
+  name: toProviderName,
+  schemaVersion: toProviderSchemaVersion,
+  provider: toOr(toPartialLandscapeProvider, toPartialRestProvider),
   scope: toUndefOr(toProviderScopeArgs)
 });
 var toListProvidersArgs = toObject({
@@ -131691,21 +132768,21 @@ var managedServicesService = {
       request: toCreateProviderArgs,
       response: toManagedServiceProvider
     }),
-    createLandscapeProviderByGit: rpc({
-      request: toCreateLandscapeProviderByGitArgs,
-      response: toManagedServiceLandscapeProvider
+    createProviderByGit: rpc({
+      request: toCreateProviderByGitArgs,
+      response: toManagedServiceProvider
     }),
-    upsertLandscapeProvider: rpc({
-      request: toUpsertLandscapeProviderArgs,
-      response: toManagedServiceLandscapeProvider
+    upsertProvider: rpc({
+      request: toUpsertProviderArgs,
+      response: toManagedServiceProvider
     }),
     deleteProvider: rpc({
       request: toProvider,
       response: toVoid
     }),
-    updateLandscapeProvider: rpc({
-      request: toUpdateLandscapeProviderArgs,
-      response: toManagedServiceLandscapeProvider
+    updateProvider: rpc({
+      request: toUpdateProviderArgs,
+      response: toManagedServiceProvider
     }),
     serviceStream: stream({
       request: toTeamServiceArgs,
@@ -131838,56 +132915,8 @@ LandscapeStub = __decorate20([
   (0, import_inversify14.injectable)()
 ], LandscapeStub);
 
-// packages/integrations/lib/deploy.js
-var DEFAULT_PLAN_TITLE = "Boost";
-var deploymentLinkTypes = ["dev-domain", "preview"];
-var toDeploymentLinkType = toUndefOr(toNullOr(toLiteralUnion("DeploymentLinkType", deploymentLinkTypes)));
-var codesphereWorkspaceUrl = (apiUrl, w) => {
-  return new URL(import_path5.default.posix.join(apiUrl.pathname, `/ide/teams/${w.teamId}/workspaces/${w.id}`), apiUrl);
-};
-var codespherePreviewUrl = (apiUrl, w) => {
-  const wsUrl = codesphereWorkspaceUrl(apiUrl, w);
-  return new URL(`${wsUrl.pathname}/preview`, wsUrl);
-};
-var bootstrapRepoUrl = "https://github.com/codesphere-cloud/OnPrem-Bootstrap-Repo";
-var bootstrapRepoBranch = "main";
-var bootstrapRepoEnvVars = (c) => {
-  const u = new URL(c.repository.url);
-  u.username = c.gitAuth.username;
-  u.password = c.gitAuth.token;
-  return {
-    GIT_REPO_URL: u.toString(),
-    BRANCH_NAME: c.pullRequest.branch,
-    GIT_AUTHOR_NAME: "Codesphere",
-    GIT_AUTHOR_EMAIL: "support@codesphere.com",
-    GIT_COMMITTER_NAME: "Codesphere",
-    GIT_COMMITTER_EMAIL: "support@codesphere.com"
-  };
-};
-var workspaceName = (repoName, prNumber) => `${repoName}-#${prNumber}`;
-var logStatusReporter = () => ({
-  setPending: async () => logI("Deployment pending."),
-  setStarted: async () => logI("Deployment started."),
-  setFailed: async () => logE("Deployment failed."),
-  setDeployed: async (environmentUrl, msg) => logI(`Deployment successful. ${msg ?? ""} ${environmentUrl}`),
-  setInactive: async () => logI("Deployment inactive."),
-  delete: async () => logI("Deployment deleted.")
-});
-var planIdByConfig = async (products, planTitle, onDemand = false) => {
-  const availablePlans = (await products.listHostingPlans()).filter((p) => !p.deprecated);
-  const planIdByName = availablePlans.find((p) => p.title === planTitle && p.characteristics.onDemand === onDemand)?.id;
-  if (has(planTitle) && !has(planIdByName)) {
-    throw new InvalidArgument3(`Unknown plan ${planTitle}. Available plans: ${availablePlans.filter((p) => !p.characteristics.onDemand).map((p) => p.title).join(", ")}`);
-  }
-  if (planIdByName) {
-    return planIdByName;
-  }
-  const defaultPlanId = availablePlans.find((p) => p.title === DEFAULT_PLAN_TITLE && !p.characteristics.onDemand)?.id;
-  if (!defaultPlanId) {
-    throw new InvalidArgument3(`Could not find default plan ${DEFAULT_PLAN_TITLE}. Available plans: ${availablePlans.filter((p) => !p.characteristics.onDemand).map((p) => p.title).join(", ")}`);
-  }
-  return defaultPlanId;
-};
+// packages/integrations/lib/streamyDeploy.js
+var planIdByConfig = async (products, planTitle, onDemand = false) => findPlan(await products.listHostingPlans(), planTitle, onDemand).id;
 var withStubs = async (dataCenterId, creds, serviceUrlDc, fn) => {
   const man = new StreamyClientManager({
     createTransport: connectWebSocketTransport,
@@ -131898,12 +132927,12 @@ var withStubs = async (dataCenterId, creds, serviceUrlDc, fn) => {
   });
   const clients = [];
   const createStub = async (service, createStub2) => {
-    const client = await man.acquire(service);
-    const stub = new createStub2(client);
+    const client2 = await man.acquire(service);
+    const stub = new createStub2(client2);
     if (stub instanceof AuthnStub) {
       await stub.authenticate(creds);
     }
-    clients.push(client);
+    clients.push(client2);
     return stub;
   };
   try {
@@ -131931,12 +132960,12 @@ var serviceUrlCreators = (apiUrl) => {
   };
   return { serviceUrl, serviceUrlDc };
 };
-var runWorkspacePipeline = async (pipeline, workspace2, profile) => {
+var runWorkspacePipeline2 = async (pipeline, workspace2, profile) => {
   logI("Running Pipeline");
-  await runPipelineStage("prepare", "success", pipeline, workspace2.id, {
+  await runPipelineStage2("prepare", "success", pipeline, workspace2.id, {
     profile
   });
-  await runPipelineStage("run", "running", pipeline, workspace2.id, { profile });
+  await runPipelineStage2("run", "running", pipeline, workspace2.id, { profile });
 };
 var initRuntimeFlags = async (apiUrl) => {
   const ideServiceUrl = new URL(joinPath(apiUrl.pathname, "ide-service"), apiUrl);
@@ -131969,7 +132998,7 @@ var getCiLandscape = async (pipeline, workspaceId, profile) => {
     throw e;
   }
 };
-var updateRepositoryInWorkspace = async (process2, workspace2, gitUrl, gitAuth, pr) => {
+var updateRepositoryInWorkspace2 = async (process2, workspace2, gitUrl, gitAuth, pr) => {
   const gitHost = new URL(gitUrl).hostname;
   logI(`Updating repository of workspace to ${pr.headCommitSha}`);
   const run2 = async (args, timeout = duration({ seconds: 10 })) => {
@@ -131986,13 +133015,13 @@ var updateRepositoryInWorkspace = async (process2, workspace2, gitUrl, gitAuth, 
     return false;
   }
   logI(`Head of workspace is at ${head} but expected ${pr.headCommitSha}. Updating`);
-  const netrcPath = "/home/user/.netrc";
+  const netrcPath2 = "/home/user/.netrc";
   const netrc = `machine ${gitHost}
   login ${gitAuth.username}
   password ${gitAuth.token}
 `;
   try {
-    await run2(["bash", { c: `echo '${netrc}' > ${netrcPath}` }]);
+    await run2(["bash", { c: `echo '${netrc}' > ${netrcPath2}` }]);
     await run2([
       "git",
       "config",
@@ -132009,7 +133038,7 @@ var updateRepositoryInWorkspace = async (process2, workspace2, gitUrl, gitAuth, 
     }
     return true;
   } finally {
-    await run2(["rm", netrcPath]);
+    await run2(["rm", netrcPath2]);
     await run2([
       "git",
       "config",
@@ -132018,34 +133047,31 @@ var updateRepositoryInWorkspace = async (process2, workspace2, gitUrl, gitAuth, 
     ]);
   }
 };
-var createDeployment = async (creds, team2, c, status, serviceUrlDc) => {
+var createDeployment2 = async (creds, team2, c, status, serviceUrlDc) => {
   await status.setPending();
   try {
     await status.setStarted();
     await withStubs(team2.defaultDataCenterId, creds, serviceUrlDc, async ({ deployment, landscape, replica, pipeline, workspaces, products, process: process2, config, git }) => {
-      const useBootstrapRepo = !await isProviderSupported(c.repository, git);
-      if (useBootstrapRepo) {
-        logI("Using Bootstrap repository");
+      if (!await isProviderSupported(c.repository, git)) {
+        throw new InvalidState(`Codesphere can't clone from the git provider of ${c.repository.url}.`);
       }
-      const w = await deployWorkspace(workspaces, deployment, pipeline, replica, {
-        envVars: useBootstrapRepo ? { ...bootstrapRepoEnvVars(c), ...c.envVars } : c.envVars,
+      const w = await deployWorkspace2(workspaces, deployment, replica, {
+        envVars: c.envVars,
         teamId: team2.id,
         baseImage: c.baseImage,
-        profile: c.profile,
         planId: await planIdByConfig(products, c.planTitle, c.onDemand),
         restricted: c.restricted,
         workspaceName: c.workspaceName ?? workspaceName(c.repository.name, c.pullRequest.number),
-        gitUrl: useBootstrapRepo ? bootstrapRepoUrl : c.repository.url,
+        gitUrl: c.repository.url,
         isPrivateRepo: c.repository.private,
-        initialBranch: useBootstrapRepo ? bootstrapRepoBranch : c.pullRequest.branch,
+        initialBranch: c.pullRequest.branch,
         cloneDepth: c.cloneDepth,
         skipLfs: c.skipLfs,
         recurseSubmodules: c.recurseSubmodules,
-        runPrepareOnCreation: useBootstrapRepo,
         vpnConfig: c.vpnConfigName,
         sharedVaultName: c.sharedVaultName
       });
-      await updateRepositoryInWorkspace(process2, w, c.repository.url, c.gitAuth, c.pullRequest);
+      await updateRepositoryInWorkspace2(process2, w, c.repository.url, c.gitAuth, c.pullRequest);
       const servers = await getCiLandscape(pipeline, w.id, c.profile);
       if (servers) {
         logD([
@@ -132057,9 +133083,9 @@ var createDeployment = async (creds, team2, c, status, serviceUrlDc) => {
           servers
         });
       }
-      await runWorkspacePipeline(pipeline, w, c.profile);
-      const environmentUrl = await getEnvironmentUrl(c, w, config);
-      await status.setDeployed(environmentUrl);
+      await runWorkspacePipeline2(pipeline, w, c.profile);
+      const environmentUrl2 = await getEnvironmentUrl(c, w, config);
+      await status.setDeployed(environmentUrl2);
     });
   } catch (e) {
     await logErrorAsync(() => status.setFailed("Deployment to Codesphere failed."));
@@ -132073,40 +133099,41 @@ var getEnvironmentUrl = async (c, w, config) => {
   const { workspaceHostingBaseDomain } = await config.getBrowserConfig();
   return `https://${workspaceDevDomain(w.id, workspaceHostingBaseDomain)}`;
 };
-var isProviderSupported = async (repo, gitStub) => {
-  const repoUrl = new URL(repo.url);
-  repoUrl.username = "";
-  repoUrl.password = "";
-  const providers = await gitStub.getSupportedGitProviders();
-  return providers.some((provider) => {
-    const p = new URL(provider.url);
-    if (repoUrl.hostname === p.hostname && repoUrl.pathname.startsWith(p.pathname)) {
-      return true;
-    }
-  });
-};
-var removeDeployment = async (creds, team2, c, status, serviceUrlDc) => {
+var isProviderSupported = async (repo, gitStub) => isProviderSupportedBy(repo, await gitStub.getSupportedGitProviders());
+var removeDeployment2 = async (creds, team2, c, status, serviceUrlDc) => {
   await status.setInactive();
   await withStubs(team2.defaultDataCenterId, creds, serviceUrlDc, async ({ workspaces }) => {
-    await deleteWorkspace(workspaces, team2.id, workspaceName(c.repository.name, c.pullRequest.number));
+    await deleteWorkspace2(workspaces, team2.id, workspaceName(c.repository.name, c.pullRequest.number));
     await status.delete();
   });
   logI("Deployment successfully deleted.");
 };
+var runWithStreamy = async (config, status) => {
+  const { serviceUrl, serviceUrlDc } = serviceUrlCreators(config.apiUrl);
+  await initRuntimeFlags(config.apiUrl);
+  const creds = await authenticate(serviceUrl("auth-service"), config.authentication.email, config.authentication.password);
+  const t = await withAuthnStub(TeamStub, serviceUrl("team-service"), creds.accessToken, (stub) => getTeam2(stub, config.teamName));
+  if (config.pullRequest.open) {
+    await createDeployment2(creds, t, config, status, serviceUrlDc);
+    return;
+  }
+  await removeDeployment2(creds, t, config, status, serviceUrlDc);
+};
+
+// packages/integrations/lib/deploy.js
 var run = async (config, status) => {
   if (config.tlsAllowUnauthorized) {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
   }
-  const { serviceUrl, serviceUrlDc } = serviceUrlCreators(config.apiUrl);
-  await initRuntimeFlags(config.apiUrl);
-  const creds = await authenticate(serviceUrl("auth-service"), config.authentication.email, config.authentication.password);
-  const t = await withAuthnStub(TeamStub, serviceUrl("team-service"), creds.accessToken, (stub) => getTeam(stub, config.teamName));
-  if (config.pullRequest.open) {
-    await createDeployment(creds, t, config, status, serviceUrlDc);
+  const authentication = config.authentication;
+  if (isOfType(authentication, toApiTokenAuthentication)) {
+    await runWithPublicApi({ ...config, authentication }, status);
     return;
   }
-  await removeDeployment(creds, t, config, status, serviceUrlDc);
+  logPasswordDeprecation();
+  await runWithStreamy({ ...config, authentication }, status);
 };
+var logPasswordDeprecation = () => logW("Authenticating with email and password is deprecated. Create a Codesphere API token and configure it instead.");
 
 // packages/integrations/lib/github-action-deploy-workspace.js
 var getConfig = async () => {
@@ -132134,10 +133161,11 @@ var getConfig = async () => {
     vpnConfigName: getActionInput("vpnConfig") ?? void 0,
     sharedVaultName: getActionInput("sharedVaultName") ?? void 0,
     deploymentLinkType: toDeploymentLinkType(getActionInput("deploymentLinkType")),
-    authentication: {
-      email: getActionInput("email", true),
-      password: getActionInput("password", true)
-    },
+    authentication: toAuthentication({
+      apiToken: getActionInput("apiToken"),
+      email: getActionInput("email"),
+      password: getActionInput("password")
+    }),
     gitAuth: {
       username: "x-aceess-token",
       token: config.gitHubToken
@@ -132191,34 +133219,50 @@ var GitHubDeployment = class _GitHubDeployment {
   async setFailed(msg) {
     await this.updateStatus("failure", msg);
   }
-  async setDeployed(environmentUrl, msg = "") {
-    await this.updateStatus("success", msg, environmentUrl);
+  async setDeployed(environmentUrl2, msg = "") {
+    await this.updateStatus("success", msg, environmentUrl2);
+    await logErrorAsync(() => this.deactivatePrevious());
   }
   async setInactive(msg = "") {
     await this.updateStatus("inactive", msg);
   }
   async delete() {
-    await this.setInactive();
-    const deployments = (await this.octokit.rest.repos.listDeployments({
-      owner: this.owner,
-      repo: this.repo,
-      environment: this.environment,
-      per_page: 100
-    })).data;
+    const deployments = await this.listDeployments();
+    await mapAsync(deployments, (d) => this.deactivate(d.id));
     await mapAsync(deployments, (d) => this.octokit.rest.repos.deleteDeployment({
       owner: this.owner,
       repo: this.repo,
       deployment_id: d.id
     }));
   }
-  async updateStatus(state, msg = "", environmentUrl = "") {
+  async listDeployments() {
+    return (await this.octokit.rest.repos.listDeployments({
+      owner: this.owner,
+      repo: this.repo,
+      environment: this.environment,
+      per_page: 100
+    })).data;
+  }
+  async deactivatePrevious() {
+    const previous = (await this.listDeployments()).filter((d) => d.id !== this.id);
+    await mapAsync(previous, (d) => this.deactivate(d.id));
+  }
+  async deactivate(deploymentId) {
+    await this.octokit.rest.repos.createDeploymentStatus({
+      owner: this.owner,
+      repo: this.repo,
+      deployment_id: deploymentId,
+      state: "inactive"
+    });
+  }
+  async updateStatus(state, msg = "", environmentUrl2 = "") {
     await this.octokit.rest.repos.createDeploymentStatus({
       owner: this.owner,
       repo: this.repo,
       deployment_id: this.id,
       state,
       description: msg,
-      environment_url: environmentUrl,
+      environment_url: environmentUrl2,
       log_url: this.logUrl()
     });
   }
@@ -132267,6 +133311,13 @@ reflect-metadata/Reflect.js:
   and limitations under the License.
   ***************************************************************************** *)
 
+content-type/dist/index.js:
+  (*!
+   * content-type
+   * Copyright(c) 2015 Douglas Christopher Wilson
+   * MIT Licensed
+   *)
+
 undici/lib/web/fetch/body.js:
 undici/lib/web/fetch/body.js:
   (*! formdata-polyfill. MIT License. Jimmy Wärting <https://jimmy.warting.se/opensource> *)
@@ -132292,7 +133343,7 @@ mime-types/index.js:
    *)
 
 axios/dist/node/axios.cjs:
-  (*! Axios v1.18.1 Copyright (c) 2026 Matt Zabriskie and contributors *)
+  (*! Axios v1.19.0 Copyright (c) 2026 Matt Zabriskie and contributors *)
 
 is-number/index.js:
   (*!
@@ -132324,4 +133375,7 @@ fill-range/index.js:
 @octokit/request/dist-bundle/index.js:
   (* v8 ignore next -- @preserve *)
   (* v8 ignore else -- @preserve *)
+
+@octokit/graphql/dist-bundle/index.js:
+  (* v8 ignore if -- @preserve *)
 */
