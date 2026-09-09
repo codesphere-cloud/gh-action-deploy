@@ -97507,7 +97507,6 @@ var AVAILABLE_INTERNAL_FLAGS = [
   "cimg-private-registry",
   "cluster-admin",
   "coco-secrets",
-  "create-provider-ui",
   "custom-image-entrypoint-autostart",
   "custom-service-image",
   "gateway-domains",
@@ -98713,6 +98712,38 @@ var toHttpContext = (x2) => {
   return ctx;
 };
 
+// packages/stubs/common/lib/auth/generatedAuthSchema.js
+var WORKSPACE_PERMISSIONS = [
+  "can_exec_ide",
+  "can_manage_landscape",
+  "can_manage_permissions",
+  "can_manage_settings",
+  "can_view",
+  "can_write_ide"
+];
+var RESOURCE_GROUP_ROLE_RELATIONS = {
+  roles: ["admin", "member"],
+  impliedBy: {
+    admin: [],
+    member: ["admin"]
+  },
+  inheritedFrom: {
+    admin: { type: "organization", role: "owner" }
+  }
+};
+var WORKSPACE_ROLE_RELATIONS = {
+  roles: ["admin", "editor", "viewer"],
+  impliedBy: {
+    admin: [],
+    editor: ["admin"],
+    viewer: ["admin", "editor"]
+  },
+  inheritedFrom: {
+    admin: { type: "resource_group", role: "admin" },
+    viewer: { type: "resource_group", role: "member" }
+  }
+};
+
 // packages/team-service/common/lib/model/TeamServiceTypes.js
 var Role;
 (function(Role2) {
@@ -98881,6 +98912,14 @@ var toUpdateWorkspaceServiceArgs = toObject({
   storageMib: toUndefOr(toNullOr(toPositiveInteger)),
   sharedVaultName: toUndefOr(toNullOr(toString))
 });
+var toWorkspaceRoleChange = toObject({
+  userId: toNonNegativeInteger,
+  role: toUndefOr(toLiteralUnion("WorkspaceRole", WORKSPACE_ROLE_RELATIONS.roles))
+});
+var toChangeWorkspaceRolesArgs = toObject({
+  workspaceId: toNonNegativeInteger,
+  changes: toNonEmptyArray(toWorkspaceRoleChange)
+});
 var toHasAccessArgs = toObject({
   ...workspaceServiceArgs,
   role: toRole
@@ -99016,38 +99055,6 @@ ReplicaStub = __decorate3([
 // packages/deployment-service/common/lib/api/workspaceDeployment.js
 var import_inversify3 = __toESM(require_inversify(), 1);
 
-// packages/stubs/common/lib/auth/generatedAuthSchema.js
-var WORKSPACE_PERMISSIONS = [
-  "can_exec_ide",
-  "can_manage_landscape",
-  "can_manage_permissions",
-  "can_manage_settings",
-  "can_view",
-  "can_write_ide"
-];
-var RESOURCE_GROUP_ROLE_RELATIONS = {
-  roles: ["admin", "member"],
-  impliedBy: {
-    admin: [],
-    member: ["admin"]
-  },
-  inheritedFrom: {
-    admin: { type: "organization", role: "owner" }
-  }
-};
-var WORKSPACE_ROLE_RELATIONS = {
-  roles: ["admin", "editor", "viewer"],
-  impliedBy: {
-    admin: [],
-    editor: ["admin"],
-    viewer: ["admin", "editor"]
-  },
-  inheritedFrom: {
-    admin: { type: "resource_group", role: "admin" },
-    viewer: { type: "resource_group", role: "member" }
-  }
-};
-
 // packages/workspace-agent/common/lib/pipeline/config.js
 var pipelineConfigPath = "ci.yml";
 var toCustomImage = toObject({
@@ -99079,7 +99086,7 @@ var GitProvider;
 var toGitProvider2 = toStringEnum("GitProvider", GitProvider);
 var SHARED_VOLUME_MOUNT_PATH = "/home/user/app";
 var toWorkspacePermissions = toObject(Object.fromEntries(WORKSPACE_PERMISSIONS.map((p) => [p, toBoolean])));
-var toWorkspaceRoles = toObject({
+var workspaceRoles = {
   highest: toObject({
     role: toLiteralUnion("WorkspaceRole", WORKSPACE_ROLE_RELATIONS.roles),
     inheritedFrom: toUndefOr(toObject({
@@ -99087,7 +99094,8 @@ var toWorkspaceRoles = toObject({
       role: toLiteralUnion("ResourceGroupRole", RESOURCE_GROUP_ROLE_RELATIONS.roles)
     }))
   })
-});
+};
+var toWorkspaceRoles = toObject(workspaceRoles);
 var workspace = {
   id: readOnly(toNonNegativeInteger),
   dataCenterId: readOnly(toNumber),
@@ -101845,6 +101853,11 @@ var PipelineAlreadyInitialized = class PipelineAlreadyInitialized2 extends Simpl
 PipelineAlreadyInitialized = __decorate10([
   registerError()
 ], PipelineAlreadyInitialized);
+var AlreadyExecuting = class AlreadyExecuting2 extends SimpleSerializableException {
+};
+AlreadyExecuting = __decorate10([
+  registerError()
+], AlreadyExecuting);
 
 // packages/workspace-agent/common/lib/api/pipeline.js
 var __decorate11 = function(decorators, target, key, desc) {
@@ -102477,6 +102490,41 @@ var toReplicaSum = toObject({
   replicas: toUndefOr(toNullOr(toOr(toNumber, toString)))
 });
 
+// packages/utils/common/lib/typing/containerImage.js
+var digestPattern = "(?:sha256:[a-f0-9]{64}|sha384:[a-f0-9]{96}|sha512:[a-f0-9]{128})";
+var prepareRegexps = () => {
+  const alphanumeric = "[a-z0-9]+";
+  const separator = "(?:[._]|__|-+)";
+  const pathComponent = `${alphanumeric}(?:${separator}${alphanumeric})*`;
+  const remoteName = `${pathComponent}(?:/${pathComponent})*`;
+  const domainNameComponent = "(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])";
+  const domainName = `${domainNameComponent}(?:\\.${domainNameComponent})*`;
+  const ipv6address = "\\[(?:[a-fA-F0-9:]+)\\]";
+  const host = `(?:${domainName}|${ipv6address})`;
+  const domainAndPort = `${host}(?::[0-9]+)?`;
+  const tag = "[\\w][\\w.-]{0,127}";
+  const name = `(?:${domainAndPort}/)?${remoteName}`;
+  return {
+    reference: new RegExp(`^(${name})(?::(${tag}))?(?:@(${digestPattern}))?$`),
+    name: new RegExp(`^(?:(${domainAndPort})/)?(${remoteName})$`)
+  };
+};
+var { reference: referenceRegexp, name: nameRegexp } = prepareRegexps();
+var digestRegexp = new RegExp(`^${digestPattern}$`);
+
+// packages/workspace-service/common/lib/api/staticBuildArtifact.js
+var toTaggedStaticBuildArtifact = toObject({
+  digest: toUndefOr(toString),
+  registryUrl: toString,
+  tag: toString
+});
+var toDigestedStaticBuildArtifact = toObject({
+  digest: toString,
+  registryUrl: toString,
+  tag: toUndefOr(toString)
+});
+var toStaticBuildArtifact = toOr(toTaggedStaticBuildArtifact, toDigestedStaticBuildArtifact);
+
 // packages/workspace-service/common/lib/api/workspaces.js
 var import_inversify9 = __toESM(require_inversify(), 1);
 
@@ -102547,10 +102595,30 @@ var VpnConfigNotFound = class VpnConfigNotFound2 extends SimpleSerializableExcep
 VpnConfigNotFound = __decorate14([
   registerError()
 ], VpnConfigNotFound);
+var toWorkspaceRole = toLiteralUnion("WorkspaceRole", WORKSPACE_ROLE_RELATIONS.roles);
+var toWorkspaceRoleAssignment = toObject({
+  userId: toNonNegativeInteger,
+  role: toWorkspaceRole,
+  inherited: toUndefOr(toObject({
+    role: toWorkspaceRole,
+    from: toObject({
+      type: toString,
+      role: toLiteralUnion("ResourceGroupRole", RESOURCE_GROUP_ROLE_RELATIONS.roles)
+    })
+  }))
+});
 var workspacesService = {
   name: "Workspaces",
   context: toHttpContext,
   methods: {
+    changeWorkspaceRoles: rpc({
+      request: toChangeWorkspaceRolesArgs,
+      response: toVoid
+    }),
+    listRoleAssignments: rpc({
+      request: toWorkspaceServiceArgs2,
+      response: toArray(toWorkspaceRoleAssignment)
+    }),
     createWorkspace: rpc({
       request: toCreateWorkspaceServiceArgs,
       response: toWorkspace2,
@@ -102644,7 +102712,8 @@ var toWorkspaceDbEntry = toObject({
   managedServiceId: toUndefOr(toUuid),
   storageMib: toUndefOr(toPositiveInteger),
   sharedVaultName: toUndefOr(toString),
-  confidentialWorkloadId: toUndefOr(toString)
+  confidentialWorkloadId: toUndefOr(toString),
+  staticBuildArtifact: toUndefOr(toStaticBuildArtifact)
 });
 
 // packages/script-lib/lib/codesphere.js
@@ -118806,23 +118875,75 @@ var capabilitiesSchema = external_exports.object({
   pointInTimeRecovery: external_exports.boolean().optional()
 });
 var toCapabilities = fromZod(capabilitiesSchema.optional());
+var labelsSchema = external_exports.record(external_exports.string().min(1).max(514), external_exports.string().min(1).max(5e3)).refine((v) => objectSize(v) <= 50, {
+  message: "Invalid input: record must have at most 50 properties"
+});
+var toLabels = fromZod(labelsSchema.optional());
+var resourceParameterSchema = external_exports.object({
+  pricedAs: external_exports.literal([
+    "cpu-tenths",
+    "free",
+    "network-bandwidth-mbps",
+    "ram-mib",
+    "replicas",
+    "storage-mib"
+  ]).optional(),
+  schema: jsonSchemaSchema
+});
+var resourceParametersSchema = external_exports.record(external_exports.string(), resourceParameterSchema);
+var toResourceParameters = fromZod(resourceParametersSchema);
 var managedServicePlanSchema = external_exports.object({
   id: external_exports.int().min(0),
-  parameters: external_exports.record(external_exports.string(), external_exports.object({
-    pricedAs: external_exports.literal([
-      "cpu-tenths",
-      "free",
-      "network-bandwidth-mbps",
-      "ram-mib",
-      "replicas",
-      "storage-mib"
-    ]).optional(),
-    schema: jsonSchemaSchema
-  })),
+  parameters: external_exports.record(external_exports.string(), external_exports.number()),
   description: external_exports.string(),
   name: external_exports.string()
 });
 var toManagedServicePlan = fromZod(managedServicePlanSchema);
+var legacyManagedServicePlanSchema = external_exports.object({
+  id: external_exports.int().min(0),
+  parameters: external_exports.record(external_exports.string(), resourceParameterSchema),
+  description: external_exports.string(),
+  name: external_exports.string()
+});
+var toLegacyPlans = fromZod(external_exports.array(legacyManagedServicePlanSchema));
+var isLegacyPlans = (rawPlans) => isOfType(rawPlans, toLegacyPlans) && rawPlans.some((plan) => Object.keys(plan.parameters).length > 0);
+var stripDefault = (schema) => {
+  const { default: _default3, ...rest } = schema;
+  return rest;
+};
+var toPlanValues = (planName, parameters) => {
+  const values = {};
+  for (const [key, parameter] of Object.entries(parameters)) {
+    if (typeof parameter.schema.default === "number") {
+      values[key] = parameter.schema.default;
+    } else if (parameter.schema.readOnly === true) {
+      throw new TypeConversionFailure("number", parameter.schema, void 0, {
+        customErrorMessage: `Legacy plan "${planName}" parameter "${key}" is read-only but has no numeric schema.default, so it pins no value.`
+      });
+    }
+  }
+  return values;
+};
+var upgradeLegacyProviderPlans = (legacyPlans) => {
+  const resourceParameters = {};
+  for (const plan of legacyPlans) {
+    for (const [key, parameter] of Object.entries(plan.parameters)) {
+      if (!(key in resourceParameters)) {
+        resourceParameters[key] = {
+          pricedAs: parameter.pricedAs,
+          schema: stripDefault(parameter.schema)
+        };
+      }
+    }
+  }
+  const plans = legacyPlans.map((plan) => ({
+    id: plan.id,
+    name: plan.name,
+    description: plan.description,
+    parameters: toPlanValues(plan.name, plan.parameters)
+  }));
+  return { plans, resourceParameters };
+};
 var asciiLabel = "Only ASCII characters 32 through 126";
 var restBackendSecretSchema = external_exports.string().regex(/^[\x20-\x7E]*$/, asciiLabel).meta({ title: asciiLabel });
 var landscapeSettingsSchema = external_exports.object({
@@ -118833,8 +118954,8 @@ var landscapeSettingsSchema = external_exports.object({
 });
 var toLandscapeSettings = fromZod(landscapeSettingsSchema);
 var versionsSchema = external_exports.record(semVerSchema, external_exports.object({
-  gitRef: external_exports.string(),
-  ciProfile: external_exports.string(),
+  gitRef: external_exports.string().min(1),
+  ciProfile: external_exports.string().min(1),
   appVersion: external_exports.string().optional(),
   description: external_exports.string().optional()
 })).meta({
@@ -118867,20 +118988,22 @@ var versionsSchema = external_exports.record(semVerSchema, external_exports.obje
 var toVersions = fromZod(versionsSchema);
 var baseProviderSchema = external_exports.object({
   name: providerNameSchema,
-  author: external_exports.string(),
+  author: external_exports.string().min(1),
   backups: external_exports.object({
     configSchema: jsonSchemaSchema,
     secretsSchema: jsonSchemaSchema
   }).optional(),
   capabilities: capabilitiesSchema.optional(),
-  category: external_exports.string(),
+  category: external_exports.string().min(1),
   configSchema: jsonSchemaSchema,
   detailsSchema: jsonSchemaSchema,
   secretsSchema: jsonSchemaSchema,
-  description: external_exports.string(),
-  displayName: external_exports.string(),
+  description: external_exports.string().min(1),
+  displayName: external_exports.string().min(1),
   iconUrl: external_exports.string(),
+  labels: labelsSchema.optional(),
   plans: external_exports.array(managedServicePlanSchema).optional(),
+  resourceParameters: resourceParametersSchema.optional(),
   schemaVersion: providerSchemaVersionSchema,
   teamSingleton: external_exports.boolean().optional(),
   documentationUrl: external_exports.string().optional(),
@@ -118914,9 +119037,10 @@ var toManagedServiceLandscapeProvider = (x2) => {
   assertLandscapeHasVersion(prov);
   return prov;
 };
+var toManagedServiceDefinitionProvider = toOr(toManagedServiceRestProvider, toManagedServiceLandscapeProvider);
 var managedServiceProviderSchema = external_exports.union([managedServiceLandscapeProviderSchema, managedServiceRestProviderSchema], { error: unionError });
 var toManagedServiceProvider = (x2) => {
-  const prov = toOr(toManagedServiceRestProvider, toManagedServiceLandscapeProvider)(x2);
+  const prov = toManagedServiceDefinitionProvider(x2);
   if ((prov.capabilities?.backups || prov.capabilities?.pointInTimeRecovery) && prov.backups === void 0) {
     throw new TypeConversionFailure("Providers with capability backup or pointInTimeRecovery must define backups.configSchema and backups.secretsSchema", prov.backups);
   }
@@ -119029,7 +119153,8 @@ var toStoredRestBackend = fromZod(storedRestBackendSchema);
 var partialManagedServiceProviderConfigPropertiesSchema = baseProviderSchema.partial().extend({
   name: providerNameSchema,
   scope: providerScopeSchema,
-  version: providerSchemaVersionSchema.optional()
+  version: providerSchemaVersionSchema.optional(),
+  resourceParameters: external_exports.record(external_exports.string(), resourceParameterSchema.nullable()).optional()
 });
 var managedServiceRestProviderConfigSchema = partialManagedServiceProviderConfigPropertiesSchema.extend({
   backend: restBackendConfigSchema.optional()
@@ -119038,10 +119163,21 @@ var managedServiceLandscapeProviderConfigSchema = partialManagedServiceProviderC
   backend: landscapeSettingsSchema.optional(),
   versions: versionsSchema.optional()
 });
-var managedServiceProviderConfigSchema = external_exports.union([
+var upgradeLegacyProviderConfigInput = (entry) => {
+  if (typeof entry !== "object" || entry === null) {
+    return entry;
+  }
+  const rawPlans = entry.plans;
+  if (!isLegacyPlans(rawPlans)) {
+    return entry;
+  }
+  const { plans, resourceParameters } = upgradeLegacyProviderPlans(rawPlans);
+  return { ...entry, plans, resourceParameters };
+};
+var managedServiceProviderConfigSchema = external_exports.preprocess(upgradeLegacyProviderConfigInput, external_exports.union([
   managedServiceRestProviderConfigSchema,
   managedServiceLandscapeProviderConfigSchema
-], { error: unionError });
+], { error: unionError }));
 var toManagedServiceProviderConfig = fromZod(managedServiceProviderConfigSchema);
 
 // packages/marketplace/common/lib/api/model/managedService.js
