@@ -7,18 +7,15 @@ runs:
   using: 'node24'
   main: 'main.js'
 inputs:
-  email:
-    description: 'email of the codesphere user'
-    required: true
-  password:
-    description: 'Password of the codesphere user account'
+  apiToken:
+    description: 'api token of the user'
     required: true
   team:
     description: 'Name of the codesphere team'
     required: true
   plan:
     description: |
-      Plan of the created workspace.
+      Plan of the workspaces ide service. All landscape services are deployed with the plan configured in your selected ci profile
 
       Available options:
       - Micro
