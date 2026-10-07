@@ -96493,6 +96493,16 @@ var formatWithDetails = (entry) => {
   const level = LogLevel[entry.level].charAt(0);
   return `[${entry.time}] ${level}: ${formatSimply(entry)}`;
 };
+var formatLocalTime = (isoTime) => new Date(isoTime).toLocaleTimeString(void 0, {
+  hourCycle: "h23",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  fractionalSecondDigits: 3
+});
+var formatWithTimestamp = (format) => {
+  return (entry) => `[${formatLocalTime(entry.time)}] ${format(entry)}`;
+};
 var levelColors = {
   [LogLevel.Debug]: import_chalk.default.gray,
   [LogLevel.Info]: import_chalk.default.cyan,
@@ -96524,7 +96534,8 @@ var ConsoleLogger = class _ConsoleLogger extends FormattingLogger {
     return new _ConsoleLogger(formatSimply);
   }
   static coloredSimple() {
-    return new _ConsoleLogger(formatInColor(formatSimply));
+    const format = process.env["SHOW_LOG_TIMESTAMPS"] === "true" ? formatWithTimestamp(formatSimply) : formatSimply;
+    return new _ConsoleLogger(formatInColor(format));
   }
   static coloredDetailed() {
     return new _ConsoleLogger(formatInColor(formatWithDetails));
@@ -98733,6 +98744,7 @@ var AVAILABLE_INTERNAL_FLAGS = [
   "o11y",
   "oidc-role-mapping",
   "openfga-frontend-authz",
+  "openfga-rg-authz",
   "overview-cockpit",
   "overview-react",
   "persistent-logs",
@@ -98744,7 +98756,8 @@ var AVAILABLE_INTERNAL_FLAGS = [
   "team-container-registries",
   "time-sameDc",
   "vcluster",
-  "vpn"
+  "vpn",
+  "workspace-pvc-storage"
 ];
 var availableInternalFlags = [...AVAILABLE_INTERNAL_FLAGS];
 var AVAILABLE_PREVIEW_FLAGS = [
@@ -98756,6 +98769,7 @@ var AVAILABLE_PREVIEW_FLAGS = [
   "sub-path-mount",
   "tcp-udp",
   "virtual-machines",
+  "workspace-router",
   "workspace-ssh"
 ];
 var availablePreviewFlags = [...AVAILABLE_PREVIEW_FLAGS];
@@ -99235,6 +99249,7 @@ var toRouterService = toObject({
   type: toLiteral("router"),
   plan: toUndefOr(toPlanId),
   replicaCount: toPositiveInteger,
+  collectTraces: toUndefOr(toBoolean),
   network: toObject({
     isLandscapeGateway: toUndefOr(toBoolean),
     paths: toUndefOr(toArray(toRouterPath)),
@@ -100825,8 +100840,24 @@ var toRouterStatus = toObject({
   desiredReplicas: toUndefOr(toNonNegativeInteger)
 });
 
-// packages/deployment-service/common/lib/api/workspaceDeployment.js
+// packages/deployment-service/common/lib/utils/exceptions.js
 var __decorate4 = function(decorators, target, key, desc) {
+  var c2 = arguments.length, r2 = c2 < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d4;
+  if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r2 = Reflect.decorate(decorators, target, key, desc);
+  else for (var i = decorators.length - 1; i >= 0; i--) if (d4 = decorators[i]) r2 = (c2 < 3 ? d4(r2) : c2 > 3 ? d4(target, key, r2) : d4(target, key)) || r2;
+  return c2 > 3 && r2 && Object.defineProperty(target, key, r2), r2;
+};
+var WorkspaceInstanceNotFound = class WorkspaceInstanceNotFound2 extends SimpleSerializableException {
+  static create(args, opts) {
+    return new this(`Workspace instance workspaceId=${args.workspaceId}, server=${args.server} not found.`, opts);
+  }
+};
+WorkspaceInstanceNotFound = __decorate4([
+  registerError()
+], WorkspaceInstanceNotFound);
+
+// packages/deployment-service/common/lib/api/workspaceDeployment.js
+var __decorate5 = function(decorators, target, key, desc) {
   var c2 = arguments.length, r2 = c2 < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d4;
   if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r2 = Reflect.decorate(decorators, target, key, desc);
   else for (var i = decorators.length - 1; i >= 0; i--) if (d4 = decorators[i]) r2 = (c2 < 3 ? d4(r2) : c2 > 3 ? d4(target, key, r2) : d4(target, key)) || r2;
@@ -101002,7 +101033,7 @@ var workspaceDeploymentStub = createAuthnStubClass("WorkspaceDeploymentStub", {
 });
 var WorkspaceDeploymentStub = class WorkspaceDeploymentStub2 extends workspaceDeploymentStub {
 };
-WorkspaceDeploymentStub = __decorate4([
+WorkspaceDeploymentStub = __decorate5([
   Kt()
 ], WorkspaceDeploymentStub);
 
@@ -101160,7 +101191,7 @@ var toBrowserConfig = toObject({
 var browserConfigId = serviceId("BrowserConfig");
 
 // packages/ide/common/lib/api/config.js
-var __decorate5 = function(decorators, target, key, desc) {
+var __decorate6 = function(decorators, target, key, desc) {
   var c2 = arguments.length, r2 = c2 < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d4;
   if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r2 = Reflect.decorate(decorators, target, key, desc);
   else for (var i = decorators.length - 1; i >= 0; i--) if (d4 = decorators[i]) r2 = (c2 < 3 ? d4(r2) : c2 > 3 ? d4(target, key, r2) : d4(target, key)) || r2;
@@ -101177,7 +101208,7 @@ var configService = {
 };
 var ConfigStub = class ConfigStub2 extends createAuthnStubClass("ConfigStub", configService) {
 };
-ConfigStub = __decorate5([
+ConfigStub = __decorate6([
   Kt()
 ], ConfigStub);
 
@@ -101279,7 +101310,7 @@ var SUPPORTED_GIT_PROVIDERS = [
 ];
 
 // packages/ide/common/lib/api/gitAuth.js
-var __decorate6 = function(decorators, target, key, desc) {
+var __decorate7 = function(decorators, target, key, desc) {
   var c2 = arguments.length, r2 = c2 < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d4;
   if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r2 = Reflect.decorate(decorators, target, key, desc);
   else for (var i = decorators.length - 1; i >= 0; i--) if (d4 = decorators[i]) r2 = (c2 < 3 ? d4(r2) : c2 > 3 ? d4(target, key, r2) : d4(target, key)) || r2;
@@ -101291,7 +101322,7 @@ var NotConnectedToProvider = class NotConnectedToProvider2 extends SimpleSeriali
     return new this(`Not connected to git provider: ${providerName}. Connect to the provider in User Settings`, opts);
   }
 };
-NotConnectedToProvider = __decorate6([
+NotConnectedToProvider = __decorate7([
   registerError()
 ], NotConnectedToProvider);
 var toAuthCode = readOnly(toObject({
@@ -101308,6 +101339,7 @@ var toAccessToken = readOnly(toObject({
   token: toString,
   expiresAt: toDate
 }));
+var minAccessTokenLifetime = duration({ minutes: 20 });
 var toSetUpProviderViaTokenParams = readOnly(toObject({
   accessToken: toString,
   accessTokenExpiresAt: toDate,
@@ -101359,12 +101391,12 @@ var gitAuthService = {
 var gitAuthStub = createAuthnStubClass("GitAuthStub", gitAuthService);
 var GitAuthStub = class GitAuthStub2 extends gitAuthStub {
 };
-GitAuthStub = __decorate6([
+GitAuthStub = __decorate7([
   Kt()
 ], GitAuthStub);
 
 // packages/payment-service/common/lib/Product.js
-var __decorate7 = function(decorators, target, key, desc) {
+var __decorate8 = function(decorators, target, key, desc) {
   var c2 = arguments.length, r2 = c2 < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d4;
   if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r2 = Reflect.decorate(decorators, target, key, desc);
   else for (var i = decorators.length - 1; i >= 0; i--) if (d4 = decorators[i]) r2 = (c2 < 3 ? d4(r2) : c2 > 3 ? d4(target, key, r2) : d4(target, key)) || r2;
@@ -101471,7 +101503,7 @@ var toWsO11yConfig = toObject({
 });
 var WsO11yPlanNotFound = class WsO11yPlanNotFound2 extends SimpleSerializableException {
 };
-WsO11yPlanNotFound = __decorate7([
+WsO11yPlanNotFound = __decorate8([
   registerError()
 ], WsO11yPlanNotFound);
 
@@ -101590,7 +101622,7 @@ var toUploadFileArgs = toObject({
 });
 
 // packages/auth-service/common/lib/api/auth.js
-var __decorate8 = function(decorators, target, key, desc) {
+var __decorate9 = function(decorators, target, key, desc) {
   var c2 = arguments.length, r2 = c2 < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d4;
   if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r2 = Reflect.decorate(decorators, target, key, desc);
   else for (var i = decorators.length - 1; i >= 0; i--) if (d4 = decorators[i]) r2 = (c2 < 3 ? d4(r2) : c2 > 3 ? d4(target, key, r2) : d4(target, key)) || r2;
@@ -101606,7 +101638,7 @@ var InvalidCredentials = class InvalidCredentials2 extends SimpleSerializableExc
     return new this("Invalid credentials", opts);
   }
 };
-InvalidCredentials = __decorate8([
+InvalidCredentials = __decorate9([
   registerError()
 ], InvalidCredentials);
 var UserDeleted = class UserDeleted2 extends SimpleSerializableException {
@@ -101614,7 +101646,7 @@ var UserDeleted = class UserDeleted2 extends SimpleSerializableException {
     return new this("User is deleted", opts);
   }
 };
-UserDeleted = __decorate8([
+UserDeleted = __decorate9([
   registerError()
 ], UserDeleted);
 var RecaptchaCheckFailed = class RecaptchaCheckFailed2 extends SimpleSerializableException {
@@ -101622,7 +101654,7 @@ var RecaptchaCheckFailed = class RecaptchaCheckFailed2 extends SimpleSerializabl
     super(msg, opts);
   }
 };
-RecaptchaCheckFailed = __decorate8([
+RecaptchaCheckFailed = __decorate9([
   registerError(),
   __metadata2("design:paramtypes", [String, Object])
 ], RecaptchaCheckFailed);
@@ -101631,7 +101663,7 @@ var UserCreationFailed = class UserCreationFailed2 extends SimpleSerializableExc
     super(msg, opts);
   }
 };
-UserCreationFailed = __decorate8([
+UserCreationFailed = __decorate9([
   registerError(),
   __metadata2("design:paramtypes", [String, Object])
 ], UserCreationFailed);
@@ -101640,7 +101672,7 @@ var PasswordResetExpired = PasswordResetExpired_1 = class PasswordResetExpired2 
     return new PasswordResetExpired_1("Password reset request expired", opts);
   }
 };
-PasswordResetExpired = PasswordResetExpired_1 = __decorate8([
+PasswordResetExpired = PasswordResetExpired_1 = __decorate9([
   registerError()
 ], PasswordResetExpired);
 var customDomainAuthRequest = {
@@ -101671,7 +101703,7 @@ var DeactivateUserFailed = DeactivateUserFailed_1 = class DeactivateUserFailed2 
     return new DeactivateUserFailed_1("Failed to delete the user preliminarily. You still have teams which are not ready to be shut down.", opts);
   }
 };
-DeactivateUserFailed = DeactivateUserFailed_1 = __decorate8([
+DeactivateUserFailed = DeactivateUserFailed_1 = __decorate9([
   registerError()
 ], DeactivateUserFailed);
 var authService = {
@@ -101745,12 +101777,12 @@ var authService = {
 };
 var AuthStub = class AuthStub2 extends createAuthnStubClass("AuthStub", authService) {
 };
-AuthStub = __decorate8([
+AuthStub = __decorate9([
   Kt()
 ], AuthStub);
 
 // packages/auth-service/common/lib/session/api.js
-var __decorate9 = function(decorators, target, key, desc) {
+var __decorate10 = function(decorators, target, key, desc) {
   var c2 = arguments.length, r2 = c2 < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d4;
   if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r2 = Reflect.decorate(decorators, target, key, desc);
   else for (var i = decorators.length - 1; i >= 0; i--) if (d4 = decorators[i]) r2 = (c2 < 3 ? d4(r2) : c2 > 3 ? d4(target, key, r2) : d4(target, key)) || r2;
@@ -101868,7 +101900,7 @@ var SessionStub = SessionStub_1 = class SessionStub2 {
   }
 };
 SessionStub.ID = serviceId("SessionStub");
-SessionStub = SessionStub_1 = __decorate9([
+SessionStub = SessionStub_1 = __decorate10([
   Kt(),
   __metadata3("design:paramtypes", [Object])
 ], SessionStub);
@@ -103308,7 +103340,7 @@ var { withAuthnStub, withStubForAddress } = createStubUtils({
 });
 
 // packages/workspace-agent/common/lib/pipeline/Exceptions.js
-var __decorate10 = function(decorators, target, key, desc) {
+var __decorate11 = function(decorators, target, key, desc) {
   var c2 = arguments.length, r2 = c2 < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d4;
   if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r2 = Reflect.decorate(decorators, target, key, desc);
   else for (var i = decorators.length - 1; i >= 0; i--) if (d4 = decorators[i]) r2 = (c2 < 3 ? d4(r2) : c2 > 3 ? d4(target, key, r2) : d4(target, key)) || r2;
@@ -103319,42 +103351,42 @@ var MissingPipelineDefinitionFile = class MissingPipelineDefinitionFile2 extends
     return new this("This workspace has no pipeline definition file.");
   }
 };
-MissingPipelineDefinitionFile = __decorate10([
+MissingPipelineDefinitionFile = __decorate11([
   registerError()
 ], MissingPipelineDefinitionFile);
 var InvalidConfig = class InvalidConfig2 extends SimpleSerializableException {
 };
-InvalidConfig = __decorate10([
+InvalidConfig = __decorate11([
   registerError()
 ], InvalidConfig);
 var StartFailed = class StartFailed2 extends SimpleSerializableException {
 };
-StartFailed = __decorate10([
+StartFailed = __decorate11([
   registerError()
 ], StartFailed);
 var AbortFailed = class AbortFailed2 extends SimpleSerializableException {
 };
-AbortFailed = __decorate10([
+AbortFailed = __decorate11([
   registerError()
 ], AbortFailed);
 var ShutdownFailed = class ShutdownFailed2 extends SimpleSerializableException {
 };
-ShutdownFailed = __decorate10([
+ShutdownFailed = __decorate11([
   registerError()
 ], ShutdownFailed);
 var PipelineAlreadyInitialized = class PipelineAlreadyInitialized2 extends SimpleSerializableException {
 };
-PipelineAlreadyInitialized = __decorate10([
+PipelineAlreadyInitialized = __decorate11([
   registerError()
 ], PipelineAlreadyInitialized);
 var AlreadyExecuting = class AlreadyExecuting2 extends SimpleSerializableException {
 };
-AlreadyExecuting = __decorate10([
+AlreadyExecuting = __decorate11([
   registerError()
 ], AlreadyExecuting);
 
 // packages/workspace-agent/common/lib/api/pipeline.js
-var __decorate11 = function(decorators, target, key, desc) {
+var __decorate12 = function(decorators, target, key, desc) {
   var c2 = arguments.length, r2 = c2 < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d4;
   if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r2 = Reflect.decorate(decorators, target, key, desc);
   else for (var i = decorators.length - 1; i >= 0; i--) if (d4 = decorators[i]) r2 = (c2 < 3 ? d4(r2) : c2 > 3 ? d4(target, key, r2) : d4(target, key)) || r2;
@@ -103473,12 +103505,12 @@ var pipelineService = {
 };
 var PipelineStub = class PipelineStub2 extends createAuthnStubClass("PipelineStub", pipelineService) {
 };
-PipelineStub = __decorate11([
+PipelineStub = __decorate12([
   Kt()
 ], PipelineStub);
 
 // packages/workspace-service/common/lib/errors.js
-var __decorate12 = function(decorators, target, key, desc) {
+var __decorate13 = function(decorators, target, key, desc) {
   var c2 = arguments.length, r2 = c2 < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d4;
   if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r2 = Reflect.decorate(decorators, target, key, desc);
   else for (var i = decorators.length - 1; i >= 0; i--) if (d4 = decorators[i]) r2 = (c2 < 3 ? d4(r2) : c2 > 3 ? d4(target, key, r2) : d4(target, key)) || r2;
@@ -103494,7 +103526,7 @@ var FreeWorkspaceLimitReached = class FreeWorkspaceLimitReached2 extends SimpleS
     ].join(""), { scope: "public" });
   }
 };
-FreeWorkspaceLimitReached = __decorate12([
+FreeWorkspaceLimitReached = __decorate13([
   registerError()
 ], FreeWorkspaceLimitReached);
 
@@ -103610,7 +103642,7 @@ var toPgConfig = toOr(toObject({
 }), toObject({ connectionString: toString }));
 
 // packages/payment-service/common/lib/api/usage.js
-var __decorate13 = function(decorators, target, key, desc) {
+var __decorate14 = function(decorators, target, key, desc) {
   var c2 = arguments.length, r2 = c2 < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d4;
   if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r2 = Reflect.decorate(decorators, target, key, desc);
   else for (var i = decorators.length - 1; i >= 0; i--) if (d4 = decorators[i]) r2 = (c2 < 3 ? d4(r2) : c2 > 3 ? d4(target, key, r2) : d4(target, key)) || r2;
@@ -103621,7 +103653,7 @@ var InvalidDateRange = class InvalidDateRange2 extends SimpleSerializableExcepti
     return new this(msg, { scope: "public" });
   }
 };
-InvalidDateRange = __decorate13([
+InvalidDateRange = __decorate14([
   registerError()
 ], InvalidDateRange);
 var LANDSCAPE_SERVICE = "Landscape Service";
@@ -104021,6 +104053,11 @@ var toChangeRoleArgs = toObject({
   userId: toNonNegativeInteger,
   role: toRole
 });
+var toAddTeamMemberInternalArgs = toObject({
+  ...teamServiceArgs,
+  userId: toNonNegativeInteger,
+  role: toRole
+});
 var toUploadFileArgs2 = toObject({
   ...teamServiceArgs,
   type: readOnly(toString),
@@ -104028,7 +104065,7 @@ var toUploadFileArgs2 = toObject({
 });
 
 // packages/workspace-service/common/lib/api/workspaces.js
-var __decorate14 = function(decorators, target, key, desc) {
+var __decorate15 = function(decorators, target, key, desc) {
   var c2 = arguments.length, r2 = c2 < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d4;
   if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r2 = Reflect.decorate(decorators, target, key, desc);
   else for (var i = decorators.length - 1; i >= 0; i--) if (d4 = decorators[i]) r2 = (c2 < 3 ? d4(r2) : c2 > 3 ? d4(target, key, r2) : d4(target, key)) || r2;
@@ -104036,7 +104073,7 @@ var __decorate14 = function(decorators, target, key, desc) {
 };
 var VpnConfigNotFound = class VpnConfigNotFound2 extends SimpleSerializableException {
 };
-VpnConfigNotFound = __decorate14([
+VpnConfigNotFound = __decorate15([
   registerError()
 ], VpnConfigNotFound);
 var toWorkspaceRole = toLiteralUnion("WorkspaceRole", WORKSPACE_ROLE_RELATIONS.roles);
@@ -104113,7 +104150,7 @@ var workspacesService = {
 var workspacesStub = createAuthnStubClass("WorkspacesStub", workspacesService);
 var WorkspacesStub = class WorkspacesStub2 extends workspacesStub {
 };
-WorkspacesStub = __decorate14([
+WorkspacesStub = __decorate15([
   Kt()
 ], WorkspacesStub);
 
@@ -104397,7 +104434,7 @@ var waitForWorkspaceStatus = async (replicaStub, workspaceId, fulfillsCondition)
 };
 
 // packages/team-service/common/lib/api/team.js
-var __decorate15 = function(decorators, target, key, desc) {
+var __decorate16 = function(decorators, target, key, desc) {
   var c2 = arguments.length, r2 = c2 < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d4;
   if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r2 = Reflect.decorate(decorators, target, key, desc);
   else for (var i = decorators.length - 1; i >= 0; i--) if (d4 = decorators[i]) r2 = (c2 < 3 ? d4(r2) : c2 > 3 ? d4(target, key, r2) : d4(target, key)) || r2;
@@ -104428,7 +104465,7 @@ var FetchMembersFailed = FetchMembersFailed_1 = class FetchMembersFailed2 extend
     return new FetchMembersFailed_1("Failed to fetch your team members please try again later", opts);
   }
 };
-FetchMembersFailed = FetchMembersFailed_1 = __decorate15([
+FetchMembersFailed = FetchMembersFailed_1 = __decorate16([
   registerError()
 ], FetchMembersFailed);
 var IsLastAdmin = IsLastAdmin_1 = class IsLastAdmin2 extends SimpleSerializableException {
@@ -104436,7 +104473,7 @@ var IsLastAdmin = IsLastAdmin_1 = class IsLastAdmin2 extends SimpleSerializableE
     return new IsLastAdmin_1("The team must have another admin", opts);
   }
 };
-IsLastAdmin = IsLastAdmin_1 = __decorate15([
+IsLastAdmin = IsLastAdmin_1 = __decorate16([
   registerError()
 ], IsLastAdmin);
 var CannotChangeOrgAdminRole = CannotChangeOrgAdminRole_1 = class CannotChangeOrgAdminRole2 extends SimpleSerializableException {
@@ -104444,7 +104481,7 @@ var CannotChangeOrgAdminRole = CannotChangeOrgAdminRole_1 = class CannotChangeOr
     return new CannotChangeOrgAdminRole_1("This user has Admin rights inherited from their organization owner role that cannot be changed at the resource group level.", opts);
   }
 };
-CannotChangeOrgAdminRole = CannotChangeOrgAdminRole_1 = __decorate15([
+CannotChangeOrgAdminRole = CannotChangeOrgAdminRole_1 = __decorate16([
   registerError()
 ], CannotChangeOrgAdminRole);
 var CannotRemoveOrgAdmin = CannotRemoveOrgAdmin_1 = class CannotRemoveOrgAdmin2 extends SimpleSerializableException {
@@ -104452,7 +104489,7 @@ var CannotRemoveOrgAdmin = CannotRemoveOrgAdmin_1 = class CannotRemoveOrgAdmin2 
     return new CannotRemoveOrgAdmin_1("This user has Admin rights inherited from their organization owner role and cannot be removed at the resource group level.", opts);
   }
 };
-CannotRemoveOrgAdmin = CannotRemoveOrgAdmin_1 = __decorate15([
+CannotRemoveOrgAdmin = CannotRemoveOrgAdmin_1 = __decorate16([
   registerError()
 ], CannotRemoveOrgAdmin);
 var LeaveTeamFailed = LeaveTeamFailed_1 = class LeaveTeamFailed2 extends SimpleSerializableException {
@@ -104460,7 +104497,7 @@ var LeaveTeamFailed = LeaveTeamFailed_1 = class LeaveTeamFailed2 extends SimpleS
     return new LeaveTeamFailed_1("Failed to leave team try again later", opts);
   }
 };
-LeaveTeamFailed = LeaveTeamFailed_1 = __decorate15([
+LeaveTeamFailed = LeaveTeamFailed_1 = __decorate16([
   registerError()
 ], LeaveTeamFailed);
 var ChangeMemberRoleFailed = ChangeMemberRoleFailed_1 = class ChangeMemberRoleFailed2 extends SimpleSerializableException {
@@ -104468,7 +104505,7 @@ var ChangeMemberRoleFailed = ChangeMemberRoleFailed_1 = class ChangeMemberRoleFa
     return new ChangeMemberRoleFailed_1("Failed to change member role please try again later", opts);
   }
 };
-ChangeMemberRoleFailed = ChangeMemberRoleFailed_1 = __decorate15([
+ChangeMemberRoleFailed = ChangeMemberRoleFailed_1 = __decorate16([
   registerError()
 ], ChangeMemberRoleFailed);
 var NotEnoughSeats = NotEnoughSeats_1 = class NotEnoughSeats2 extends SimpleSerializableException {
@@ -104476,7 +104513,7 @@ var NotEnoughSeats = NotEnoughSeats_1 = class NotEnoughSeats2 extends SimpleSeri
     return new NotEnoughSeats_1("Not enough seats to add more team members", opts);
   }
 };
-NotEnoughSeats = NotEnoughSeats_1 = __decorate15([
+NotEnoughSeats = NotEnoughSeats_1 = __decorate16([
   registerError()
 ], NotEnoughSeats);
 var SendInviteFailed = SendInviteFailed_1 = class SendInviteFailed2 extends SimpleSerializableException {
@@ -104484,7 +104521,7 @@ var SendInviteFailed = SendInviteFailed_1 = class SendInviteFailed2 extends Simp
     return new SendInviteFailed_1("Failed to send invitation try again later", opts);
   }
 };
-SendInviteFailed = SendInviteFailed_1 = __decorate15([
+SendInviteFailed = SendInviteFailed_1 = __decorate16([
   registerError()
 ], SendInviteFailed);
 var IsAlreadyMember = IsAlreadyMember_1 = class IsAlreadyMember2 extends SimpleSerializableException {
@@ -104492,7 +104529,7 @@ var IsAlreadyMember = IsAlreadyMember_1 = class IsAlreadyMember2 extends SimpleS
     return new IsAlreadyMember_1("User is already a member of the team.", opts);
   }
 };
-IsAlreadyMember = IsAlreadyMember_1 = __decorate15([
+IsAlreadyMember = IsAlreadyMember_1 = __decorate16([
   registerError()
 ], IsAlreadyMember);
 var AddToOrgFailed = AddToOrgFailed_1 = class AddToOrgFailed2 extends SimpleSerializableException {
@@ -104500,7 +104537,7 @@ var AddToOrgFailed = AddToOrgFailed_1 = class AddToOrgFailed2 extends SimpleSeri
     return new AddToOrgFailed_1("Failed to add the user to the organization. Please try again later", opts);
   }
 };
-AddToOrgFailed = AddToOrgFailed_1 = __decorate15([
+AddToOrgFailed = AddToOrgFailed_1 = __decorate16([
   registerError()
 ], AddToOrgFailed);
 var InvalidInvitation = InvalidInvitation_1 = class InvalidInvitation2 extends SimpleSerializableException {
@@ -104508,7 +104545,7 @@ var InvalidInvitation = InvalidInvitation_1 = class InvalidInvitation2 extends S
     return new InvalidInvitation_1("Failed to accept invitation.", opts);
   }
 };
-InvalidInvitation = InvalidInvitation_1 = __decorate15([
+InvalidInvitation = InvalidInvitation_1 = __decorate16([
   registerError()
 ], InvalidInvitation);
 var TeamUpdateFailed = TeamUpdateFailed_1 = class TeamUpdateFailed2 extends SimpleSerializableException {
@@ -104516,7 +104553,7 @@ var TeamUpdateFailed = TeamUpdateFailed_1 = class TeamUpdateFailed2 extends Simp
     return new TeamUpdateFailed_1("Team update failed please try again later", opts);
   }
 };
-TeamUpdateFailed = TeamUpdateFailed_1 = __decorate15([
+TeamUpdateFailed = TeamUpdateFailed_1 = __decorate16([
   registerError()
 ], TeamUpdateFailed);
 var FileTooLarge = FileTooLarge_1 = class FileTooLarge2 extends SimpleSerializableException {
@@ -104524,7 +104561,7 @@ var FileTooLarge = FileTooLarge_1 = class FileTooLarge2 extends SimpleSerializab
     return new FileTooLarge_1(msg, opts);
   }
 };
-FileTooLarge = FileTooLarge_1 = __decorate15([
+FileTooLarge = FileTooLarge_1 = __decorate16([
   registerError()
 ], FileTooLarge);
 var IncorrectType = IncorrectType_1 = class IncorrectType2 extends SimpleSerializableException {
@@ -104532,12 +104569,12 @@ var IncorrectType = IncorrectType_1 = class IncorrectType2 extends SimpleSeriali
     return new IncorrectType_1(msg, opts);
   }
 };
-IncorrectType = IncorrectType_1 = __decorate15([
+IncorrectType = IncorrectType_1 = __decorate16([
   registerError()
 ], IncorrectType);
 var RemoveMemberFailed = class RemoveMemberFailed2 extends SimpleSerializableException {
 };
-RemoveMemberFailed = __decorate15([
+RemoveMemberFailed = __decorate16([
   registerError()
 ], RemoveMemberFailed);
 var AvatarNotFound = AvatarNotFound_1 = class AvatarNotFound2 extends NotFound {
@@ -104545,7 +104582,7 @@ var AvatarNotFound = AvatarNotFound_1 = class AvatarNotFound2 extends NotFound {
     return new AvatarNotFound_1("Team has no Avatar", opts);
   }
 };
-AvatarNotFound = AvatarNotFound_1 = __decorate15([
+AvatarNotFound = AvatarNotFound_1 = __decorate16([
   registerError()
 ], AvatarNotFound);
 var FetchTeamsFailed = FetchTeamsFailed_1 = class FetchTeamsFailed2 extends SimpleSerializableException {
@@ -104553,7 +104590,7 @@ var FetchTeamsFailed = FetchTeamsFailed_1 = class FetchTeamsFailed2 extends Simp
     return new FetchTeamsFailed_1("Failed to fetch your teams. Please try again later", opts);
   }
 };
-FetchTeamsFailed = FetchTeamsFailed_1 = __decorate15([
+FetchTeamsFailed = FetchTeamsFailed_1 = __decorate16([
   registerError()
 ], FetchTeamsFailed);
 var SetDeletionPendingFailed = SetDeletionPendingFailed_1 = class SetDeletionPendingFailed2 extends SimpleSerializableException {
@@ -104561,7 +104598,7 @@ var SetDeletionPendingFailed = SetDeletionPendingFailed_1 = class SetDeletionPen
     return new SetDeletionPendingFailed_1(msg, opts);
   }
 };
-SetDeletionPendingFailed = SetDeletionPendingFailed_1 = __decorate15([
+SetDeletionPendingFailed = SetDeletionPendingFailed_1 = __decorate16([
   registerError()
 ], SetDeletionPendingFailed);
 var ReactivateDeletedUserTeamsFailed = ReactivateDeletedUserTeamsFailed_1 = class ReactivateDeletedUserTeamsFailed2 extends SimpleSerializableException {
@@ -104569,7 +104606,7 @@ var ReactivateDeletedUserTeamsFailed = ReactivateDeletedUserTeamsFailed_1 = clas
     return new ReactivateDeletedUserTeamsFailed_1("Reactivating the teams of the deleted user failed.", opts);
   }
 };
-ReactivateDeletedUserTeamsFailed = ReactivateDeletedUserTeamsFailed_1 = __decorate15([
+ReactivateDeletedUserTeamsFailed = ReactivateDeletedUserTeamsFailed_1 = __decorate16([
   registerError()
 ], ReactivateDeletedUserTeamsFailed);
 var FetchInvitationsFailed = FetchInvitationsFailed_1 = class FetchInvitationsFailed2 extends SimpleSerializableException {
@@ -104577,12 +104614,12 @@ var FetchInvitationsFailed = FetchInvitationsFailed_1 = class FetchInvitationsFa
     return new FetchInvitationsFailed_1("Failed to fetch your invitations. Please try again later", opts);
   }
 };
-FetchInvitationsFailed = FetchInvitationsFailed_1 = __decorate15([
+FetchInvitationsFailed = FetchInvitationsFailed_1 = __decorate16([
   registerError()
 ], FetchInvitationsFailed);
 var DeleteTeamFailed = class DeleteTeamFailed2 extends SimpleSerializableException {
 };
-DeleteTeamFailed = __decorate15([
+DeleteTeamFailed = __decorate16([
   registerError()
 ], DeleteTeamFailed);
 var NotOrganizationMember = NotOrganizationMember_1 = class NotOrganizationMember2 extends SimpleSerializableException {
@@ -104590,22 +104627,22 @@ var NotOrganizationMember = NotOrganizationMember_1 = class NotOrganizationMembe
     return new NotOrganizationMember_1(msg, opts);
   }
 };
-NotOrganizationMember = NotOrganizationMember_1 = __decorate15([
+NotOrganizationMember = NotOrganizationMember_1 = __decorate16([
   registerError()
 ], NotOrganizationMember);
 var DomainDeletionFailed = class DomainDeletionFailed2 extends DeleteTeamFailed {
 };
-DomainDeletionFailed = __decorate15([
+DomainDeletionFailed = __decorate16([
   registerError()
 ], DomainDeletionFailed);
 var WorkspaceDeletionFailed = class WorkspaceDeletionFailed2 extends DeleteTeamFailed {
 };
-WorkspaceDeletionFailed = __decorate15([
+WorkspaceDeletionFailed = __decorate16([
   registerError()
 ], WorkspaceDeletionFailed);
 var VpnDeletionFailed = class VpnDeletionFailed2 extends DeleteTeamFailed {
 };
-VpnDeletionFailed = __decorate15([
+VpnDeletionFailed = __decorate16([
   registerError()
 ], VpnDeletionFailed);
 var teamService = {
@@ -104678,6 +104715,10 @@ var teamService = {
       request: toSendInviteArgs,
       response: toVoid
     }),
+    addTeamMemberInternal: rpc({
+      request: toAddTeamMemberInternalArgs,
+      response: toVoid
+    }),
     leaveTeam: rpc({
       request: toTeamServiceArgs,
       response: toVoid
@@ -104719,12 +104760,12 @@ var teamService = {
 var teamStub = createAuthnStubClass("TeamStub", teamService);
 var TeamStub = class TeamStub2 extends teamStub {
 };
-TeamStub = __decorate15([
+TeamStub = __decorate16([
   Kt()
 ], TeamStub);
 
 // packages/workspace-proxy/common/lib/api/pipeline.js
-var __decorate16 = function(decorators, target, key, desc) {
+var __decorate17 = function(decorators, target, key, desc) {
   var c2 = arguments.length, r2 = c2 < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d4;
   if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r2 = Reflect.decorate(decorators, target, key, desc);
   else for (var i = decorators.length - 1; i >= 0; i--) if (d4 = decorators[i]) r2 = (c2 < 3 ? d4(r2) : c2 > 3 ? d4(target, key, r2) : d4(target, key)) || r2;
@@ -104841,12 +104882,12 @@ var pipelineProxyService = {
 };
 var PipelineProxyStub = class PipelineProxyStub2 extends createAuthnStubClass("PipelineProxyStub", pipelineProxyService) {
 };
-PipelineProxyStub = __decorate16([
+PipelineProxyStub = __decorate17([
   Kt()
 ], PipelineProxyStub);
 
 // packages/workspace-agent/common/lib/api/process.js
-var __decorate17 = function(decorators, target, key, desc) {
+var __decorate18 = function(decorators, target, key, desc) {
   var c2 = arguments.length, r2 = c2 < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d4;
   if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r2 = Reflect.decorate(decorators, target, key, desc);
   else for (var i = decorators.length - 1; i >= 0; i--) if (d4 = decorators[i]) r2 = (c2 < 3 ? d4(r2) : c2 > 3 ? d4(target, key, r2) : d4(target, key)) || r2;
@@ -104881,12 +104922,12 @@ var ProcessExecutionFailed = ProcessExecutionFailed_1 = class ProcessExecutionFa
     return new ProcessExecutionFailed_1(message + `, Exit Code: ${exitCode}, Output: ${output}, Error: ${error51}`);
   }
 };
-ProcessExecutionFailed = ProcessExecutionFailed_1 = __decorate17([
+ProcessExecutionFailed = ProcessExecutionFailed_1 = __decorate18([
   registerError()
 ], ProcessExecutionFailed);
 var ProcessTimedOut = class ProcessTimedOut2 extends SimpleSerializableException {
 };
-ProcessTimedOut = __decorate17([
+ProcessTimedOut = __decorate18([
   registerError()
 ], ProcessTimedOut);
 var processService = {
@@ -104904,12 +104945,12 @@ var processService = {
 var processStub = createAuthnStubClass("ProcessStub", processService);
 var ProcessStub = class ProcessStub2 extends processStub {
 };
-ProcessStub = __decorate17([
+ProcessStub = __decorate18([
   Kt()
 ], ProcessStub);
 
 // packages/workspace-proxy/common/lib/api/process.js
-var __decorate18 = function(decorators, target, key, desc) {
+var __decorate19 = function(decorators, target, key, desc) {
   var c2 = arguments.length, r2 = c2 < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d4;
   if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r2 = Reflect.decorate(decorators, target, key, desc);
   else for (var i = decorators.length - 1; i >= 0; i--) if (d4 = decorators[i]) r2 = (c2 < 3 ? d4(r2) : c2 > 3 ? d4(target, key, r2) : d4(target, key)) || r2;
@@ -104931,7 +104972,7 @@ var processProxyService = {
 var processProxyStub = createAuthnStubClass("ProcessProxyStub", processProxyService);
 var ProcessProxyStub = class ProcessProxyStub2 extends processProxyStub {
 };
-ProcessProxyStub = __decorate18([
+ProcessProxyStub = __decorate19([
   Kt()
 ], ProcessProxyStub);
 
@@ -120912,7 +120953,7 @@ var deleteArgsSchema = external_exports.object({
 var toDeleteArgs = fromZod(deleteArgsSchema);
 
 // packages/marketplace/common/lib/api/model/errors.js
-var __decorate19 = function(decorators, target, key, desc) {
+var __decorate20 = function(decorators, target, key, desc) {
   var c2 = arguments.length, r2 = c2 < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d4;
   if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r2 = Reflect.decorate(decorators, target, key, desc);
   else for (var i = decorators.length - 1; i >= 0; i--) if (d4 = decorators[i]) r2 = (c2 < 3 ? d4(r2) : c2 > 3 ? d4(target, key, r2) : d4(target, key)) || r2;
@@ -120923,22 +120964,22 @@ var MissingProviderCapabilities = class MissingProviderCapabilities2 extends Inv
     return new this(`The operation couldn't be performed because the provider ${name} / ${schemaVersion} doesn't have capabilities: ${missingCaps.join(", ")}.`, { scope: "public" });
   }
 };
-MissingProviderCapabilities = __decorate19([
+MissingProviderCapabilities = __decorate20([
   registerError()
 ], MissingProviderCapabilities);
 var StaticProviderAlreadyExists = class StaticProviderAlreadyExists2 extends AlreadyExists {
 };
-StaticProviderAlreadyExists = __decorate19([
+StaticProviderAlreadyExists = __decorate20([
   registerError()
 ], StaticProviderAlreadyExists);
 var RestProviderAlreadyExists = class RestProviderAlreadyExists2 extends AlreadyExists {
 };
-RestProviderAlreadyExists = __decorate19([
+RestProviderAlreadyExists = __decorate20([
   registerError()
 ], RestProviderAlreadyExists);
 var LandscapeProviderAlreadyExists = class LandscapeProviderAlreadyExists2 extends AlreadyExists {
 };
-LandscapeProviderAlreadyExists = __decorate19([
+LandscapeProviderAlreadyExists = __decorate20([
   registerError()
 ], LandscapeProviderAlreadyExists);
 
@@ -121021,7 +121062,7 @@ var managedServicesService = {
 var managedServicesStub = createAuthnStubClass("ManagedServiceStub", managedServicesService);
 
 // packages/workspace-service/common/lib/api/landscape.js
-var __decorate20 = function(decorators, target, key, desc) {
+var __decorate21 = function(decorators, target, key, desc) {
   var c2 = arguments.length, r2 = c2 < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d4;
   if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r2 = Reflect.decorate(decorators, target, key, desc);
   else for (var i = decorators.length - 1; i >= 0; i--) if (d4 = decorators[i]) r2 = (c2 < 3 ? d4(r2) : c2 > 3 ? d4(target, key, r2) : d4(target, key)) || r2;
@@ -121134,7 +121175,7 @@ var landscapeService = {
 var landscapeStub = createAuthnStubClass("LandscapeStub", landscapeService);
 var LandscapeStub = class LandscapeStub2 extends landscapeStub {
 };
-LandscapeStub = __decorate20([
+LandscapeStub = __decorate21([
   Kt()
 ], LandscapeStub);
 
@@ -121372,6 +121413,7 @@ var getConfig = async () => {
     },
     apiUrl: new URL(getActionInput("apiUrl") ?? "https://codesphere.com"),
     teamName: getActionInput("team", true),
+    environmentName: getActionInput("environmentName") ?? void 0,
     baseImage: getActionInput("baseImage") ?? void 0,
     profile: getActionInput("ciProfile") ?? void 0,
     planTitle: getActionInput("plan") ?? void 0,
@@ -121498,7 +121540,7 @@ var GitHubDeployment = class _GitHubDeployment {
 };
 var statusReporter = async (config2) => {
   try {
-    return await GitHubDeployment.create(config2.gitAuth.token, config2.repository, `Codesphere Preview #${config2.pullRequest.number}`, config2.pullRequest, new URL(config2.apiUrl));
+    return await GitHubDeployment.create(config2.gitAuth.token, config2.repository, `${config2.environmentName ?? "Codesphere Preview"} #${config2.pullRequest.number}`, config2.pullRequest, new URL(config2.apiUrl));
   } catch (e2) {
     if (e2 instanceof RefNotExist) {
       return logStatusReporter();
