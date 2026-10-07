@@ -13,6 +13,9 @@ inputs:
   team:
     description: 'Name of the codesphere team'
     required: true
+  environmentName:
+    description: 'Name of the GitHub deployment environment (defaults to Codesphere Preview).'
+    required: false
   plan:
     description: |
       Plan of the workspaces ide service. All landscape services are deployed with the plan configured in your selected ci profile
