@@ -65,6 +65,15 @@ Available options:
 - `dev-domain` (default): direct link to the running app
 - `preview`: link to the IDE preview tab
 
+### `cleanupClosedPullRequests`
+
+Whether every run also deletes the team's preview workspaces of this repository
+whose pull request is closed. GitHub doesn't start the run of every closed pull
+request, e.g. not for one closed with a merge conflict, so this catches the
+workspaces such a run would have deleted.
+
+Default `"true"`.
+
 ### `ciProfile`
 
 The name of the CI profile to use for the deployment.

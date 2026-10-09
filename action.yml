@@ -54,6 +54,13 @@ inputs:
       - 'preview': link to the IDE preview tab
     required: false
     default: 'dev-domain'
+  cleanupClosedPullRequests:
+    description: |
+      Whether every run also deletes the team's preview workspaces of this
+      repository whose pull request is closed, for closed pull requests whose
+      own run GitHub never started.
+    required: false
+    default: 'true'
   ciProfile:
     description: |
       The name of the CI profile to use for the deployment.
