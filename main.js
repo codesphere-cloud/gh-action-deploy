@@ -1330,7 +1330,7 @@ var require_package = __commonJS({
 var require_main = __commonJS({
   "node_modules/dotenv/lib/main.js"(exports2, module2) {
     var fs2 = require("fs");
-    var path2 = require("path");
+    var path3 = require("path");
     var os2 = require("os");
     var crypto2 = require("crypto");
     var packageJson = require_package();
@@ -1446,7 +1446,7 @@ var require_main = __commonJS({
           possibleVaultPath = options.path.endsWith(".vault") ? options.path : `${options.path}.vault`;
         }
       } else {
-        possibleVaultPath = path2.resolve(process.cwd(), ".env.vault");
+        possibleVaultPath = path3.resolve(process.cwd(), ".env.vault");
       }
       if (fs2.existsSync(possibleVaultPath)) {
         return possibleVaultPath;
@@ -1454,7 +1454,7 @@ var require_main = __commonJS({
       return null;
     }
     function _resolveHome(envPath) {
-      return envPath[0] === "~" ? path2.join(os2.homedir(), envPath.slice(1)) : envPath;
+      return envPath[0] === "~" ? path3.join(os2.homedir(), envPath.slice(1)) : envPath;
     }
     function _configVault(options) {
       const debug2 = Boolean(options && options.debug);
@@ -1471,7 +1471,7 @@ var require_main = __commonJS({
       return { parsed };
     }
     function configDotenv(options) {
-      const dotenvPath = path2.resolve(process.cwd(), ".env");
+      const dotenvPath = path3.resolve(process.cwd(), ".env");
       let encoding = "utf8";
       const debug2 = Boolean(options && options.debug);
       const quiet = options && "quiet" in options ? options.quiet : true;
@@ -1495,13 +1495,13 @@ var require_main = __commonJS({
       }
       let lastError;
       const parsedAll = {};
-      for (const path3 of optionPaths) {
+      for (const path4 of optionPaths) {
         try {
-          const parsed = DotenvModule.parse(fs2.readFileSync(path3, { encoding }));
+          const parsed = DotenvModule.parse(fs2.readFileSync(path4, { encoding }));
           DotenvModule.populate(parsedAll, parsed, options);
         } catch (e2) {
           if (debug2) {
-            _debug(`Failed to load ${path3} ${e2.message}`);
+            _debug(`Failed to load ${path4} ${e2.message}`);
           }
           lastError = e2;
         }
@@ -1516,7 +1516,7 @@ var require_main = __commonJS({
         const shortPaths = [];
         for (const filePath of optionPaths) {
           try {
-            const relative2 = path2.relative(process.cwd(), filePath);
+            const relative2 = path3.relative(process.cwd(), filePath);
             shortPaths.push(relative2);
           } catch (e2) {
             if (debug2) {
@@ -4484,15 +4484,15 @@ var require_route = __commonJS({
       };
     }
     function wrapConversion(toModel, graph) {
-      const path2 = [graph[toModel].parent, toModel];
+      const path3 = [graph[toModel].parent, toModel];
       let fn = conversions[graph[toModel].parent][toModel];
       let cur = graph[toModel].parent;
       while (graph[cur].parent) {
-        path2.unshift(graph[cur].parent);
+        path3.unshift(graph[cur].parent);
         fn = link(conversions[graph[cur].parent][cur], fn);
         cur = graph[cur].parent;
       }
-      fn.conversion = path2;
+      fn.conversion = path3;
       return fn;
     }
     module2.exports = function(fromModel) {
@@ -6200,14 +6200,14 @@ var require_util2 = __commonJS({
         }
         const port = url2.port != null ? url2.port : url2.protocol === "https:" ? 443 : 80;
         let origin = url2.origin != null ? url2.origin : `${url2.protocol || ""}//${url2.hostname || ""}:${port}`;
-        let path2 = url2.path != null ? url2.path : `${url2.pathname || ""}${url2.search || ""}`;
+        let path3 = url2.path != null ? url2.path : `${url2.pathname || ""}${url2.search || ""}`;
         if (origin[origin.length - 1] === "/") {
           origin = origin.slice(0, origin.length - 1);
         }
-        if (path2 && path2[0] !== "/") {
-          path2 = `/${path2}`;
+        if (path3 && path3[0] !== "/") {
+          path3 = `/${path3}`;
         }
-        return new URL(`${origin}${path2}`);
+        return new URL(`${origin}${path3}`);
       }
       if (!isHttpOrHttpsPrefixed(url2.origin || url2.protocol)) {
         throw new InvalidArgumentError("Invalid URL protocol: the URL must start with `http:` or `https:`.");
@@ -6658,39 +6658,39 @@ var require_diagnostics = __commonJS({
       });
       diagnosticsChannel.channel("undici:client:sendHeaders").subscribe((evt) => {
         const {
-          request: { method, path: path2, origin }
+          request: { method, path: path3, origin }
         } = evt;
-        debuglog("sending request to %s %s/%s", method, origin, path2);
+        debuglog("sending request to %s %s/%s", method, origin, path3);
       });
       diagnosticsChannel.channel("undici:request:headers").subscribe((evt) => {
         const {
-          request: { method, path: path2, origin },
+          request: { method, path: path3, origin },
           response: { statusCode }
         } = evt;
         debuglog(
           "received response to %s %s/%s - HTTP %d",
           method,
           origin,
-          path2,
+          path3,
           statusCode
         );
       });
       diagnosticsChannel.channel("undici:request:trailers").subscribe((evt) => {
         const {
-          request: { method, path: path2, origin }
+          request: { method, path: path3, origin }
         } = evt;
-        debuglog("trailers received from %s %s/%s", method, origin, path2);
+        debuglog("trailers received from %s %s/%s", method, origin, path3);
       });
       diagnosticsChannel.channel("undici:request:error").subscribe((evt) => {
         const {
-          request: { method, path: path2, origin },
+          request: { method, path: path3, origin },
           error: error51
         } = evt;
         debuglog(
           "request to %s %s/%s errored - %s",
           method,
           origin,
-          path2,
+          path3,
           error51.message
         );
       });
@@ -6739,9 +6739,9 @@ var require_diagnostics = __commonJS({
         });
         diagnosticsChannel.channel("undici:client:sendHeaders").subscribe((evt) => {
           const {
-            request: { method, path: path2, origin }
+            request: { method, path: path3, origin }
           } = evt;
-          debuglog("sending request to %s %s/%s", method, origin, path2);
+          debuglog("sending request to %s %s/%s", method, origin, path3);
         });
       }
       diagnosticsChannel.channel("undici:websocket:open").subscribe((evt) => {
@@ -6804,7 +6804,7 @@ var require_request = __commonJS({
     var kHandler = /* @__PURE__ */ Symbol("handler");
     var Request = class {
       constructor(origin, {
-        path: path2,
+        path: path3,
         method,
         body,
         headers,
@@ -6819,11 +6819,11 @@ var require_request = __commonJS({
         expectContinue,
         servername
       }, handler2) {
-        if (typeof path2 !== "string") {
+        if (typeof path3 !== "string") {
           throw new InvalidArgumentError("path must be a string");
-        } else if (path2[0] !== "/" && !(path2.startsWith("http://") || path2.startsWith("https://")) && method !== "CONNECT") {
+        } else if (path3[0] !== "/" && !(path3.startsWith("http://") || path3.startsWith("https://")) && method !== "CONNECT") {
           throw new InvalidArgumentError("path must be an absolute URL or start with a slash");
-        } else if (invalidPathRegex.test(path2)) {
+        } else if (invalidPathRegex.test(path3)) {
           throw new InvalidArgumentError("invalid request path");
         }
         if (typeof method !== "string") {
@@ -6889,7 +6889,7 @@ var require_request = __commonJS({
         this.completed = false;
         this.aborted = false;
         this.upgrade = upgrade || null;
-        this.path = query ? buildURL(path2, query) : path2;
+        this.path = query ? buildURL(path3, query) : path3;
         this.origin = origin;
         this.idempotent = idempotent == null ? method === "HEAD" || method === "GET" : idempotent;
         this.blocking = blocking == null ? false : blocking;
@@ -11518,7 +11518,7 @@ var require_client_h1 = __commonJS({
       return method !== "GET" && method !== "HEAD" && method !== "OPTIONS" && method !== "TRACE" && method !== "CONNECT";
     }
     function writeH1(client2, request2) {
-      const { method, path: path2, host, upgrade, blocking, reset } = request2;
+      const { method, path: path3, host, upgrade, blocking, reset } = request2;
       let { body, headers, contentLength } = request2;
       const expectsPayload = method === "PUT" || method === "POST" || method === "PATCH" || method === "QUERY" || method === "PROPFIND" || method === "PROPPATCH";
       if (util.isFormDataLike(body)) {
@@ -11593,7 +11593,7 @@ var require_client_h1 = __commonJS({
       if (blocking) {
         socket[kBlocking] = true;
       }
-      let header = `${method} ${path2} HTTP/1.1\r
+      let header = `${method} ${path3} HTTP/1.1\r
 `;
       if (typeof host === "string") {
         header += `host: ${host}\r
@@ -12119,7 +12119,7 @@ var require_client_h2 = __commonJS({
     }
     function writeH2(client2, request2) {
       const session = client2[kHTTP2Session];
-      const { method, path: path2, host, upgrade, expectContinue, signal, headers: reqHeaders } = request2;
+      const { method, path: path3, host, upgrade, expectContinue, signal, headers: reqHeaders } = request2;
       let { body } = request2;
       if (upgrade) {
         util.errorRequest(client2, request2, new Error("Upgrade not supported for H2"));
@@ -12186,7 +12186,7 @@ var require_client_h2 = __commonJS({
         });
         return true;
       }
-      headers[HTTP2_HEADER_PATH] = path2;
+      headers[HTTP2_HEADER_PATH] = path3;
       headers[HTTP2_HEADER_SCHEME] = "https";
       const expectsPayload = method === "PUT" || method === "POST" || method === "PATCH";
       if (body && typeof body.read === "function") {
@@ -12539,9 +12539,9 @@ var require_redirect_handler = __commonJS({
           return this.handler.onHeaders(statusCode, headers, resume, statusText);
         }
         const { origin, pathname, search } = util.parseURL(new URL(this.location, this.opts.origin && new URL(this.opts.path, this.opts.origin)));
-        const path2 = search ? `${pathname}${search}` : pathname;
+        const path3 = search ? `${pathname}${search}` : pathname;
         this.opts.headers = cleanRequestHeaders(this.opts.headers, statusCode === 303, this.opts.origin !== origin);
-        this.opts.path = path2;
+        this.opts.path = path3;
         this.opts.origin = origin;
         this.opts.maxRedirections = 0;
         this.opts.query = null;
@@ -13776,10 +13776,10 @@ var require_proxy_agent = __commonJS({
         };
         const {
           origin,
-          path: path2 = "/",
+          path: path3 = "/",
           headers = {}
         } = opts;
-        opts.path = origin + path2;
+        opts.path = origin + path3;
         if (!("host" in headers) && !("Host" in headers)) {
           const { host } = new URL2(origin);
           headers.host = host;
@@ -15751,20 +15751,20 @@ var require_mock_utils = __commonJS({
       }
       return true;
     }
-    function safeUrl(path2) {
-      if (typeof path2 !== "string") {
-        return path2;
+    function safeUrl(path3) {
+      if (typeof path3 !== "string") {
+        return path3;
       }
-      const pathSegments = path2.split("?");
+      const pathSegments = path3.split("?");
       if (pathSegments.length !== 2) {
-        return path2;
+        return path3;
       }
       const qp = new URLSearchParams(pathSegments.pop());
       qp.sort();
       return [...pathSegments, qp.toString()].join("?");
     }
-    function matchKey(mockDispatch2, { path: path2, method, body, headers }) {
-      const pathMatch = matchValue(mockDispatch2.path, path2);
+    function matchKey(mockDispatch2, { path: path3, method, body, headers }) {
+      const pathMatch = matchValue(mockDispatch2.path, path3);
       const methodMatch = matchValue(mockDispatch2.method, method);
       const bodyMatch = typeof mockDispatch2.body !== "undefined" ? matchValue(mockDispatch2.body, body) : true;
       const headersMatch = matchHeaders(mockDispatch2, headers);
@@ -15786,7 +15786,7 @@ var require_mock_utils = __commonJS({
     function getMockDispatch(mockDispatches, key) {
       const basePath = key.query ? buildURL(key.path, key.query) : key.path;
       const resolvedPath = typeof basePath === "string" ? safeUrl(basePath) : basePath;
-      let matchedMockDispatches = mockDispatches.filter(({ consumed }) => !consumed).filter(({ path: path2 }) => matchValue(safeUrl(path2), resolvedPath));
+      let matchedMockDispatches = mockDispatches.filter(({ consumed }) => !consumed).filter(({ path: path3 }) => matchValue(safeUrl(path3), resolvedPath));
       if (matchedMockDispatches.length === 0) {
         throw new MockNotMatchedError(`Mock dispatch not matched for path '${resolvedPath}'`);
       }
@@ -15824,9 +15824,9 @@ var require_mock_utils = __commonJS({
       }
     }
     function buildKey(opts) {
-      const { path: path2, method, body, headers, query } = opts;
+      const { path: path3, method, body, headers, query } = opts;
       return {
-        path: path2,
+        path: path3,
         method,
         body,
         headers,
@@ -16289,10 +16289,10 @@ var require_pending_interceptors_formatter = __commonJS({
       }
       format(pendingInterceptors) {
         const withPrettyHeaders = pendingInterceptors.map(
-          ({ method, path: path2, data: { statusCode }, persist, times, timesInvoked, origin }) => ({
+          ({ method, path: path3, data: { statusCode }, persist, times, timesInvoked, origin }) => ({
             Method: method,
             Origin: origin,
-            Path: path2,
+            Path: path3,
             "Status code": statusCode,
             Persistent: persist ? PERSISTENT : NOT_PERSISTENT,
             Invocations: timesInvoked,
@@ -21173,9 +21173,9 @@ var require_util7 = __commonJS({
         }
       }
     }
-    function validateCookiePath(path2) {
-      for (let i = 0; i < path2.length; ++i) {
-        const code = path2.charCodeAt(i);
+    function validateCookiePath(path3) {
+      for (let i = 0; i < path3.length; ++i) {
+        const code = path3.charCodeAt(i);
         if (code < 32 || // exclude CTLs (0-31)
         code > 126 || // exclude DEL and non-ascii
         code === 59) {
@@ -24017,11 +24017,11 @@ var require_undici = __commonJS({
           if (typeof opts.path !== "string") {
             throw new InvalidArgumentError("invalid opts.path");
           }
-          let path2 = opts.path;
+          let path3 = opts.path;
           if (!opts.path.startsWith("/")) {
-            path2 = `/${path2}`;
+            path3 = `/${path3}`;
           }
-          url2 = new URL(util.parseOrigin(url2).origin + path2);
+          url2 = new URL(util.parseOrigin(url2).origin + path3);
         } else {
           if (!opts) {
             opts = typeof url2 === "object" ? url2 : {};
@@ -24975,14 +24975,14 @@ var require_util10 = __commonJS({
         }
         const port = url2.port != null ? url2.port : url2.protocol === "https:" ? 443 : 80;
         let origin = url2.origin != null ? url2.origin : `${url2.protocol || ""}//${url2.hostname || ""}:${port}`;
-        let path2 = url2.path != null ? url2.path : `${url2.pathname || ""}${url2.search || ""}`;
+        let path3 = url2.path != null ? url2.path : `${url2.pathname || ""}${url2.search || ""}`;
         if (origin[origin.length - 1] === "/") {
           origin = origin.slice(0, origin.length - 1);
         }
-        if (path2 && path2[0] !== "/") {
-          path2 = `/${path2}`;
+        if (path3 && path3[0] !== "/") {
+          path3 = `/${path3}`;
         }
-        return new URL(`${origin}${path2}`);
+        return new URL(`${origin}${path3}`);
       }
       if (!isHttpOrHttpsPrefixed(url2.origin || url2.protocol)) {
         throw new InvalidArgumentError("Invalid URL protocol: the URL must start with `http:` or `https:`.");
@@ -25433,39 +25433,39 @@ var require_diagnostics2 = __commonJS({
       });
       diagnosticsChannel.channel("undici:client:sendHeaders").subscribe((evt) => {
         const {
-          request: { method, path: path2, origin }
+          request: { method, path: path3, origin }
         } = evt;
-        debuglog("sending request to %s %s/%s", method, origin, path2);
+        debuglog("sending request to %s %s/%s", method, origin, path3);
       });
       diagnosticsChannel.channel("undici:request:headers").subscribe((evt) => {
         const {
-          request: { method, path: path2, origin },
+          request: { method, path: path3, origin },
           response: { statusCode }
         } = evt;
         debuglog(
           "received response to %s %s/%s - HTTP %d",
           method,
           origin,
-          path2,
+          path3,
           statusCode
         );
       });
       diagnosticsChannel.channel("undici:request:trailers").subscribe((evt) => {
         const {
-          request: { method, path: path2, origin }
+          request: { method, path: path3, origin }
         } = evt;
-        debuglog("trailers received from %s %s/%s", method, origin, path2);
+        debuglog("trailers received from %s %s/%s", method, origin, path3);
       });
       diagnosticsChannel.channel("undici:request:error").subscribe((evt) => {
         const {
-          request: { method, path: path2, origin },
+          request: { method, path: path3, origin },
           error: error51
         } = evt;
         debuglog(
           "request to %s %s/%s errored - %s",
           method,
           origin,
-          path2,
+          path3,
           error51.message
         );
       });
@@ -25514,9 +25514,9 @@ var require_diagnostics2 = __commonJS({
         });
         diagnosticsChannel.channel("undici:client:sendHeaders").subscribe((evt) => {
           const {
-            request: { method, path: path2, origin }
+            request: { method, path: path3, origin }
           } = evt;
-          debuglog("sending request to %s %s/%s", method, origin, path2);
+          debuglog("sending request to %s %s/%s", method, origin, path3);
         });
       }
       diagnosticsChannel.channel("undici:websocket:open").subscribe((evt) => {
@@ -25579,7 +25579,7 @@ var require_request3 = __commonJS({
     var kHandler = /* @__PURE__ */ Symbol("handler");
     var Request = class {
       constructor(origin, {
-        path: path2,
+        path: path3,
         method,
         body,
         headers,
@@ -25594,11 +25594,11 @@ var require_request3 = __commonJS({
         expectContinue,
         servername
       }, handler2) {
-        if (typeof path2 !== "string") {
+        if (typeof path3 !== "string") {
           throw new InvalidArgumentError("path must be a string");
-        } else if (path2[0] !== "/" && !(path2.startsWith("http://") || path2.startsWith("https://")) && method !== "CONNECT") {
+        } else if (path3[0] !== "/" && !(path3.startsWith("http://") || path3.startsWith("https://")) && method !== "CONNECT") {
           throw new InvalidArgumentError("path must be an absolute URL or start with a slash");
-        } else if (invalidPathRegex.test(path2)) {
+        } else if (invalidPathRegex.test(path3)) {
           throw new InvalidArgumentError("invalid request path");
         }
         if (typeof method !== "string") {
@@ -25664,7 +25664,7 @@ var require_request3 = __commonJS({
         this.completed = false;
         this.aborted = false;
         this.upgrade = upgrade || null;
-        this.path = query ? buildURL(path2, query) : path2;
+        this.path = query ? buildURL(path3, query) : path3;
         this.origin = origin;
         this.idempotent = idempotent == null ? method === "HEAD" || method === "GET" : idempotent;
         this.blocking = blocking == null ? false : blocking;
@@ -30293,7 +30293,7 @@ var require_client_h12 = __commonJS({
       return method !== "GET" && method !== "HEAD" && method !== "OPTIONS" && method !== "TRACE" && method !== "CONNECT";
     }
     function writeH1(client2, request2) {
-      const { method, path: path2, host, upgrade, blocking, reset } = request2;
+      const { method, path: path3, host, upgrade, blocking, reset } = request2;
       let { body, headers, contentLength } = request2;
       const expectsPayload = method === "PUT" || method === "POST" || method === "PATCH" || method === "QUERY" || method === "PROPFIND" || method === "PROPPATCH";
       if (util.isFormDataLike(body)) {
@@ -30368,7 +30368,7 @@ var require_client_h12 = __commonJS({
       if (blocking) {
         socket[kBlocking] = true;
       }
-      let header = `${method} ${path2} HTTP/1.1\r
+      let header = `${method} ${path3} HTTP/1.1\r
 `;
       if (typeof host === "string") {
         header += `host: ${host}\r
@@ -30894,7 +30894,7 @@ var require_client_h22 = __commonJS({
     }
     function writeH2(client2, request2) {
       const session = client2[kHTTP2Session];
-      const { method, path: path2, host, upgrade, expectContinue, signal, headers: reqHeaders } = request2;
+      const { method, path: path3, host, upgrade, expectContinue, signal, headers: reqHeaders } = request2;
       let { body } = request2;
       if (upgrade) {
         util.errorRequest(client2, request2, new Error("Upgrade not supported for H2"));
@@ -30961,7 +30961,7 @@ var require_client_h22 = __commonJS({
         });
         return true;
       }
-      headers[HTTP2_HEADER_PATH] = path2;
+      headers[HTTP2_HEADER_PATH] = path3;
       headers[HTTP2_HEADER_SCHEME] = "https";
       const expectsPayload = method === "PUT" || method === "POST" || method === "PATCH";
       if (body && typeof body.read === "function") {
@@ -31314,9 +31314,9 @@ var require_redirect_handler2 = __commonJS({
           return this.handler.onHeaders(statusCode, headers, resume, statusText);
         }
         const { origin, pathname, search } = util.parseURL(new URL(this.location, this.opts.origin && new URL(this.opts.path, this.opts.origin)));
-        const path2 = search ? `${pathname}${search}` : pathname;
+        const path3 = search ? `${pathname}${search}` : pathname;
         this.opts.headers = cleanRequestHeaders(this.opts.headers, statusCode === 303, this.opts.origin !== origin);
-        this.opts.path = path2;
+        this.opts.path = path3;
         this.opts.origin = origin;
         this.opts.maxRedirections = 0;
         this.opts.query = null;
@@ -32551,10 +32551,10 @@ var require_proxy_agent2 = __commonJS({
         };
         const {
           origin,
-          path: path2 = "/",
+          path: path3 = "/",
           headers = {}
         } = opts;
-        opts.path = origin + path2;
+        opts.path = origin + path3;
         if (!("host" in headers) && !("Host" in headers)) {
           const { host } = new URL2(origin);
           headers.host = host;
@@ -34526,20 +34526,20 @@ var require_mock_utils2 = __commonJS({
       }
       return true;
     }
-    function safeUrl(path2) {
-      if (typeof path2 !== "string") {
-        return path2;
+    function safeUrl(path3) {
+      if (typeof path3 !== "string") {
+        return path3;
       }
-      const pathSegments = path2.split("?");
+      const pathSegments = path3.split("?");
       if (pathSegments.length !== 2) {
-        return path2;
+        return path3;
       }
       const qp = new URLSearchParams(pathSegments.pop());
       qp.sort();
       return [...pathSegments, qp.toString()].join("?");
     }
-    function matchKey(mockDispatch2, { path: path2, method, body, headers }) {
-      const pathMatch = matchValue(mockDispatch2.path, path2);
+    function matchKey(mockDispatch2, { path: path3, method, body, headers }) {
+      const pathMatch = matchValue(mockDispatch2.path, path3);
       const methodMatch = matchValue(mockDispatch2.method, method);
       const bodyMatch = typeof mockDispatch2.body !== "undefined" ? matchValue(mockDispatch2.body, body) : true;
       const headersMatch = matchHeaders(mockDispatch2, headers);
@@ -34561,7 +34561,7 @@ var require_mock_utils2 = __commonJS({
     function getMockDispatch(mockDispatches, key) {
       const basePath = key.query ? buildURL(key.path, key.query) : key.path;
       const resolvedPath = typeof basePath === "string" ? safeUrl(basePath) : basePath;
-      let matchedMockDispatches = mockDispatches.filter(({ consumed }) => !consumed).filter(({ path: path2 }) => matchValue(safeUrl(path2), resolvedPath));
+      let matchedMockDispatches = mockDispatches.filter(({ consumed }) => !consumed).filter(({ path: path3 }) => matchValue(safeUrl(path3), resolvedPath));
       if (matchedMockDispatches.length === 0) {
         throw new MockNotMatchedError(`Mock dispatch not matched for path '${resolvedPath}'`);
       }
@@ -34599,9 +34599,9 @@ var require_mock_utils2 = __commonJS({
       }
     }
     function buildKey(opts) {
-      const { path: path2, method, body, headers, query } = opts;
+      const { path: path3, method, body, headers, query } = opts;
       return {
-        path: path2,
+        path: path3,
         method,
         body,
         headers,
@@ -35064,10 +35064,10 @@ var require_pending_interceptors_formatter2 = __commonJS({
       }
       format(pendingInterceptors) {
         const withPrettyHeaders = pendingInterceptors.map(
-          ({ method, path: path2, data: { statusCode }, persist, times, timesInvoked, origin }) => ({
+          ({ method, path: path3, data: { statusCode }, persist, times, timesInvoked, origin }) => ({
             Method: method,
             Origin: origin,
-            Path: path2,
+            Path: path3,
             "Status code": statusCode,
             Persistent: persist ? PERSISTENT : NOT_PERSISTENT,
             Invocations: timesInvoked,
@@ -39948,9 +39948,9 @@ var require_util15 = __commonJS({
         }
       }
     }
-    function validateCookiePath(path2) {
-      for (let i = 0; i < path2.length; ++i) {
-        const code = path2.charCodeAt(i);
+    function validateCookiePath(path3) {
+      for (let i = 0; i < path3.length; ++i) {
+        const code = path3.charCodeAt(i);
         if (code < 32 || // exclude CTLs (0-31)
         code > 126 || // exclude DEL and non-ascii
         code === 59) {
@@ -42792,11 +42792,11 @@ var require_undici2 = __commonJS({
           if (typeof opts.path !== "string") {
             throw new InvalidArgumentError("invalid opts.path");
           }
-          let path2 = opts.path;
+          let path3 = opts.path;
           if (!opts.path.startsWith("/")) {
-            path2 = `/${path2}`;
+            path3 = `/${path3}`;
           }
-          url2 = new URL(util.parseOrigin(url2).origin + path2);
+          url2 = new URL(util.parseOrigin(url2).origin + path3);
         } else {
           if (!opts) {
             opts = typeof url2 === "object" ? url2 : {};
@@ -52910,7 +52910,7 @@ var require_websocket3 = __commonJS({
     var http = require("http");
     var net = require("net");
     var tls = require("tls");
-    var { randomBytes, createHash } = require("crypto");
+    var { randomBytes, createHash: createHash2 } = require("crypto");
     var { Duplex, Readable } = require("stream");
     var { URL: URL2 } = require("url");
     var PerMessageDeflate2 = require_permessage_deflate3();
@@ -53578,7 +53578,7 @@ var require_websocket3 = __commonJS({
           abortHandshake(websocket, socket, "Invalid Upgrade header");
           return;
         }
-        const digest = createHash("sha1").update(key + GUID).digest("base64");
+        const digest = createHash2("sha1").update(key + GUID).digest("base64");
         if (res.headers["sec-websocket-accept"] !== digest) {
           abortHandshake(websocket, socket, "Invalid Sec-WebSocket-Accept header");
           return;
@@ -53947,7 +53947,7 @@ var require_websocket_server = __commonJS({
     var EventEmitter = require("events");
     var http = require("http");
     var { Duplex } = require("stream");
-    var { createHash } = require("crypto");
+    var { createHash: createHash2 } = require("crypto");
     var extension2 = require_extension();
     var PerMessageDeflate2 = require_permessage_deflate3();
     var subprotocol2 = require_subprotocol();
@@ -54254,7 +54254,7 @@ var require_websocket_server = __commonJS({
           );
         }
         if (this._state > RUNNING) return abortHandshake(socket, 503);
-        const digest = createHash("sha1").update(key + GUID).digest("base64");
+        const digest = createHash2("sha1").update(key + GUID).digest("base64");
         const headers = [
           "HTTP/1.1 101 Switching Protocols",
           "Upgrade: websocket",
@@ -63845,11 +63845,11 @@ var require_mime_types = __commonJS({
       }
       return exts[0];
     }
-    function lookup(path2) {
-      if (!path2 || typeof path2 !== "string") {
+    function lookup(path3) {
+      if (!path3 || typeof path3 !== "string") {
         return false;
       }
-      var extension3 = extname("x." + path2).toLowerCase().substr(1);
+      var extension3 = extname("x." + path3).toLowerCase().substr(1);
       if (!extension3) {
         return false;
       }
@@ -64954,7 +64954,7 @@ var require_form_data = __commonJS({
     "use strict";
     var CombinedStream = require_combined_stream();
     var util = require("util");
-    var path2 = require("path");
+    var path3 = require("path");
     var http = require("http");
     var https = require("https");
     var parseUrl2 = require("url").parse;
@@ -65085,11 +65085,11 @@ var require_form_data = __commonJS({
     FormData2.prototype._getContentDisposition = function(value, options) {
       var filename;
       if (typeof options.filepath === "string") {
-        filename = path2.normalize(options.filepath).replace(/\\/g, "/");
+        filename = path3.normalize(options.filepath).replace(/\\/g, "/");
       } else if (options.filename || value && (value.name || value.path)) {
-        filename = path2.basename(options.filename || value && (value.name || value.path));
+        filename = path3.basename(options.filename || value && (value.name || value.path));
       } else if (value && value.readable && hasOwn(value, "httpVersion")) {
-        filename = path2.basename(value.client._httpMessage.path || "");
+        filename = path3.basename(value.client._httpMessage.path || "");
       }
       if (filename) {
         return 'filename="' + escapeHeaderParam(filename) + '"';
@@ -66911,7 +66911,7 @@ var require_axios = __commonJS({
     var https = require("https");
     var http2 = require("http2");
     var util = require("util");
-    var path2 = require("path");
+    var path3 = require("path");
     var followRedirects = require_follow_redirects();
     var zlib = require("zlib");
     var stream2 = require("stream");
@@ -66934,22 +66934,82 @@ var require_axios = __commonJS({
     var hasOwnProperty = (({
       hasOwnProperty: hasOwnProperty2
     }) => (obj, prop) => hasOwnProperty2.call(obj, prop))(Object.prototype);
+    var isUnsafeObjectKey = (prop) => typeof prop === "string" && (prop === "__proto__" || prop === "constructor" || prop === "prototype");
+    var isPrototypeBoundary = (obj, prototype2, source) => obj === Object.prototype || !source && prototype2 === null;
+    var isSafeAndFullyMutable = (obj) => {
+      if (!Object.isExtensible(obj)) {
+        return false;
+      }
+      const props = Object.getOwnPropertyNames(obj);
+      if (Object.getOwnPropertySymbols) {
+        props.push(...Object.getOwnPropertySymbols(obj));
+      }
+      return props.every((prop) => {
+        if (isUnsafeObjectKey(prop)) {
+          return false;
+        }
+        const descriptor = Object.getOwnPropertyDescriptor(obj, prop);
+        return !!descriptor && descriptor.configurable && descriptor.writable === true;
+      });
+    };
     var hasOwnInPrototypeChain = (thing, prop) => {
       let obj = thing;
       const seen = [];
-      while (obj != null && obj !== Object.prototype) {
+      while (obj != null) {
         if (seen.indexOf(obj) !== -1) {
           return false;
         }
         seen.push(obj);
+        const prototype2 = getPrototypeOf(obj);
+        if (isPrototypeBoundary(obj, prototype2, obj === thing)) {
+          return false;
+        }
         if (hasOwnProperty(obj, prop)) {
           return true;
         }
-        obj = getPrototypeOf(obj);
+        obj = prototype2;
       }
       return false;
     };
     var getSafeProp = (obj, prop) => obj != null && hasOwnInPrototypeChain(obj, prop) ? obj[prop] : void 0;
+    var toSafeFlatObject = (thing) => {
+      if (thing == null || typeof thing !== "object" && typeof thing !== "function") {
+        return thing;
+      }
+      const sourcePrototype = getPrototypeOf(thing);
+      if (sourcePrototype === null && isSafeAndFullyMutable(thing)) {
+        return thing;
+      }
+      const result = /* @__PURE__ */ Object.create(null);
+      const merged = /* @__PURE__ */ Object.create(null);
+      const seen = [];
+      let current = thing;
+      while (current != null) {
+        if (seen.indexOf(current) !== -1) {
+          break;
+        }
+        seen.push(current);
+        const prototype2 = current === thing ? sourcePrototype : getPrototypeOf(current);
+        if (isPrototypeBoundary(current, prototype2, current === thing)) {
+          break;
+        }
+        const props = Object.getOwnPropertyNames(current);
+        if (Object.getOwnPropertySymbols) {
+          props.push(...Object.getOwnPropertySymbols(current));
+        }
+        for (const prop of props) {
+          if (isUnsafeObjectKey(prop)) {
+            continue;
+          }
+          if (!hasOwnProperty(merged, prop)) {
+            result[prop] = thing[prop];
+            merged[prop] = true;
+          }
+        }
+        current = prototype2;
+      }
+      return result;
+    };
     var kindOf = /* @__PURE__ */ ((cache) => (thing) => {
       const str = toString2.call(thing);
       return cache[str] || (cache[str] = str.slice(8, -1).toLowerCase());
@@ -66986,9 +67046,9 @@ var require_axios = __commonJS({
         return false;
       }
       const prototype2 = getPrototypeOf(val);
-      return (prototype2 === null || prototype2 === Object.prototype || getPrototypeOf(prototype2) === null) && // Treat any genuine (non-Object.prototype-polluted) Symbol.toStringTag or
-      // Symbol.iterator as evidence the value is a tagged/iterable type rather
-      // than a plain object, while ignoring keys injected onto Object.prototype.
+      return (prototype2 === null || prototype2 === Object.prototype || getPrototypeOf(prototype2) === null) && // Treat safe own/inherited Symbol.toStringTag or Symbol.iterator members as
+      // evidence the value is tagged/iterable, while ignoring members reachable
+      // only through shared or terminal prototype boundaries.
       !hasOwnInPrototypeChain(val, toStringTag) && !hasOwnInPrototypeChain(val, iterator2);
     };
     var isEmptyObject = (val) => {
@@ -67400,6 +67460,7 @@ var require_axios = __commonJS({
       // an alias to avoid ESLint no-prototype-builtins detection
       hasOwnInPrototypeChain,
       getSafeProp,
+      toSafeFlatObject,
       reduceDescriptors,
       freezeMethods,
       toObjectSet,
@@ -67480,7 +67541,7 @@ var require_axios = __commonJS({
       });
       return byteStringHeaders;
     }
-    var $internals = /* @__PURE__ */ Symbol("internals");
+    var $internals$1 = /* @__PURE__ */ Symbol("internals");
     function normalizeHeader(header) {
       return header && String(header).trim().toLowerCase();
     }
@@ -67776,7 +67837,7 @@ var require_axios = __commonJS({
         return computed;
       }
       static accessor(header) {
-        const internals = this[$internals] = this[$internals] = {
+        const internals = this[$internals$1] = this[$internals$1] = {
           accessors: {}
         };
         const accessors = internals.accessors;
@@ -67979,9 +68040,9 @@ var require_axios = __commonJS({
     function removeBrackets(key) {
       return utils$1.endsWith(key, "[]") ? key.slice(0, -2) : key;
     }
-    function renderKey(path3, key, dots) {
-      if (!path3) return key;
-      return path3.concat(key).map(function each(token, i) {
+    function renderKey(path4, key, dots) {
+      if (!path4) return key;
+      return path4.concat(key).map(function each(token, i) {
         token = removeBrackets(token);
         return !dots && i ? "[" + token + "]" : token;
       }).join(dots ? "." : "");
@@ -67997,19 +68058,16 @@ var require_axios = __commonJS({
         throw new TypeError("target must be an object");
       }
       formData = formData || new (FormData$1 || FormData)();
-      options = utils$1.toFlatObject(options, {
-        metaTokens: true,
-        dots: false,
-        indexes: false
-      }, false, function defined(option, source) {
-        return !utils$1.isUndefined(source[option]);
-      });
-      const metaTokens = options.metaTokens;
-      const visitor = options.visitor || defaultVisitor;
-      const dots = options.dots;
-      const indexes = options.indexes;
-      const _Blob = options.Blob || typeof Blob !== "undefined" && Blob;
-      const maxDepth = options.maxDepth === void 0 ? DEFAULT_FORM_DATA_MAX_DEPTH : options.maxDepth;
+      const option = (name, fallback) => {
+        const value = utils$1.getSafeProp(options, name);
+        return utils$1.isUndefined(value) ? fallback : value;
+      };
+      const metaTokens = option("metaTokens", true);
+      const visitor = option("visitor") || defaultVisitor;
+      const dots = option("dots", false);
+      const indexes = option("indexes", false);
+      const _Blob = option("Blob") || typeof Blob !== "undefined" && Blob;
+      const maxDepth = option("maxDepth", DEFAULT_FORM_DATA_MAX_DEPTH);
       const useBlob = _Blob && utils$1.isSpecCompliantForm(formData);
       const stack = [];
       if (!utils$1.isFunction(visitor)) {
@@ -68059,13 +68117,13 @@ var require_axios = __commonJS({
           return currentValue;
         });
       }
-      function defaultVisitor(value, key, path3) {
+      function defaultVisitor(value, key, path4) {
         let arr = value;
         if (utils$1.isReactNative(formData) && utils$1.isReactNativeBlob(value)) {
-          formData.append(renderKey(path3, key, dots), convertValue(value));
+          formData.append(renderKey(path4, key, dots), convertValue(value));
           return false;
         }
-        if (value && !path3 && typeof value === "object") {
+        if (value && !path4 && typeof value === "object") {
           if (utils$1.endsWith(key, "{}")) {
             key = metaTokens ? key : key.slice(0, -2);
             value = stringifyWithDepthLimit(value, 1);
@@ -68084,7 +68142,7 @@ var require_axios = __commonJS({
         if (isVisitable(value)) {
           return true;
         }
-        formData.append(renderKey(path3, key, dots), convertValue(value));
+        formData.append(renderKey(path4, key, dots), convertValue(value));
         return false;
       }
       const exposedHelpers = Object.assign(predicates, {
@@ -68092,17 +68150,17 @@ var require_axios = __commonJS({
         convertValue,
         isVisitable
       });
-      function build(value, path3, depth = 0) {
+      function build(value, path4, depth = 0) {
         if (utils$1.isUndefined(value)) return;
         throwIfMaxDepthExceeded(depth);
         if (stack.indexOf(value) !== -1) {
-          throw new Error("Circular reference detected in " + path3.join("."));
+          throw new Error("Circular reference detected in " + path4.join("."));
         }
         stack.push(value);
         utils$1.forEach(value, function each(el, key) {
-          const result = !(utils$1.isUndefined(el) || el === null) && visitor.call(formData, el, utils$1.isString(key) ? key.trim() : key, path3, exposedHelpers);
+          const result = !(utils$1.isUndefined(el) || el === null) && visitor.call(formData, el, utils$1.isString(key) ? key.trim() : key, path4, exposedHelpers);
           if (result === true) {
-            build(el, path3 ? path3.concat(key) : [key], depth + 1);
+            build(el, path4 ? path4.concat(key) : [key], depth + 1);
           }
         });
         stack.pop();
@@ -68168,9 +68226,47 @@ var require_axios = __commonJS({
       }
       return url3;
     }
+    var $internals = /* @__PURE__ */ Symbol("internals");
+    function countHandlers(handlers) {
+      return handlers ? handlers.length : 0;
+    }
+    function trimHandlers(handlers) {
+      if (!handlers) {
+        return;
+      }
+      while (handlers.length && handlers[handlers.length - 1] === null) {
+        handlers.pop();
+      }
+    }
+    function syncHandlerEntries(manager, internals) {
+      const handlers = manager.handlers;
+      const length = countHandlers(handlers);
+      if (handlers !== internals.handlersRef) {
+        internals.handlersRef = handlers;
+        internals.handlerEntries.clear();
+      } else if (length !== internals.handlersLength) {
+        if (!length) {
+          internals.handlerEntries.clear();
+        } else {
+          internals.handlerEntries.forEach(function removeStaleEntry(entry, id) {
+            if (handlers[entry.index] !== entry.handler) {
+              internals.handlerEntries.delete(id);
+            }
+          });
+        }
+      }
+      internals.handlersLength = length;
+    }
     var InterceptorManager = class {
       constructor() {
         this.handlers = [];
+        this[$internals] = {
+          handlersRef: this.handlers,
+          handlersLength: this.handlers.length,
+          handlerEntries: /* @__PURE__ */ new Map(),
+          iterationDepth: 0,
+          nextId: 0
+        };
       }
       /**
        * Add a new interceptor to the stack
@@ -68182,13 +68278,25 @@ var require_axios = __commonJS({
        * @return {Number} An ID used to remove interceptor later
        */
       use(fulfilled, rejected, options) {
-        this.handlers.push({
+        const handler2 = {
           fulfilled,
           rejected,
           synchronous: options ? options.synchronous : false,
           runWhen: options ? options.runWhen : null
+        };
+        const internals = this[$internals];
+        if (this.handlers == null) {
+          this.handlers = [];
+        }
+        syncHandlerEntries(this, internals);
+        const id = internals.nextId++;
+        this.handlers.push(handler2);
+        internals.handlerEntries.set(id, {
+          handler: handler2,
+          index: this.handlers.length - 1
         });
-        return this.handlers.length - 1;
+        internals.handlersLength = this.handlers.length;
+        return id;
       }
       /**
        * Remove an interceptor from the stack
@@ -68198,8 +68306,19 @@ var require_axios = __commonJS({
        * @returns {void}
        */
       eject(id) {
-        if (this.handlers[id]) {
-          this.handlers[id] = null;
+        const internals = this[$internals];
+        syncHandlerEntries(this, internals);
+        const entry = internals.handlerEntries.get(id);
+        if (entry) {
+          internals.handlerEntries.delete(id);
+          if (this.handlers[entry.index] !== entry.handler) {
+            return;
+          }
+          this.handlers[entry.index] = null;
+          if (!internals.iterationDepth) {
+            trimHandlers(this.handlers);
+            internals.handlersLength = this.handlers.length;
+          }
         }
       }
       /**
@@ -68210,6 +68329,7 @@ var require_axios = __commonJS({
       clear() {
         if (this.handlers) {
           this.handlers = [];
+          syncHandlerEntries(this, this[$internals]);
         }
       }
       /**
@@ -68223,11 +68343,22 @@ var require_axios = __commonJS({
        * @returns {void}
        */
       forEach(fn) {
-        utils$1.forEach(this.handlers, function forEachHandler(h2) {
-          if (h2 !== null) {
-            fn(h2);
+        const internals = this[$internals];
+        syncHandlerEntries(this, internals);
+        internals.iterationDepth++;
+        try {
+          utils$1.forEach(this.handlers, function forEachHandler(h2) {
+            if (h2 !== null) {
+              fn(h2);
+            }
+          });
+        } finally {
+          if (!--internals.iterationDepth) {
+            syncHandlerEntries(this, internals);
+            trimHandlers(this.handlers);
+            internals.handlersLength = countHandlers(this.handlers);
           }
-        });
+        }
       }
     };
     var transitionalDefaults = {
@@ -68291,7 +68422,7 @@ var require_axios = __commonJS({
     };
     function toURLEncodedForm(data, options) {
       return toFormData(data, new platform2.classes.URLSearchParams(), {
-        visitor: function(value, key, path3, helpers) {
+        visitor: function(value, key, path4, helpers) {
           if (platform2.isNode && utils$1.isBuffer(value)) {
             this.append(key, value.toString("base64"));
             return false;
@@ -68308,14 +68439,14 @@ var require_axios = __commonJS({
       }
     }
     function parsePropPath(name) {
-      const path3 = [];
+      const path4 = [];
       const pattern = /[^.[\]]+|\[([^.[\]]*)]/g;
       let match;
       while ((match = pattern.exec(name)) !== null) {
-        throwIfDepthExceeded(path3.length);
-        path3.push(match[0] === "[]" ? "" : match[1] || match[0]);
+        throwIfDepthExceeded(path4.length);
+        path4.push(match[0] === "[]" ? "" : match[1] || match[0]);
       }
-      return path3;
+      return path4;
     }
     function arrayToObject(arr) {
       const obj = {};
@@ -68330,12 +68461,12 @@ var require_axios = __commonJS({
       return obj;
     }
     function formDataToJSON(formData) {
-      function buildPath(path3, value, target, index) {
+      function buildPath(path4, value, target, index) {
         throwIfDepthExceeded(index);
-        let name = path3[index++];
+        let name = path4[index++];
         if (name === "__proto__") return true;
         const isNumericKey = Number.isFinite(+name);
-        const isLast = index >= path3.length;
+        const isLast = index >= path4.length;
         name = !name && utils$1.isArray(target) ? target.length : name;
         if (isLast) {
           if (utils$1.hasOwnProp(target, name)) {
@@ -68348,7 +68479,7 @@ var require_axios = __commonJS({
         if (!utils$1.hasOwnProp(target, name) || !utils$1.isObject(target[name])) {
           target[name] = [];
         }
-        const result = buildPath(path3, value, target[name], index);
+        const result = buildPath(path4, value, target[name], index);
         if (result && utils$1.isArray(target[name])) {
           target[name] = arrayToObject(target[name]);
         }
@@ -68363,6 +68494,7 @@ var require_axios = __commonJS({
       }
       return null;
     }
+    var methodList = Object.freeze(["get", "delete", "head", "options", "post", "put", "patch", "purge", "link", "unlink", "query"]);
     var own = (obj, key) => obj != null && utils$1.hasOwnProp(obj, key) ? obj[key] : void 0;
     function stringifySafely(rawValue, parser, encoder) {
       if (utils$1.isString(rawValue)) {
@@ -68468,7 +68600,7 @@ var require_axios = __commonJS({
         }
       }
     };
-    utils$1.forEach(["delete", "get", "head", "post", "put", "patch", "query"], (method) => {
+    utils$1.forEach(methodList, (method) => {
       defaults3.headers[method] = {};
     });
     function transformData(fns, response) {
@@ -68525,18 +68657,18 @@ var require_axios = __commonJS({
       }
       return baseURL.slice(0, end) + "/" + relativeURL.replace(/^\/+/, "");
     }
-    var malformedHttpProtocol = /^https?:(?!\/\/)/i;
-    var httpProtocolControlCharacters = /[\t\n\r]/g;
-    function stripLeadingC0ControlOrSpace(url3) {
-      let i = 0;
-      while (i < url3.length && url3.charCodeAt(i) <= 32) {
-        i++;
-      }
-      return url3.slice(i);
-    }
+    var urlParserControlCharacters = /[\t\n\r]/g;
     function normalizeURLForProtocolCheck(url3) {
-      return stripLeadingC0ControlOrSpace(url3).replace(httpProtocolControlCharacters, "");
+      if (typeof url3 !== "string") {
+        return url3;
+      }
+      let start = 0;
+      while (start < url3.length && url3.charCodeAt(start) <= 32) {
+        start++;
+      }
+      return url3.slice(start).replace(urlParserControlCharacters, "");
     }
+    var malformedHttpProtocol = /^https?:(?!\/\/)/i;
     function redactFragment(fragment) {
       if (!fragment) {
         return fragment;
@@ -68637,12 +68769,12 @@ var require_axios = __commonJS({
     function getEnv2(key) {
       return process.env[key.toLowerCase()] || process.env[key.toUpperCase()] || "";
     }
-    var VERSION10 = "1.19.0";
+    var VERSION10 = "1.20.0";
     function parseProtocol(url3) {
       const match = /^([-+\w]{1,25}):(?:\/\/)?/.exec(url3);
       return match && match[1] || "";
     }
-    var DATA_URL_PATTERN = /^([^,;]+\/[^,;]+)?((?:;[^,;=]+=[^,;]+)*)(;base64)?,([\s\S]*)$/;
+    var DATA_URL_PATTERN = /^([^,;/]+\/[^,;/]+)?((?:;[^,;=]+=[^,;]+)*)(;base64)?,([\s\S]*)$/;
     function fromDataURI(uri, asBlob, options) {
       const _Blob = options && options.Blob || platform2.classes.Blob;
       const protocol = parseProtocol(uri);
@@ -68919,7 +69051,7 @@ var require_axios = __commonJS({
         this.sessions = /* @__PURE__ */ Object.create(null);
       }
       getSession(authority, options) {
-        options = Object.assign({
+        options = Object.assign(/* @__PURE__ */ Object.create(null), {
           sessionTimeout: 1e3
         }, options);
         let authoritySessions = this.sessions[authority];
@@ -68984,6 +69116,7 @@ var require_axios = __commonJS({
           };
         }
         session.once("close", removeSession);
+        session.once("error", removeSession);
         let entry = [session, options];
         authoritySessions ? authoritySessions.push(entry) : authoritySessions = this.sessions[authority] = [entry];
         return session;
@@ -69002,6 +69135,13 @@ var require_axios = __commonJS({
       } : fn;
     };
     var LOOPBACK_HOSTNAMES = /* @__PURE__ */ new Set(["localhost", "0.0.0.0"]);
+    var trimTrailingDots = (value) => {
+      let end = value.length;
+      while (end && value.charCodeAt(end - 1) === 46) {
+        end--;
+      }
+      return end === value.length ? value : value.slice(0, end);
+    };
     var isIPv4Loopback = (host) => {
       const parts = host.split(".");
       if (parts.length !== 4) return false;
@@ -69034,7 +69174,7 @@ var require_axios = __commonJS({
       if (h2.charAt(0) === "[" && h2.charAt(h2.length - 1) === "]") {
         h2 = h2.slice(1, -1);
       }
-      h2 = h2.replace(/\.+$/, "");
+      h2 = trimTrailingDots(h2);
       if (!/^[0-9.xXa-fA-F]+$/.test(h2)) return host;
       const parts = h2.split(".");
       if (parts.some((p3) => p3 === "")) return host;
@@ -69146,6 +69286,40 @@ var require_axios = __commonJS({
       }
       return host;
     };
+    var IPV4_OCTET_RE = /^(?:0|[1-9]\d{0,2})$/;
+    var ipv4ToBytes = (host) => {
+      const parts = host.split(".");
+      return parts.length === 4 && parts.every((part) => IPV4_OCTET_RE.test(part) && Number(part) <= 255) ? parts.map(Number) : null;
+    };
+    var IPV6_GROUP_RE = /^[0-9a-f]{1,4}$/i;
+    var ipv6ToBytes = (host) => {
+      const halves = host.split("::");
+      if (halves.length > 2) {
+        return null;
+      }
+      const groups = halves[0] ? halves[0].split(":") : [];
+      if (halves.length === 2) {
+        const rear = halves[1] ? halves[1].split(":") : [];
+        const missing = 8 - groups.length - rear.length;
+        if (missing < 1) {
+          return null;
+        }
+        groups.push(...new Array(missing).fill("0"), ...rear);
+      }
+      if (groups.length !== 8 || groups.some((group) => !IPV6_GROUP_RE.test(group))) {
+        return null;
+      }
+      return groups.flatMap((group) => {
+        const value = Number.parseInt(group, 16);
+        return [value >> 8 & 255, value & 255];
+      });
+    };
+    var ipToBytes = (host) => {
+      if (typeof host !== "string" || !host) {
+        return null;
+      }
+      return host.indexOf(":") !== -1 ? ipv6ToBytes(host) : ipv4ToBytes(host);
+    };
     var normalizeNoProxyHost = (hostname3) => {
       if (!hostname3) {
         return hostname3;
@@ -69153,12 +69327,98 @@ var require_axios = __commonJS({
       if (hostname3.charAt(0) === "[" && hostname3.charAt(hostname3.length - 1) === "]") {
         hostname3 = hostname3.slice(1, -1);
       }
-      const trimmed = hostname3.replace(/\.+$/, "");
+      const trimmed = trimTrailingDots(hostname3);
       const ipv43 = normalizeIPAddress(trimmed);
       if (ipv43 !== trimmed) {
         return ipv43;
       }
       return unmapIPv4MappedIPv6(trimmed);
+    };
+    var normalizeCidrBase = (input) => {
+      let base = input;
+      const startsBracket = base.charAt(0) === "[";
+      const endsBracket = base.charAt(base.length - 1) === "]";
+      const hasBracket = base.includes("[") || base.includes("]");
+      if (startsBracket || endsBracket) {
+        if (!startsBracket || !endsBracket) {
+          return null;
+        }
+        base = base.slice(1, -1);
+        if (base.indexOf(":") === -1 || base.includes("[") || base.includes("]")) {
+          return null;
+        }
+      } else if (hasBracket) {
+        return null;
+      }
+      if (!base || base.charAt(base.length - 1) === ".") {
+        return null;
+      }
+      const wasIPv6 = base.indexOf(":") !== -1;
+      if (wasIPv6) {
+        try {
+          base = new URL(`http://[${base}]/`).hostname.slice(1, -1);
+        } catch (_err) {
+          return null;
+        }
+      } else {
+        base = normalizeIPAddress(base);
+        if (!ipv4ToBytes(base)) {
+          return null;
+        }
+      }
+      return {
+        normalized: unmapIPv4MappedIPv6(base),
+        wasIPv6
+      };
+    };
+    var CIDR_ENTRY_RE = /^(.+)\/(0|[1-9]\d{0,2})$/;
+    var parseCidrEntry = (entry) => {
+      if (entry.indexOf("/") === -1) {
+        return void 0;
+      }
+      const match = CIDR_ENTRY_RE.exec(entry);
+      if (!match) {
+        return null;
+      }
+      let prefix = Number(match[2]);
+      const parsedBase = normalizeCidrBase(match[1]);
+      if (!parsedBase) {
+        return null;
+      }
+      const {
+        normalized,
+        wasIPv6
+      } = parsedBase;
+      if (wasIPv6 && normalized.indexOf(":") === -1) {
+        if (prefix < 96) {
+          return null;
+        }
+        prefix -= 96;
+      }
+      const bytes2 = ipToBytes(normalized);
+      if (!bytes2 || prefix > bytes2.length * 8) {
+        return null;
+      }
+      return {
+        bytes: bytes2,
+        prefix
+      };
+    };
+    var isInSubnet = (addressBytes, networkBytes, prefix) => {
+      const fullBytes = prefix >> 3;
+      for (let i = 0; i < fullBytes; i++) {
+        if (addressBytes[i] !== networkBytes[i]) {
+          return false;
+        }
+      }
+      const remainingBits = prefix & 7;
+      if (remainingBits) {
+        const mask = 255 << 8 - remainingBits & 255;
+        if ((addressBytes[fullBytes] & mask) !== (networkBytes[fullBytes] & mask)) {
+          return false;
+        }
+      }
+      return true;
     };
     function shouldBypassProxy(location) {
       let parsed;
@@ -69176,12 +69436,17 @@ var require_axios = __commonJS({
       }
       const port = Number.parseInt(parsed.port, 10) || DEFAULT_PORTS[parsed.protocol.split(":", 1)[0]] || 0;
       const hostname3 = normalizeNoProxyHost(parsed.hostname.toLowerCase());
+      const hostnameBytes = ipToBytes(hostname3);
       return noProxy.split(/[\s,]+/).some((entry) => {
         if (!entry) {
           return false;
         }
         if (entry === "*") {
           return true;
+        }
+        const cidr = parseCidrEntry(entry);
+        if (cidr !== void 0) {
+          return cidr !== null && !!hostnameBytes && hostnameBytes.length === cidr.bytes.length && isInSubnet(hostnameBytes, cidr.bytes, cidr.prefix);
         }
         let [entryHost, entryPort] = parseNoProxyEntry(entry);
         entryHost = normalizeNoProxyHost(entryHost);
@@ -69263,13 +69528,14 @@ var require_axios = __commonJS({
         }
       };
       const flush = () => lastArgs && invoke(lastArgs);
-      return [throttled, flush];
+      const flushWith = (...args) => invoke(args);
+      return [throttled, flush, flushWith];
     }
     var progressEventReducer = (listener, isDownloadStream, freq = 3) => {
       let bytesNotified = 0;
       const _speedometer = speedometer(50, 250);
       return throttle((e2) => {
-        if (!e2 || typeof e2.loaded !== "number") {
+        if (!e2 || !utils$1.isNumber(e2.loaded)) {
           return;
         }
         const rawLoaded = e2.loaded;
@@ -69423,6 +69689,12 @@ var require_axios = __commonJS({
     var isHttps = /https:?/;
     var kAxiosSocketListener = /* @__PURE__ */ Symbol("axios.http.socketListener");
     var kAxiosCurrentReq = /* @__PURE__ */ Symbol("axios.http.currentReq");
+    function handleSocketError(err) {
+      const current = this[kAxiosCurrentReq];
+      if (current && !current.destroyed) {
+        current.destroy(err);
+      }
+    }
     var kAxiosInstalledTunnel = /* @__PURE__ */ Symbol("axios.http.installedTunnel");
     var tunnelingAgentCache = /* @__PURE__ */ new Map();
     var tunnelingAgentCacheUser = /* @__PURE__ */ new WeakMap();
@@ -69531,10 +69803,10 @@ var require_axios = __commonJS({
         return false;
       }
     }
-    function setProxy(options, configProxy, location, isRedirect2, configHttpsAgent, configHttpAgent) {
+    function setProxy(options, configProxy, location, isRedirect2, configHttpsAgent, configHttpAgent, allowEnvProxy = true) {
       let proxy = configProxy;
       const proxyEnvAgent = getProxyEnvAgent(options, configHttpAgent, configHttpsAgent);
-      if (!proxy && proxy !== false && !isNodeEnvProxyEnabled(proxyEnvAgent)) {
+      if (!proxy && proxy !== false && allowEnvProxy && !isNodeEnvProxyEnabled(proxyEnvAgent)) {
         const proxyUrl = getProxyForUrl(location);
         if (proxyUrl) {
           if (!shouldBypassProxy(location)) {
@@ -69625,8 +69897,9 @@ var require_axios = __commonJS({
         }
       }
       options.beforeRedirects.proxy = function beforeRedirect(redirectOptions) {
-        setProxy(redirectOptions, configProxy, redirectOptions.href, true, configHttpsAgent, configHttpAgent);
+        setProxy(redirectOptions, configProxy, redirectOptions.href, true, configHttpsAgent, configHttpAgent, allowEnvProxy);
       };
+      return Boolean(proxy || configProxy !== false && allowEnvProxy && isNodeEnvProxyEnabled(proxyEnvAgent));
     }
     var isHttpAdapterSupported = typeof process !== "undefined" && utils$1.kindOf(process) === "process";
     var wrapAsync = (asyncExecutor) => {
@@ -69654,7 +69927,7 @@ var require_axios = __commonJS({
       family
     }) => {
       if (!utils$1.isString(address)) {
-        throw TypeError("address must be a string");
+        throw new AxiosError("address must be a string", AxiosError.ERR_BAD_OPTION_VALUE);
       }
       return {
         address,
@@ -69665,6 +69938,30 @@ var require_axios = __commonJS({
       address,
       family
     });
+    var normalizedLookupCache = /* @__PURE__ */ new WeakMap();
+    var normalizeLookup = (lookup) => {
+      let normalized = normalizedLookupCache.get(lookup);
+      if (normalized) {
+        return normalized;
+      }
+      const callbackLookup = callbackify(lookup, (value) => utils$1.isArray(value) ? value : [value]);
+      normalized = (hostname3, opt, cb) => {
+        callbackLookup(hostname3, opt, (err, arg0, arg1) => {
+          if (err) {
+            return cb(err);
+          }
+          let addresses;
+          try {
+            addresses = utils$1.isArray(arg0) ? arg0.map((addr) => buildAddressEntry(addr)) : [buildAddressEntry(arg0, arg1)];
+          } catch (error51) {
+            return cb(error51);
+          }
+          opt.all ? cb(err, addresses) : cb(err, addresses[0].address, addresses[0].family);
+        });
+      };
+      normalizedLookupCache.set(lookup, normalized);
+      return normalized;
+    };
     var http2Transport = {
       request(options, cb) {
         const authority = options.protocol + "//" + options.hostname + ":" + (options.port || (options.protocol === "https:" ? 443 : 80));
@@ -69709,6 +70006,7 @@ var require_axios = __commonJS({
         let family = own2("family");
         let httpVersion = own2("httpVersion");
         if (httpVersion === void 0) httpVersion = 1;
+        const rawHttpVersion = httpVersion;
         let http2Options = own2("http2Options");
         const httpAgent = own2("httpAgent");
         const httpsAgent = own2("httpsAgent");
@@ -69725,25 +70023,20 @@ var require_axios = __commonJS({
         let rejected = false;
         let req;
         let connectPhaseTimer;
-        httpVersion = +httpVersion;
+        try {
+          httpVersion = +httpVersion;
+        } catch (err) {
+          throw new AxiosError("Invalid protocol version: value is not a number", AxiosError.ERR_BAD_OPTION_VALUE, config2);
+        }
         if (Number.isNaN(httpVersion)) {
-          throw TypeError(`Invalid protocol version: '${config2.httpVersion}' is not a number`);
+          throw new AxiosError(`Invalid protocol version: '${rawHttpVersion}' is not a number`, AxiosError.ERR_BAD_OPTION_VALUE, config2);
         }
         if (httpVersion !== 1 && httpVersion !== 2) {
-          throw TypeError(`Unsupported protocol version '${httpVersion}'`);
+          throw new AxiosError(`Unsupported protocol version '${httpVersion}'`, AxiosError.ERR_BAD_OPTION_VALUE, config2);
         }
         const isHttp2 = httpVersion === 2;
         if (lookup) {
-          const _lookup = callbackify(lookup, (value) => utils$1.isArray(value) ? value : [value]);
-          lookup = (hostname3, opt, cb) => {
-            _lookup(hostname3, opt, (err, arg0, arg1) => {
-              if (err) {
-                return cb(err);
-              }
-              const addresses = utils$1.isArray(arg0) ? arg0.map((addr) => buildAddressEntry(addr)) : [buildAddressEntry(arg0, arg1)];
-              opt.all ? cb(err, addresses) : cb(err, addresses[0].address, addresses[0].family);
-            });
-          };
+          lookup = normalizeLookup(lookup);
         }
         const abortEmitter = new events.EventEmitter();
         function abort(reason) {
@@ -69936,6 +70229,11 @@ var require_axios = __commonJS({
           }));
         }
         headers.set("Accept-Encoding", utils$1.hasOwnProp(transitional, "advertiseZstdAcceptEncoding") && transitional.advertiseZstdAcceptEncoding === true ? ACCEPT_ENCODING_WITH_ZSTD : ACCEPT_ENCODING, false);
+        if (isHttp2 && lookup) {
+          http2Options = Object.assign(/* @__PURE__ */ Object.create(null), http2Options, {
+            lookup
+          });
+        }
         const options = Object.assign(/* @__PURE__ */ Object.create(null), {
           path: path$1,
           method,
@@ -69949,9 +70247,11 @@ var require_axios = __commonJS({
           family,
           beforeRedirect: dispatchBeforeRedirect,
           beforeRedirects: /* @__PURE__ */ Object.create(null),
-          http2Options
+          http2Options,
+          createConnection: void 0
         });
         !utils$1.isUndefined(lookup) && (options.lookup = lookup);
+        let proxyApplied = false;
         if (socketPath) {
           if (typeof socketPath !== "string") {
             return reject(new AxiosError("socketPath must be a string", AxiosError.ERR_BAD_OPTION_VALUE, config2));
@@ -69959,8 +70259,8 @@ var require_axios = __commonJS({
           const allowedSocketPaths = own2("allowedSocketPaths");
           if (allowedSocketPaths != null) {
             const allowed = Array.isArray(allowedSocketPaths) ? allowedSocketPaths : [allowedSocketPaths];
-            const resolvedSocket = path2.resolve(socketPath);
-            const isAllowed = allowed.some((entry) => typeof entry === "string" && path2.resolve(entry) === resolvedSocket);
+            const resolvedSocket = path3.resolve(socketPath);
+            const isAllowed = allowed.some((entry) => typeof entry === "string" && path3.resolve(entry) === resolvedSocket);
             if (!isAllowed) {
               return reject(new AxiosError(`socketPath "${socketPath}" is not permitted by allowedSocketPaths`, AxiosError.ERR_BAD_OPTION_VALUE, config2));
             }
@@ -69969,7 +70269,18 @@ var require_axios = __commonJS({
         } else {
           options.hostname = parsed.hostname.startsWith("[") ? parsed.hostname.slice(1, -1) : parsed.hostname;
           options.port = parsed.port;
-          setProxy(options, configProxy, protocol + "//" + parsed.hostname + (parsed.port ? ":" + parsed.port : "") + options.path, false, httpsAgent, httpAgent);
+          proxyApplied = setProxy(
+            options,
+            configProxy,
+            protocol + "//" + parsed.hostname + (parsed.port ? ":" + parsed.port : "") + options.path,
+            false,
+            httpsAgent,
+            httpAgent,
+            // The HTTP/2 transport connects independently of HTTP/1 agents, so it
+            // cannot apply either axios-resolved or agent-local environment proxies.
+            // Explicit proxy config is still processed and rejected below.
+            !isHttp2
+          );
         }
         let transport;
         let isNativeTransport = false;
@@ -69979,6 +70290,9 @@ var require_axios = __commonJS({
           options.agent = isHttpsRequest ? httpsAgent : httpAgent;
         }
         if (isHttp2) {
+          if (proxyApplied) {
+            return reject(new AxiosError("HTTP/2 requests with a proxy are not supported", AxiosError.ERR_NOT_SUPPORT, config2));
+          }
           transport = http2Transport;
         } else {
           const configTransport = own2("transport");
@@ -70176,12 +70490,7 @@ var require_axios = __commonJS({
             socket.setKeepAlive(true, 1e3 * 60);
           }
           if (!socket[kAxiosSocketListener]) {
-            socket.on("error", function handleSocketError(err) {
-              const current = socket[kAxiosCurrentReq];
-              if (current && !current.destroyed) {
-                current.destroy(err);
-              }
-            });
+            socket.on("error", handleSocketError);
             socket[kAxiosSocketListener] = true;
           }
           socket[kAxiosCurrentReq] = req;
@@ -70259,14 +70568,14 @@ var require_axios = __commonJS({
     var cookies = platform2.hasStandardBrowserEnv ? (
       // Standard browser envs support document.cookie
       {
-        write(name, value, expires, path3, domain2, secure, sameSite) {
+        write(name, value, expires, path4, domain2, secure, sameSite) {
           if (typeof document === "undefined") return;
           const cookie = [`${name}=${encodeURIComponent(value)}`];
           if (utils$1.isNumber(expires)) {
             cookie.push(`expires=${new Date(expires).toUTCString()}`);
           }
-          if (utils$1.isString(path3)) {
-            cookie.push(`path=${path3}`);
+          if (utils$1.isString(path4)) {
+            cookie.push(`path=${path4}`);
           }
           if (utils$1.isString(domain2)) {
             cookie.push(`domain=${domain2}`);
@@ -70397,7 +70706,7 @@ var require_axios = __commonJS({
         transformResponse: defaultToConfig2,
         paramsSerializer: defaultToConfig2,
         timeout: defaultToConfig2,
-        timeoutMessage: defaultToConfig2,
+        timeoutErrorMessage: defaultToConfig2,
         withCredentials: defaultToConfig2,
         withXSRFToken: defaultToConfig2,
         adapter: defaultToConfig2,
@@ -70465,10 +70774,11 @@ var require_axios = __commonJS({
         }
       }
       if (utils$1.isFormData(data)) {
+        const getHeaders = utils$1.getSafeProp(data, "getHeaders");
         if (platform2.hasStandardBrowserEnv || platform2.hasStandardBrowserWebWorkerEnv || utils$1.isReactNative(data)) {
           headers.setContentType(void 0);
-        } else if (utils$1.isFunction(data.getHeaders)) {
-          setFormDataHeaders(headers, data.getHeaders(), own2("formDataHeaderPolicy"));
+        } else if (utils$1.isFunction(getHeaders)) {
+          setFormDataHeaders(headers, getHeaders.call(data), own2("formDataHeaderPolicy"));
         }
       }
       if (platform2.hasStandardBrowserEnv) {
@@ -70498,7 +70808,7 @@ var require_axios = __commonJS({
         } = _config;
         let onCanceled;
         let uploadThrottled, downloadThrottled;
-        let flushUpload, flushDownload;
+        let flushUpload, flushDownload, flushDownloadWithEvent;
         function done() {
           flushUpload && flushUpload();
           flushDownload && flushDownload();
@@ -70508,7 +70818,27 @@ var require_axios = __commonJS({
         let request2 = new XMLHttpRequest();
         request2.open(_config.method.toUpperCase(), _config.url, true);
         request2.timeout = _config.timeout;
-        function onloadend() {
+        function onloadend(event) {
+          if (!request2) {
+            return;
+          }
+          if (request2.status === 0 && (parseProtocol(normalizeURLForProtocolCheck(_config.url)) || parseProtocol(platform2.origin)) !== "file" && !(request2.responseURL && request2.responseURL.startsWith("file:"))) {
+            reject(new AxiosError("Request aborted", AxiosError.ECONNABORTED, config2, request2));
+            done();
+            request2 = null;
+            return;
+          }
+          try {
+            if (event) {
+              flushDownloadWithEvent && flushDownloadWithEvent(event);
+            } else {
+              flushDownload && flushDownload();
+            }
+          } catch (err) {
+            setTimeout(() => {
+              throw err;
+            });
+          }
           if (!request2) {
             return;
           }
@@ -70583,7 +70913,7 @@ var require_axios = __commonJS({
           request2.responseType = _config.responseType;
         }
         if (onDownloadProgress) {
-          [downloadThrottled, flushDownload] = progressEventReducer(onDownloadProgress, true);
+          [downloadThrottled, flushDownload, flushDownloadWithEvent] = progressEventReducer(onDownloadProgress, true);
           request2.addEventListener("progress", downloadThrottled);
         }
         if (onUploadProgress && request2.upload) {
@@ -70745,6 +71075,17 @@ var require_axios = __commonJS({
       });
     };
     var DEFAULT_CHUNK_SIZE = 64 * 1024;
+    var DEFAULT_REQUEST_OPTIONS = {
+      cache: "default",
+      redirect: "follow",
+      referrer: "about:client",
+      referrerPolicy: "",
+      mode: "cors",
+      integrity: "",
+      keepalive: false,
+      priority: "auto",
+      window: null
+    };
     var {
       isFunction
     } = utils$1;
@@ -70873,7 +71214,8 @@ var require_axios = __commonJS({
           withCredentials = "same-origin",
           fetchOptions,
           maxContentLength,
-          maxBodyLength
+          maxBodyLength,
+          maxRedirects
         } = resolveConfig(config2);
         const hasMaxContentLength = utils$1.isNumber(maxContentLength) && maxContentLength > -1;
         const hasMaxBodyLength = utils$1.isNumber(maxBodyLength) && maxBodyLength > -1;
@@ -70974,17 +71316,44 @@ var require_axios = __commonJS({
             }
           }
           headers.set("User-Agent", "axios/" + VERSION10, false);
-          const resolvedOptions = {
-            ...fetchOptions,
+          const safeFetchOptions = fetchOptions == null ? fetchOptions : Object.assign(/* @__PURE__ */ Object.create(null), fetchOptions);
+          if (safeFetchOptions) {
+            delete safeFetchOptions.body;
+            delete safeFetchOptions.headers;
+            delete safeFetchOptions.method;
+            delete safeFetchOptions.signal;
+            delete safeFetchOptions.duplex;
+            delete safeFetchOptions.credentials;
+          }
+          const resolvedOptions = Object.assign(/* @__PURE__ */ Object.create(null), safeFetchOptions, {
             signal: composedSignal,
             method: method.toUpperCase(),
             headers: toByteStringHeaderObject(headers.normalize()),
             body: data,
             duplex: "half",
             credentials: isCredentialsSupported ? withCredentials : void 0
-          };
+          });
+          if (isRequestSupported) {
+            utils$1.forEach(DEFAULT_REQUEST_OPTIONS, (value, key) => {
+              if (resolvedOptions[key] === void 0) {
+                resolvedOptions[key] = value;
+              }
+            });
+            if (resolvedOptions.signal === void 0) {
+              resolvedOptions.signal = null;
+            }
+            if (resolvedOptions.body === void 0) {
+              resolvedOptions.body = null;
+            }
+          }
+          if (maxRedirects === 0) {
+            resolvedOptions.redirect = "manual";
+            if (safeFetchOptions) {
+              safeFetchOptions.redirect = "manual";
+            }
+          }
           request2 = isRequestSupported && new Request(url3, resolvedOptions);
-          let response = await (isRequestSupported ? _fetch(request2, fetchOptions) : _fetch(url3, resolvedOptions));
+          let response = await (isRequestSupported ? _fetch(request2, safeFetchOptions) : _fetch(url3, resolvedOptions));
           const responseHeaders = AxiosHeaders.from(response.headers);
           if (hasMaxContentLength) {
             const declaredLength = utils$1.toFiniteNumber(responseHeaders.getContentLength());
@@ -71176,9 +71545,10 @@ var require_axios = __commonJS({
         throw new CanceledError(null, config2);
       }
     }
-    function dispatchRequest(config2) {
+    function dispatchRequest(_config) {
+      const config2 = utils$1.toSafeFlatObject(_config);
       throwIfCancellationRequested(config2);
-      config2.headers = AxiosHeaders.from(config2.headers);
+      config2.headers = AxiosHeaders.from(utils$1.getSafeProp(config2, "headers"));
       config2.data = transformData.call(config2, config2.transformRequest);
       if (["post", "put", "patch"].indexOf(config2.method) !== -1) {
         config2.headers.setContentType("application/x-www-form-urlencoded", false);
@@ -71286,16 +71656,15 @@ var require_axios = __commonJS({
           return await this._request(configOrUrl, config2);
         } catch (err) {
           if (err instanceof Error) {
-            let dummy = {};
-            Error.captureStackTrace ? Error.captureStackTrace(dummy) : dummy = new Error();
-            const stack = (() => {
-              if (!dummy.stack) {
-                return "";
-              }
-              const firstNewlineIndex = dummy.stack.indexOf("\n");
-              return firstNewlineIndex === -1 ? "" : dummy.stack.slice(firstNewlineIndex + 1);
-            })();
             try {
+              let dummy = {};
+              Error.captureStackTrace ? Error.captureStackTrace(dummy) : dummy = new Error();
+              const dummyStack = dummy.stack;
+              let stack = "";
+              if (typeof dummyStack === "string") {
+                const firstNewlineIndex = dummyStack.indexOf("\n");
+                stack = firstNewlineIndex === -1 ? "" : dummyStack.slice(firstNewlineIndex + 1);
+              }
               if (!err.stack) {
                 err.stack = stack;
               } else if (stack) {
@@ -71357,9 +71726,9 @@ var require_axios = __commonJS({
           baseUrl: validators.spelling("baseURL"),
           withXsrfToken: validators.spelling("withXSRFToken")
         }, true);
-        config2.method = (config2.method || this.defaults.method || "get").toLowerCase();
+        config2.method = (utils$1.getSafeProp(config2, "method") || utils$1.getSafeProp(this.defaults, "method") || "get").toLowerCase();
         let contextHeaders = headers && utils$1.merge(headers.common, headers[config2.method]);
-        headers && utils$1.forEach(["delete", "get", "head", "post", "put", "patch", "query", "common"], (method) => {
+        headers && utils$1.forEach(methodList.concat("common"), (method) => {
           delete headers[method];
         });
         config2.headers = AxiosHeaders.concat(contextHeaders, headers);
@@ -71606,14 +71975,22 @@ var require_axios = __commonJS({
       Gone: 410,
       LengthRequired: 411,
       PreconditionFailed: 412,
+      /**
+       * @deprecated Use `ContentTooLarge` instead.
+       */
       PayloadTooLarge: 413,
+      ContentTooLarge: 413,
       UriTooLong: 414,
       UnsupportedMediaType: 415,
       RangeNotSatisfiable: 416,
       ExpectationFailed: 417,
       ImATeapot: 418,
       MisdirectedRequest: 421,
+      /**
+       * @deprecated Use `UnprocessableContent` instead.
+       */
       UnprocessableEntity: 422,
+      UnprocessableContent: 422,
       Locked: 423,
       FailedDependency: 424,
       TooEarly: 425,
@@ -71642,7 +72019,9 @@ var require_axios = __commonJS({
       InvalidSslCertificate: 526
     };
     Object.entries(HttpStatusCode2).forEach(([key, value]) => {
-      HttpStatusCode2[value] = key;
+      if (HttpStatusCode2[value] === void 0) {
+        HttpStatusCode2[value] = key;
+      }
     });
     function createInstance(defaultConfig) {
       const context4 = new Axios(defaultConfig);
@@ -71713,8 +72092,8 @@ var require_errors3 = __commonJS({
       }
     };
     exports2.FgaError = FgaError;
-    function getRequestMetadataFromPath(path2) {
-      let splitPath = (path2 || "").split("/");
+    function getRequestMetadataFromPath(path3) {
+      let splitPath = (path3 || "").split("/");
       if (splitPath.length < 4) {
         splitPath = [];
       }
@@ -83002,7 +83381,7 @@ var require_split2 = __commonJS({
 var require_helper = __commonJS({
   "node_modules/pgpass/lib/helper.js"(exports2, module2) {
     "use strict";
-    var path2 = require("path");
+    var path3 = require("path");
     var Stream = require("stream").Stream;
     var split = require_split2();
     var util = require("util");
@@ -83041,7 +83420,7 @@ var require_helper = __commonJS({
     };
     module2.exports.getFileName = function(rawEnv) {
       var env = rawEnv || process.env;
-      var file2 = env.PGPASSFILE || (isWin ? path2.join(env.APPDATA || "./", "postgresql", "pgpass.conf") : path2.join(env.HOME || "./", ".pgpass"));
+      var file2 = env.PGPASSFILE || (isWin ? path3.join(env.APPDATA || "./", "postgresql", "pgpass.conf") : path3.join(env.HOME || "./", ".pgpass"));
       return file2;
     };
     module2.exports.usePgPass = function(stats, fname) {
@@ -83173,7 +83552,7 @@ var require_helper = __commonJS({
 var require_lib3 = __commonJS({
   "node_modules/pgpass/lib/index.js"(exports2, module2) {
     "use strict";
-    var path2 = require("path");
+    var path3 = require("path");
     var fs2 = require("fs");
     var helper = require_helper();
     module2.exports = function(connInfo, cb) {
@@ -88153,6 +88532,7 @@ var require_utils6 = __commonJS({
     "use strict";
     var isUUID = RegExp.prototype.test.bind(/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/iu);
     var isIPv4 = RegExp.prototype.test.bind(/^(?:(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]\d|\d)$/u);
+    var isPort = RegExp.prototype.test.bind(/^\d*$/u);
     var isHexPair = RegExp.prototype.test.bind(/^[\da-f]{2}$/iu);
     var isUnreserved = RegExp.prototype.test.bind(/^[\da-z\-._~]$/iu);
     var isPathCharacter = RegExp.prototype.test.bind(/^[A-Za-z0-9\-._~!$&'()*+,;=:@/]$/u);
@@ -88294,8 +88674,8 @@ var require_utils6 = __commonJS({
       }
       return ind;
     }
-    function removeDotSegments(path2) {
-      let input = path2;
+    function removeDotSegments(path3) {
+      let input = path3;
       const output = [];
       let nextSlash = -1;
       let len = 0;
@@ -88639,8 +89019,12 @@ var require_utils6 = __commonJS({
         uriTokens.push(host);
       }
       if (typeof component.port === "number" || typeof component.port === "string") {
+        const port = String(component.port);
+        if (!isPort(port)) {
+          throw new TypeError("URI port is malformed.");
+        }
         uriTokens.push(":");
-        uriTokens.push(String(component.port));
+        uriTokens.push(port);
       }
       return uriTokens.length ? uriTokens.join("") : void 0;
     }
@@ -88736,8 +89120,8 @@ var require_schemes = __commonJS({
       }
       if (wsComponent.resourceName) {
         const queryIndex = wsComponent.resourceName.indexOf("?");
-        const path2 = queryIndex === -1 ? wsComponent.resourceName : wsComponent.resourceName.slice(0, queryIndex);
-        wsComponent.path = path2 && path2 !== "/" ? path2 : void 0;
+        const path3 = queryIndex === -1 ? wsComponent.resourceName : wsComponent.resourceName.slice(0, queryIndex);
+        wsComponent.path = path3 && path3 !== "/" ? path3 : void 0;
         wsComponent.query = queryIndex === -1 ? void 0 : wsComponent.resourceName.slice(queryIndex + 1);
         wsComponent.resourceName = void 0;
       }
@@ -88980,24 +89364,25 @@ var require_schemes = __commonJS({
             mailtoComponent.error = mailtoComponent.error || "URI mailto has malformed header fields.";
             continue;
           }
-          const name = eqIdx === -1 ? token : token.slice(0, eqIdx);
+          const name = decodeHex(eqIdx === -1 ? token : token.slice(0, eqIdx));
+          const normalizedName = name.toLowerCase();
           const value = eqIdx === -1 ? "" : token.slice(eqIdx + 1);
-          if (name === "to") {
+          if (normalizedName === "to") {
             const addrs = value.split(",");
             for (let j2 = 0; j2 < addrs.length; j2++) to.push(addrs[j2]);
             continue;
           }
-          if (name === "subject") {
+          if (normalizedName === "subject") {
             mailtoComponent.subject = decodeHex(value);
             continue;
           }
-          if (name === "body") {
+          if (normalizedName === "body") {
             mailtoComponent.body = decodeHex(value);
             continue;
           }
           if (headers === null) headers = /** @type {Record<string,string>} */
           /* @__PURE__ */ Object.create(null);
-          headers[decodeHex(name)] = decodeHex(value);
+          headers[name] = decodeHex(value);
         }
         if (headers !== null) mailtoComponent.headers = headers;
       }
@@ -89017,9 +89402,28 @@ var require_schemes = __commonJS({
       if (to.length) mailtoComponent.to = to;
       return mailtoComponent;
     }
+    function mailtoEncodeHeaderName(name) {
+      return encodeWithAllow(name.replace(/%/gu, "%25"), HFNAME);
+    }
     function mailtoSerialize(component, options) {
       const mailtoComponent = component;
       const to = Array.isArray(mailtoComponent.to) ? mailtoComponent.to.slice() : [];
+      const sourceHeaders = mailtoComponent.headers && typeof mailtoComponent.headers === "object" ? Object.assign(/* @__PURE__ */ Object.create(null), mailtoComponent.headers) : /* @__PURE__ */ Object.create(null);
+      const headers = /* @__PURE__ */ Object.create(null);
+      for (const name in sourceHeaders) {
+        const normalizedName = name.toLowerCase();
+        if (normalizedName === "to") {
+          const addrs = String(sourceHeaders[name]).split(",");
+          for (let i = 0; i < addrs.length; i++) to.push(addrs[i]);
+        } else if (normalizedName === "subject" || normalizedName === "body") {
+          headers[normalizedName] = sourceHeaders[name];
+        } else {
+          headers[name] = sourceHeaders[name];
+        }
+      }
+      if (mailtoComponent.subject !== void 0) headers.subject = mailtoComponent.subject;
+      if (mailtoComponent.body !== void 0) headers.body = mailtoComponent.body;
+      mailtoComponent.headers = headers;
       if (to.length) {
         for (let i = 0; i < to.length; i++) {
           const addr = String(to[i]);
@@ -89036,15 +89440,11 @@ var require_schemes = __commonJS({
       } else {
         mailtoComponent.path = void 0;
       }
-      const headers = mailtoComponent.headers && typeof mailtoComponent.headers === "object" ? Object.assign(/* @__PURE__ */ Object.create(null), mailtoComponent.headers) : /* @__PURE__ */ Object.create(null);
-      if (mailtoComponent.subject) headers.subject = mailtoComponent.subject;
-      if (mailtoComponent.body) headers.body = mailtoComponent.body;
-      mailtoComponent.headers = headers;
       let query = "";
       let count = 0;
       for (const name in headers) {
         if (count++ !== 0) query += "&";
-        query += encodeWithAllow(name, HFNAME) + "=" + encodeWithAllow(String(headers[name]), HFNAME);
+        query += mailtoEncodeHeaderName(name) + "=" + encodeWithAllow(String(headers[name]), HFNAME);
       }
       if (count !== 0) {
         mailtoComponent.query = query;
@@ -89312,12 +89712,16 @@ var require_fast_uri = __commonJS({
       }
       return false;
     }
+    function isIPLiteral(host) {
+      return host[0] === "[" && host[host.length - 1] === "]";
+    }
     function hasMalformedComponentPercentEncoding(matches) {
       const host = matches[4];
-      return hasMalformedPercentEncoding(matches[3]) || host !== void 0 && !(host[0] === "[" && host[host.length - 1] === "]") && hasMalformedPercentEncoding(host) || hasMalformedPercentEncoding(matches[6]) || hasMalformedPercentEncoding(matches[7]) || hasMalformedPercentEncoding(matches[8]);
+      return hasMalformedPercentEncoding(matches[3]) || host !== void 0 && !isIPLiteral(host) && hasMalformedPercentEncoding(host) || hasMalformedPercentEncoding(matches[6]) || hasMalformedPercentEncoding(matches[7]) || hasMalformedPercentEncoding(matches[8]);
     }
     function canonicalizeHost(parsed, options, schemeHandler, isIP) {
-      if (!options.unicodeSupport && (!schemeHandler || !schemeHandler.unicodeSupport) && parsed.host && parsed.host[0] !== "[" && (options.domainHost || schemeHandler && schemeHandler.domainHost) && isIP === false && nonSimpleDomain(parsed.host)) {
+      const bracketedIPLiteral = parsed.host && parsed.host[0] === "[" && parsed.host[parsed.host.length - 1] === "]";
+      if (!options.unicodeSupport && (!schemeHandler || !schemeHandler.unicodeSupport) && parsed.host && !isIPLiteral(parsed.host) && (options.domainHost || schemeHandler && schemeHandler.domainHost) && isIP === false && !bracketedIPLiteral && nonSimpleDomain(parsed.host)) {
         try {
           parsed.host = new URL("http://" + parsed.host).hostname;
         } catch (e2) {
@@ -89404,10 +89808,11 @@ var require_fast_uri = __commonJS({
         if (parsed.host) {
           const ipv4result = isIPv4(parsed.host);
           if (ipv4result === false) {
-            const bracketedIPLiteral = parsed.host[0] === "[" && parsed.host[parsed.host.length - 1] === "]";
+            const bracketedIPLiteral = isIPLiteral(parsed.host);
+            const hasIPLiteralBracket = parsed.host.indexOf("[") !== -1 || parsed.host.indexOf("]") !== -1;
             const ipv6result = normalizeIPv6(parsed.host);
             isIP = ipv6result.isIPV6 || ipv6result.isIPVFuture === true;
-            malformedIPLiteral = bracketedIPLiteral && ipv6result.error === true;
+            malformedIPLiteral = hasIPLiteralBracket && (!bracketedIPLiteral || ipv6result.error === true);
             parsed.host = isIP ? ipv6result.host : ipv6result.host.toLowerCase();
             if (malformedIPLiteral) {
               parsed.error = parsed.error || "URI host is malformed.";
@@ -89430,14 +89835,17 @@ var require_fast_uri = __commonJS({
           parsed.error = parsed.error || "URI is not a " + options.reference + " reference.";
         }
         const schemeHandler = getSchemeHandler(options.scheme || parsed.scheme);
-        malformedHost = canonicalizeHost(parsed, options, schemeHandler, isIP);
-        if (!schemeHandler || schemeHandler && !schemeHandler.skipNormalize) {
-          if (uri.indexOf("%") !== -1) {
-            if (parsed.host !== void 0 && !malformedIPLiteral) {
-              const host = isIP ? parsed.host : normalizePercentEncoding(parsed.host, true);
-              parsed.host = reescapeHostDelimiters(host, isIP);
-            }
+        if (!malformedIPLiteral) {
+          malformedHost = canonicalizeHost(parsed, options, schemeHandler, isIP);
+        }
+        if (uri.indexOf("%") !== -1 && parsed.host !== void 0 && !malformedIPLiteral) {
+          let host = isIP ? parsed.host : normalizePercentEncoding(parsed.host, true);
+          if (!isIP) {
+            host = normalizePercentEncoding(host.toLowerCase());
           }
+          parsed.host = reescapeHostDelimiters(host, isIP);
+        }
+        if (!schemeHandler || schemeHandler && !schemeHandler.skipNormalize) {
           if (parsed.path) {
             parsed.path = normalizePathEncoding(parsed.path);
           }
@@ -93552,17 +93960,17 @@ function requestLog(octokit) {
     octokit.log.debug("request", options);
     const start = Date.now();
     const requestOptions = octokit.request.endpoint.parse(options);
-    const path2 = requestOptions.url.replace(options.baseUrl, "");
+    const path3 = requestOptions.url.replace(options.baseUrl, "");
     return request2(options).then((response) => {
       const requestId2 = response.headers["x-github-request-id"];
       octokit.log.info(
-        `${requestOptions.method} ${path2} - ${response.status} with id ${requestId2} in ${Date.now() - start}ms`
+        `${requestOptions.method} ${path3} - ${response.status} with id ${requestId2} in ${Date.now() - start}ms`
       );
       return response;
     }).catch((error51) => {
       const requestId2 = error51.response?.headers["x-github-request-id"] || "UNKNOWN";
       octokit.log.error(
-        `${requestOptions.method} ${path2} - ${error51.status} with id ${requestId2} in ${Date.now() - start}ms`
+        `${requestOptions.method} ${path3} - ${error51.status} with id ${requestId2} in ${Date.now() - start}ms`
       );
       throw error51;
     });
@@ -97438,6 +97846,7 @@ var toBearer = (token) => `Bearer ${token}`;
 
 // packages/utils/node/lib/gitProviders/github.js
 var gitHubUrl = (repo) => ["https://github.com", repo.owner, `${repo.name}.git`].join("/");
+var CLOSE_PR_TIMEOUT = duration({ seconds: 15 });
 
 // node_modules/@actions/http-client/lib/index.js
 var tunnel = __toESM(require_tunnel2(), 1);
@@ -97825,8 +98234,8 @@ var Context = class {
       if ((0, import_fs2.existsSync)(process.env.GITHUB_EVENT_PATH)) {
         this.payload = JSON.parse((0, import_fs2.readFileSync)(process.env.GITHUB_EVENT_PATH, { encoding: "utf8" }));
       } else {
-        const path2 = process.env.GITHUB_EVENT_PATH;
-        process.stdout.write(`GITHUB_EVENT_PATH ${path2} does not exist${import_os3.EOL}`);
+        const path3 = process.env.GITHUB_EVENT_PATH;
+        process.stdout.write(`GITHUB_EVENT_PATH ${path3} does not exist${import_os3.EOL}`);
       }
     }
     this.eventName = process.env.GITHUB_EVENT_NAME;
@@ -98067,8 +98476,55 @@ var toCreateDeploymentResponse = toObject({
 });
 var InvalidGitHubEvent = class extends Exception {
   constructor(name) {
-    super(`Only "opened" and "close" events are supported, got ${name}`);
+    super(`Unsupported GitHub event: ${name}.`);
   }
+};
+var UnsupportedGitHubRef = class extends Exception {
+  constructor(ref) {
+    super(`Only branch and tag refs are supported, got ${ref}.`);
+  }
+};
+var fetchGitHubActionSource = async () => {
+  const source = sourceFromGitHubEvent(context3.eventName, context3.ref);
+  if (source.kind === "pullRequest") {
+    const config2 = await fetchGitHubActionPrConfig();
+    return {
+      gitHubToken: config2.gitHubToken,
+      repository: config2.repository,
+      gitRef: { kind: "pullRequest", pullRequest: config2.pullRequest }
+    };
+  }
+  return {
+    gitHubToken: getEnv("GITHUB_TOKEN"),
+    repository: await fetchGitHubRepository(),
+    gitRef: { ...source, headCommitSha: context3.sha }
+  };
+};
+var sourceFromGitHubEvent = (eventName, ref) => {
+  if (eventName === "pull_request") {
+    return { kind: "pullRequest" };
+  }
+  const supportedEvents = [
+    "push",
+    "release",
+    "schedule",
+    "workflow_dispatch"
+  ];
+  if (!supportedEvents.includes(eventName)) {
+    throw new InvalidGitHubEvent(eventName);
+  }
+  return sourceFromGitHubRef(ref);
+};
+var sourceFromGitHubRef = (ref) => {
+  const branchPrefix = "refs/heads/";
+  if (ref.startsWith(branchPrefix) && ref.length > branchPrefix.length) {
+    return { kind: "branch", name: ref.slice(branchPrefix.length) };
+  }
+  const tagPrefix = "refs/tags/";
+  if (ref.startsWith(tagPrefix) && ref.length > tagPrefix.length) {
+    return { kind: "tag", name: ref.slice(tagPrefix.length) };
+  }
+  throw new UnsupportedGitHubRef(ref);
 };
 var RefNotExist = class extends Exception {
   constructor(ref) {
@@ -98122,42 +98578,79 @@ var fetchGitHubRepository = async () => {
     private: repo.private
   };
 };
+var MAX_PULL_REQUESTS_PER_PAGE = 100;
+var listOpenPullRequestNumbers = async (octokit, { owner, name }) => {
+  const pullRequests = await octokit.paginate(octokit.rest.pulls.list, {
+    owner,
+    repo: name,
+    state: "open",
+    per_page: MAX_PULL_REQUESTS_PER_PAGE
+  });
+  return new Set(pullRequests.map((pr) => pr.number));
+};
 function getActionInput(name, required2 = false) {
   const input = getInput(name, { required: required2 });
   return input === "" ? null : input;
 }
 var isRequestResponse = (e2) => isObject(e2) && "status" in e2 && isNumber(e2.status);
-var listDeployments = async (octokit, owner, repo, environment, pullRequest) => {
+var listDeployments = async (octokit, owner, repo, environment, headCommitSha) => {
   try {
     return toArray(toDeployment)((await octokit.rest.repos.listDeployments({
       owner,
       repo,
       environment,
-      sha: pullRequest.headCommitSha
+      sha: headCommitSha
     })).data);
   } catch (e2) {
     if (isRequestResponse(e2)) {
       if (404 === e2.status) {
-        throw new NotFound(`No Deployment for PR ${pullRequest.number} found.`);
+        throw new NotFound(`No deployment for ${headCommitSha} found.`);
       }
       if (422 === e2.status) {
-        throw new RefNotExist(pullRequest.headCommitSha);
+        throw new RefNotExist(headCommitSha);
       }
     }
     throw e2;
   }
 };
-var getCurrentDeployment = async (token, { owner, name }, environment, pullRequest) => {
+var getCurrentDeployment = async (token, { owner, name }, environment, headCommitSha) => {
   const octokit = new Octokit2({ auth: token, request: { fetch: fetch2 } });
-  const deployments = await listDeployments(octokit, owner, name, environment, pullRequest);
+  const deployments = await listDeployments(octokit, owner, name, environment, headCommitSha);
   if (0 === deployments.length) {
-    throw new NotFound(`No Deployment for PR ${pullRequest.number} found.`);
+    throw new NotFound(`No deployment for ${headCommitSha} found.`);
   }
-  const current = deployments.find((d4) => d4.sha === pullRequest.headCommitSha);
+  const current = deployments.find((d4) => d4.sha === headCommitSha);
   if (!has(current)) {
-    throw new NotFound(`No deployment found for pull request ${pullRequest.number}.`);
+    throw new NotFound(`No deployment for ${headCommitSha} found.`);
   }
   return current;
+};
+
+// packages/utils/node/lib/gitProviders/gitRef.js
+var import_node_path = __toESM(require("node:path"), 1);
+var gitRefName = (ref) => ref.kind === "pullRequest" ? ref.pullRequest.branch : ref.name;
+var gitRefHeadCommitSha = (ref) => ref.kind === "pullRequest" ? ref.pullRequest.headCommitSha : ref.headCommitSha;
+var gitRefDeploymentCommitSha = (ref) => {
+  if (ref.kind !== "pullRequest") {
+    return ref.headCommitSha;
+  }
+  const deploymentCommit = ref.pullRequest.deploymentCommit;
+  if (deploymentCommit?.kind === "branchTip") {
+    return void 0;
+  }
+  return deploymentCommit?.sha ?? ref.pullRequest.headCommitSha;
+};
+var gitRefIsOpen = (ref) => ref.kind === "pullRequest" ? ref.pullRequest.open : true;
+var gitRefFetchRefspecs = (ref) => {
+  if (ref.kind === "pullRequest") {
+    return [import_node_path.default.posix.join("refs", "heads", ref.pullRequest.branch)];
+  }
+  const commit = ref.headCommitSha;
+  if (ref.kind !== "tag") {
+    return [commit];
+  }
+  const tag = import_node_path.default.posix.join("refs", "tags", ref.name);
+  return [commit, `+${tag}:${tag}`];
 };
 
 // packages/utils/node/lib/runMain.js
@@ -98174,249 +98667,8 @@ var runMain = (main2) => {
 };
 
 // packages/integrations/lib/deployConfig.js
-var import_path = __toESM(require("path"), 1);
-var deploymentLinkTypes = ["dev-domain", "preview"];
-var toDeploymentLinkType = toUndefOr(toNullOr(toLiteralUnion("DeploymentLinkType", deploymentLinkTypes)));
-var toApiTokenAuthentication = toObject({
-  apiToken: toNonEmptyString
-});
-var toPasswordAuthentication = toObject({
-  email: toNonEmptyString,
-  password: toNonEmptyString
-});
-var toConfiguredAuthentication = toOr(toApiTokenAuthentication, toPasswordAuthentication);
-var toAuthentication = (input) => rethrow(() => toConfiguredAuthentication(input), [
-  TypeConversionFailure,
-  () => new InvalidArgument3("No Codesphere credentials configured. Set an API token (recommended) or an email and a password.")
-]);
-var logStatusReporter = () => ({
-  setPending: async () => logI("Deployment pending."),
-  setStarted: async () => logI("Deployment started."),
-  setFailed: async () => logE("Deployment failed."),
-  setDeployed: async (environmentUrl2, msg) => logI(`Deployment successful. ${msg ?? ""} ${environmentUrl2}`),
-  setInactive: async () => logI("Deployment inactive."),
-  delete: async () => logI("Deployment deleted.")
-});
-var workspaceName = (repoName, prNumber) => `${repoName}-#${prNumber}`;
-var codesphereWorkspaceUrl = (apiUrl, w) => {
-  return new URL(import_path.default.posix.join(apiUrl.pathname, `/ide/teams/${w.teamId}/workspaces/${w.id}`), apiUrl);
-};
-var codespherePreviewUrl = (apiUrl, w) => {
-  const wsUrl = codesphereWorkspaceUrl(apiUrl, w);
-  return new URL(`${wsUrl.pathname}/preview`, wsUrl);
-};
-var isProviderSupportedBy = (repo, providers) => {
-  const repoUrl = new URL(repo.url);
-  repoUrl.username = "";
-  repoUrl.password = "";
-  return providers.some((provider) => {
-    const p3 = new URL(provider.url);
-    if (repoUrl.hostname === p3.hostname && repoUrl.pathname.startsWith(p3.pathname)) {
-      return true;
-    }
-  });
-};
-var findPlan = (plans, planTitle, onDemand = false) => {
-  const availablePlans = plans.filter((p3) => !p3.deprecated && p3.characteristics.onDemand === onDemand);
-  const planByName = availablePlans.find((p3) => p3.title === planTitle);
-  if (has(planTitle) && !has(planByName)) {
-    throw new InvalidArgument3(`Unknown plan ${planTitle}. Available plans: ${planTitles(availablePlans)}`);
-  }
-  if (planByName) {
-    return planByName;
-  }
-  const smallestPlan = availablePlans.reduce((smallest, current) => !has(smallest) || current.characteristics.CPU < smallest.characteristics.CPU ? current : smallest, void 0);
-  if (!has(smallestPlan)) {
-    throw new InvalidArgument3(`No plan to deploy to. Available plans: ${planTitles(plans)}`);
-  }
-  return smallestPlan;
-};
-var planTitles = (plans) => plans.map((p3) => p3.title).join(", ");
-
-// packages/integrations/lib/pipeline.js
-var processCleanupWaitTime = duration({ seconds: 15 });
-var PipelineStageFailed = class extends Exception {
-  constructor(stage) {
-    super(`Pipeline stage ${stage} failed.`);
-  }
-};
-var PipelineStageAborted = class extends Exception {
-  constructor(stage) {
-    super(`Pipeline stage ${stage} aborted.`);
-  }
-};
-var runWorkspacePipeline = async (api, workspaceId, profile) => {
-  logI("Running Pipeline");
-  await runPipelineStage(api, workspaceId, "prepare", "success", profile);
-  await runPipelineStage(api, workspaceId, "run", void 0, profile);
-};
-var runPipelineStage = async (api, workspaceId, stage, targetState, profile) => {
-  logI(`Running pipeline stage "${stage}" with ${profile} profile.`);
-  const before = await api.pipelineStatus(workspaceId, stage);
-  await api.stopPipelineStage(workspaceId, stage);
-  await wait(processCleanupWaitTime);
-  await api.startPipelineStage(workspaceId, stage, profile);
-  if (!targetState) {
-    logI(`Started ${stage} stage.`);
-    return;
-  }
-  logI(`Waiting for stage "${stage}" to be in ${targetState}.`);
-  await waitForStageSuccess(api, workspaceId, stage, before);
-  logI(`Stage "${stage}" successfully finished.`);
-};
-var waitForStageSuccess = async (api, workspaceId, stage, before) => {
-  const logs = new PipelineLogs(api, workspaceId, stage);
-  try {
-    await retryWithBackoff(async () => {
-      const infos = (await api.pipelineStatus(workspaceId, stage)).filter((i) => isCurrentExecution(i, before));
-      if (!infos.length) {
-        logD(`Waiting for stage "${stage}" to start.`);
-        return false;
-      }
-      logs.follow(infos);
-      if (infos.some((i) => "failure" === i.state)) {
-        throw new PipelineStageFailed(stage);
-      }
-      if (infos.some((i) => "aborted" === i.state)) {
-        throw new PipelineStageAborted(stage);
-      }
-      if (infos.every((i) => "success" === i.state)) {
-        return true;
-      }
-      logD(`Waiting for stage "${stage}" to finish. Stage is in state: ${infos.map((i) => i.state)}.`);
-      return false;
-    }, {
-      initialWait: duration({ seconds: 1 }),
-      factor: 1.2,
-      maxWait: duration({ seconds: 15 }),
-      timeout: duration({ hours: 1 }),
-      errMessage: `Waiting for pipeline stage "${stage}"`
-    });
-  } finally {
-    await logErrorAsync(() => logs.close());
-  }
-};
-var isCurrentExecution = (info, before) => {
-  const previous = before.find((i) => i.replica === info.replica);
-  return has(info.startedAt) && previous?.startedAt?.getTime() !== info.startedAt.getTime();
-};
-var PipelineLogs = class {
-  constructor(api, workspaceId, stage) {
-    this.api = api;
-    this.workspaceId = workspaceId;
-    this.stage = stage;
-    this.streams = /* @__PURE__ */ new Map();
-  }
-  follow(infos) {
-    infos.forEach((info) => range(info.steps.length).forEach((step) => {
-      const replica = "run" === this.stage ? info.replica : void 0;
-      const key = `${replica ?? ""}:${step}`;
-      if (this.streams.has(key)) {
-        return;
-      }
-      const label = has(replica) ? `${this.stage}[${step}] ${info.server}` : `${this.stage}[${step}]`;
-      this.streams.set(key, this.api.logs({
-        workspaceId: this.workspaceId,
-        stage: this.stage,
-        step,
-        replica
-      }, (entries) => entries.forEach((e2) => logI(`[Pipeline ${label}] ${e2.data}`))));
-    }));
-  }
-  async close() {
-    const streams = [...this.streams.values()];
-    await ignoreErrorAsync(() => throwOnTimeout({
-      label: `Logs of stage ${this.stage}`,
-      timeoutMs: duration({ seconds: 30 }).asMilliseconds(),
-      promise: allThrowRejected(streams.map((s2) => s2.done))
-    }));
-    await mapAsync(streams, (s2) => s2.close());
-    this.streams.clear();
-  }
-};
-
-// packages/utils/common/lib/HttpMethod.js
-var HttpMethod;
-(function(HttpMethod2) {
-  HttpMethod2["Connect"] = "connect";
-  HttpMethod2["Delete"] = "delete";
-  HttpMethod2["Get"] = "get";
-  HttpMethod2["Head"] = "head";
-  HttpMethod2["Options"] = "options";
-  HttpMethod2["Patch"] = "patch";
-  HttpMethod2["Post"] = "post";
-  HttpMethod2["Put"] = "put";
-})(HttpMethod || (HttpMethod = {}));
-
-// packages/utils/common/lib/url.js
-var devDomainRegex = /^(?:ide-|preview-)?(?<wsId>\d+)(?:-(?<port>\d+))?(?<server>-[a-z0-9-]*)?\./;
-var csInCsDomains = [
-  ".dev.5.codesphere.com",
-  ".cloud.codesphere.com",
-  ".2.codesphere.com",
-  ".dev-codesphere.com"
-];
-var isWorkspaceDomainWithWsId = (host) => {
-  const hostname3 = host.split(":")[0];
-  return devDomainRegex.test(hostname3) && csInCsDomains.some((d4) => hostname3.endsWith(d4));
-};
-var isLocalHost = (host) => host.split(":")[0] === "localhost" || host.split(":")[0] === "127.0.0.1";
-var isDevHost = (host) => [
-  ".dev.codesphere.com",
-  "3.codesphere.com",
-  "5.codesphere.com",
-  ".dev-codesphere.com"
-].some((s2) => host.endsWith(s2));
-var isQaHost = (host) => host.endsWith("qa.dev-codesphere.com");
-var createBaseUrl = (protocol, host, dc) => {
-  if (host.includes("://")) {
-    throw new InvalidArgument3("Host should not contain protocol.");
-  }
-  const p3 = isLocalHost(host) ? protocol : `${protocol}s`;
-  const prefix = !has(dc) || isLocalHost(host) || host.startsWith(`${dc}.`) || isWorkspaceDomainWithWsId(host) ? "" : `${dc}${isDevHost(host) && !isQaHost(host) ? "-" : "."}`;
-  return new URL(`${p3}://${prefix}${host}`);
-};
-var createServiceUrl = (protocol, host, servicePath, dc) => {
-  const u2 = createBaseUrl(protocol, host, dc);
-  u2.pathname = servicePath;
-  return u2;
-};
-var getHeader = (headers, name) => {
-  const lowerName = name.toLowerCase();
-  for (const [key, value] of Object.entries(headers)) {
-    if (key.toLowerCase() === lowerName) {
-      return value;
-    }
-  }
-  return void 0;
-};
-var joinPath = (...segments) => {
-  return [
-    segments[0] === "/" ? "" : segments[0],
-    ...segments.slice(1).map((s2) => trimPrefix(s2, "/"))
-  ].join("/");
-};
-var toHttpUrl = (url2) => {
-  const u2 = new URL(url2);
-  if (!["http:", "https:", "ws:", "wss:"].includes(u2.protocol)) {
-    throw new TypeError(`Can only convert ws and wss not ${u2.protocol}`);
-  }
-  if (u2.protocol === "ws:") {
-    u2.protocol = "http:";
-  }
-  if (u2.protocol === "wss:") {
-    u2.protocol = "https:";
-  }
-  return u2;
-};
-
-// packages/workspace-agent/common/lib/pipeline/logging.js
-var toLogKind = toLiteralUnion("kind", ["E", "I"]);
-var toLogEntry = toObject({
-  timestamp: toDate,
-  kind: toLogKind,
-  data: toString
-});
+var import_node_crypto = require("node:crypto");
+var import_path4 = __toESM(require("path"), 1);
 
 // packages/utils/common/lib/keys.js
 var keys = Object.keys;
@@ -98723,6 +98975,38 @@ var planMap = {
   [PlanId.Gpu]: gpuPlan
 };
 
+// packages/stubs/common/lib/auth/generatedAuthSchema.js
+var WORKSPACE_PERMISSIONS = [
+  "can_exec_ide",
+  "can_manage_landscape",
+  "can_manage_permissions",
+  "can_manage_settings",
+  "can_view",
+  "can_write_ide"
+];
+var RESOURCE_GROUP_ROLE_RELATIONS = {
+  roles: ["admin", "member"],
+  impliedBy: {
+    admin: [],
+    member: ["admin"]
+  },
+  inheritedFrom: {
+    admin: { type: "organization", role: "owner" }
+  }
+};
+var WORKSPACE_ROLE_RELATIONS = {
+  roles: ["admin", "editor", "viewer"],
+  impliedBy: {
+    admin: [],
+    editor: ["admin"],
+    viewer: ["admin", "editor"]
+  },
+  inheritedFrom: {
+    admin: { type: "resource_group", role: "admin" },
+    viewer: { type: "resource_group", role: "member" }
+  }
+};
+
 // packages/utils/common/lib/flags.js
 var MAINTENANCE_MODE_INTERNAL_FLAG_NAME = "maintenance-mode";
 var AVAILABLE_INTERNAL_FLAGS = [
@@ -98898,6 +99182,14 @@ var setEnabledFlags = ({ internal, preview, features }) => {
   return allEnabled();
 };
 
+// packages/utils/common/lib/experiments.js
+var initExperiments = (cfg = []) => {
+  setEnabledFlags(isOfType(cfg, toReadOnly(toArray(toString))) ? {
+    internal: cfg,
+    preview: []
+  } : cfg);
+};
+
 // packages/utils/common/lib/features.js
 var toFeatures = toObject({
   available: toReadOnly(toArray(toFeatureName)),
@@ -98912,43 +99204,6 @@ var initFeatures = (features = []) => {
     available: result.features.available,
     enabled: result.features.enabled
   };
-};
-
-// packages/utils/common/lib/path.js
-var import_path2 = require("path");
-var POSIX_PATH_REGEX = new RegExp("^/?(?:[^/\0]+/?)*$");
-var toPosixPath2 = (p3) => {
-  const s2 = toString(p3);
-  if (!POSIX_PATH_REGEX.test(s2)) {
-    throw new TypeConversionFailure("POSIX path", p3);
-  }
-  return s2;
-};
-var toPathWithoutTraversal = (p3) => {
-  const s2 = toPosixPath2(p3);
-  if (s2.split(import_path2.sep).includes("..")) {
-    throw new TypeConversionFailure("path without ..", p3);
-  }
-  return s2;
-};
-
-// packages/utils/common/lib/typing/semver.js
-var import_semver2 = __toESM(require_semver2(), 1);
-var toSemVer = (x2) => {
-  let s2;
-  try {
-    s2 = (0, import_semver2.parse)(toString(x2), false, true).toString();
-  } catch (e2) {
-    throw new TypeConversionFailure("semver", x2, void 0, {
-      cause: e2
-    });
-  }
-  if (s2 !== x2) {
-    throw new TypeConversionFailure("semver", x2, void 0, {
-      cause: new AmbiguousArgument(`Parser would have produced: ${s2}`)
-    });
-  }
-  return s2;
 };
 
 // packages/utils/common/lib/typing/url.js
@@ -99014,6 +99269,126 @@ var toFullUrl = (x2) => {
   }
 };
 
+// packages/utils/common/lib/url.js
+var devDomainRegex = /^(?:ide-|preview-)?(?<wsId>\d+)(?:-(?<port>\d+))?(?<server>-[a-z0-9-]*)?\./;
+var csInCsDomains = [
+  ".dev.5.codesphere.com",
+  ".cloud.codesphere.com",
+  ".2.codesphere.com",
+  ".dev-codesphere.com"
+];
+var isWorkspaceDomainWithWsId = (host) => {
+  const hostname3 = host.split(":")[0];
+  return devDomainRegex.test(hostname3) && csInCsDomains.some((d4) => hostname3.endsWith(d4));
+};
+var isLocalHost = (host) => host.split(":")[0] === "localhost" || host.split(":")[0] === "127.0.0.1";
+var isDevHost = (host) => [
+  ".dev.codesphere.com",
+  "3.codesphere.com",
+  "5.codesphere.com",
+  ".dev-codesphere.com"
+].some((s2) => host.endsWith(s2));
+var isQaHost = (host) => host.endsWith("qa.dev-codesphere.com");
+var createBaseUrl = (protocol, host, dc) => {
+  if (host.includes("://")) {
+    throw new InvalidArgument3("Host should not contain protocol.");
+  }
+  const p3 = isLocalHost(host) ? protocol : `${protocol}s`;
+  const prefix = !has(dc) || isLocalHost(host) || host.startsWith(`${dc}.`) || isWorkspaceDomainWithWsId(host) ? "" : `${dc}${isDevHost(host) && !isQaHost(host) ? "-" : "."}`;
+  return new URL(`${p3}://${prefix}${host}`);
+};
+var createServiceUrl = (protocol, host, servicePath, dc) => {
+  const u2 = createBaseUrl(protocol, host, dc);
+  u2.pathname = servicePath;
+  return u2;
+};
+var getHeader = (headers, name) => {
+  const lowerName = name.toLowerCase();
+  for (const [key, value] of Object.entries(headers)) {
+    if (key.toLowerCase() === lowerName) {
+      return value;
+    }
+  }
+  return void 0;
+};
+var joinPath = (...segments) => {
+  return [
+    segments[0] === "/" ? "" : segments[0],
+    ...segments.slice(1).map((s2) => trimPrefix(s2, "/"))
+  ].join("/");
+};
+var toHttpUrl = (url2) => {
+  const u2 = new URL(url2);
+  if (!["http:", "https:", "ws:", "wss:"].includes(u2.protocol)) {
+    throw new TypeError(`Can only convert ws and wss not ${u2.protocol}`);
+  }
+  if (u2.protocol === "ws:") {
+    u2.protocol = "http:";
+  }
+  if (u2.protocol === "wss:") {
+    u2.protocol = "https:";
+  }
+  return u2;
+};
+
+// packages/workspace-agent/common/lib/pipeline/config.js
+var pipelineConfigPath = "ci.yml";
+var toCustomImage = toObject({
+  entrypoint: toUndefOr(toArray(toString)),
+  cmd: toUndefOr(toArray(toString)),
+  workingDir: toUndefOr(toString)
+});
+var toPipelineMetaConfig = toObject({
+  configRootDir: toString,
+  workingDirectory: toString,
+  internalDataDir: toString,
+  maxLogsPerStep: toNumber,
+  envVars: toRecord(toString),
+  replicaId: toString,
+  serverName: toString,
+  workspaceId: toUndefOr(toNonNegativeInteger),
+  otelLogCollectorHostname: toUndefOr(toString),
+  persistentLogs: toUndefOr(toBoolean),
+  customImage: toUndefOr(toCustomImage)
+});
+
+// packages/utils/common/lib/path.js
+var import_path = require("path");
+var POSIX_PATH_REGEX = new RegExp("^/?(?:[^/\0]+/?)*$");
+var toPosixPath2 = (p3) => {
+  const s2 = toString(p3);
+  if (!POSIX_PATH_REGEX.test(s2)) {
+    throw new TypeConversionFailure("POSIX path", p3);
+  }
+  return s2;
+};
+var toPathWithoutTraversal = (p3) => {
+  const s2 = toPosixPath2(p3);
+  if (s2.split(import_path.sep).includes("..")) {
+    throw new TypeConversionFailure("path without ..", p3);
+  }
+  return s2;
+};
+
+// packages/utils/common/lib/typing/semver.js
+var import_semver2 = __toESM(require_semver2(), 1);
+var toSemVer = (x2) => {
+  let s2;
+  try {
+    s2 = (0, import_semver2.parse)(toString(x2), false, true).toString();
+  } catch (e2) {
+    throw new TypeConversionFailure("semver", x2, void 0, {
+      cause: e2
+    });
+  }
+  if (s2 !== x2) {
+    throw new TypeConversionFailure("semver", x2, void 0, {
+      cause: new AmbiguousArgument(`Parser would have produced: ${s2}`)
+    });
+  }
+  return s2;
+};
+
 // packages/workspace-agent/common/lib/pipeline/deployStageV03Validation.js
 var validateDeployStageV03 = (stage) => {
   const routers = Object.entries(stage).filter(([name, service]) => isRouterService(service));
@@ -99058,19 +99433,19 @@ var validateRouterPaths = (stage, routerName, router) => {
   const paths = router.network.paths ?? [];
   const externalTargets = router.network.externalTargets ?? [];
   const duplicatePaths = findDuplicates([
-    ...paths.map(({ path: path2 }) => path2),
-    ...externalTargets.map(({ path: path2 }) => path2)
+    ...paths.map(({ path: path3 }) => path3),
+    ...externalTargets.map(({ path: path3 }) => path3)
   ]);
   if (duplicatePaths.length > 0) {
     throw invalid([...paths, ...externalTargets], `Router service '${routerName}' must not configure the same path more than once, but path(s) ${duplicatePaths.join(", ")} are duplicated.`);
   }
-  for (const path2 of paths) {
-    const target = stage[path2.service];
+  for (const path3 of paths) {
+    const target = stage[path3.service];
     if (void 0 === target) {
-      throw invalid(path2, `Router service '${routerName}' has a path '${path2.path}' that refers to service '${path2.service}', but no such service is configured.`);
+      throw invalid(path3, `Router service '${routerName}' has a path '${path3.path}' that refers to service '${path3.service}', but no such service is configured.`);
     }
-    if (!isDeployStageServerV02(target) || !target.network.ports.includes(path2.port)) {
-      throw invalid(path2, `Router service '${routerName}' has a path '${path2.path}' that refers to port ${path2.port} of service '${path2.service}', but that service does not configure this port.`);
+    if (!isDeployStageServerV02(target) || !target.network.ports.includes(path3.port)) {
+      throw invalid(path3, `Router service '${routerName}' has a path '${path3.path}' that refers to port ${path3.port} of service '${path3.service}', but that service does not configure this port.`);
     }
   }
 };
@@ -99079,10 +99454,10 @@ var invalid = (value, message) => new TypeConversionFailure("DeployStageV03", va
 });
 
 // packages/workspace-agent/common/lib/pipeline/execution.js
-var import_path3 = require("path");
+var import_path2 = require("path");
 var CODESPHERE_INTERNAL_DIR = ".codesphere-internal";
-var INTERNAL_CI_CONFIGS_DIR = (0, import_path3.join)(CODESPHERE_INTERNAL_DIR, "ci-configs");
-var STATIC_BUILD_CONFIG_DIR = (0, import_path3.join)(INTERNAL_CI_CONFIGS_DIR, "static-build");
+var INTERNAL_CI_CONFIGS_DIR = (0, import_path2.join)(CODESPHERE_INTERNAL_DIR, "ci-configs");
+var STATIC_BUILD_CONFIG_DIR = (0, import_path2.join)(INTERNAL_CI_CONFIGS_DIR, "static-build");
 
 // packages/workspace-agent/common/lib/pipeline/types.js
 var singleRunningStageKinds = ["prepare", "test"];
@@ -99327,17 +99702,426 @@ var stageExecutionInfo = {
 var toStageExecutionInfo = toObject(stageExecutionInfo);
 var isAdvancedNetworkConfig = (c2) => isOfType(c2, toAdvancedNetworkConfig);
 
+// packages/utils/common/lib/typing/containerImage.js
+var digestPattern = "(?:sha256:[a-f0-9]{64}|sha384:[a-f0-9]{96}|sha512:[a-f0-9]{128})";
+var prepareRegexps = () => {
+  const alphanumeric = "[a-z0-9]+";
+  const separator = "(?:[._]|__|-+)";
+  const pathComponent = `${alphanumeric}(?:${separator}${alphanumeric})*`;
+  const remoteName = `${pathComponent}(?:/${pathComponent})*`;
+  const domainNameComponent = "(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])";
+  const domainName = `${domainNameComponent}(?:\\.${domainNameComponent})*`;
+  const ipv6address = "\\[(?:[a-fA-F0-9:]+)\\]";
+  const host = `(?:${domainName}|${ipv6address})`;
+  const domainAndPort = `${host}(?::[0-9]+)?`;
+  const tag = "[\\w][\\w.-]{0,127}";
+  const name = `(?:${domainAndPort}/)?${remoteName}`;
+  return {
+    reference: new RegExp(`^(${name})(?::(${tag}))?(?:@(${digestPattern}))?$`),
+    name: new RegExp(`^(?:(${domainAndPort})/)?(${remoteName})$`),
+    registry: new RegExp(`^${domainAndPort}$`),
+    tag: new RegExp(`^${tag}$`),
+    digest: new RegExp(`^${digestPattern}$`)
+  };
+};
+var { reference: referenceRegexp, name: nameRegexp, registry: registryRegexp, tag: tagRegexp, digest: digestRegexp } = prepareRegexps();
+var localhost = "localhost";
+var defaultDomain = "docker.io";
+var legacyDefaultDomain = "index.docker.io";
+var dockerHubApiHosts = /* @__PURE__ */ new Set([
+  legacyDefaultDomain,
+  "registry-1.docker.io"
+]);
+var officialRepoPrefix = "library/";
+var repositoryNameTotalLengthMax = 255;
+var imageIdRegexp = /^[a-f0-9]{64}$/;
+var normalizeOciRegistry = (registry2) => dockerHubApiHosts.has(registry2) ? defaultDomain : registry2;
+var withOfficialPrefix = (domain2, remoteName) => {
+  if (domain2 === defaultDomain && !remoteName.includes("/")) {
+    return { domain: domain2, remoteName: `${officialRepoPrefix}${remoteName}` };
+  }
+  return { domain: domain2, remoteName };
+};
+var splitDomain = (name) => {
+  const slash = name.indexOf("/");
+  if (slash < 0) {
+    return withOfficialPrefix(defaultDomain, name);
+  }
+  const maybeDomain = name.slice(0, slash);
+  const isDomain = maybeDomain === localhost || maybeDomain.includes(".") || maybeDomain.includes(":") || maybeDomain.toLowerCase() !== maybeDomain;
+  if (!isDomain) {
+    return withOfficialPrefix(defaultDomain, name);
+  }
+  return withOfficialPrefix(normalizeOciRegistry(maybeDomain), name.slice(slash + 1));
+};
+var isParsableReference = (reference) => {
+  const match = referenceRegexp.exec(reference);
+  if (!match) {
+    return false;
+  }
+  const [, name] = match;
+  const nameMatch = nameRegexp.exec(name);
+  const path3 = nameMatch?.[2] ?? name;
+  return path3.length <= repositoryNameTotalLengthMax;
+};
+var isOciImageRef = (s2) => {
+  if (imageIdRegexp.test(s2)) {
+    return false;
+  }
+  const { domain: domain2, remoteName } = splitDomain(s2);
+  const tagSeparator = remoteName.indexOf(":");
+  const remote = tagSeparator < 0 ? remoteName : remoteName.slice(0, tagSeparator);
+  if (remote.toLowerCase() !== remote) {
+    return false;
+  }
+  return isParsableReference(`${domain2}/${remoteName}`);
+};
+var toOciImageName = (x2) => {
+  if (isString(x2) && nameRegexp.test(x2) && isOciImageRef(x2)) {
+    return x2;
+  }
+  throw new TypeConversionFailure("OCI image name", x2);
+};
+var toOciImageTag = (x2) => {
+  if (isString(x2) && tagRegexp.test(x2)) {
+    return x2;
+  }
+  throw new TypeConversionFailure("OCI image tag", x2);
+};
+var toOciImageDigest = (x2) => {
+  if (isString(x2) && digestRegexp.test(x2)) {
+    return x2;
+  }
+  throw new TypeConversionFailure("OCI image digest", x2);
+};
+var toOciIndex = toObject({
+  manifests: toArray(toObject({
+    digest: toOciImageDigest,
+    annotations: toUndefOr(toRecord(toString))
+  }))
+});
+
+// packages/workspace-service/common/lib/api/staticBuildArtifact.js
+var toTaggedStaticBuildArtifact = toObject({
+  digest: toUndefOr(toOciImageDigest),
+  registryUrl: toOciImageName,
+  tag: toOciImageTag
+});
+var toDigestedStaticBuildArtifact = toObject({
+  digest: toOciImageDigest,
+  registryUrl: toOciImageName,
+  tag: toUndefOr(toOciImageTag)
+});
+var toStaticBuildArtifact = toOr(toTaggedStaticBuildArtifact, toDigestedStaticBuildArtifact);
+
+// packages/workspace-service/common/lib/Workspace.js
+var GitProvider;
+(function(GitProvider2) {
+  GitProvider2["GitHub"] = "github";
+  GitProvider2["GitLab"] = "gitlab";
+  GitProvider2["Bitbucket"] = "bitbucket";
+})(GitProvider || (GitProvider = {}));
+var toGitProvider = toStringEnum("GitProvider", GitProvider);
+var SHARED_VOLUME_MOUNT_PATH = "/home/user/app";
+var MAX_WORKSPACE_NAME_LENGTH = 100;
+var toWorkspacePermissions = toObject(Object.fromEntries(WORKSPACE_PERMISSIONS.map((p3) => [p3, toBoolean])));
+var workspaceRoles = {
+  highest: toObject({
+    role: toLiteralUnion("WorkspaceRole", WORKSPACE_ROLE_RELATIONS.roles),
+    inheritedFrom: toUndefOr(toObject({
+      type: toString,
+      role: toLiteralUnion("ResourceGroupRole", RESOURCE_GROUP_ROLE_RELATIONS.roles)
+    }))
+  })
+};
+var toWorkspaceRoles = toObject(workspaceRoles);
+var workspace = {
+  id: readOnly(toNonNegativeInteger),
+  dataCenterId: readOnly(toNumber),
+  userId: readOnly(toInteger),
+  teamId: readOnly(toNonNegativeInteger),
+  name: toString,
+  gitUrl: readOnly(toNullOr(toString)),
+  isPrivateRepo: readOnly(toBoolean),
+  welcomeMessage: readOnly(toNullOr(toString)),
+  initialBranch: readOnly(toNullOr(toString)),
+  initialGitRef: readOnly(toUndefOr(toString)),
+  cloneDepth: toUndefOr(toPositiveInteger),
+  skipLfs: toUndefOr(toBoolean),
+  recurseSubmodules: toUndefOr(toBoolean),
+  sourceWorkspaceId: readOnly(toNullOr(toNonNegativeInteger)),
+  planId: toPlanId,
+  replicas: toPositiveInteger,
+  vpnConfig: toNullOr(toString),
+  collectTraces: toBoolean,
+  restricted: toBoolean,
+  baseImage: toUndefOr(toString),
+  persistentLogs: toBoolean,
+  createdAt: toDate,
+  managedServiceId: toUndefOr(toUuid),
+  storageMib: toUndefOr(toPositiveInteger),
+  sharedVaultName: toUndefOr(toString),
+  confidentialWorkloadId: toUndefOr(toString),
+  vhsmAddress: toUndefOr(toFullUrl),
+  staticBuildArtifact: readOnly(toUndefOr(toStaticBuildArtifact)),
+  roles: readOnly(toUndefOr(toWorkspaceRoles)),
+  permissions: readOnly(toUndefOr(toWorkspacePermissions))
+};
+var toWorkspace = toObject(workspace);
+var validServerNameRegex = new RegExp("^(?:[a-z]|[a-z][-a-z0-9]{0,30}[a-z0-9])$");
+var toMsdServerName = toStringMatchingRegex("MsdServerName", validServerNameRegex);
+var toServerPath = toObject({
+  port: toPositiveInteger,
+  path: toUrlPath,
+  stripPath: toBoolean
+});
+var toServerPort = toObject({
+  port: toPositiveInteger,
+  isPublic: toBoolean
+});
+var toServerNetwork = toObject({
+  ports: toNonEmptyArray(toServerPort),
+  paths: toArray(toServerPath)
+});
+var server = {
+  name: readOnly(toMsdServerName),
+  planId: toPlanId,
+  replicas: toPositiveInteger,
+  network: toServerNetwork,
+  isLandscapeGateway: toUndefOr(toBoolean),
+  landscapeGatewayHttpPort: toUndefOr(toPositiveInteger),
+  baseImage: toUndefOr(toString),
+  env: toUndefOr(toEnv),
+  runAsUser: toUndefOr(toNonNegativeInteger),
+  runAsGroup: toUndefOr(toNonNegativeInteger),
+  volumeMounts: toUndefOr(toVolumeMounts),
+  steps: toUndefOr(toArray(toStep)),
+  profile: toUndefOr(toString)
+};
+var toServer = toObject(server);
+var toHeadlessService = toObject({
+  name: toString,
+  network: toArray(toObject({
+    path: toUrlPath,
+    target: toString,
+    stripPath: toBoolean
+  }))
+});
+var serverV1 = {
+  name: readOnly(toMsdServerName),
+  planId: toPlanId,
+  replicas: toPositiveInteger,
+  stripPath: toBoolean,
+  isPublic: toUndefOr(toBoolean),
+  network: toUndefOr(toObject({
+    path: toUrlPath
+  }))
+};
+var toServerV1 = toObject(serverV1);
+var IDE_SERVER_NAME = "codesphere-ide";
+var DEFAULT_PORT = 3e3;
+var ROUTER_BASE_IMAGE = "workspace-router";
+var ROUTER_CONFIG_MOUNT_PATH = "/etc/router/ci.yml";
+var ROUTER_USER_GROUP_ID = 101;
+var workspaceDevDomain = (workspaceId, workspaceHostingBaseDomain) => `${workspaceId}${isFeatureEnabled("dev-domains-port") ? `-${DEFAULT_PORT}` : ""}.${workspaceHostingBaseDomain}`;
+var simpleNetworkToServerNetwork = (networkConfig, isPublic) => ({
+  ports: [
+    {
+      port: DEFAULT_PORT,
+      isPublic: isPublic ?? true
+    }
+  ],
+  paths: !networkConfig || !(isPublic ?? true) ? [] : [
+    {
+      port: DEFAULT_PORT,
+      path: networkConfig.path,
+      stripPath: networkConfig.stripPath ?? false
+    }
+  ]
+});
+var advancedNetworkToServerNetwork = (networkConfig) => ({
+  ports: networkConfig.ports,
+  paths: "paths" in networkConfig && has(networkConfig.paths) ? networkConfig.paths.map((path3) => ({ stripPath: false, ...path3 })) : []
+});
+var isLandscapeGatewayNetworkConfig = (networkConfig) => isAdvancedNetworkConfig(networkConfig) && networkConfig.landscapeGateway !== void 0;
+var configToLandscape = (config2, profile) => {
+  return Object.entries(config2).map(([k2, v3]) => {
+    if (isRouterService(v3)) {
+      return routerServiceToServer(k2, v3, profile);
+    }
+    if (isDeployStageServerV02(v3)) {
+      return v05ServerToServer(k2, v3, profile);
+    }
+    if (!isDeployStageServer(v3)) {
+      return;
+    }
+    return deployStageServerToLandscape(k2, v3, profile);
+  }).filter((x2) => x2 !== void 0);
+};
+var routerServiceToServer = (name, config2, profile) => {
+  const isLandscapeGateway = config2.network.isLandscapeGateway === true;
+  return toServer({
+    name,
+    planId: config2.plan,
+    replicas: config2.replicaCount,
+    baseImage: ROUTER_BASE_IMAGE,
+    runAsUser: ROUTER_USER_GROUP_ID,
+    runAsGroup: ROUTER_USER_GROUP_ID,
+    volumeMounts: [
+      {
+        name: "_workspace",
+        mountPath: SHARED_VOLUME_MOUNT_PATH,
+        workspacePath: ""
+      },
+      {
+        name: "_workspace",
+        mountPath: ROUTER_CONFIG_MOUNT_PATH,
+        workspacePath: profile ?? pipelineConfigPath
+      }
+    ],
+    profile,
+    isLandscapeGateway: isLandscapeGateway ? true : void 0,
+    landscapeGatewayHttpPort: isLandscapeGateway ? DEFAULT_PORT : void 0,
+    network: {
+      ports: [{ port: DEFAULT_PORT, isPublic: false }],
+      paths: []
+    }
+  });
+};
+var v05ServerToServer = (name, config2, profile) => {
+  const ports = config2.network.ports.map((port) => ({
+    port,
+    isPublic: false
+  }));
+  const network = config2.network.landscapeGateway ? { ports, landscapeGateway: config2.network.landscapeGateway } : { ports, paths: [] };
+  return deployStageServerToLandscape(name, { ...config2, network }, profile);
+};
+var deployStageServerToLandscape = (name, config2, profile) => {
+  const network = config2.network;
+  const isLandscapeGateway = has(network) && isLandscapeGatewayNetworkConfig(network);
+  return toServer({
+    name,
+    planId: config2.plan,
+    replicas: config2.replicas ?? 1,
+    env: config2.env,
+    baseImage: config2.image,
+    runAsUser: config2.runAsUser ?? void 0,
+    runAsGroup: config2.runAsGroup ?? void 0,
+    volumeMounts: config2.volumeMounts,
+    steps: config2.steps,
+    profile,
+    isLandscapeGateway,
+    landscapeGatewayHttpPort: isLandscapeGateway ? network.landscapeGateway.httpPort : void 0,
+    network: has(network) && isAdvancedNetworkConfig(network) ? advancedNetworkToServerNetwork(network) : simpleNetworkToServerNetwork(network, config2.isPublic)
+  });
+};
+
+// packages/integrations/lib/deployConfig.js
+var deploymentLinkTypes = ["dev-domain", "preview"];
+var toDeploymentLinkType = toUndefOr(toNullOr(toLiteralUnion("DeploymentLinkType", deploymentLinkTypes)));
+var toApiTokenAuthentication = toObject({
+  apiToken: toNonEmptyString
+});
+var toPasswordAuthentication = toObject({
+  email: toNonEmptyString,
+  password: toNonEmptyString
+});
+var toConfiguredAuthentication = toOr(toApiTokenAuthentication, toPasswordAuthentication);
+var toAuthentication = (input) => rethrow(() => toConfiguredAuthentication(input), [
+  TypeConversionFailure,
+  () => new InvalidArgument3("No Codesphere credentials configured. Set an API token (recommended) or an email and a password.")
+]);
+var logStatusReporter = () => ({
+  setPending: async () => logI("Deployment pending."),
+  setStarted: async () => logI("Deployment started."),
+  setFailed: async () => logE("Deployment failed."),
+  setDeployed: async (environmentUrl2, msg) => logI(`Deployment successful. ${msg ?? ""} ${environmentUrl2}`),
+  setInactive: async () => logI("Deployment inactive."),
+  delete: async () => logI("Deployment deleted.")
+});
+var workspaceName = (repoName, prNumber) => `${repoName}-#${prNumber}`;
+var workspaceNameForRef = (repoName, ref) => {
+  if (ref.kind === "pullRequest") {
+    return workspaceName(repoName, ref.pullRequest.number);
+  }
+  const hashLength = 8;
+  const hash2 = (0, import_node_crypto.createHash)("sha256").update(JSON.stringify([repoName, ref.kind, ref.name])).digest("hex").slice(0, hashLength);
+  const base = `${repoName}-${ref.kind}-${ref.name.replaceAll(/[^a-zA-Z0-9-]/g, "-")}`;
+  const maxBaseLength = MAX_WORKSPACE_NAME_LENGTH - hash2.length - 1;
+  return `${base.slice(0, maxBaseLength)}-${hash2}`;
+};
+var pullRequestNumberOf = (repoName, name) => {
+  const prNumber = Number(name.slice(name.lastIndexOf("#") + 1));
+  return isOfType(prNumber, toPositiveInteger) && workspaceName(repoName, prNumber) === name ? prNumber : void 0;
+};
+var codesphereWorkspaceUrl = (apiUrl, w) => {
+  return new URL(import_path4.default.posix.join(apiUrl.pathname, `/ide/teams/${w.teamId}/workspaces/${w.id}`), apiUrl);
+};
+var codespherePreviewUrl = (apiUrl, w) => {
+  const wsUrl = codesphereWorkspaceUrl(apiUrl, w);
+  return new URL(`${wsUrl.pathname}/preview`, wsUrl);
+};
+var isProviderSupportedBy = (repo, providers) => {
+  const repoUrl = new URL(repo.url);
+  repoUrl.username = "";
+  repoUrl.password = "";
+  return providers.some((provider) => {
+    const p3 = new URL(provider.url);
+    if (repoUrl.hostname === p3.hostname && repoUrl.pathname.startsWith(p3.pathname)) {
+      return true;
+    }
+  });
+};
+var findPlan = (plans, planTitle, onDemand = false) => {
+  const availablePlans = plans.filter((p3) => !p3.deprecated && p3.characteristics.onDemand === onDemand);
+  const planByName = availablePlans.find((p3) => p3.title === planTitle);
+  if (has(planTitle) && !has(planByName)) {
+    throw new InvalidArgument3(`Unknown plan ${planTitle}. Available plans: ${planTitles(availablePlans)}`);
+  }
+  if (planByName) {
+    return planByName;
+  }
+  const smallestPlan = availablePlans.reduce((smallest, current) => !has(smallest) || current.characteristics.CPU < smallest.characteristics.CPU ? current : smallest, void 0);
+  if (!has(smallestPlan)) {
+    throw new InvalidArgument3(`No plan to deploy to. Available plans: ${planTitles(plans)}`);
+  }
+  return smallestPlan;
+};
+var planTitles = (plans) => plans.map((p3) => p3.title).join(", ");
+
+// packages/utils/common/lib/HttpMethod.js
+var HttpMethod;
+(function(HttpMethod2) {
+  HttpMethod2["Connect"] = "connect";
+  HttpMethod2["Delete"] = "delete";
+  HttpMethod2["Get"] = "get";
+  HttpMethod2["Head"] = "head";
+  HttpMethod2["Options"] = "options";
+  HttpMethod2["Patch"] = "patch";
+  HttpMethod2["Post"] = "post";
+  HttpMethod2["Put"] = "put";
+})(HttpMethod || (HttpMethod = {}));
+
+// packages/workspace-agent/common/lib/pipeline/logging.js
+var toLogKind = toLiteralUnion("kind", ["E", "I"]);
+var toLogEntry = toObject({
+  timestamp: toDate,
+  kind: toLogKind,
+  data: toString
+});
+
 // packages/integrations/lib/publicApiClient.js
 var toTeam = toObject({
   id: toNonNegativeInteger,
   name: toString
 });
-var toWorkspace = toObject({
+var toWorkspace2 = toObject({
   id: toNonNegativeInteger,
   teamId: toNonNegativeInteger,
   name: toString,
   replicas: toPositiveInteger,
-  devDomain: toUndefOr(toString)
+  devDomain: toUndefOr(toString),
+  gitUrl: toNullOr(toString)
 });
 var toWorkspacePlan = toObject({
   id: toNonNegativeInteger,
@@ -99348,7 +100132,7 @@ var toWorkspacePlan = toObject({
     onDemand: toBoolean
   })
 });
-var toGitProvider = toObject({
+var toGitProvider2 = toObject({
   url: toString
 });
 var toWorkspaceStatus = toObject({
@@ -99392,17 +100176,17 @@ var PublicApiClient = class {
     return await this.get("metadata/workspace-plans", toArray(toWorkspacePlan));
   }
   async listGitProviders() {
-    return await this.get("metadata/git-providers", toArray(toGitProvider));
+    return await this.get("metadata/git-providers", toArray(toGitProvider2));
   }
   async listWorkspaces(teamId) {
-    return await this.get(`workspaces/team/${teamId}`, toArray(toWorkspace));
+    return await this.get(`workspaces/team/${teamId}`, toArray(toWorkspace2));
   }
   async createWorkspace(args) {
     return await this.send({
       method: HttpMethod.Post,
       path: "workspaces",
       body: args,
-      converter: toWorkspace
+      converter: toWorkspace2
     });
   }
   async updateWorkspace(workspaceId, args) {
@@ -99455,16 +100239,16 @@ var PublicApiClient = class {
     return await this.get(`workspaces/${workspaceId}/pipeline/${stage}`, toArray(toStageExecutionInfo2));
   }
   logs({ workspaceId, stage, step, replica }, onLogs) {
-    const path2 = has(replica) ? `workspaces/${workspaceId}/logs/run/${step}/replica/${replica}` : `workspaces/${workspaceId}/logs/${stage}/${step}`;
+    const path3 = has(replica) ? `workspaces/${workspaceId}/logs/run/${step}/replica/${replica}` : `workspaces/${workspaceId}/logs/${stage}/${step}`;
     const controller = new AbortController();
     const done = (async () => {
       try {
-        await this.listen(path2, toArray(toLogEntry), onLogs, controller);
+        await this.listen(path3, toArray(toLogEntry), onLogs, controller);
       } catch (e2) {
         if (controller.signal.aborted) {
           return;
         }
-        logW(`Log stream ${path2} failed.`, { cause: e2 });
+        logW(`Log stream ${path3} failed.`, { cause: e2 });
       } finally {
         controller.abort();
       }
@@ -99477,11 +100261,11 @@ var PublicApiClient = class {
       done
     };
   }
-  async get(path2, converter) {
-    return await this.send({ method: HttpMethod.Get, path: path2, converter });
+  async get(path3, converter) {
+    return await this.send({ method: HttpMethod.Get, path: path3, converter });
   }
-  async send({ method, path: path2, body, converter }) {
-    const url2 = this.url(path2);
+  async send({ method, path: path3, body, converter }) {
+    const url2 = this.url(path3);
     logD(`${method} ${url2}`);
     const res = await this.fetchFollowingRedirects(url2, {
       method,
@@ -99497,8 +100281,8 @@ var PublicApiClient = class {
     }
     return converter(await res.json());
   }
-  async listen(path2, converter, onEvent, controller) {
-    const url2 = this.url(path2);
+  async listen(path3, converter, onEvent, controller) {
+    const url2 = this.url(path3);
     logD(`Listening on ${url2}`);
     const res = await this.fetchFollowingRedirects(url2, {
       headers: { ...this.headers(), Accept: "text/event-stream" },
@@ -99527,8 +100311,8 @@ var PublicApiClient = class {
     logD(`Following redirect to ${location}`);
     return await this.fetchFollowingRedirects(new URL(location, url2), options, redirectsLeft - 1);
   }
-  url(path2) {
-    return new URL(joinPath(this.baseUrl.pathname, path2), this.baseUrl);
+  url(path3) {
+    return new URL(joinPath(this.baseUrl.pathname, path3), this.baseUrl);
   }
   headers(hasBody = false) {
     return {
@@ -99541,7 +100325,7 @@ var isRedirect = (status) => [
   HttpStatusCode.TemporaryRedirect,
   HttpStatusCode.PermanentRedirect
 ].includes(status);
-var withProfile = (path2, profile) => has(profile) ? `${path2}/${profile}` : path2;
+var withProfile = (path3, profile) => has(profile) ? `${path3}/${profile}` : path3;
 var eventData = (message) => {
   const parsed = /^event:\s*(?<event>.+)\ndata:\s*(?<data>.+)$/ms.exec(message);
   const event = parsed?.groups?.event;
@@ -99560,16 +100344,119 @@ var requestFailed = async (method, url2, res) => {
   return new PublicApiRequestFailed(res.status, msg);
 };
 
+// packages/integrations/lib/pipeline.js
+var processCleanupWaitTime = duration({ seconds: 15 });
+var PipelineStageFailed = class extends Exception {
+  constructor(stage) {
+    super(`Pipeline stage ${stage} failed.`);
+  }
+};
+var PipelineStageAborted = class extends Exception {
+  constructor(stage) {
+    super(`Pipeline stage ${stage} aborted.`);
+  }
+};
+var runWorkspacePipeline = async (api, workspaceId, profile) => {
+  logI("Running Pipeline");
+  await runPipelineStage(api, workspaceId, "prepare", "success", profile);
+  await runPipelineStage(api, workspaceId, "run", void 0, profile);
+};
+var runPipelineStage = async (api, workspaceId, stage, targetState, profile) => {
+  logI(`Running pipeline stage "${stage}" with ${profile} profile.`);
+  const before = await api.pipelineStatus(workspaceId, stage);
+  await api.stopPipelineStage(workspaceId, stage);
+  await wait(processCleanupWaitTime);
+  await api.startPipelineStage(workspaceId, stage, profile);
+  if (!targetState) {
+    logI(`Started ${stage} stage.`);
+    return;
+  }
+  logI(`Waiting for stage "${stage}" to be in ${targetState}.`);
+  await waitForStageSuccess(api, workspaceId, stage, before);
+  logI(`Stage "${stage}" successfully finished.`);
+};
+var waitForStageSuccess = async (api, workspaceId, stage, before) => {
+  const logs = new PipelineLogs(api, workspaceId, stage);
+  try {
+    await retryWithBackoff(async () => {
+      const infos = (await api.pipelineStatus(workspaceId, stage)).filter((i) => isCurrentExecution(i, before));
+      if (!infos.length) {
+        logD(`Waiting for stage "${stage}" to start.`);
+        return false;
+      }
+      logs.follow(infos);
+      if (infos.some((i) => "failure" === i.state)) {
+        throw new PipelineStageFailed(stage);
+      }
+      if (infos.some((i) => "aborted" === i.state)) {
+        throw new PipelineStageAborted(stage);
+      }
+      if (infos.every((i) => "success" === i.state)) {
+        return true;
+      }
+      logD(`Waiting for stage "${stage}" to finish. Stage is in state: ${infos.map((i) => i.state)}.`);
+      return false;
+    }, {
+      initialWait: duration({ seconds: 1 }),
+      factor: 1.2,
+      maxWait: duration({ seconds: 15 }),
+      timeout: duration({ hours: 1 }),
+      errMessage: `Waiting for pipeline stage "${stage}"`
+    });
+  } finally {
+    await logErrorAsync(() => logs.close());
+  }
+};
+var isCurrentExecution = (info, before) => {
+  const previous = before.find((i) => i.replica === info.replica);
+  return has(info.startedAt) && previous?.startedAt?.getTime() !== info.startedAt.getTime();
+};
+var PipelineLogs = class {
+  constructor(api, workspaceId, stage) {
+    this.api = api;
+    this.workspaceId = workspaceId;
+    this.stage = stage;
+    this.streams = /* @__PURE__ */ new Map();
+  }
+  follow(infos) {
+    infos.forEach((info) => range(info.steps.length).forEach((step) => {
+      const replica = "run" === this.stage ? info.replica : void 0;
+      const key = `${replica ?? ""}:${step}`;
+      if (this.streams.has(key)) {
+        return;
+      }
+      const label = has(replica) ? `${this.stage}[${step}] ${info.server}` : `${this.stage}[${step}]`;
+      this.streams.set(key, this.api.logs({
+        workspaceId: this.workspaceId,
+        stage: this.stage,
+        step,
+        replica
+      }, (entries) => entries.forEach((e2) => logI(`[Pipeline ${label}] ${e2.data}`))));
+    }));
+  }
+  async close() {
+    const streams = [...this.streams.values()];
+    await ignoreErrorAsync(() => throwOnTimeout({
+      label: `Logs of stage ${this.stage}`,
+      timeoutMs: duration({ seconds: 30 }).asMilliseconds(),
+      promise: allThrowRejected(streams.map((s2) => s2.done))
+    }));
+    await mapAsync(streams, (s2) => s2.close());
+    this.streams.clear();
+  }
+};
+
 // packages/integrations/lib/workspaceCommands.js
 var netrcPath = "/home/user/.netrc";
 var updateRepositoryInWorkspace = async (api, w, c2) => {
-  const pr = c2.pullRequest;
+  const gitRef = c2.gitRef;
+  const deploymentCommitSha = gitRefDeploymentCommitSha(gitRef);
   const head = await api.gitHead(w.id);
-  if (head.startsWith(pr.headCommitSha)) {
+  if (deploymentCommitSha && head.startsWith(deploymentCommitSha)) {
     logI(`Head of workspace is already at ${head}. Not updating`);
     return false;
   }
-  logI(`Head of workspace is at ${head} but expected ${pr.headCommitSha}. Updating`);
+  logI(`Head of workspace is at ${head} but expected ${deploymentCommitSha ?? "the source branch tip"}. Updating`);
   const gitHost = new URL(c2.repository.url).hostname;
   const netrc = `machine ${gitHost}
   login ${c2.gitAuth.username}
@@ -99580,9 +100467,20 @@ var updateRepositoryInWorkspace = async (api, w, c2) => {
     await api.execute(w.id, `echo ${singleQuoted(netrc)} > ${netrcPath}`);
     await api.execute(w.id, `git config --global --add ${insteadOf} ${singleQuoted(`git@${gitHost}:`)}`);
     logI("Fetching repository upstream");
-    await runInBackground(api, w.id, "git fetch", { minutes: 30 });
-    logI(`Setting repository to origin/${pr.branch}.`);
-    await runInBackground(api, w.id, `git reset --hard origin/${singleQuoted(pr.branch)}`, { minutes: 2 });
+    try {
+      await runInBackground(api, w.id, [
+        "git fetch --no-tags origin",
+        ...gitRefFetchRefspecs(gitRef).map(singleQuoted)
+      ].join(" "), { minutes: 30 });
+    } catch (error51) {
+      if (gitRef.kind !== "pullRequest" || !deploymentCommitSha) {
+        throw error51;
+      }
+      await runInBackground(api, w.id, `git fetch --no-tags origin ${singleQuoted(deploymentCommitSha)}`, { minutes: 30 });
+    }
+    const ref = deploymentCommitSha ?? "FETCH_HEAD";
+    logI(`Setting repository to ${ref}.`);
+    await runInBackground(api, w.id, `git reset --hard ${singleQuoted(ref)}`, { minutes: 2 });
     if (c2.recurseSubmodules ?? true) {
       await runInBackground(api, w.id, "git submodule update --recursive --init", { minutes: 30 });
     }
@@ -99631,11 +100529,27 @@ var runWithPublicApi = async (config2, status) => await runWithClient(client(con
 var client = (config2) => new PublicApiClient(config2.apiUrl, config2.authentication.apiToken);
 var runWithClient = async (api, config2, status) => {
   const team2 = await getTeam(api, config2.teamName);
-  if (config2.pullRequest.open) {
+  if (gitRefIsOpen(config2.gitRef)) {
     await createDeployment(api, team2, config2, status);
     return;
   }
   await removeDeployment(api, team2, config2, status);
+};
+var cleanupStaleDeploymentsWithClient = async (api, config2, listOpenPullRequests) => {
+  const team2 = await getTeam(api, config2.teamName);
+  const workspaces = await api.listWorkspaces(team2.id);
+  const open2 = await listOpenPullRequests(config2.repository);
+  const stale = workspaces.filter((w) => {
+    if (w.gitUrl !== config2.repository.url) {
+      return false;
+    }
+    const prNumber = pullRequestNumberOf(config2.repository.name, w.name);
+    return void 0 !== prNumber && !open2.has(prNumber);
+  });
+  for (const w of stale) {
+    logI(`Deleting workspace ${w.name} of a closed pull request.`);
+    await deleteWorkspaceIfExists(api, w);
+  }
 };
 var getTeam = async (api, name) => {
   logI(`Fetching team ${name} from Codesphere.`);
@@ -99665,13 +100579,13 @@ var createDeployment = async (api, team2, c2, status) => {
 };
 var removeDeployment = async (api, team2, c2, status) => {
   await status.setInactive();
-  await deleteWorkspace(api, team2, c2.workspaceName ?? workspaceName(c2.repository.name, c2.pullRequest.number));
+  await deleteWorkspace(api, team2, c2.workspaceName ?? workspaceNameForRef(c2.repository.name, c2.gitRef));
   await status.delete();
   logI("Deployment successfully deleted.");
 };
 var deployWorkspace = async (api, team2, c2) => {
   logI("Starting deployment to Codesphere");
-  const name = c2.workspaceName ?? workspaceName(c2.repository.name, c2.pullRequest.number);
+  const name = c2.workspaceName ?? workspaceNameForRef(c2.repository.name, c2.gitRef);
   const existing = await findWorkspace(api, team2, name);
   if (existing) {
     logI(`Workspace ${name} (id: ${existing.id}) already exists.`);
@@ -99698,7 +100612,7 @@ var createWorkspace = async (api, team2, c2, name) => {
     replicas: 1,
     baseImage: c2.baseImage,
     gitUrl: c2.repository.url,
-    gitRef: c2.pullRequest.branch,
+    gitRef: gitRefName(c2.gitRef),
     isPrivateRepo: c2.repository.private,
     cloneDepth: c2.cloneDepth,
     skipLfs: c2.skipLfs,
@@ -99728,6 +100642,9 @@ var deleteWorkspace = async (api, team2, name) => {
     logI(`Workspace ${name} doesn't exist. Nothing to delete.`);
     return;
   }
+  await deleteWorkspaceIfExists(api, w);
+};
+var deleteWorkspaceIfExists = async (api, w) => {
   try {
     await api.deleteWorkspace(w.id);
   } catch (e2) {
@@ -99735,7 +100652,7 @@ var deleteWorkspace = async (api, team2, name) => {
       throw e2;
     }
   }
-  logI(`Workspace ${name} successfully deleted.`);
+  logI(`Workspace ${w.name} successfully deleted.`);
 };
 var environmentUrl = (c2, w) => {
   if ("preview" === c2.deploymentLinkType) {
@@ -100074,38 +100991,6 @@ var createAuthnStubClass = (name, spec) => {
   return klass;
 };
 
-// packages/stubs/common/lib/auth/generatedAuthSchema.js
-var WORKSPACE_PERMISSIONS = [
-  "can_exec_ide",
-  "can_manage_landscape",
-  "can_manage_permissions",
-  "can_manage_settings",
-  "can_view",
-  "can_write_ide"
-];
-var RESOURCE_GROUP_ROLE_RELATIONS = {
-  roles: ["admin", "member"],
-  impliedBy: {
-    admin: [],
-    member: ["admin"]
-  },
-  inheritedFrom: {
-    admin: { type: "organization", role: "owner" }
-  }
-};
-var WORKSPACE_ROLE_RELATIONS = {
-  roles: ["admin", "editor", "viewer"],
-  impliedBy: {
-    admin: [],
-    editor: ["admin"],
-    viewer: ["admin", "editor"]
-  },
-  inheritedFrom: {
-    admin: { type: "resource_group", role: "admin" },
-    viewer: { type: "resource_group", role: "member" }
-  }
-};
-
 // packages/team-service/common/lib/model/TeamServiceTypes.js
 var Role;
 (function(Role2) {
@@ -100214,118 +101099,6 @@ var EnvVarsStub = class EnvVarsStub2 extends envVarsStub {
 EnvVarsStub = __decorate2([
   Kt()
 ], EnvVarsStub);
-
-// packages/utils/common/lib/typing/containerImage.js
-var digestPattern = "(?:sha256:[a-f0-9]{64}|sha384:[a-f0-9]{96}|sha512:[a-f0-9]{128})";
-var prepareRegexps = () => {
-  const alphanumeric = "[a-z0-9]+";
-  const separator = "(?:[._]|__|-+)";
-  const pathComponent = `${alphanumeric}(?:${separator}${alphanumeric})*`;
-  const remoteName = `${pathComponent}(?:/${pathComponent})*`;
-  const domainNameComponent = "(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])";
-  const domainName = `${domainNameComponent}(?:\\.${domainNameComponent})*`;
-  const ipv6address = "\\[(?:[a-fA-F0-9:]+)\\]";
-  const host = `(?:${domainName}|${ipv6address})`;
-  const domainAndPort = `${host}(?::[0-9]+)?`;
-  const tag = "[\\w][\\w.-]{0,127}";
-  const name = `(?:${domainAndPort}/)?${remoteName}`;
-  return {
-    reference: new RegExp(`^(${name})(?::(${tag}))?(?:@(${digestPattern}))?$`),
-    name: new RegExp(`^(?:(${domainAndPort})/)?(${remoteName})$`),
-    registry: new RegExp(`^${domainAndPort}$`),
-    tag: new RegExp(`^${tag}$`),
-    digest: new RegExp(`^${digestPattern}$`)
-  };
-};
-var { reference: referenceRegexp, name: nameRegexp, registry: registryRegexp, tag: tagRegexp, digest: digestRegexp } = prepareRegexps();
-var localhost = "localhost";
-var defaultDomain = "docker.io";
-var legacyDefaultDomain = "index.docker.io";
-var dockerHubApiHosts = /* @__PURE__ */ new Set([
-  legacyDefaultDomain,
-  "registry-1.docker.io"
-]);
-var officialRepoPrefix = "library/";
-var repositoryNameTotalLengthMax = 255;
-var imageIdRegexp = /^[a-f0-9]{64}$/;
-var normalizeOciRegistry = (registry2) => dockerHubApiHosts.has(registry2) ? defaultDomain : registry2;
-var withOfficialPrefix = (domain2, remoteName) => {
-  if (domain2 === defaultDomain && !remoteName.includes("/")) {
-    return { domain: domain2, remoteName: `${officialRepoPrefix}${remoteName}` };
-  }
-  return { domain: domain2, remoteName };
-};
-var splitDomain = (name) => {
-  const slash = name.indexOf("/");
-  if (slash < 0) {
-    return withOfficialPrefix(defaultDomain, name);
-  }
-  const maybeDomain = name.slice(0, slash);
-  const isDomain = maybeDomain === localhost || maybeDomain.includes(".") || maybeDomain.includes(":") || maybeDomain.toLowerCase() !== maybeDomain;
-  if (!isDomain) {
-    return withOfficialPrefix(defaultDomain, name);
-  }
-  return withOfficialPrefix(normalizeOciRegistry(maybeDomain), name.slice(slash + 1));
-};
-var isParsableReference = (reference) => {
-  const match = referenceRegexp.exec(reference);
-  if (!match) {
-    return false;
-  }
-  const [, name] = match;
-  const nameMatch = nameRegexp.exec(name);
-  const path2 = nameMatch?.[2] ?? name;
-  return path2.length <= repositoryNameTotalLengthMax;
-};
-var isOciImageRef = (s2) => {
-  if (imageIdRegexp.test(s2)) {
-    return false;
-  }
-  const { domain: domain2, remoteName } = splitDomain(s2);
-  const tagSeparator = remoteName.indexOf(":");
-  const remote = tagSeparator < 0 ? remoteName : remoteName.slice(0, tagSeparator);
-  if (remote.toLowerCase() !== remote) {
-    return false;
-  }
-  return isParsableReference(`${domain2}/${remoteName}`);
-};
-var toOciImageName = (x2) => {
-  if (isString(x2) && nameRegexp.test(x2) && isOciImageRef(x2)) {
-    return x2;
-  }
-  throw new TypeConversionFailure("OCI image name", x2);
-};
-var toOciImageTag = (x2) => {
-  if (isString(x2) && tagRegexp.test(x2)) {
-    return x2;
-  }
-  throw new TypeConversionFailure("OCI image tag", x2);
-};
-var toOciImageDigest = (x2) => {
-  if (isString(x2) && digestRegexp.test(x2)) {
-    return x2;
-  }
-  throw new TypeConversionFailure("OCI image digest", x2);
-};
-var toOciIndex = toObject({
-  manifests: toArray(toObject({
-    digest: toOciImageDigest,
-    annotations: toUndefOr(toRecord(toString))
-  }))
-});
-
-// packages/workspace-service/common/lib/api/staticBuildArtifact.js
-var toTaggedStaticBuildArtifact = toObject({
-  digest: toUndefOr(toOciImageDigest),
-  registryUrl: toOciImageName,
-  tag: toOciImageTag
-});
-var toDigestedStaticBuildArtifact = toObject({
-  digest: toOciImageDigest,
-  registryUrl: toOciImageName,
-  tag: toUndefOr(toOciImageTag)
-});
-var toStaticBuildArtifact = toOr(toTaggedStaticBuildArtifact, toDigestedStaticBuildArtifact);
 
 // packages/workspace-service/common/lib/serviceArgs.js
 var workspaceServiceArgs = {
@@ -100536,236 +101309,6 @@ var ReplicaStub = class ReplicaStub2 extends createAuthnStubClass("ReplicaStub",
 ReplicaStub = __decorate3([
   Kt()
 ], ReplicaStub);
-
-// packages/utils/common/lib/experiments.js
-var initExperiments = (cfg = []) => {
-  setEnabledFlags(isOfType(cfg, toReadOnly(toArray(toString))) ? {
-    internal: cfg,
-    preview: []
-  } : cfg);
-};
-
-// packages/workspace-agent/common/lib/pipeline/config.js
-var pipelineConfigPath = "ci.yml";
-var toCustomImage = toObject({
-  entrypoint: toUndefOr(toArray(toString)),
-  cmd: toUndefOr(toArray(toString)),
-  workingDir: toUndefOr(toString)
-});
-var toPipelineMetaConfig = toObject({
-  configRootDir: toString,
-  workingDirectory: toString,
-  internalDataDir: toString,
-  maxLogsPerStep: toNumber,
-  envVars: toRecord(toString),
-  replicaId: toString,
-  serverName: toString,
-  workspaceId: toUndefOr(toNonNegativeInteger),
-  otelLogCollectorHostname: toUndefOr(toString),
-  persistentLogs: toUndefOr(toBoolean),
-  customImage: toUndefOr(toCustomImage)
-});
-
-// packages/workspace-service/common/lib/Workspace.js
-var GitProvider;
-(function(GitProvider2) {
-  GitProvider2["GitHub"] = "github";
-  GitProvider2["GitLab"] = "gitlab";
-  GitProvider2["Bitbucket"] = "bitbucket";
-})(GitProvider || (GitProvider = {}));
-var toGitProvider2 = toStringEnum("GitProvider", GitProvider);
-var SHARED_VOLUME_MOUNT_PATH = "/home/user/app";
-var toWorkspacePermissions = toObject(Object.fromEntries(WORKSPACE_PERMISSIONS.map((p3) => [p3, toBoolean])));
-var workspaceRoles = {
-  highest: toObject({
-    role: toLiteralUnion("WorkspaceRole", WORKSPACE_ROLE_RELATIONS.roles),
-    inheritedFrom: toUndefOr(toObject({
-      type: toString,
-      role: toLiteralUnion("ResourceGroupRole", RESOURCE_GROUP_ROLE_RELATIONS.roles)
-    }))
-  })
-};
-var toWorkspaceRoles = toObject(workspaceRoles);
-var workspace = {
-  id: readOnly(toNonNegativeInteger),
-  dataCenterId: readOnly(toNumber),
-  userId: readOnly(toInteger),
-  teamId: readOnly(toNonNegativeInteger),
-  name: toString,
-  gitUrl: readOnly(toNullOr(toString)),
-  isPrivateRepo: readOnly(toBoolean),
-  welcomeMessage: readOnly(toNullOr(toString)),
-  initialBranch: readOnly(toNullOr(toString)),
-  initialGitRef: readOnly(toUndefOr(toString)),
-  cloneDepth: toUndefOr(toPositiveInteger),
-  skipLfs: toUndefOr(toBoolean),
-  recurseSubmodules: toUndefOr(toBoolean),
-  sourceWorkspaceId: readOnly(toNullOr(toNonNegativeInteger)),
-  planId: toPlanId,
-  replicas: toPositiveInteger,
-  vpnConfig: toNullOr(toString),
-  collectTraces: toBoolean,
-  restricted: toBoolean,
-  baseImage: toUndefOr(toString),
-  persistentLogs: toBoolean,
-  createdAt: toDate,
-  managedServiceId: toUndefOr(toUuid),
-  storageMib: toUndefOr(toPositiveInteger),
-  sharedVaultName: toUndefOr(toString),
-  confidentialWorkloadId: toUndefOr(toString),
-  vhsmAddress: toUndefOr(toFullUrl),
-  staticBuildArtifact: readOnly(toUndefOr(toStaticBuildArtifact)),
-  roles: readOnly(toUndefOr(toWorkspaceRoles)),
-  permissions: readOnly(toUndefOr(toWorkspacePermissions))
-};
-var toWorkspace2 = toObject(workspace);
-var validServerNameRegex = new RegExp("^(?:[a-z]|[a-z][-a-z0-9]{0,30}[a-z0-9])$");
-var toMsdServerName = toStringMatchingRegex("MsdServerName", validServerNameRegex);
-var toServerPath = toObject({
-  port: toPositiveInteger,
-  path: toUrlPath,
-  stripPath: toBoolean
-});
-var toServerPort = toObject({
-  port: toPositiveInteger,
-  isPublic: toBoolean
-});
-var toServerNetwork = toObject({
-  ports: toNonEmptyArray(toServerPort),
-  paths: toArray(toServerPath)
-});
-var server = {
-  name: readOnly(toMsdServerName),
-  planId: toPlanId,
-  replicas: toPositiveInteger,
-  network: toServerNetwork,
-  isLandscapeGateway: toUndefOr(toBoolean),
-  landscapeGatewayHttpPort: toUndefOr(toPositiveInteger),
-  baseImage: toUndefOr(toString),
-  env: toUndefOr(toEnv),
-  runAsUser: toUndefOr(toNonNegativeInteger),
-  runAsGroup: toUndefOr(toNonNegativeInteger),
-  volumeMounts: toUndefOr(toVolumeMounts),
-  steps: toUndefOr(toArray(toStep)),
-  profile: toUndefOr(toString)
-};
-var toServer = toObject(server);
-var toHeadlessService = toObject({
-  name: toString,
-  network: toArray(toObject({
-    path: toUrlPath,
-    target: toString,
-    stripPath: toBoolean
-  }))
-});
-var serverV1 = {
-  name: readOnly(toMsdServerName),
-  planId: toPlanId,
-  replicas: toPositiveInteger,
-  stripPath: toBoolean,
-  isPublic: toUndefOr(toBoolean),
-  network: toUndefOr(toObject({
-    path: toUrlPath
-  }))
-};
-var toServerV1 = toObject(serverV1);
-var IDE_SERVER_NAME = "codesphere-ide";
-var DEFAULT_PORT = 3e3;
-var ROUTER_BASE_IMAGE = "workspace-router";
-var ROUTER_CONFIG_MOUNT_PATH = "/etc/router/ci.yml";
-var ROUTER_USER_GROUP_ID = 101;
-var workspaceDevDomain = (workspaceId, workspaceHostingBaseDomain) => `${workspaceId}${isFeatureEnabled("dev-domains-port") ? `-${DEFAULT_PORT}` : ""}.${workspaceHostingBaseDomain}`;
-var simpleNetworkToServerNetwork = (networkConfig, isPublic) => ({
-  ports: [
-    {
-      port: DEFAULT_PORT,
-      isPublic: isPublic ?? true
-    }
-  ],
-  paths: !networkConfig || !(isPublic ?? true) ? [] : [
-    {
-      port: DEFAULT_PORT,
-      path: networkConfig.path,
-      stripPath: networkConfig.stripPath ?? false
-    }
-  ]
-});
-var advancedNetworkToServerNetwork = (networkConfig) => ({
-  ports: networkConfig.ports,
-  paths: "paths" in networkConfig && has(networkConfig.paths) ? networkConfig.paths.map((path2) => ({ stripPath: false, ...path2 })) : []
-});
-var isLandscapeGatewayNetworkConfig = (networkConfig) => isAdvancedNetworkConfig(networkConfig) && networkConfig.landscapeGateway !== void 0;
-var configToLandscape = (config2, profile) => {
-  return Object.entries(config2).map(([k2, v3]) => {
-    if (isRouterService(v3)) {
-      return routerServiceToServer(k2, v3, profile);
-    }
-    if (isDeployStageServerV02(v3)) {
-      return v05ServerToServer(k2, v3, profile);
-    }
-    if (!isDeployStageServer(v3)) {
-      return;
-    }
-    return deployStageServerToLandscape(k2, v3, profile);
-  }).filter((x2) => x2 !== void 0);
-};
-var routerServiceToServer = (name, config2, profile) => {
-  const isLandscapeGateway = config2.network.isLandscapeGateway === true;
-  return toServer({
-    name,
-    planId: config2.plan,
-    replicas: config2.replicaCount,
-    baseImage: ROUTER_BASE_IMAGE,
-    runAsUser: ROUTER_USER_GROUP_ID,
-    runAsGroup: ROUTER_USER_GROUP_ID,
-    volumeMounts: [
-      {
-        name: "_workspace",
-        mountPath: SHARED_VOLUME_MOUNT_PATH,
-        workspacePath: ""
-      },
-      {
-        name: "_workspace",
-        mountPath: ROUTER_CONFIG_MOUNT_PATH,
-        workspacePath: profile ?? pipelineConfigPath
-      }
-    ],
-    profile,
-    isLandscapeGateway: isLandscapeGateway ? true : void 0,
-    landscapeGatewayHttpPort: isLandscapeGateway ? DEFAULT_PORT : void 0,
-    network: {
-      ports: [{ port: DEFAULT_PORT, isPublic: false }],
-      paths: []
-    }
-  });
-};
-var v05ServerToServer = (name, config2, profile) => {
-  const ports = config2.network.ports.map((port) => ({
-    port,
-    isPublic: false
-  }));
-  const network = config2.network.landscapeGateway ? { ports, landscapeGateway: config2.network.landscapeGateway } : { ports, paths: [] };
-  return deployStageServerToLandscape(name, { ...config2, network }, profile);
-};
-var deployStageServerToLandscape = (name, config2, profile) => {
-  const network = config2.network;
-  const isLandscapeGateway = has(network) && isLandscapeGatewayNetworkConfig(network);
-  return toServer({
-    name,
-    planId: config2.plan,
-    replicas: config2.replicas ?? 1,
-    env: config2.env,
-    baseImage: config2.image,
-    runAsUser: config2.runAsUser ?? void 0,
-    runAsGroup: config2.runAsGroup ?? void 0,
-    volumeMounts: config2.volumeMounts,
-    steps: config2.steps,
-    profile,
-    isLandscapeGateway,
-    landscapeGatewayHttpPort: isLandscapeGateway ? network.landscapeGateway.httpPort : void 0,
-    network: has(network) && isAdvancedNetworkConfig(network) ? advancedNetworkToServerNetwork(network) : simpleNetworkToServerNetwork(network, config2.isPublic)
-  });
-};
 
 // packages/deployment-service/common/lib/PrometheusResponse.js
 var toUnixTimeAndValueTuple = toTuple(toNumber, toOr(toString, toNumber));
@@ -103535,6 +104078,12 @@ var import_node_cache = __toESM(require_node_cache2(), 1);
 var import_sdk = __toESM(require_dist3(), 1);
 var REQUEST_TIMEOUT = duration({ seconds: 2 });
 var RETRY_MIN_WAIT = duration({ milliseconds: 100 });
+var WARM_UP_BACKOFF = {
+  initialWait: duration({ seconds: 1 }),
+  factor: 2,
+  maxWait: duration({ seconds: 30 }),
+  timeout: duration({ minutes: 10 })
+};
 var fgaCluster = (clusterId) => `cluster:${clusterId}`;
 var CLUSTER = fgaCluster("default");
 
@@ -103688,7 +104237,7 @@ var toChangeRoleArgs = toObject({
   userId: toNonNegativeInteger,
   role: toRole
 });
-var toAddTeamMemberInternalArgs = toObject({
+var toEnsureTeamRoleArgs = toObject({
   ...teamServiceArgs,
   userId: toNonNegativeInteger,
   role: toRole
@@ -103735,7 +104284,7 @@ var workspacesService = {
     }),
     createWorkspace: rpc({
       request: toCreateWorkspaceServiceArgs,
-      response: toWorkspace2,
+      response: toWorkspace,
       defaultOptions: { timeout: duration({ seconds: 60 }) }
     }),
     deleteWorkspace: rpc({
@@ -103745,11 +104294,11 @@ var workspacesService = {
     }),
     getWorkspace: rpc({
       request: toGetWorkspaceServiceArgs,
-      response: toWorkspace2
+      response: toWorkspace
     }),
     getByManagedService: rpc({
       request: toGetByManagedServiceArgs,
-      response: toWorkspace2
+      response: toWorkspace
     }),
     hasAccess: rpc({
       request: toHasAccessArgs,
@@ -103769,11 +104318,11 @@ var workspacesService = {
     }),
     listWorkspaces: rpc({
       request: toTeamServiceArgs,
-      response: toArray(toWorkspace2)
+      response: toArray(toWorkspace)
     }),
     listManagedServiceWorkspaces: rpc({
       request: toVoid,
-      response: toArray(toWorkspace2)
+      response: toArray(toWorkspace)
     }),
     updateWorkspace: rpc({
       request: toUpdateWorkspaceServiceArgs,
@@ -103781,7 +104330,7 @@ var workspacesService = {
       defaultOptions: { timeout: duration({ seconds: 10 }) }
     }),
     workspacesStream: stream({
-      response: toArray(toWorkspace2),
+      response: toArray(toWorkspace),
       request: toTeamServiceArgs
     })
   }
@@ -104359,8 +104908,8 @@ var teamService = {
       request: toSendInviteArgs,
       response: toVoid
     }),
-    addTeamMemberInternal: rpc({
-      request: toAddTeamMemberInternalArgs,
+    ensureTeamRole: rpc({
+      request: toEnsureTeamRoleArgs,
       response: toVoid
     }),
     leaveTeam: rpc({
@@ -105421,10 +105970,10 @@ function mergeDefs(...defs) {
 function cloneDef(schema) {
   return mergeDefs(schema._zod.def);
 }
-function getElementAtPath(obj, path2) {
-  if (!path2)
+function getElementAtPath(obj, path3) {
+  if (!path3)
     return obj;
-  return path2.reduce((acc, key) => acc?.[key], obj);
+  return path3.reduce((acc, key) => acc?.[key], obj);
 }
 function promiseAllObject(promisesObj) {
   const keys2 = Object.keys(promisesObj);
@@ -105833,11 +106382,11 @@ function explicitlyAborted(x2, startIndex = 0) {
   }
   return false;
 }
-function prefixIssues(path2, issues) {
+function prefixIssues(path3, issues) {
   return issues.map((iss) => {
     var _a3;
     (_a3 = iss).path ?? (_a3.path = []);
-    iss.path.unshift(path2);
+    iss.path.unshift(path3);
     return iss;
   });
 }
@@ -105984,16 +106533,16 @@ function flattenError(error51, mapper = (issue3) => issue3.message) {
 }
 function formatError2(error51, mapper = (issue3) => issue3.message) {
   const fieldErrors = { _errors: [] };
-  const processError = (error52, path2 = []) => {
+  const processError = (error52, path3 = []) => {
     for (const issue3 of error52.issues) {
       if (issue3.code === "invalid_union" && issue3.errors.length) {
-        issue3.errors.map((issues) => processError({ issues }, [...path2, ...issue3.path]));
+        issue3.errors.map((issues) => processError({ issues }, [...path3, ...issue3.path]));
       } else if (issue3.code === "invalid_key") {
-        processError({ issues: issue3.issues }, [...path2, ...issue3.path]);
+        processError({ issues: issue3.issues }, [...path3, ...issue3.path]);
       } else if (issue3.code === "invalid_element") {
-        processError({ issues: issue3.issues }, [...path2, ...issue3.path]);
+        processError({ issues: issue3.issues }, [...path3, ...issue3.path]);
       } else {
-        const fullpath = [...path2, ...issue3.path];
+        const fullpath = [...path3, ...issue3.path];
         if (fullpath.length === 0) {
           fieldErrors._errors.push(mapper(issue3));
         } else {
@@ -106020,17 +106569,17 @@ function formatError2(error51, mapper = (issue3) => issue3.message) {
 }
 function treeifyError(error51, mapper = (issue3) => issue3.message) {
   const result = { errors: [] };
-  const processError = (error52, path2 = []) => {
+  const processError = (error52, path3 = []) => {
     var _a3, _b;
     for (const issue3 of error52.issues) {
       if (issue3.code === "invalid_union" && issue3.errors.length) {
-        issue3.errors.map((issues) => processError({ issues }, [...path2, ...issue3.path]));
+        issue3.errors.map((issues) => processError({ issues }, [...path3, ...issue3.path]));
       } else if (issue3.code === "invalid_key") {
-        processError({ issues: issue3.issues }, [...path2, ...issue3.path]);
+        processError({ issues: issue3.issues }, [...path3, ...issue3.path]);
       } else if (issue3.code === "invalid_element") {
-        processError({ issues: issue3.issues }, [...path2, ...issue3.path]);
+        processError({ issues: issue3.issues }, [...path3, ...issue3.path]);
       } else {
-        const fullpath = [...path2, ...issue3.path];
+        const fullpath = [...path3, ...issue3.path];
         if (fullpath.length === 0) {
           result.errors.push(mapper(issue3));
           continue;
@@ -106062,8 +106611,8 @@ function treeifyError(error51, mapper = (issue3) => issue3.message) {
 }
 function toDotPath(_path) {
   const segs = [];
-  const path2 = _path.map((seg) => typeof seg === "object" ? seg.key : seg);
-  for (const seg of path2) {
+  const path3 = _path.map((seg) => typeof seg === "object" ? seg.key : seg);
+  for (const seg of path3) {
     if (typeof seg === "number")
       segs.push(`[${seg}]`);
     else if (typeof seg === "symbol")
@@ -118755,13 +119304,13 @@ function resolveRef(ref, ctx) {
   if (!ref.startsWith("#")) {
     throw new Error("External $ref is not supported, only local refs (#/...) are allowed");
   }
-  const path2 = ref.slice(1).split("/").filter(Boolean);
-  if (path2.length === 0) {
+  const path3 = ref.slice(1).split("/").filter(Boolean);
+  if (path3.length === 0) {
     return ctx.rootSchema;
   }
   const defsKey = ctx.version === "draft-2020-12" ? "$defs" : "definitions";
-  if (path2[0] === defsKey) {
-    const key = path2[1];
+  if (path3[0] === defsKey) {
+    const key = path3[1];
     if (!key || !ctx.defs[key]) {
       throw new Error(`Reference not found: ${ref}`);
     }
@@ -119201,7 +119750,7 @@ var stripUndefined = (value) => {
   }
   return Object.fromEntries(Object.entries(value).filter(([_3, v3]) => v3 !== void 0).map(([k2, v3]) => [k2, stripUndefined(v3)]));
 };
-var issuePath = (path2 = []) => path2.reduce((acc, segment) => typeof segment === "number" ? `${acc}[${segment}]` : acc ? `${acc}.${String(segment)}` : String(segment), "");
+var issuePath = (path3 = []) => path3.reduce((acc, segment) => typeof segment === "number" ? `${acc}[${segment}]` : acc ? `${acc}.${String(segment)}` : String(segment), "");
 var unionError = (issue3) => {
   const variants = issue3.errors.map((variant) => variant.map((i) => {
     const at = issuePath(i.path);
@@ -120017,6 +120566,21 @@ var convertersOf = (schema) => Object.fromEntries(Object.entries(schema.shape).m
   fromZod(v3)
 ]));
 
+// packages/marketplace/common/lib/api/model/backupStore.js
+var backupStoreTypeSchema = external_exports.enum(["s3"]);
+var backupStoreSchema = external_exports.discriminatedUnion("type", [
+  external_exports.strictObject({
+    type: external_exports.literal("s3"),
+    endpointUrl: external_exports.url({ protocol: /^https?$/ }),
+    bucket: external_exports.string().regex(/^[a-zA-Z0-9._-]{1,255}$/, "bucket must be a single bucket name"),
+    prefix: external_exports.string().regex(/^[^/?#%\s]+(\/[^/?#%\s]+)*$/, 'prefix must be "/"-separated segments without "?", "#", "%" or spaces').optional(),
+    accessKeyId: external_exports.string().min(1)
+  })
+]);
+var backupStoreSecretsSchema = external_exports.strictObject({
+  secretKey: external_exports.string().min(1)
+});
+
 // packages/marketplace/common/lib/api/model/provider.js
 var providerNamePattern = "^[a-z0-9-_]+$";
 var providerNameSchema = external_exports.string().regex(new RegExp(providerNamePattern), "ProviderName").meta({ title: "ProviderName" });
@@ -120037,6 +120601,7 @@ var labelsSchema = external_exports.record(external_exports.string().min(1).max(
   message: "Invalid input: record must have at most 50 properties"
 });
 var toLabels = fromZod(labelsSchema.optional());
+var backupStoreTypesSchema = external_exports.array(backupStoreTypeSchema).min(1);
 var resourceParameterSchema = external_exports.object({
   pricedAs: external_exports.literal([
     "cpu-tenths",
@@ -120126,19 +120691,22 @@ var landscapeSettingsSchema = external_exports.object({
   })
 });
 var toLandscapeSettings = fromZod(landscapeSettingsSchema);
-var versionsSchema = external_exports.record(semVerSchema, external_exports.object({
-  gitRef: external_exports.string().min(1).optional(),
-  artifactTag: ociImageTagSchema.optional(),
-  ciProfile: external_exports.string().min(1).optional(),
+var versionInfoSchema = external_exports.object({
   appVersion: external_exports.string().optional(),
   description: external_exports.string().optional()
+});
+var versionKeyMeta = {
+  title: "SemVer",
+  type: "string",
+  description: "A semantic version number",
+  example: "1.0.0"
+};
+var landscapeVersionsSchema = external_exports.record(semVerSchema, versionInfoSchema.extend({
+  gitRef: external_exports.string().min(1).optional(),
+  artifactTag: ociImageTagSchema.optional(),
+  ciProfile: external_exports.string().min(1).optional()
 })).meta({
-  propertyNames: {
-    title: "SemVer",
-    type: "string",
-    description: "A semantic version number",
-    example: "1.0.0"
-  },
+  propertyNames: versionKeyMeta,
   example: {
     "0.0.1": {
       ciProfile: "debug",
@@ -120159,13 +120727,30 @@ var versionsSchema = external_exports.record(semVerSchema, external_exports.obje
     }
   }
 });
-var toVersions = fromZod(versionsSchema);
+var toLandscapeVersions = fromZod(landscapeVersionsSchema);
+var restVersionsSchema = external_exports.record(semVerSchema, external_exports.strictObject(versionInfoSchema.shape)).meta({
+  propertyNames: versionKeyMeta,
+  example: {
+    "1.0.0": {
+      appVersion: "example-app v1.0",
+      description: "Initial release."
+    },
+    "1.1.0": {
+      appVersion: "example-app v1.1",
+      description: "Upgrades example-app to v1.1. The service restarts once during the update."
+    },
+    "1.2.0": {
+      appVersion: "example-app v1.1",
+      description: "Adds feature X. The app version is unchanged."
+    }
+  }
+});
+var toRestVersions = fromZod(restVersionsSchema);
 var baseProviderSchema = external_exports.object({
   name: providerNameSchema,
   author: external_exports.string().min(1),
   backups: external_exports.object({
-    configSchema: jsonSchemaSchema,
-    secretsSchema: jsonSchemaSchema
+    storeTypes: backupStoreTypesSchema
   }).optional(),
   capabilities: capabilitiesSchema.optional(),
   category: external_exports.string().min(1),
@@ -120191,13 +120776,14 @@ var managedServiceRestProviderSchema = baseProviderSchema.extend({
       secret: restBackendSecretSchema.optional()
     })
   }),
+  versions: restVersionsSchema.optional(),
   createdAt: dateSchema.optional()
 });
 var refinedRestProviderSchema = managedServiceRestProviderSchema.superRefine(refinePlanParametersDefined);
 var toManagedServiceRestProvider = fromZod(refinedRestProviderSchema);
 var managedServiceLandscapeProviderSchema = baseProviderSchema.extend({
   backend: landscapeSettingsSchema,
-  versions: versionsSchema.optional(),
+  versions: landscapeVersionsSchema.optional(),
   createdAt: dateSchema.optional()
 });
 var refineLandscapeSource = (prov, ctx) => {
@@ -120240,7 +120826,7 @@ var managedServiceProviderSchema = external_exports.union([managedServiceLandsca
 var toManagedServiceProvider = (x2) => {
   const prov = toManagedServiceDefinitionProvider(x2);
   if ((prov.capabilities?.backups || prov.capabilities?.pointInTimeRecovery) && prov.backups === void 0) {
-    throw new TypeConversionFailure("Providers with capability backup or pointInTimeRecovery must define backups.configSchema and backups.secretsSchema", prov.backups);
+    throw new TypeConversionFailure("Providers with capability backups or pointInTimeRecovery must define backups.storeTypes", prov.backups);
   }
   return prov;
 };
@@ -120297,7 +120883,7 @@ var partialProviderFieldsSchema = baseProviderSchema.omit({
 }).partial();
 var partialLandscapeProviderSchema = partialProviderFieldsSchema.extend({
   backend: landscapeSettingsSchema.optional(),
-  versions: versionsSchema.optional()
+  versions: landscapeVersionsSchema.optional()
 });
 var toPartialLandscapeProvider = fromZod(partialLandscapeProviderSchema);
 var partialRestProviderSchema = partialProviderFieldsSchema.extend({
@@ -120306,7 +120892,8 @@ var partialRestProviderSchema = partialProviderFieldsSchema.extend({
       endpoint: external_exports.string(),
       secret: restBackendSecretSchema.optional()
     })
-  }).optional()
+  }).optional(),
+  versions: restVersionsSchema.optional()
 });
 var toPartialRestProvider = fromZod(partialRestProviderSchema);
 var providerRefSchema = external_exports.object({
@@ -120363,7 +120950,7 @@ var managedServiceRestProviderConfigSchema = partialManagedServiceProviderConfig
 });
 var managedServiceLandscapeProviderConfigSchema = partialManagedServiceProviderConfigPropertiesSchema.extend({
   backend: landscapeSettingsSchema.optional(),
-  versions: versionsSchema.optional()
+  versions: landscapeVersionsSchema.optional()
 });
 var upgradeLegacyProviderConfigInput = (entry) => {
   if (typeof entry !== "object" || entry === null) {
@@ -120548,7 +121135,7 @@ var createManagedServiceArgsSchema = external_exports.object({
   secrets: recordWithDefinedSchema,
   teamId: external_exports.int().min(0),
   workspaceId: external_exports.int().min(0).optional(),
-  recoverFrom: recoveryRefSchema.optional(),
+  recoverFrom: external_exports.union([recoveryRefSchema, external_exports.strictObject({ id: uuidSchema })]).optional(),
   confidentialWorkloadId: external_exports.string().optional(),
   vhsmAddress: fullUrlSchema.optional()
 });
@@ -120907,9 +121494,10 @@ var getCiLandscape = async (pipeline, workspaceId, profile) => {
     throw e2;
   }
 };
-var updateRepositoryInWorkspace2 = async (process3, workspace2, gitUrl, gitAuth, pr) => {
+var updateRepositoryInWorkspace2 = async (process3, workspace2, gitUrl, gitAuth, gitRef) => {
   const gitHost = new URL(gitUrl).hostname;
-  logI(`Updating repository of workspace to ${pr.headCommitSha}`);
+  const deploymentCommitSha = gitRefDeploymentCommitSha(gitRef);
+  logI(`Updating repository of workspace to ${deploymentCommitSha ?? "the source branch tip"}`);
   const run2 = async (args, timeout = duration({ seconds: 10 })) => {
     const { output } = await process3.execute({
       workspaceId: workspace2.id,
@@ -120919,11 +121507,11 @@ var updateRepositoryInWorkspace2 = async (process3, workspace2, gitUrl, gitAuth,
     return output;
   };
   const head = await run2(["git", "rev-parse", "HEAD"]);
-  if (head.startsWith(pr.headCommitSha)) {
+  if (deploymentCommitSha && head.startsWith(deploymentCommitSha)) {
     logI(`Head of workspace is already at ${head}. Not updating`);
     return false;
   }
-  logI(`Head of workspace is at ${head} but expected ${pr.headCommitSha}. Updating`);
+  logI(`Head of workspace is at ${head} but expected ${deploymentCommitSha ?? "the source branch tip"}. Updating`);
   const netrcPath2 = "/home/user/.netrc";
   const netrc = `machine ${gitHost}
   login ${gitAuth.username}
@@ -120939,9 +121527,29 @@ var updateRepositoryInWorkspace2 = async (process3, workspace2, gitUrl, gitAuth,
       `git@${gitHost}:`
     ]);
     logI("Fetching repository upstream");
-    await run2(["git", "fetch"], duration({ minutes: 30 }));
-    logI(`Setting repository to origin/${pr.branch}.`);
-    await run2(["git", "reset", { hard: true }, `origin/${pr.branch}`], duration({ minutes: 2 }));
+    try {
+      await run2([
+        "git",
+        "fetch",
+        { "no-tags": true },
+        "origin",
+        ...gitRefFetchRefspecs(gitRef)
+      ], duration({ minutes: 30 }));
+    } catch (error51) {
+      if (gitRef.kind !== "pullRequest" || !deploymentCommitSha) {
+        throw error51;
+      }
+      await run2([
+        "git",
+        "fetch",
+        { "no-tags": true },
+        "origin",
+        deploymentCommitSha
+      ], duration({ minutes: 30 }));
+    }
+    const ref = deploymentCommitSha ?? "FETCH_HEAD";
+    logI(`Setting repository to ${ref}.`);
+    await run2(["git", "reset", { hard: true }, ref], duration({ minutes: 2 }));
     if (workspace2.recurseSubmodules ?? true) {
       await run2(["git", "submodule", "update", { recursive: true, init: true }], duration({ minutes: 30 }));
     }
@@ -120970,17 +121578,17 @@ var createDeployment2 = async (creds, team2, c2, status, serviceUrlDc) => {
         baseImage: c2.baseImage,
         planId: await planIdByConfig(products, c2.planTitle, c2.onDemand),
         restricted: c2.restricted,
-        workspaceName: c2.workspaceName ?? workspaceName(c2.repository.name, c2.pullRequest.number),
+        workspaceName: c2.workspaceName ?? workspaceNameForRef(c2.repository.name, c2.gitRef),
         gitUrl: c2.repository.url,
         isPrivateRepo: c2.repository.private,
-        initialBranch: c2.pullRequest.branch,
+        initialBranch: gitRefName(c2.gitRef),
         cloneDepth: c2.cloneDepth,
         skipLfs: c2.skipLfs,
         recurseSubmodules: c2.recurseSubmodules,
         vpnConfig: c2.vpnConfigName,
         sharedVaultName: c2.sharedVaultName
       });
-      await updateRepositoryInWorkspace2(process3, w, c2.repository.url, c2.gitAuth, c2.pullRequest);
+      await updateRepositoryInWorkspace2(process3, w, c2.repository.url, c2.gitAuth, c2.gitRef);
       const servers = await getCiLandscape(pipeline, w.id, c2.profile);
       if (servers) {
         logD([
@@ -121012,7 +121620,7 @@ var isProviderSupported = async (repo, gitStub) => isProviderSupportedBy(repo, a
 var removeDeployment2 = async (creds, team2, c2, status, serviceUrlDc) => {
   await status.setInactive();
   await withStubs(team2.defaultDataCenterId, creds, serviceUrlDc, async ({ workspaces }) => {
-    await deleteWorkspace2(workspaces, team2.id, workspaceName(c2.repository.name, c2.pullRequest.number));
+    await deleteWorkspace2(workspaces, team2.id, c2.workspaceName ?? workspaceNameForRef(c2.repository.name, c2.gitRef));
     await status.delete();
   });
   logI("Deployment successfully deleted.");
@@ -121022,7 +121630,7 @@ var runWithStreamy = async (config2, status) => {
   await initRuntimeFlags(config2.apiUrl);
   const creds = await authenticate(serviceUrl("auth-service"), config2.authentication.email, config2.authentication.password);
   const t3 = await withAuthnStub(TeamStub, serviceUrl("team-service"), creds.accessToken, (stub) => getTeam2(stub, config2.teamName));
-  if (config2.pullRequest.open) {
+  if (gitRefIsOpen(config2.gitRef)) {
     await createDeployment2(creds, t3, config2, status, serviceUrlDc);
     return;
   }
@@ -121042,45 +121650,69 @@ var run = async (config2, status) => {
   logPasswordDeprecation();
   await runWithStreamy({ ...config2, authentication }, status);
 };
+var cleanupStaleDeployments = async (config2, listOpenPullRequests) => {
+  const authentication = config2.authentication;
+  if (!isOfType(authentication, toApiTokenAuthentication)) {
+    logW("Skipping the cleanup of closed pull requests, it needs a Codesphere API token.");
+    return;
+  }
+  await cleanupStaleDeploymentsWithClient(new PublicApiClient(config2.apiUrl, authentication.apiToken), config2, listOpenPullRequests);
+};
 var logPasswordDeprecation = () => logW("Authenticating with email and password is deprecated. Create a Codesphere API token and configure it instead.");
+
+// packages/integrations/lib/githubActionSource.js
+var githubEnvironmentName = (ref, baseName) => {
+  switch (ref.kind) {
+    case "pullRequest":
+      return `${baseName} #${ref.pullRequest.number}`;
+    case "branch":
+      return `${baseName} ${ref.name}`;
+    case "tag":
+      return `${baseName} tag ${ref.name}`;
+  }
+};
 
 // packages/integrations/lib/github-action-deploy-workspace.js
 var getConfig = async () => {
-  const config2 = await fetchGitHubActionPrConfig();
+  const source = await fetchGitHubActionSource();
   const envVars = (0, import_dotenv.parse)(getActionInput("env") ?? "");
   const cloneDepth = getActionInput("cloneDepth");
   const recurseSubmodules = getActionInput("recurseSubmodules") ?? "true";
+  const environmentName = getActionInput("environmentName") ?? "Codesphere Preview";
   return {
-    ...config2,
-    repository: {
-      ...config2.repository,
-      url: gitHubUrl(config2.repository)
-    },
-    apiUrl: new URL(getActionInput("apiUrl") ?? "https://codesphere.com"),
-    teamName: getActionInput("team", true),
-    environmentName: getActionInput("environmentName") ?? void 0,
-    baseImage: getActionInput("baseImage") ?? void 0,
-    profile: getActionInput("ciProfile") ?? void 0,
-    planTitle: getActionInput("plan") ?? void 0,
-    onDemand: "true" === getActionInput("onDemand"),
-    restricted: "true" === getActionInput("restricted"),
-    cloneDepth: cloneDepth ? Number(cloneDepth) : void 0,
-    skipLfs: "true" === getActionInput("skipLfs"),
-    recurseSubmodules: "true" === recurseSubmodules,
-    envVars,
-    vpnConfigName: getActionInput("vpnConfig") ?? void 0,
-    sharedVaultName: getActionInput("sharedVaultName") ?? void 0,
-    deploymentLinkType: toDeploymentLinkType(getActionInput("deploymentLinkType")),
-    authentication: toAuthentication({
-      apiToken: getActionInput("apiToken"),
-      email: getActionInput("email"),
-      password: getActionInput("password")
-    }),
-    gitAuth: {
-      username: "x-aceess-token",
-      token: config2.gitHubToken
-    },
-    tlsAllowUnauthorized: "true" === getActionInput("tlsAllowUnauthorized")
+    environment: githubEnvironmentName(source.gitRef, environmentName),
+    configuration: {
+      gitRef: source.gitRef,
+      repository: {
+        ...source.repository,
+        url: gitHubUrl(source.repository)
+      },
+      apiUrl: new URL(getActionInput("apiUrl") ?? "https://codesphere.com"),
+      teamName: getActionInput("team", true),
+      environmentName,
+      baseImage: getActionInput("baseImage") ?? void 0,
+      profile: getActionInput("ciProfile") ?? void 0,
+      planTitle: getActionInput("plan") ?? void 0,
+      onDemand: "true" === getActionInput("onDemand"),
+      restricted: "true" === getActionInput("restricted"),
+      cloneDepth: cloneDepth ? Number(cloneDepth) : void 0,
+      skipLfs: "true" === getActionInput("skipLfs"),
+      recurseSubmodules: "true" === recurseSubmodules,
+      envVars,
+      vpnConfigName: getActionInput("vpnConfig") ?? void 0,
+      sharedVaultName: getActionInput("sharedVaultName") ?? void 0,
+      deploymentLinkType: toDeploymentLinkType(getActionInput("deploymentLinkType")),
+      authentication: toAuthentication({
+        apiToken: getActionInput("apiToken"),
+        email: getActionInput("email"),
+        password: getActionInput("password")
+      }),
+      gitAuth: {
+        username: "x-aceess-token",
+        token: source.gitHubToken
+      },
+      tlsAllowUnauthorized: "true" === getActionInput("tlsAllowUnauthorized")
+    }
   };
 };
 var GitHubDeployment = class _GitHubDeployment {
@@ -121092,10 +121724,10 @@ var GitHubDeployment = class _GitHubDeployment {
     this.environment = environment;
     this.codesphereUrl = codesphereUrl;
   }
-  static async create(token, { owner, name: repo }, environment, pullRequest, codesphereUrl) {
+  static async create(token, { owner, name: repo }, environment, gitRef, codesphereUrl) {
     const octokit = new Octokit2({ auth: token, request: { fetch: fetch2 } });
     try {
-      const d4 = await getCurrentDeployment(token, { owner, name: repo }, environment, pullRequest);
+      const d4 = await getCurrentDeployment(token, { owner, name: repo }, environment, gitRefHeadCommitSha(gitRef));
       return new _GitHubDeployment(octokit, owner, repo, d4.id, environment, codesphereUrl);
     } catch (e2) {
       if (!(e2 instanceof NotFound)) {
@@ -121106,8 +121738,8 @@ var GitHubDeployment = class _GitHubDeployment {
     const { id } = toCreateDeploymentResponse(await octokit.rest.repos.createDeployment({
       owner,
       repo,
-      ref: pullRequest.branch,
-      description: "Codesphere preview deployment",
+      ref: gitRefHeadCommitSha(gitRef),
+      description: "Codesphere deployment",
       environment,
       auto_merge: false,
       transient_environment: false,
@@ -121183,9 +121815,9 @@ var GitHubDeployment = class _GitHubDeployment {
     return `${codesphereWorkspaceUrl(this.codesphereUrl, this.workspace)}`;
   }
 };
-var statusReporter = async (config2) => {
+var statusReporter = async (config2, environment) => {
   try {
-    return await GitHubDeployment.create(config2.gitAuth.token, config2.repository, `${config2.environmentName ?? "Codesphere Preview"} #${config2.pullRequest.number}`, config2.pullRequest, new URL(config2.apiUrl));
+    return await GitHubDeployment.create(config2.gitAuth.token, config2.repository, environment, config2.gitRef, new URL(config2.apiUrl));
   } catch (e2) {
     if (e2 instanceof RefNotExist) {
       return logStatusReporter();
@@ -121193,10 +121825,19 @@ var statusReporter = async (config2) => {
     throw e2;
   }
 };
+var cleanupClosedPullRequests = async (config2) => {
+  const octokit = new Octokit2({ auth: config2.gitAuth.token, request: { fetch: fetch2 } });
+  await cleanupStaleDeployments(config2, (repository) => listOpenPullRequestNumbers(octokit, repository));
+};
+var isCleanupOfClosedPullRequestsEnabled = () => "true" === (getActionInput("cleanupClosedPullRequests") ?? "true");
 var main = async () => {
   initLogging(LogEnv.Script);
-  const config2 = await getConfig();
-  await run(config2, await statusReporter(config2));
+  const { configuration, environment } = await getConfig();
+  await run(configuration, await statusReporter(configuration, environment));
+  if (!isCleanupOfClosedPullRequestsEnabled()) {
+    return;
+  }
+  await logErrorAsync(() => cleanupClosedPullRequests(configuration));
 };
 runMain(main);
 // Annotate the CommonJS export names for ESM import in node:
@@ -121253,7 +121894,7 @@ mime-types/index.js:
    *)
 
 axios/dist/node/axios.cjs:
-  (*! Axios v1.19.0 Copyright (c) 2026 Matt Zabriskie and contributors *)
+  (*! Axios v1.20.0 Copyright (c) 2026 Matt Zabriskie and contributors *)
 
 @octokit/request-error/dist-src/index.js:
   (* v8 ignore else -- @preserve -- Bug with vitest coverage where it sees an else branch that doesn't exist *)
