@@ -99099,6 +99099,24 @@ var planMap = {
 };
 
 // packages/stubs/common/lib/auth/generatedAuthSchema.js
+var RESOURCE_GROUP_PERMISSIONS = [
+  "can_create_workspace",
+  "can_delete",
+  "can_manage_managed_service_providers",
+  "can_manage_managed_services",
+  "can_manage_network",
+  "can_manage_o11y",
+  "can_manage_permissions",
+  "can_manage_registries",
+  "can_manage_secrets",
+  "can_manage_settings",
+  "can_view",
+  "can_view_managed_services",
+  "can_view_network",
+  "can_view_registries",
+  "can_view_secrets",
+  "can_view_usage"
+];
 var WORKSPACE_PERMISSIONS = [
   "can_exec_ide",
   "can_manage_landscape",
@@ -99107,6 +99125,14 @@ var WORKSPACE_PERMISSIONS = [
   "can_view",
   "can_write_ide"
 ];
+var ORGANIZATION_ROLE_RELATIONS = {
+  roles: ["owner", "member"],
+  impliedBy: {
+    owner: [],
+    member: ["owner"]
+  },
+  inheritedFrom: {}
+};
 var RESOURCE_GROUP_ROLE_RELATIONS = {
   roles: ["admin", "member"],
   impliedBy: {
@@ -99133,6 +99159,7 @@ var WORKSPACE_ROLE_RELATIONS = {
 // packages/utils/common/lib/flags.js
 var MAINTENANCE_MODE_INTERNAL_FLAG_NAME = "maintenance-mode";
 var AVAILABLE_INTERNAL_FLAGS = [
+  "access-management",
   "cimg-private-registry",
   "cluster-admin",
   "coco-dev",
@@ -99151,6 +99178,7 @@ var AVAILABLE_INTERNAL_FLAGS = [
   "o11y",
   "oidc-role-mapping",
   "openfga-frontend-authz",
+  "openfga-org-authz",
   "openfga-rg-authz",
   "overview-cockpit",
   "overview-react",
@@ -99478,7 +99506,7 @@ var toPipelineMetaConfig = toObject({
 
 // packages/utils/common/lib/path.js
 var import_path = require("path");
-var POSIX_PATH_REGEX = new RegExp("^/?(?:[^/\0]+/?)*$");
+var POSIX_PATH_REGEX = new RegExp("^/?(?:[^/\0]+/)*[^/\0]*$");
 var toPosixPath2 = (p3) => {
   const s2 = toString(p3);
   if (!POSIX_PATH_REGEX.test(s2)) {
@@ -99844,11 +99872,12 @@ var prepareRegexps = () => {
     reference: new RegExp(`^(${name})(?::(${tag}))?(?:@(${digestPattern}))?$`),
     name: new RegExp(`^(?:(${domainAndPort})/)?(${remoteName})$`),
     registry: new RegExp(`^${domainAndPort}$`),
+    registryAddress: new RegExp(`^(${domainAndPort})(?:/(${remoteName}))?$`),
     tag: new RegExp(`^${tag}$`),
     digest: new RegExp(`^${digestPattern}$`)
   };
 };
-var { reference: referenceRegexp, name: nameRegexp, registry: registryRegexp, tag: tagRegexp, digest: digestRegexp } = prepareRegexps();
+var { reference: referenceRegexp, name: nameRegexp, registry: registryRegexp, registryAddress: registryAddressRegexp, tag: tagRegexp, digest: digestRegexp } = prepareRegexps();
 var localhost = "localhost";
 var defaultDomain = "docker.io";
 var legacyDefaultDomain = "index.docker.io";
@@ -99866,14 +99895,14 @@ var withOfficialPrefix = (domain2, remoteName) => {
   }
   return { domain: domain2, remoteName };
 };
+var isRegistryDomain = (segment) => segment === localhost || segment.includes(".") || segment.includes(":") || segment.toLowerCase() !== segment;
 var splitDomain = (name) => {
   const slash = name.indexOf("/");
   if (slash < 0) {
     return withOfficialPrefix(defaultDomain, name);
   }
   const maybeDomain = name.slice(0, slash);
-  const isDomain = maybeDomain === localhost || maybeDomain.includes(".") || maybeDomain.includes(":") || maybeDomain.toLowerCase() !== maybeDomain;
-  if (!isDomain) {
+  if (!isRegistryDomain(maybeDomain)) {
     return withOfficialPrefix(defaultDomain, name);
   }
   return withOfficialPrefix(normalizeOciRegistry(maybeDomain), name.slice(slash + 1));
@@ -101143,9 +101172,27 @@ var team = {
   organizationId: toUndefOr(toUuid)
 };
 var toTeam2 = toObject(team);
-var toTeamWithRole = toObject({
+var toPermission = withDefault(toBoolean, () => false);
+var toResourceGroupPermissions = toObject(Object.fromEntries(RESOURCE_GROUP_PERMISSIONS.map((p3) => [p3, toPermission])));
+var resourceGroupRoles = {
+  highest: toObject({
+    role: toLiteralUnion("ResourceGroupRole", RESOURCE_GROUP_ROLE_RELATIONS.roles),
+    inheritedFrom: toUndefOr(toObject({
+      type: toString,
+      role: toLiteralUnion("OrganizationRole", ORGANIZATION_ROLE_RELATIONS.roles)
+    }))
+  })
+};
+var toResourceGroupRoles = toObject(resourceGroupRoles);
+var teamWithRole = {
   ...team,
   role: readOnly(toRole)
+};
+var toTeamWithRole = toObject(teamWithRole);
+var toTeamWithAuthz = toObject({
+  ...teamWithRole,
+  roles: readOnly(toUndefOr(toResourceGroupRoles)),
+  permissions: readOnly(toUndefOr(toResourceGroupPermissions))
 });
 var toTeamMember = toObject({
   userId: readOnly(toNonNegativeInteger),
@@ -104994,7 +105041,7 @@ var teamService = {
     }),
     getTeam: rpc({
       request: toTeamServiceArgs,
-      response: toTeamWithRole
+      response: toTeamWithAuthz
     }),
     listMembers: rpc({
       request: toTeamServiceArgs,
@@ -125916,7 +125963,7 @@ var providerNameSchema = external_exports.string().regex(new RegExp(providerName
 var providerSchemaVersionPattern = "^v[0-9][0-9a-z]*$";
 var providerSchemaVersionSchema = external_exports.string().regex(new RegExp(providerSchemaVersionPattern), "ProviderSchemaVersion").meta({ title: "ProviderSchemaVersion" });
 var toProviderSchemaVersion = fromZod(providerSchemaVersionSchema);
-var providerScopeSchema = external_exports.literal(["global", "team"]).default("global");
+var providerScopeSchema = external_exports.literal(["global", "team", "organization"]).default("global");
 var toProviderScope = fromZod(providerScopeSchema);
 var capabilitiesSchema = external_exports.object({
   backups: external_exports.boolean().optional(),
@@ -125940,7 +125987,8 @@ var resourceParameterSchema = external_exports.object({
     "replicas",
     "storage-mib"
   ]).optional(),
-  schema: jsonSchemaSchema
+  schema: jsonSchemaSchema,
+  reportsUtilization: external_exports.optional(external_exports.boolean())
 });
 var resourceParametersSchema = external_exports.record(external_exports.string(), resourceParameterSchema);
 var toResourceParameters = fromZod(resourceParametersSchema);
@@ -125950,7 +125998,6 @@ var managedServicePlanSchema = external_exports.object({
   description: external_exports.string(),
   name: external_exports.string()
 });
-var toManagedServicePlan = fromZod(managedServicePlanSchema);
 var refinePlanParametersDefined = (prov, ctx) => {
   const resourceParameters = prov.resourceParameters ?? {};
   for (const plan of prov.plans ?? []) {
@@ -125964,51 +126011,6 @@ var refinePlanParametersDefined = (prov, ctx) => {
       }
     }
   }
-};
-var legacyManagedServicePlanSchema = external_exports.object({
-  id: external_exports.int().min(0),
-  parameters: external_exports.record(external_exports.string(), resourceParameterSchema),
-  description: external_exports.string(),
-  name: external_exports.string()
-});
-var toLegacyPlans = fromZod(external_exports.array(legacyManagedServicePlanSchema));
-var isLegacyPlans = (rawPlans) => isOfType(rawPlans, toLegacyPlans) && rawPlans.some((plan) => Object.keys(plan.parameters).length > 0);
-var stripDefault = (schema) => {
-  const { default: _default3, ...rest } = schema;
-  return rest;
-};
-var toPlanValues = (planName, parameters) => {
-  const values = {};
-  for (const [key, parameter] of Object.entries(parameters)) {
-    if (typeof parameter.schema.default === "number") {
-      values[key] = parameter.schema.default;
-    } else if (parameter.schema.readOnly === true) {
-      throw new TypeConversionFailure("number", parameter.schema, void 0, {
-        customErrorMessage: `Legacy plan "${planName}" parameter "${key}" is read-only but has no numeric schema.default, so it pins no value.`
-      });
-    }
-  }
-  return values;
-};
-var upgradeLegacyProviderPlans = (legacyPlans) => {
-  const resourceParameters = {};
-  for (const plan of legacyPlans) {
-    for (const [key, parameter] of Object.entries(plan.parameters)) {
-      if (!(key in resourceParameters)) {
-        resourceParameters[key] = {
-          pricedAs: parameter.pricedAs,
-          schema: stripDefault(parameter.schema)
-        };
-      }
-    }
-  }
-  const plans = legacyPlans.map((plan) => ({
-    id: plan.id,
-    name: plan.name,
-    description: plan.description,
-    parameters: toPlanValues(plan.name, plan.parameters)
-  }));
-  return { plans, resourceParameters };
 };
 var asciiLabel = "Only ASCII characters 32 through 126";
 var restBackendSecretSchema = external_exports.string().regex(/^[\x20-\x7E]*$/, asciiLabel).meta({ title: asciiLabel });
@@ -126177,6 +126179,10 @@ var providerScopeArgsSchema = external_exports.discriminatedUnion("type", [
   external_exports.object({
     type: external_exports.literal("team"),
     teamIds: external_exports.array(external_exports.int().min(0)).min(1)
+  }),
+  external_exports.object({
+    type: external_exports.literal("organization"),
+    organizationIds: external_exports.array(uuidSchema).min(1)
   })
 ]);
 var createLandscapeProviderArgsSchema = external_exports.object({
@@ -126281,22 +126287,14 @@ var managedServiceLandscapeProviderConfigSchema = partialManagedServiceProviderC
   backend: landscapeSettingsSchema.optional(),
   versions: landscapeVersionsSchema.optional()
 });
-var upgradeLegacyProviderConfigInput = (entry) => {
-  if (typeof entry !== "object" || entry === null) {
-    return entry;
-  }
-  const rawPlans = entry.plans;
-  if (!isLegacyPlans(rawPlans)) {
-    return entry;
-  }
-  const { plans, resourceParameters } = upgradeLegacyProviderPlans(rawPlans);
-  return { ...entry, plans, resourceParameters };
-};
-var managedServiceProviderConfigSchema = external_exports.preprocess(upgradeLegacyProviderConfigInput, external_exports.union([
+var managedServiceProviderConfigSchema = external_exports.union([
   managedServiceRestProviderConfigSchema,
   managedServiceLandscapeProviderConfigSchema
-], { error: unionError }));
+], { error: unionError });
 var toManagedServiceProviderConfig = fromZod(managedServiceProviderConfigSchema);
+
+// packages/marketplace/common/lib/api/model/utilization.js
+var utilizationSchema = external_exports.record(external_exports.string(), external_exports.number());
 
 // packages/marketplace/common/lib/api/model/managedService.js
 var configSchema = recordWithDefinedSchema;
@@ -126368,32 +126366,51 @@ var backupSettingsSchema = external_exports.discriminatedUnion("enabled", [
   })
 ]);
 var toBackupSettings = fromZod(backupSettingsSchema);
+var managedServiceHealthSchema = external_exports.object({
+  status: external_exports.enum(["healthy", "degraded", "unhealthy", "unknown"]),
+  message: external_exports.string().max(500).optional()
+});
+var managedServiceBackupsConditionSchema = external_exports.object({
+  status: external_exports.enum(["upToDate", "overdue"]),
+  lastConfirmedAt: dateSchema.optional()
+});
+var managedServiceConditionsSchema = external_exports.object({
+  health: managedServiceHealthSchema.optional(),
+  backups: managedServiceBackupsConditionSchema.optional()
+});
 var managedServiceStatusSchema = external_exports.discriminatedUnion("state", [
   external_exports.object({
     state: external_exports.literal("creating")
   }),
   external_exports.object({
-    state: external_exports.literal("updating")
+    state: external_exports.literal("updating"),
+    conditions: managedServiceConditionsSchema.optional(),
+    utilization: utilizationSchema.optional()
   }),
   external_exports.object({
     state: external_exports.literal("deleting"),
     deletedAt: dateSchema
   }),
   external_exports.object({
-    state: external_exports.literal("synchronized")
+    state: external_exports.literal("synchronized"),
+    conditions: managedServiceConditionsSchema.optional(),
+    utilization: utilizationSchema.optional()
   }),
   external_exports.object({
     state: external_exports.literal("deleted"),
     deletedAt: dateSchema
   }),
   external_exports.object({
-    state: external_exports.literal("pausing")
+    state: external_exports.literal("pausing"),
+    utilization: utilizationSchema.optional()
   }),
   external_exports.object({
-    state: external_exports.literal("unpausing")
+    state: external_exports.literal("unpausing"),
+    utilization: utilizationSchema.optional()
   }),
   external_exports.object({
-    state: external_exports.literal("paused")
+    state: external_exports.literal("paused"),
+    utilization: utilizationSchema.optional()
   }),
   external_exports.object({
     state: external_exports.literal("unknown")
