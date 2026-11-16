@@ -126248,7 +126248,7 @@ var satisfiesSequentialMinorUpgradeOnlyConstraint = (newValue, currentValue) => 
 };
 var compileCache = new I({ max: 1e3 });
 var compile2 = (schema, options) => {
-  const cacheKey = `${options?.removeAdditional ?? false}:${options?.coerceTypes ?? false}:${JSON.stringify(schema)}`;
+  const cacheKey = `${options?.removeAdditional ?? false}:${options?.coerceTypes ?? false}:${options?.useDefaults ?? true}:${JSON.stringify(schema)}`;
   const cached2 = compileCache.get(cacheKey);
   if (cached2) {
     return cached2;
@@ -126256,7 +126256,7 @@ var compile2 = (schema, options) => {
   const ajv = new import_ajv.Ajv({
     allErrors: true,
     strict: false,
-    useDefaults: true,
+    useDefaults: options?.useDefaults ?? true,
     removeAdditional: options?.removeAdditional ?? false,
     coerceTypes: options?.coerceTypes ?? false,
     passContext: true
