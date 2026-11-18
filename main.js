@@ -99553,6 +99553,7 @@ var AVAILABLE_INTERNAL_FLAGS = [
   "persistent-logs",
   "persistent-nix",
   "recaptcha-v3",
+  "rg-o11y-dev",
   "selectable-resources",
   "static-build-workspace-creation",
   "team-container-registries",
@@ -102828,12 +102829,12 @@ PasswordResetExpired = PasswordResetExpired_1 = __decorate9([
 ], PasswordResetExpired);
 var customDomainAuthRequest = {
   appToken: toString,
-  sessionId: toString
+  sessionId: toUndefOr(toString)
 };
 var toCustomDomainAuthRequest = toObject(customDomainAuthRequest);
 var devDomainAuthRequest = {
   workspaceId: toNumber,
-  sessionId: toString
+  sessionId: toUndefOr(toString)
 };
 var toDevDomainAuthRequest = toObject(devDomainAuthRequest);
 var customDomainAuthResponse = {
@@ -125528,71 +125529,6 @@ function date4(params) {
   return _coercedDate(ZodDate, params);
 }
 
-// packages/utils/common/lib/typing/zod.js
-var zodWrapperTypes = /* @__PURE__ */ new Set([
-  "catch",
-  "default",
-  "nonoptional",
-  "nullable",
-  "optional",
-  "prefault",
-  "readonly"
-]);
-var zodExpectedType = (schema) => {
-  const def = schema.def;
-  if (zodWrapperTypes.has(def?.type) && def.innerType) {
-    return zodExpectedType(def.innerType);
-  }
-  if (def?.type === "pipe" && def.in) {
-    return zodExpectedType(def.in);
-  }
-  return def?.format ?? def?.type ?? "value";
-};
-var stripUndefined = (value) => {
-  if (Array.isArray(value)) {
-    return value.map(stripUndefined);
-  }
-  if (!isRecord(value) || Object.getPrototypeOf(value) !== Object.prototype) {
-    return value;
-  }
-  return Object.fromEntries(Object.entries(value).filter(([_3, v3]) => v3 !== void 0).map(([k2, v3]) => [k2, stripUndefined(v3)]));
-};
-var issuePath = (path3 = []) => path3.reduce((acc, segment) => typeof segment === "number" ? `${acc}[${segment}]` : acc ? `${acc}.${String(segment)}` : String(segment), "");
-var unionError = (issue3) => {
-  const variants = issue3.errors.map((variant) => variant.map((i) => {
-    const at = issuePath(i.path);
-    return at ? `${i.message} (at ${at})` : i.message;
-  }).join("; "));
-  return [
-    "no accepted shape matched:",
-    ...Array.from(new Set(variants)).map((v3, i) => `  (${i + 1}) ${v3}`)
-  ].join("\n");
-};
-var fromZod = (schema) => {
-  return (input2) => {
-    const parsed = schema.safeParse(input2);
-    if (parsed.success) {
-      return stripUndefined(parsed.data);
-    }
-    throw new TypeConversionFailure(zodExpectedType(schema), input2, void 0, { customErrorMessage: external_exports.prettifyError(parsed.error) });
-  };
-};
-var toZod2 = (tc, meta3) => {
-  const schema = external_exports.unknown().transform((value, ctx) => {
-    try {
-      return tc(value);
-    } catch (e2) {
-      if (!(e2 instanceof TypeConversionFailure)) {
-        throw e2;
-      }
-      const message = e2.opts?.customErrorMessage ?? `expected a type of '${e2.expectedType}'`;
-      ctx.issues.push({ code: "custom", message, input: value });
-      return external_exports.NEVER;
-    }
-  });
-  return meta3 === void 0 ? schema : schema.meta(meta3);
-};
-
 // packages/utils/common/lib/typing/jsonSchema.js
 var import_ajv = __toESM(require_ajv(), 1);
 var import_ajv_formats = __toESM(require_dist5(), 1);
@@ -126332,6 +126268,71 @@ var toSchemaObject = (x2) => {
   return s2;
 };
 
+// packages/utils/common/lib/typing/zod.js
+var zodWrapperTypes = /* @__PURE__ */ new Set([
+  "catch",
+  "default",
+  "nonoptional",
+  "nullable",
+  "optional",
+  "prefault",
+  "readonly"
+]);
+var zodExpectedType = (schema) => {
+  const def = schema.def;
+  if (zodWrapperTypes.has(def?.type) && def.innerType) {
+    return zodExpectedType(def.innerType);
+  }
+  if (def?.type === "pipe" && def.in) {
+    return zodExpectedType(def.in);
+  }
+  return def?.format ?? def?.type ?? "value";
+};
+var stripUndefined = (value) => {
+  if (Array.isArray(value)) {
+    return value.map(stripUndefined);
+  }
+  if (!isRecord(value) || Object.getPrototypeOf(value) !== Object.prototype) {
+    return value;
+  }
+  return Object.fromEntries(Object.entries(value).filter(([_3, v3]) => v3 !== void 0).map(([k2, v3]) => [k2, stripUndefined(v3)]));
+};
+var issuePath = (path3 = []) => path3.reduce((acc, segment) => typeof segment === "number" ? `${acc}[${segment}]` : acc ? `${acc}.${String(segment)}` : String(segment), "");
+var unionError = (issue3) => {
+  const variants = issue3.errors.map((variant) => variant.map((i) => {
+    const at = issuePath(i.path);
+    return at ? `${i.message} (at ${at})` : i.message;
+  }).join("; "));
+  return [
+    "no accepted shape matched:",
+    ...Array.from(new Set(variants)).map((v3, i) => `  (${i + 1}) ${v3}`)
+  ].join("\n");
+};
+var fromZod = (schema) => {
+  return (input2) => {
+    const parsed = schema.safeParse(input2);
+    if (parsed.success) {
+      return stripUndefined(parsed.data);
+    }
+    throw new TypeConversionFailure(zodExpectedType(schema), input2, void 0, { customErrorMessage: external_exports.prettifyError(parsed.error) });
+  };
+};
+var toZod2 = (tc, meta3) => {
+  const schema = external_exports.unknown().transform((value, ctx) => {
+    try {
+      return tc(value);
+    } catch (e2) {
+      if (!(e2 instanceof TypeConversionFailure)) {
+        throw e2;
+      }
+      const message = e2.opts?.customErrorMessage ?? `expected a type of '${e2.expectedType}'`;
+      ctx.issues.push({ code: "custom", message, input: value });
+      return external_exports.NEVER;
+    }
+  });
+  return meta3 === void 0 ? schema : schema.meta(meta3);
+};
+
 // packages/marketplace/common/lib/api/model/primitives.js
 var uuidSchema = toZod2(toUuid, {
   type: "string",
@@ -126416,6 +126417,7 @@ var resourceParameterSchema = external_exports.object({
     "network-bandwidth-mbps",
     "ram-mib",
     "replicas",
+    "storage-kib",
     "storage-mib"
   ]).optional(),
   schema: jsonSchemaSchema,
@@ -126725,7 +126727,14 @@ var managedServiceProviderConfigSchema = external_exports.union([
 var toManagedServiceProviderConfig = fromZod(managedServiceProviderConfigSchema);
 
 // packages/marketplace/common/lib/api/model/utilization.js
-var utilizationSchema = external_exports.record(external_exports.string(), external_exports.number());
+var utilizationStateSchema = external_exports.object({
+  status: external_exports.enum(["normal", "closeToLimit", "atLimit"]),
+  percentUsed: external_exports.int().min(0)
+});
+var utilizationSchema = external_exports.record(external_exports.string(), external_exports.object({
+  value: external_exports.number(),
+  state: utilizationStateSchema.optional()
+}));
 
 // packages/marketplace/common/lib/api/model/managedService.js
 var configSchema = recordWithDefinedSchema;
@@ -126738,7 +126747,13 @@ var secretRevisionsSchema = external_exports.record(external_exports.string(), e
 var toSecretRevisions = fromZod(secretRevisionsSchema);
 var planSelectionSchema = external_exports.object({
   id: external_exports.int().min(0),
-  parameters: external_exports.record(external_exports.string(), external_exports.int())
+  parameters: external_exports.record(external_exports.string(), external_exports.int()),
+  autoScaling: external_exports.record(external_exports.string(), external_exports.object({
+    enabled: external_exports.boolean(),
+    max: external_exports.int().min(0),
+    thresholdRelative: external_exports.float64().min(0.4).max(0.9),
+    stepsizeRelative: external_exports.float64().min(1.01).max(4)
+  })).optional()
 });
 var toPlanSelection = fromZod(planSelectionSchema.optional());
 var optionalPlanSelectionSchema = planSelectionSchema.optional();
@@ -127105,9 +127120,18 @@ var __decorate20 = function(decorators, target, key, desc) {
   else for (var i = decorators.length - 1; i >= 0; i--) if (d4 = decorators[i]) r2 = (c2 < 3 ? d4(r2) : c2 > 3 ? d4(target, key, r2) : d4(target, key)) || r2;
   return c2 > 3 && r2 && Object.defineProperty(target, key, r2), r2;
 };
+var toRequestEnv = toUndefOr(toRecord(toEnvValue, toEnvVarName));
 var toUpdateLandscapeArgs = toObject({
   workspaceId: toNonNegativeInteger,
-  servers: toArray(toServer)
+  servers: toArray(toObject({ ...server, env: toRequestEnv }))
+});
+var toResolvedHelmRelease = toObject({
+  name: toString,
+  repoUrl: toString,
+  chart: toString,
+  version: toString,
+  namespace: toUndefOr(toString),
+  values: toUndefOr(toJsonObject)
 });
 var toSyncError = toObject({ message: toString });
 var toManagedService2 = toObject({
@@ -127116,9 +127140,18 @@ var toManagedService2 = toObject({
   status: toOr(toManagedServiceStatus, toSyncError)
 });
 var toStateStreamResponse = toRecord(toOr(toManagedService2, toHeadlessServiceConfig, toVirtualMachineConfig));
+var toRequestDeployStage = (x2) => {
+  const stage = toDeployStage(x2);
+  for (const config2 of Object.values(stage)) {
+    if ("env" in config2) {
+      toRequestEnv(config2.env);
+    }
+  }
+  return stage;
+};
 var toSyncLandscapeArgs = toObject({
   workspaceId: toNonNegativeInteger,
-  landscape: toDeployStage,
+  landscape: toRequestDeployStage,
   profile: toUndefOr(toString)
 });
 var toHeadlessServiceNetwork = toObject({
@@ -127176,6 +127209,10 @@ var landscapeService = {
     getLandscapeWithResolvedEnv: rpc({
       request: toObject({ workspaceId: toNonNegativeInteger }),
       response: toArray(toServer)
+    }),
+    getHelmReleasesWithResolvedValues: rpc({
+      request: toObject({ workspaceId: toNonNegativeInteger }),
+      response: toArray(toResolvedHelmRelease)
     }),
     tearDownLandscape: rpc({
       request: toObject({ workspaceId: toNonNegativeInteger }),
