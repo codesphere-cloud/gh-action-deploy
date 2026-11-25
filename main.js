@@ -21,8 +21,8 @@ var __commonJS = (cb, mod) => function __require() {
   }
 };
 var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
+  for (var name2 in all)
+    __defProp(target, name2, { get: all[name2], enumerable: true });
 };
 var __copyProps = (to, from, except, desc) => {
   if (from && typeof from === "object" || typeof from === "function") {
@@ -2399,12 +2399,12 @@ var init_context_utils = __esm({
 });
 
 // node_modules/@opentelemetry/api/build/esm/trace/spancontext-utils.js
-function isValidHex(id, length) {
-  if (typeof id !== "string" || id.length !== length)
+function isValidHex(id2, length) {
+  if (typeof id2 !== "string" || id2.length !== length)
     return false;
   let r2 = 0;
-  for (let i = 0; i < id.length; i += 4) {
-    r2 += (isHex[id.charCodeAt(i)] | 0) + (isHex[id.charCodeAt(i + 1)] | 0) + (isHex[id.charCodeAt(i + 2)] | 0) + (isHex[id.charCodeAt(i + 3)] | 0);
+  for (let i = 0; i < id2.length; i += 4) {
+    r2 += (isHex[id2.charCodeAt(i)] | 0) + (isHex[id2.charCodeAt(i + 1)] | 0) + (isHex[id2.charCodeAt(i + 2)] | 0) + (isHex[id2.charCodeAt(i + 3)] | 0);
   }
   return r2 === length;
 }
@@ -2547,7 +2547,7 @@ var init_NoopTracer = __esm({
     contextApi = ContextAPI.getInstance();
     NoopTracer = class {
       // startSpan starts a noop span.
-      startSpan(name, options, context4 = contextApi.active()) {
+      startSpan(name2, options, context4 = contextApi.active()) {
         const root = Boolean(options === null || options === void 0 ? void 0 : options.root);
         if (root) {
           return new NonRecordingSpan();
@@ -2559,7 +2559,7 @@ var init_NoopTracer = __esm({
           return new NonRecordingSpan();
         }
       }
-      startActiveSpan(name, arg2, arg3, arg4) {
+      startActiveSpan(name2, arg2, arg3, arg4) {
         let opts;
         let ctx;
         let fn;
@@ -2576,7 +2576,7 @@ var init_NoopTracer = __esm({
           fn = arg4;
         }
         const parentContext = ctx !== null && ctx !== void 0 ? ctx : contextApi.active();
-        const span = this.startSpan(name, opts, parentContext);
+        const span = this.startSpan(name2, opts, parentContext);
         const contextWithSpanSet = setSpan(parentContext, span);
         return contextApi.with(contextWithSpanSet, fn, void 0, span);
       }
@@ -2591,14 +2591,14 @@ var init_ProxyTracer = __esm({
     init_NoopTracer();
     NOOP_TRACER = new NoopTracer();
     ProxyTracer = class {
-      constructor(provider, name, version2, options) {
+      constructor(provider, name2, version2, options) {
         this._provider = provider;
-        this.name = name;
+        this.name = name2;
         this.version = version2;
         this.options = options;
       }
-      startSpan(name, options, context4) {
-        return this._getTracer().startSpan(name, options, context4);
+      startSpan(name2, options, context4) {
+        return this._getTracer().startSpan(name2, options, context4);
       }
       startActiveSpan(_name, _options, _context, _fn) {
         const tracer = this._getTracer();
@@ -2647,9 +2647,9 @@ var init_ProxyTracerProvider = __esm({
       /**
        * Get a {@link ProxyTracer}
        */
-      getTracer(name, version2, options) {
+      getTracer(name2, version2, options) {
         var _a3;
-        return (_a3 = this.getDelegateTracer(name, version2, options)) !== null && _a3 !== void 0 ? _a3 : new ProxyTracer(this, name, version2, options);
+        return (_a3 = this.getDelegateTracer(name2, version2, options)) !== null && _a3 !== void 0 ? _a3 : new ProxyTracer(this, name2, version2, options);
       }
       getDelegate() {
         var _a3;
@@ -2661,9 +2661,9 @@ var init_ProxyTracerProvider = __esm({
       setDelegate(delegate) {
         this._delegate = delegate;
       }
-      getDelegateTracer(name, version2, options) {
+      getDelegateTracer(name2, version2, options) {
         var _a3;
-        return (_a3 = this._delegate) === null || _a3 === void 0 ? void 0 : _a3.getTracer(name, version2, options);
+        return (_a3 = this._delegate) === null || _a3 === void 0 ? void 0 : _a3.getTracer(name2, version2, options);
       }
     };
   }
@@ -2873,8 +2873,8 @@ var init_metrics = __esm({
       /**
        * Returns a meter from the global meter provider.
        */
-      getMeter(name, version2, options) {
-        return this.getMeterProvider().getMeter(name, version2, options);
+      getMeter(name2, version2, options) {
+        return this.getMeterProvider().getMeter(name2, version2, options);
       }
       /** Remove the global meter provider */
       disable() {
@@ -3067,8 +3067,8 @@ var init_trace = __esm({
       /**
        * Returns a tracer from the global tracer provider.
        */
-      getTracer(name, version2) {
-        return this.getTracerProvider().getTracer(name, version2);
+      getTracer(name2, version2) {
+        return this.getTracerProvider().getTracer(name2, version2);
       }
       /** Remove the global tracer provider */
       disable() {
@@ -4614,11 +4614,11 @@ var require_ansi_styles = __commonJS({
       const offset = isBackground ? 10 : 0;
       const styles = {};
       for (const [sourceSpace, suite] of Object.entries(colorConvert)) {
-        const name = sourceSpace === "ansi16" ? "ansi" : sourceSpace;
+        const name2 = sourceSpace === "ansi16" ? "ansi" : sourceSpace;
         if (sourceSpace === targetSpace) {
-          styles[name] = wrap(identity, offset);
+          styles[name2] = wrap(identity, offset);
         } else if (typeof suite === "object") {
-          styles[name] = wrap(suite[targetSpace], offset);
+          styles[name2] = wrap(suite[targetSpace], offset);
         }
       }
       return styles;
@@ -4900,7 +4900,7 @@ var require_templates = __commonJS({
       }
       return ESCAPES.get(c2) || c2;
     }
-    function parseArguments(name, arguments_) {
+    function parseArguments(name2, arguments_) {
       const results = [];
       const chunks = arguments_.trim().split(/\s*,\s*/g);
       let matches;
@@ -4911,7 +4911,7 @@ var require_templates = __commonJS({
         } else if (matches = chunk2.match(STRING_REGEX)) {
           results.push(matches[2].replace(ESCAPE_REGEX, (m, escape, character) => escape ? unescape(escape) : character));
         } else {
-          throw new Error(`Invalid Chalk template style argument: ${chunk2} (in style '${name}')`);
+          throw new Error(`Invalid Chalk template style argument: ${chunk2} (in style '${name2}')`);
         }
       }
       return results;
@@ -4921,12 +4921,12 @@ var require_templates = __commonJS({
       const results = [];
       let matches;
       while ((matches = STYLE_REGEX.exec(style)) !== null) {
-        const name = matches[1];
+        const name2 = matches[1];
         if (matches[2]) {
-          const args = parseArguments(name, matches[2]);
-          results.push([name].concat(args));
+          const args = parseArguments(name2, matches[2]);
+          results.push([name2].concat(args));
         } else {
-          results.push([name]);
+          results.push([name2]);
         }
       }
       return results;
@@ -6497,15 +6497,15 @@ var require_util2 = __commonJS({
         size: m[3] ? parseInt(m[3]) : null
       } : null;
     }
-    function addListener(obj, name, listener) {
+    function addListener(obj, name2, listener) {
       const listeners = obj[kListeners] ??= [];
-      listeners.push([name, listener]);
-      obj.on(name, listener);
+      listeners.push([name2, listener]);
+      obj.on(name2, listener);
       return obj;
     }
     function removeAllListeners(obj) {
-      for (const [name, listener] of obj[kListeners] ?? []) {
-        obj.removeListener(name, listener);
+      for (const [name2, listener] of obj[kListeners] ?? []) {
+        obj.removeListener(name2, listener);
       }
       obj[kListeners] = null;
     }
@@ -8673,9 +8673,9 @@ var require_data_url = __commonJS({
       assert2(mimeType !== "failure");
       const { parameters, essence } = mimeType;
       let serialization = essence;
-      for (let [name, value] of parameters.entries()) {
+      for (let [name2, value] of parameters.entries()) {
         serialization += ";";
-        serialization += name;
+        serialization += name2;
         serialization += "=";
         if (!HTTP_TOKEN_CODEPOINTS.test(value)) {
           value = value.replace(/(\\|")/g, "\\$1");
@@ -9123,11 +9123,11 @@ var require_webidl = __commonJS({
       }
       return V;
     };
-    webidl.converters.TypedArray = function(V, T4, prefix, name, opts) {
+    webidl.converters.TypedArray = function(V, T4, prefix, name2, opts) {
       if (webidl.util.Type(V) !== "Object" || !types2.isTypedArray(V) || V.constructor.name !== T4.name) {
         throw webidl.errors.conversionFailed({
           prefix,
-          argument: `${name} ("${webidl.util.Stringify(V)}")`,
+          argument: `${name2} ("${webidl.util.Stringify(V)}")`,
           types: [T4.name]
         });
       }
@@ -9145,11 +9145,11 @@ var require_webidl = __commonJS({
       }
       return V;
     };
-    webidl.converters.DataView = function(V, prefix, name, opts) {
+    webidl.converters.DataView = function(V, prefix, name2, opts) {
       if (webidl.util.Type(V) !== "Object" || !types2.isDataView(V)) {
         throw webidl.errors.exception({
           header: prefix,
-          message: `${name} is not a DataView.`
+          message: `${name2} is not a DataView.`
         });
       }
       if (opts?.allowShared === false && types2.isSharedArrayBuffer(V.buffer)) {
@@ -9166,19 +9166,19 @@ var require_webidl = __commonJS({
       }
       return V;
     };
-    webidl.converters.BufferSource = function(V, prefix, name, opts) {
+    webidl.converters.BufferSource = function(V, prefix, name2, opts) {
       if (types2.isAnyArrayBuffer(V)) {
-        return webidl.converters.ArrayBuffer(V, prefix, name, { ...opts, allowShared: false });
+        return webidl.converters.ArrayBuffer(V, prefix, name2, { ...opts, allowShared: false });
       }
       if (types2.isTypedArray(V)) {
-        return webidl.converters.TypedArray(V, V.constructor, prefix, name, { ...opts, allowShared: false });
+        return webidl.converters.TypedArray(V, V.constructor, prefix, name2, { ...opts, allowShared: false });
       }
       if (types2.isDataView(V)) {
-        return webidl.converters.DataView(V, prefix, name, { ...opts, allowShared: false });
+        return webidl.converters.DataView(V, prefix, name2, { ...opts, allowShared: false });
       }
       throw webidl.errors.conversionFailed({
         prefix,
-        argument: `${name} ("${webidl.util.Stringify(V)}")`,
+        argument: `${name2} ("${webidl.util.Stringify(V)}")`,
         types: ["BufferSource"]
       });
     };
@@ -9622,7 +9622,7 @@ var require_util3 = __commonJS({
       return result;
     }
     var esIteratorPrototype = Object.getPrototypeOf(Object.getPrototypeOf([][Symbol.iterator]()));
-    function createIterator(name, kInternalIterator, keyIndex = 0, valueIndex = 1) {
+    function createIterator(name2, kInternalIterator, keyIndex = 0, valueIndex = 1) {
       class FastIterableIterator {
         /** @type {any} */
         #target;
@@ -9643,7 +9643,7 @@ var require_util3 = __commonJS({
         next() {
           if (typeof this !== "object" || this === null || !(#target in this)) {
             throw new TypeError(
-              `'next' called on an object that does not implement interface ${name} Iterator.`
+              `'next' called on an object that does not implement interface ${name2} Iterator.`
             );
           }
           const index = this.#index;
@@ -9682,7 +9682,7 @@ var require_util3 = __commonJS({
           writable: false,
           enumerable: false,
           configurable: true,
-          value: `${name} Iterator`
+          value: `${name2} Iterator`
         },
         next: { writable: true, enumerable: true, configurable: true }
       });
@@ -9690,8 +9690,8 @@ var require_util3 = __commonJS({
         return new FastIterableIterator(target, kind);
       };
     }
-    function iteratorMixin(name, object2, kInternalIterator, keyIndex = 0, valueIndex = 1) {
-      const makeIterator = createIterator(name, kInternalIterator, keyIndex, valueIndex);
+    function iteratorMixin(name2, object2, kInternalIterator, keyIndex = 0, valueIndex = 1) {
+      const makeIterator = createIterator(name2, kInternalIterator, keyIndex, valueIndex);
       const properties = {
         keys: {
           writable: true,
@@ -9726,10 +9726,10 @@ var require_util3 = __commonJS({
           configurable: true,
           value: function forEach(callbackfn, thisArg = globalThis) {
             webidl.brandCheck(this, object2);
-            webidl.argumentLengthCheck(arguments, 1, `${name}.forEach`);
+            webidl.argumentLengthCheck(arguments, 1, `${name2}.forEach`);
             if (typeof callbackfn !== "function") {
               throw new TypeError(
-                `Failed to execute 'forEach' on '${name}': parameter 1 is not of type 'Function'.`
+                `Failed to execute 'forEach' on '${name2}': parameter 1 is not of type 'Function'.`
               );
             }
             for (const { 0: key, 1: value } of makeIterator(this, "key+value")) {
@@ -9981,8 +9981,8 @@ var require_util3 = __commonJS({
       }
       return values;
     }
-    function getDecodeSplit(name, list) {
-      const value = list.get(name, true);
+    function getDecodeSplit(name2, list) {
+      const value = list.get(name2, true);
       if (value === null) {
         return null;
       }
@@ -10169,7 +10169,7 @@ var require_formdata = __commonJS({
         }
         this[kState] = [];
       }
-      append(name, value, filename = void 0) {
+      append(name2, value, filename = void 0) {
         webidl.brandCheck(this, _FormData);
         const prefix = "FormData.append";
         webidl.argumentLengthCheck(arguments, 2, prefix);
@@ -10178,45 +10178,45 @@ var require_formdata = __commonJS({
             "Failed to execute 'append' on 'FormData': parameter 2 is not of type 'Blob'"
           );
         }
-        name = webidl.converters.USVString(name, prefix, "name");
+        name2 = webidl.converters.USVString(name2, prefix, "name");
         value = isBlobLike(value) ? webidl.converters.Blob(value, prefix, "value", { strict: false }) : webidl.converters.USVString(value, prefix, "value");
         filename = arguments.length === 3 ? webidl.converters.USVString(filename, prefix, "filename") : void 0;
-        const entry = makeEntry(name, value, filename);
+        const entry = makeEntry(name2, value, filename);
         this[kState].push(entry);
       }
-      delete(name) {
+      delete(name2) {
         webidl.brandCheck(this, _FormData);
         const prefix = "FormData.delete";
         webidl.argumentLengthCheck(arguments, 1, prefix);
-        name = webidl.converters.USVString(name, prefix, "name");
-        this[kState] = this[kState].filter((entry) => entry.name !== name);
+        name2 = webidl.converters.USVString(name2, prefix, "name");
+        this[kState] = this[kState].filter((entry) => entry.name !== name2);
       }
-      get(name) {
+      get(name2) {
         webidl.brandCheck(this, _FormData);
         const prefix = "FormData.get";
         webidl.argumentLengthCheck(arguments, 1, prefix);
-        name = webidl.converters.USVString(name, prefix, "name");
-        const idx = this[kState].findIndex((entry) => entry.name === name);
+        name2 = webidl.converters.USVString(name2, prefix, "name");
+        const idx = this[kState].findIndex((entry) => entry.name === name2);
         if (idx === -1) {
           return null;
         }
         return this[kState][idx].value;
       }
-      getAll(name) {
+      getAll(name2) {
         webidl.brandCheck(this, _FormData);
         const prefix = "FormData.getAll";
         webidl.argumentLengthCheck(arguments, 1, prefix);
-        name = webidl.converters.USVString(name, prefix, "name");
-        return this[kState].filter((entry) => entry.name === name).map((entry) => entry.value);
+        name2 = webidl.converters.USVString(name2, prefix, "name");
+        return this[kState].filter((entry) => entry.name === name2).map((entry) => entry.value);
       }
-      has(name) {
+      has(name2) {
         webidl.brandCheck(this, _FormData);
         const prefix = "FormData.has";
         webidl.argumentLengthCheck(arguments, 1, prefix);
-        name = webidl.converters.USVString(name, prefix, "name");
-        return this[kState].findIndex((entry) => entry.name === name) !== -1;
+        name2 = webidl.converters.USVString(name2, prefix, "name");
+        return this[kState].findIndex((entry) => entry.name === name2) !== -1;
       }
-      set(name, value, filename = void 0) {
+      set(name2, value, filename = void 0) {
         webidl.brandCheck(this, _FormData);
         const prefix = "FormData.set";
         webidl.argumentLengthCheck(arguments, 2, prefix);
@@ -10225,16 +10225,16 @@ var require_formdata = __commonJS({
             "Failed to execute 'set' on 'FormData': parameter 2 is not of type 'Blob'"
           );
         }
-        name = webidl.converters.USVString(name, prefix, "name");
+        name2 = webidl.converters.USVString(name2, prefix, "name");
         value = isBlobLike(value) ? webidl.converters.Blob(value, prefix, "name", { strict: false }) : webidl.converters.USVString(value, prefix, "name");
         filename = arguments.length === 3 ? webidl.converters.USVString(filename, prefix, "name") : void 0;
-        const entry = makeEntry(name, value, filename);
-        const idx = this[kState].findIndex((entry2) => entry2.name === name);
+        const entry = makeEntry(name2, value, filename);
+        const idx = this[kState].findIndex((entry2) => entry2.name === name2);
         if (idx !== -1) {
           this[kState] = [
             ...this[kState].slice(0, idx),
             entry,
-            ...this[kState].slice(idx + 1).filter((entry2) => entry2.name !== name)
+            ...this[kState].slice(idx + 1).filter((entry2) => entry2.name !== name2)
           ];
         } else {
           this[kState].push(entry);
@@ -10272,7 +10272,7 @@ var require_formdata = __commonJS({
         configurable: true
       }
     });
-    function makeEntry(name, value, filename) {
+    function makeEntry(name2, value, filename) {
       if (typeof value === "string") {
       } else {
         if (!isFileLike(value)) {
@@ -10286,7 +10286,7 @@ var require_formdata = __commonJS({
           value = value instanceof NativeFile ? new File2([value], filename, options) : new FileLike(value, filename, options);
         }
       }
-      return { name, value };
+      return { name: name2, value };
     }
     module2.exports = { FormData: FormData2, makeEntry };
   }
@@ -10365,7 +10365,7 @@ var require_formdata_parser = __commonJS({
         if (result === "failure") {
           return "failure";
         }
-        let { name, filename, contentType, encoding } = result;
+        let { name: name2, filename, contentType, encoding } = result;
         position.position += 2;
         let body;
         {
@@ -10394,22 +10394,22 @@ var require_formdata_parser = __commonJS({
         } else {
           value = utf8DecodeBytes(Buffer.from(body));
         }
-        assert2(isUSVString(name));
+        assert2(isUSVString(name2));
         assert2(typeof value === "string" && isUSVString(value) || isFileLike(value));
-        entryList.push(makeEntry(name, value, filename));
+        entryList.push(makeEntry(name2, value, filename));
       }
     }
     function parseMultipartFormDataHeaders(input2, position) {
-      let name = null;
+      let name2 = null;
       let filename = null;
       let contentType = null;
       let encoding = null;
       while (true) {
         if (input2[position.position] === 13 && input2[position.position + 1] === 10) {
-          if (name === null) {
+          if (name2 === null) {
             return "failure";
           }
-          return { name, filename, contentType, encoding };
+          return { name: name2, filename, contentType, encoding };
         }
         let headerName = collectASequenceOfBytes(
           (char) => char !== 10 && char !== 13 && char !== 58,
@@ -10431,13 +10431,13 @@ var require_formdata_parser = __commonJS({
         );
         switch (bufferToLowerCasedHeaderName(headerName)) {
           case "content-disposition": {
-            name = filename = null;
+            name2 = filename = null;
             if (!bufferStartsWith(input2, formDataNameBuffer, position)) {
               return "failure";
             }
             position.position += 17;
-            name = parseMultipartFormDataName(input2, position);
-            if (name === null) {
+            name2 = parseMultipartFormDataName(input2, position);
+            if (name2 === null) {
               return "failure";
             }
             if (bufferStartsWith(input2, filenameBuffer, position)) {
@@ -10494,7 +10494,7 @@ var require_formdata_parser = __commonJS({
     }
     function parseMultipartFormDataName(input2, position) {
       assert2(input2[position.position - 1] === 34);
-      let name = collectASequenceOfBytes(
+      let name2 = collectASequenceOfBytes(
         (char) => char !== 10 && char !== 13 && char !== 34,
         input2,
         position
@@ -10504,8 +10504,8 @@ var require_formdata_parser = __commonJS({
       } else {
         position.position++;
       }
-      name = new TextDecoder().decode(name).replace(/%0A/ig, "\n").replace(/%0D/ig, "\r").replace(/%22/g, '"');
-      return name;
+      name2 = new TextDecoder().decode(name2).replace(/%0A/ig, "\n").replace(/%0D/ig, "\r").replace(/%22/g, '"');
+      return name2;
     }
     function collectASequenceOfBytes(condition, input2, position) {
       let start = position.position;
@@ -10632,16 +10632,16 @@ Content-Disposition: form-data`;
         const rn = new Uint8Array([13, 10]);
         length = 0;
         let hasUnknownSizeValue = false;
-        for (const [name, value] of object2) {
+        for (const [name2, value] of object2) {
           if (typeof value === "string") {
-            const chunk3 = textEncoder.encode(prefix + `; name="${escape(normalizeLinefeeds(name))}"\r
+            const chunk3 = textEncoder.encode(prefix + `; name="${escape(normalizeLinefeeds(name2))}"\r
 \r
 ${normalizeLinefeeds(value)}\r
 `);
             blobParts.push(chunk3);
             length += chunk3.byteLength;
           } else {
-            const chunk3 = textEncoder.encode(`${prefix}; name="${escape(normalizeLinefeeds(name))}"` + (value.name ? `; filename="${escape(value.name)}"` : "") + `\r
+            const chunk3 = textEncoder.encode(`${prefix}; name="${escape(normalizeLinefeeds(name2))}"` + (value.name ? `; filename="${escape(value.name)}"` : "") + `\r
 Content-Type: ${value.type || "application/octet-stream"}\r
 \r
 `);
@@ -10785,8 +10785,8 @@ Content-Type: ${value.type || "application/octet-stream"}\r
                 case "application/x-www-form-urlencoded": {
                   const entries = new URLSearchParams(value.toString());
                   const fd = new FormData2();
-                  for (const [name, value2] of entries) {
-                    fd.append(name, value2);
+                  for (const [name2, value2] of entries) {
+                    fd.append(name2, value2);
                   }
                   return fd;
                 }
@@ -12042,13 +12042,13 @@ var require_client_h2 = __commonJS({
     } = http2;
     function parseH2Headers(headers) {
       const result = [];
-      for (const [name, value] of Object.entries(headers)) {
+      for (const [name2, value] of Object.entries(headers)) {
         if (Array.isArray(value)) {
           for (const subvalue of value) {
-            result.push(Buffer.from(name), Buffer.from(subvalue));
+            result.push(Buffer.from(name2), Buffer.from(subvalue));
           }
         } else {
-          result.push(Buffer.from(name), Buffer.from(value));
+          result.push(Buffer.from(name2), Buffer.from(value));
         }
       }
       return result;
@@ -12155,8 +12155,8 @@ var require_client_h2 = __commonJS({
       this[kSocket][kError] = err;
       this[kClient][kOnError](err);
     }
-    function onHttp2FrameError(type, code, id) {
-      if (id === 0) {
+    function onHttp2FrameError(type, code, id2) {
+      if (id2 === 0) {
         const err = new InformationalError(`HTTP/2: "frameError" received - type ${type}, code ${code}`);
         this[kSocket][kError] = err;
         this[kClient][kOnError](err);
@@ -12692,8 +12692,8 @@ var require_redirect_handler = __commonJS({
         return true;
       }
       if (unknownOrigin && (header.length === 13 || header.length === 6 || header.length === 19)) {
-        const name = util.headerNameToString(header);
-        return name === "authorization" || name === "cookie" || name === "proxy-authorization";
+        const name2 = util.headerNameToString(header);
+        return name2 === "authorization" || name2 === "cookie" || name2 === "proxy-authorization";
       }
       return false;
     }
@@ -15946,13 +15946,13 @@ var require_mock_utils = __commonJS({
       for (let i = 0; i < keys2.length; ++i) {
         const key = keys2[i];
         const value = data[key];
-        const name = Buffer.from(`${key}`);
+        const name2 = Buffer.from(`${key}`);
         if (Array.isArray(value)) {
           for (let j2 = 0; j2 < value.length; ++j2) {
-            result.push(name, Buffer.from(`${value[j2]}`));
+            result.push(name2, Buffer.from(`${value[j2]}`));
           }
         } else {
-          result.push(name, Buffer.from(`${value}`));
+          result.push(name2, Buffer.from(`${value}`));
         }
       }
       return result;
@@ -17102,12 +17102,12 @@ var require_headers = __commonJS({
         });
       }
     }
-    function appendHeader(headers, name, value) {
+    function appendHeader(headers, name2, value) {
       value = headerValueNormalize(value);
-      if (!isValidHeaderName(name)) {
+      if (!isValidHeaderName(name2)) {
         throw webidl.errors.invalidArgument({
           prefix: "Headers.append",
-          value: name,
+          value: name2,
           type: "header name"
         });
       } else if (!isValidHeaderValue(value)) {
@@ -17120,7 +17120,7 @@ var require_headers = __commonJS({
       if (getHeadersGuard(headers) === "immutable") {
         throw new TypeError("immutable");
       }
-      return getHeadersList(headers).append(name, value, false);
+      return getHeadersList(headers).append(name2, value, false);
     }
     function compareHeaderName(a2, b) {
       return a2[0] < b[0] ? -1 : 1;
@@ -17143,8 +17143,8 @@ var require_headers = __commonJS({
        * @param {string} name
        * @param {boolean} isLowerCase
        */
-      contains(name, isLowerCase) {
-        return this[kHeadersMap].has(isLowerCase ? name : name.toLowerCase());
+      contains(name2, isLowerCase) {
+        return this[kHeadersMap].has(isLowerCase ? name2 : name2.toLowerCase());
       }
       clear() {
         this[kHeadersMap].clear();
@@ -17157,9 +17157,9 @@ var require_headers = __commonJS({
        * @param {string} value
        * @param {boolean} isLowerCase
        */
-      append(name, value, isLowerCase) {
+      append(name2, value, isLowerCase) {
         this[kHeadersSortedMap] = null;
-        const lowercaseName = isLowerCase ? name : name.toLowerCase();
+        const lowercaseName = isLowerCase ? name2 : name2.toLowerCase();
         const exists2 = this[kHeadersMap].get(lowercaseName);
         if (exists2) {
           const delimiter = lowercaseName === "cookie" ? "; " : ", ";
@@ -17168,7 +17168,7 @@ var require_headers = __commonJS({
             value: `${exists2.value}${delimiter}${value}`
           });
         } else {
-          this[kHeadersMap].set(lowercaseName, { name, value });
+          this[kHeadersMap].set(lowercaseName, { name: name2, value });
         }
         if (lowercaseName === "set-cookie") {
           (this.cookies ??= []).push(value);
@@ -17180,26 +17180,26 @@ var require_headers = __commonJS({
        * @param {string} value
        * @param {boolean} isLowerCase
        */
-      set(name, value, isLowerCase) {
+      set(name2, value, isLowerCase) {
         this[kHeadersSortedMap] = null;
-        const lowercaseName = isLowerCase ? name : name.toLowerCase();
+        const lowercaseName = isLowerCase ? name2 : name2.toLowerCase();
         if (lowercaseName === "set-cookie") {
           this.cookies = [value];
         }
-        this[kHeadersMap].set(lowercaseName, { name, value });
+        this[kHeadersMap].set(lowercaseName, { name: name2, value });
       }
       /**
        * @see https://fetch.spec.whatwg.org/#concept-header-list-delete
        * @param {string} name
        * @param {boolean} isLowerCase
        */
-      delete(name, isLowerCase) {
+      delete(name2, isLowerCase) {
         this[kHeadersSortedMap] = null;
-        if (!isLowerCase) name = name.toLowerCase();
-        if (name === "set-cookie") {
+        if (!isLowerCase) name2 = name2.toLowerCase();
+        if (name2 === "set-cookie") {
           this.cookies = null;
         }
-        this[kHeadersMap].delete(name);
+        this[kHeadersMap].delete(name2);
       }
       /**
        * @see https://fetch.spec.whatwg.org/#concept-header-list-get
@@ -17207,19 +17207,19 @@ var require_headers = __commonJS({
        * @param {boolean} isLowerCase
        * @returns {string | null}
        */
-      get(name, isLowerCase) {
-        return this[kHeadersMap].get(isLowerCase ? name : name.toLowerCase())?.value ?? null;
+      get(name2, isLowerCase) {
+        return this[kHeadersMap].get(isLowerCase ? name2 : name2.toLowerCase())?.value ?? null;
       }
       *[Symbol.iterator]() {
-        for (const { 0: name, 1: { value } } of this[kHeadersMap]) {
-          yield [name, value];
+        for (const { 0: name2, 1: { value } } of this[kHeadersMap]) {
+          yield [name2, value];
         }
       }
       get entries() {
         const headers = {};
         if (this[kHeadersMap].size !== 0) {
-          for (const { name, value } of this[kHeadersMap].values()) {
-            headers[name] = value;
+          for (const { name: name2, value } of this[kHeadersMap].values()) {
+            headers[name2] = value;
           }
         }
         return headers;
@@ -17230,13 +17230,13 @@ var require_headers = __commonJS({
       get entriesList() {
         const headers = [];
         if (this[kHeadersMap].size !== 0) {
-          for (const { 0: lowerName, 1: { name, value } } of this[kHeadersMap]) {
+          for (const { 0: lowerName, 1: { name: name2, value } } of this[kHeadersMap]) {
             if (lowerName === "set-cookie") {
               for (const cookie of this.cookies) {
-                headers.push([name, cookie]);
+                headers.push([name2, cookie]);
               }
             } else {
-              headers.push([name, value]);
+              headers.push([name2, value]);
             }
           }
         }
@@ -17282,8 +17282,8 @@ var require_headers = __commonJS({
           return array2;
         } else {
           let i = 0;
-          for (const { 0: name, 1: { value } } of this[kHeadersMap]) {
-            array2[i++] = [name, value];
+          for (const { 0: name2, 1: { value } } of this[kHeadersMap]) {
+            array2[i++] = [name2, value];
             assert2(value !== null);
           }
           return array2.sort(compareHeaderName);
@@ -17306,77 +17306,77 @@ var require_headers = __commonJS({
         }
       }
       // https://fetch.spec.whatwg.org/#dom-headers-append
-      append(name, value) {
+      append(name2, value) {
         webidl.brandCheck(this, _Headers);
         webidl.argumentLengthCheck(arguments, 2, "Headers.append");
         const prefix = "Headers.append";
-        name = webidl.converters.ByteString(name, prefix, "name");
+        name2 = webidl.converters.ByteString(name2, prefix, "name");
         value = webidl.converters.ByteString(value, prefix, "value");
-        return appendHeader(this, name, value);
+        return appendHeader(this, name2, value);
       }
       // https://fetch.spec.whatwg.org/#dom-headers-delete
-      delete(name) {
+      delete(name2) {
         webidl.brandCheck(this, _Headers);
         webidl.argumentLengthCheck(arguments, 1, "Headers.delete");
         const prefix = "Headers.delete";
-        name = webidl.converters.ByteString(name, prefix, "name");
-        if (!isValidHeaderName(name)) {
+        name2 = webidl.converters.ByteString(name2, prefix, "name");
+        if (!isValidHeaderName(name2)) {
           throw webidl.errors.invalidArgument({
             prefix: "Headers.delete",
-            value: name,
+            value: name2,
             type: "header name"
           });
         }
         if (this.#guard === "immutable") {
           throw new TypeError("immutable");
         }
-        if (!this.#headersList.contains(name, false)) {
+        if (!this.#headersList.contains(name2, false)) {
           return;
         }
-        this.#headersList.delete(name, false);
+        this.#headersList.delete(name2, false);
       }
       // https://fetch.spec.whatwg.org/#dom-headers-get
-      get(name) {
+      get(name2) {
         webidl.brandCheck(this, _Headers);
         webidl.argumentLengthCheck(arguments, 1, "Headers.get");
         const prefix = "Headers.get";
-        name = webidl.converters.ByteString(name, prefix, "name");
-        if (!isValidHeaderName(name)) {
+        name2 = webidl.converters.ByteString(name2, prefix, "name");
+        if (!isValidHeaderName(name2)) {
           throw webidl.errors.invalidArgument({
             prefix,
-            value: name,
+            value: name2,
             type: "header name"
           });
         }
-        return this.#headersList.get(name, false);
+        return this.#headersList.get(name2, false);
       }
       // https://fetch.spec.whatwg.org/#dom-headers-has
-      has(name) {
+      has(name2) {
         webidl.brandCheck(this, _Headers);
         webidl.argumentLengthCheck(arguments, 1, "Headers.has");
         const prefix = "Headers.has";
-        name = webidl.converters.ByteString(name, prefix, "name");
-        if (!isValidHeaderName(name)) {
+        name2 = webidl.converters.ByteString(name2, prefix, "name");
+        if (!isValidHeaderName(name2)) {
           throw webidl.errors.invalidArgument({
             prefix,
-            value: name,
+            value: name2,
             type: "header name"
           });
         }
-        return this.#headersList.contains(name, false);
+        return this.#headersList.contains(name2, false);
       }
       // https://fetch.spec.whatwg.org/#dom-headers-set
-      set(name, value) {
+      set(name2, value) {
         webidl.brandCheck(this, _Headers);
         webidl.argumentLengthCheck(arguments, 2, "Headers.set");
         const prefix = "Headers.set";
-        name = webidl.converters.ByteString(name, prefix, "name");
+        name2 = webidl.converters.ByteString(name2, prefix, "name");
         value = webidl.converters.ByteString(value, prefix, "value");
         value = headerValueNormalize(value);
-        if (!isValidHeaderName(name)) {
+        if (!isValidHeaderName(name2)) {
           throw webidl.errors.invalidArgument({
             prefix,
-            value: name,
+            value: name2,
             type: "header name"
           });
         } else if (!isValidHeaderValue(value)) {
@@ -17389,7 +17389,7 @@ var require_headers = __commonJS({
         if (this.#guard === "immutable") {
           throw new TypeError("immutable");
         }
-        this.#headersList.set(name, value, false);
+        this.#headersList.set(name2, value, false);
       }
       // https://fetch.spec.whatwg.org/#dom-headers-getsetcookie
       getSetCookie() {
@@ -17412,13 +17412,13 @@ var require_headers = __commonJS({
           return this.#headersList[kHeadersSortedMap] = names;
         }
         for (let i = 0; i < names.length; ++i) {
-          const { 0: name, 1: value } = names[i];
-          if (name === "set-cookie") {
+          const { 0: name2, 1: value } = names[i];
+          if (name2 === "set-cookie") {
             for (let j2 = 0; j2 < cookies.length; ++j2) {
-              headers.push([name, cookies[j2]]);
+              headers.push([name2, cookies[j2]]);
             }
           } else {
-            headers.push([name, value]);
+            headers.push([name2, value]);
           }
         }
         return this.#headersList[kHeadersSortedMap] = headers;
@@ -17838,23 +17838,23 @@ var require_response = __commonJS({
     webidl.converters.URLSearchParams = webidl.interfaceConverter(
       URLSearchParams
     );
-    webidl.converters.XMLHttpRequestBodyInit = function(V, prefix, name) {
+    webidl.converters.XMLHttpRequestBodyInit = function(V, prefix, name2) {
       if (typeof V === "string") {
-        return webidl.converters.USVString(V, prefix, name);
+        return webidl.converters.USVString(V, prefix, name2);
       }
       if (isBlobLike(V)) {
-        return webidl.converters.Blob(V, prefix, name, { strict: false });
+        return webidl.converters.Blob(V, prefix, name2, { strict: false });
       }
       if (ArrayBuffer.isView(V) || types2.isArrayBuffer(V)) {
-        return webidl.converters.BufferSource(V, prefix, name);
+        return webidl.converters.BufferSource(V, prefix, name2);
       }
       if (util.isFormDataLike(V)) {
-        return webidl.converters.FormData(V, prefix, name, { strict: false });
+        return webidl.converters.FormData(V, prefix, name2, { strict: false });
       }
       if (V instanceof URLSearchParams) {
-        return webidl.converters.URLSearchParams(V, prefix, name);
+        return webidl.converters.URLSearchParams(V, prefix, name2);
       }
-      return webidl.converters.DOMString(V, prefix, name);
+      return webidl.converters.DOMString(V, prefix, name2);
     };
     webidl.converters.BodyInit = function(V, prefix, argument) {
       if (V instanceof ReadableStream) {
@@ -18225,8 +18225,8 @@ var require_request2 = __commonJS({
           const headers = init2.headers !== void 0 ? init2.headers : new HeadersList(headersList);
           headersList.clear();
           if (headers instanceof HeadersList) {
-            for (const { name, value } of headers.rawValues()) {
-              headersList.append(name, value, false);
+            for (const { name: name2, value } of headers.rawValues()) {
+              headersList.append(name2, value, false);
             }
             headersList.cookies = headers.cookies;
           } else {
@@ -21230,9 +21230,9 @@ var require_util7 = __commonJS({
       }
       return false;
     }
-    function validateCookieName(name) {
-      for (let i = 0; i < name.length; ++i) {
-        const code = name.charCodeAt(i);
+    function validateCookieName(name2) {
+      for (let i = 0; i < name2.length; ++i) {
+        const code = name2.charCodeAt(i);
         if (code < 33 || // exclude CTLs (0-31), SP and HT
         code > 126 || // exclude non-ascii and DEL
         code === 34 || // "
@@ -21439,7 +21439,7 @@ var require_parse = __commonJS({
       }
       let nameValuePair = "";
       let unparsedAttributes = "";
-      let name = "";
+      let name2 = "";
       let value = "";
       if (header.includes(";")) {
         const position = { position: 0 };
@@ -21452,20 +21452,20 @@ var require_parse = __commonJS({
         value = nameValuePair;
       } else {
         const position = { position: 0 };
-        name = collectASequenceOfCodePointsFast(
+        name2 = collectASequenceOfCodePointsFast(
           "=",
           nameValuePair,
           position
         );
         value = nameValuePair.slice(position.position + 1);
       }
-      name = name.trim();
+      name2 = name2.trim();
       value = value.trim();
-      if (name.length + value.length > maxNameValuePairSize) {
+      if (name2.length + value.length > maxNameValuePairSize) {
         return null;
       }
       return {
-        name,
+        name: name2,
         value,
         ...parseUnparsedAttributes(unparsedAttributes)
       };
@@ -21578,19 +21578,19 @@ var require_cookies = __commonJS({
         return out;
       }
       for (const piece of cookie.split(";")) {
-        const [name, ...value] = piece.split("=");
-        out[name.trim()] = value.join("=");
+        const [name2, ...value] = piece.split("=");
+        out[name2.trim()] = value.join("=");
       }
       return out;
     }
-    function deleteCookie(headers, name, attributes) {
+    function deleteCookie(headers, name2, attributes) {
       webidl.brandCheck(headers, Headers3, { strict: false });
       const prefix = "deleteCookie";
       webidl.argumentLengthCheck(arguments, 2, prefix);
-      name = webidl.converters.DOMString(name, prefix, "name");
+      name2 = webidl.converters.DOMString(name2, prefix, "name");
       attributes = webidl.converters.DeleteCookieAttributes(attributes);
       setCookie(headers, {
-        name,
+        name: name2,
         value: "",
         expires: /* @__PURE__ */ new Date(0),
         ...attributes
@@ -22152,9 +22152,9 @@ var require_util8 = __commonJS({
       const extensionList = /* @__PURE__ */ new Map();
       while (position.position < extensions.length) {
         const pair = collectASequenceOfCodePointsFast(";", extensions, position);
-        const [name, value = ""] = pair.split("=");
+        const [name2, value = ""] = pair.split("=");
         extensionList.set(
-          removeHTTPWhitespace(name, true, false),
+          removeHTTPWhitespace(name2, true, false),
           removeHTTPWhitespace(value, false, true)
         );
         position.position++;
@@ -25455,15 +25455,15 @@ var require_util10 = __commonJS({
         size: m[3] ? parseInt(m[3]) : null
       } : null;
     }
-    function addListener(obj, name, listener) {
+    function addListener(obj, name2, listener) {
       const listeners = obj[kListeners] ??= [];
-      listeners.push([name, listener]);
-      obj.on(name, listener);
+      listeners.push([name2, listener]);
+      obj.on(name2, listener);
       return obj;
     }
     function removeAllListeners(obj) {
-      for (const [name, listener] of obj[kListeners] ?? []) {
-        obj.removeListener(name, listener);
+      for (const [name2, listener] of obj[kListeners] ?? []) {
+        obj.removeListener(name2, listener);
       }
       obj[kListeners] = null;
     }
@@ -27631,9 +27631,9 @@ var require_data_url2 = __commonJS({
       assert2(mimeType !== "failure");
       const { parameters, essence } = mimeType;
       let serialization = essence;
-      for (let [name, value] of parameters.entries()) {
+      for (let [name2, value] of parameters.entries()) {
         serialization += ";";
-        serialization += name;
+        serialization += name2;
         serialization += "=";
         if (!HTTP_TOKEN_CODEPOINTS.test(value)) {
           value = value.replace(/(\\|")/g, "\\$1");
@@ -28081,11 +28081,11 @@ var require_webidl2 = __commonJS({
       }
       return V;
     };
-    webidl.converters.TypedArray = function(V, T4, prefix, name, opts) {
+    webidl.converters.TypedArray = function(V, T4, prefix, name2, opts) {
       if (webidl.util.Type(V) !== "Object" || !types2.isTypedArray(V) || V.constructor.name !== T4.name) {
         throw webidl.errors.conversionFailed({
           prefix,
-          argument: `${name} ("${webidl.util.Stringify(V)}")`,
+          argument: `${name2} ("${webidl.util.Stringify(V)}")`,
           types: [T4.name]
         });
       }
@@ -28103,11 +28103,11 @@ var require_webidl2 = __commonJS({
       }
       return V;
     };
-    webidl.converters.DataView = function(V, prefix, name, opts) {
+    webidl.converters.DataView = function(V, prefix, name2, opts) {
       if (webidl.util.Type(V) !== "Object" || !types2.isDataView(V)) {
         throw webidl.errors.exception({
           header: prefix,
-          message: `${name} is not a DataView.`
+          message: `${name2} is not a DataView.`
         });
       }
       if (opts?.allowShared === false && types2.isSharedArrayBuffer(V.buffer)) {
@@ -28124,19 +28124,19 @@ var require_webidl2 = __commonJS({
       }
       return V;
     };
-    webidl.converters.BufferSource = function(V, prefix, name, opts) {
+    webidl.converters.BufferSource = function(V, prefix, name2, opts) {
       if (types2.isAnyArrayBuffer(V)) {
-        return webidl.converters.ArrayBuffer(V, prefix, name, { ...opts, allowShared: false });
+        return webidl.converters.ArrayBuffer(V, prefix, name2, { ...opts, allowShared: false });
       }
       if (types2.isTypedArray(V)) {
-        return webidl.converters.TypedArray(V, V.constructor, prefix, name, { ...opts, allowShared: false });
+        return webidl.converters.TypedArray(V, V.constructor, prefix, name2, { ...opts, allowShared: false });
       }
       if (types2.isDataView(V)) {
-        return webidl.converters.DataView(V, prefix, name, { ...opts, allowShared: false });
+        return webidl.converters.DataView(V, prefix, name2, { ...opts, allowShared: false });
       }
       throw webidl.errors.conversionFailed({
         prefix,
-        argument: `${name} ("${webidl.util.Stringify(V)}")`,
+        argument: `${name2} ("${webidl.util.Stringify(V)}")`,
         types: ["BufferSource"]
       });
     };
@@ -28580,7 +28580,7 @@ var require_util11 = __commonJS({
       return result;
     }
     var esIteratorPrototype = Object.getPrototypeOf(Object.getPrototypeOf([][Symbol.iterator]()));
-    function createIterator(name, kInternalIterator, keyIndex = 0, valueIndex = 1) {
+    function createIterator(name2, kInternalIterator, keyIndex = 0, valueIndex = 1) {
       class FastIterableIterator {
         /** @type {any} */
         #target;
@@ -28601,7 +28601,7 @@ var require_util11 = __commonJS({
         next() {
           if (typeof this !== "object" || this === null || !(#target in this)) {
             throw new TypeError(
-              `'next' called on an object that does not implement interface ${name} Iterator.`
+              `'next' called on an object that does not implement interface ${name2} Iterator.`
             );
           }
           const index = this.#index;
@@ -28640,7 +28640,7 @@ var require_util11 = __commonJS({
           writable: false,
           enumerable: false,
           configurable: true,
-          value: `${name} Iterator`
+          value: `${name2} Iterator`
         },
         next: { writable: true, enumerable: true, configurable: true }
       });
@@ -28648,8 +28648,8 @@ var require_util11 = __commonJS({
         return new FastIterableIterator(target, kind);
       };
     }
-    function iteratorMixin(name, object2, kInternalIterator, keyIndex = 0, valueIndex = 1) {
-      const makeIterator = createIterator(name, kInternalIterator, keyIndex, valueIndex);
+    function iteratorMixin(name2, object2, kInternalIterator, keyIndex = 0, valueIndex = 1) {
+      const makeIterator = createIterator(name2, kInternalIterator, keyIndex, valueIndex);
       const properties = {
         keys: {
           writable: true,
@@ -28684,10 +28684,10 @@ var require_util11 = __commonJS({
           configurable: true,
           value: function forEach(callbackfn, thisArg = globalThis) {
             webidl.brandCheck(this, object2);
-            webidl.argumentLengthCheck(arguments, 1, `${name}.forEach`);
+            webidl.argumentLengthCheck(arguments, 1, `${name2}.forEach`);
             if (typeof callbackfn !== "function") {
               throw new TypeError(
-                `Failed to execute 'forEach' on '${name}': parameter 1 is not of type 'Function'.`
+                `Failed to execute 'forEach' on '${name2}': parameter 1 is not of type 'Function'.`
               );
             }
             for (const { 0: key, 1: value } of makeIterator(this, "key+value")) {
@@ -28939,8 +28939,8 @@ var require_util11 = __commonJS({
       }
       return values;
     }
-    function getDecodeSplit(name, list) {
-      const value = list.get(name, true);
+    function getDecodeSplit(name2, list) {
+      const value = list.get(name2, true);
       if (value === null) {
         return null;
       }
@@ -29127,7 +29127,7 @@ var require_formdata2 = __commonJS({
         }
         this[kState] = [];
       }
-      append(name, value, filename = void 0) {
+      append(name2, value, filename = void 0) {
         webidl.brandCheck(this, _FormData);
         const prefix = "FormData.append";
         webidl.argumentLengthCheck(arguments, 2, prefix);
@@ -29136,45 +29136,45 @@ var require_formdata2 = __commonJS({
             "Failed to execute 'append' on 'FormData': parameter 2 is not of type 'Blob'"
           );
         }
-        name = webidl.converters.USVString(name, prefix, "name");
+        name2 = webidl.converters.USVString(name2, prefix, "name");
         value = isBlobLike(value) ? webidl.converters.Blob(value, prefix, "value", { strict: false }) : webidl.converters.USVString(value, prefix, "value");
         filename = arguments.length === 3 ? webidl.converters.USVString(filename, prefix, "filename") : void 0;
-        const entry = makeEntry(name, value, filename);
+        const entry = makeEntry(name2, value, filename);
         this[kState].push(entry);
       }
-      delete(name) {
+      delete(name2) {
         webidl.brandCheck(this, _FormData);
         const prefix = "FormData.delete";
         webidl.argumentLengthCheck(arguments, 1, prefix);
-        name = webidl.converters.USVString(name, prefix, "name");
-        this[kState] = this[kState].filter((entry) => entry.name !== name);
+        name2 = webidl.converters.USVString(name2, prefix, "name");
+        this[kState] = this[kState].filter((entry) => entry.name !== name2);
       }
-      get(name) {
+      get(name2) {
         webidl.brandCheck(this, _FormData);
         const prefix = "FormData.get";
         webidl.argumentLengthCheck(arguments, 1, prefix);
-        name = webidl.converters.USVString(name, prefix, "name");
-        const idx = this[kState].findIndex((entry) => entry.name === name);
+        name2 = webidl.converters.USVString(name2, prefix, "name");
+        const idx = this[kState].findIndex((entry) => entry.name === name2);
         if (idx === -1) {
           return null;
         }
         return this[kState][idx].value;
       }
-      getAll(name) {
+      getAll(name2) {
         webidl.brandCheck(this, _FormData);
         const prefix = "FormData.getAll";
         webidl.argumentLengthCheck(arguments, 1, prefix);
-        name = webidl.converters.USVString(name, prefix, "name");
-        return this[kState].filter((entry) => entry.name === name).map((entry) => entry.value);
+        name2 = webidl.converters.USVString(name2, prefix, "name");
+        return this[kState].filter((entry) => entry.name === name2).map((entry) => entry.value);
       }
-      has(name) {
+      has(name2) {
         webidl.brandCheck(this, _FormData);
         const prefix = "FormData.has";
         webidl.argumentLengthCheck(arguments, 1, prefix);
-        name = webidl.converters.USVString(name, prefix, "name");
-        return this[kState].findIndex((entry) => entry.name === name) !== -1;
+        name2 = webidl.converters.USVString(name2, prefix, "name");
+        return this[kState].findIndex((entry) => entry.name === name2) !== -1;
       }
-      set(name, value, filename = void 0) {
+      set(name2, value, filename = void 0) {
         webidl.brandCheck(this, _FormData);
         const prefix = "FormData.set";
         webidl.argumentLengthCheck(arguments, 2, prefix);
@@ -29183,16 +29183,16 @@ var require_formdata2 = __commonJS({
             "Failed to execute 'set' on 'FormData': parameter 2 is not of type 'Blob'"
           );
         }
-        name = webidl.converters.USVString(name, prefix, "name");
+        name2 = webidl.converters.USVString(name2, prefix, "name");
         value = isBlobLike(value) ? webidl.converters.Blob(value, prefix, "name", { strict: false }) : webidl.converters.USVString(value, prefix, "name");
         filename = arguments.length === 3 ? webidl.converters.USVString(filename, prefix, "name") : void 0;
-        const entry = makeEntry(name, value, filename);
-        const idx = this[kState].findIndex((entry2) => entry2.name === name);
+        const entry = makeEntry(name2, value, filename);
+        const idx = this[kState].findIndex((entry2) => entry2.name === name2);
         if (idx !== -1) {
           this[kState] = [
             ...this[kState].slice(0, idx),
             entry,
-            ...this[kState].slice(idx + 1).filter((entry2) => entry2.name !== name)
+            ...this[kState].slice(idx + 1).filter((entry2) => entry2.name !== name2)
           ];
         } else {
           this[kState].push(entry);
@@ -29230,7 +29230,7 @@ var require_formdata2 = __commonJS({
         configurable: true
       }
     });
-    function makeEntry(name, value, filename) {
+    function makeEntry(name2, value, filename) {
       if (typeof value === "string") {
       } else {
         if (!isFileLike(value)) {
@@ -29244,7 +29244,7 @@ var require_formdata2 = __commonJS({
           value = value instanceof NativeFile ? new File2([value], filename, options) : new FileLike(value, filename, options);
         }
       }
-      return { name, value };
+      return { name: name2, value };
     }
     module2.exports = { FormData: FormData2, makeEntry };
   }
@@ -29323,7 +29323,7 @@ var require_formdata_parser2 = __commonJS({
         if (result === "failure") {
           return "failure";
         }
-        let { name, filename, contentType, encoding } = result;
+        let { name: name2, filename, contentType, encoding } = result;
         position.position += 2;
         let body;
         {
@@ -29352,22 +29352,22 @@ var require_formdata_parser2 = __commonJS({
         } else {
           value = utf8DecodeBytes(Buffer.from(body));
         }
-        assert2(isUSVString(name));
+        assert2(isUSVString(name2));
         assert2(typeof value === "string" && isUSVString(value) || isFileLike(value));
-        entryList.push(makeEntry(name, value, filename));
+        entryList.push(makeEntry(name2, value, filename));
       }
     }
     function parseMultipartFormDataHeaders(input2, position) {
-      let name = null;
+      let name2 = null;
       let filename = null;
       let contentType = null;
       let encoding = null;
       while (true) {
         if (input2[position.position] === 13 && input2[position.position + 1] === 10) {
-          if (name === null) {
+          if (name2 === null) {
             return "failure";
           }
-          return { name, filename, contentType, encoding };
+          return { name: name2, filename, contentType, encoding };
         }
         let headerName = collectASequenceOfBytes(
           (char) => char !== 10 && char !== 13 && char !== 58,
@@ -29389,13 +29389,13 @@ var require_formdata_parser2 = __commonJS({
         );
         switch (bufferToLowerCasedHeaderName(headerName)) {
           case "content-disposition": {
-            name = filename = null;
+            name2 = filename = null;
             if (!bufferStartsWith(input2, formDataNameBuffer, position)) {
               return "failure";
             }
             position.position += 17;
-            name = parseMultipartFormDataName(input2, position);
-            if (name === null) {
+            name2 = parseMultipartFormDataName(input2, position);
+            if (name2 === null) {
               return "failure";
             }
             if (bufferStartsWith(input2, filenameBuffer, position)) {
@@ -29452,7 +29452,7 @@ var require_formdata_parser2 = __commonJS({
     }
     function parseMultipartFormDataName(input2, position) {
       assert2(input2[position.position - 1] === 34);
-      let name = collectASequenceOfBytes(
+      let name2 = collectASequenceOfBytes(
         (char) => char !== 10 && char !== 13 && char !== 34,
         input2,
         position
@@ -29462,8 +29462,8 @@ var require_formdata_parser2 = __commonJS({
       } else {
         position.position++;
       }
-      name = new TextDecoder().decode(name).replace(/%0A/ig, "\n").replace(/%0D/ig, "\r").replace(/%22/g, '"');
-      return name;
+      name2 = new TextDecoder().decode(name2).replace(/%0A/ig, "\n").replace(/%0D/ig, "\r").replace(/%22/g, '"');
+      return name2;
     }
     function collectASequenceOfBytes(condition, input2, position) {
       let start = position.position;
@@ -29590,16 +29590,16 @@ Content-Disposition: form-data`;
         const rn = new Uint8Array([13, 10]);
         length = 0;
         let hasUnknownSizeValue = false;
-        for (const [name, value] of object2) {
+        for (const [name2, value] of object2) {
           if (typeof value === "string") {
-            const chunk3 = textEncoder.encode(prefix + `; name="${escape(normalizeLinefeeds(name))}"\r
+            const chunk3 = textEncoder.encode(prefix + `; name="${escape(normalizeLinefeeds(name2))}"\r
 \r
 ${normalizeLinefeeds(value)}\r
 `);
             blobParts.push(chunk3);
             length += chunk3.byteLength;
           } else {
-            const chunk3 = textEncoder.encode(`${prefix}; name="${escape(normalizeLinefeeds(name))}"` + (value.name ? `; filename="${escape(value.name)}"` : "") + `\r
+            const chunk3 = textEncoder.encode(`${prefix}; name="${escape(normalizeLinefeeds(name2))}"` + (value.name ? `; filename="${escape(value.name)}"` : "") + `\r
 Content-Type: ${value.type || "application/octet-stream"}\r
 \r
 `);
@@ -29743,8 +29743,8 @@ Content-Type: ${value.type || "application/octet-stream"}\r
                 case "application/x-www-form-urlencoded": {
                   const entries = new URLSearchParams(value.toString());
                   const fd = new FormData2();
-                  for (const [name, value2] of entries) {
-                    fd.append(name, value2);
+                  for (const [name2, value2] of entries) {
+                    fd.append(name2, value2);
                   }
                   return fd;
                 }
@@ -31000,13 +31000,13 @@ var require_client_h22 = __commonJS({
     } = http2;
     function parseH2Headers(headers) {
       const result = [];
-      for (const [name, value] of Object.entries(headers)) {
+      for (const [name2, value] of Object.entries(headers)) {
         if (Array.isArray(value)) {
           for (const subvalue of value) {
-            result.push(Buffer.from(name), Buffer.from(subvalue));
+            result.push(Buffer.from(name2), Buffer.from(subvalue));
           }
         } else {
-          result.push(Buffer.from(name), Buffer.from(value));
+          result.push(Buffer.from(name2), Buffer.from(value));
         }
       }
       return result;
@@ -31113,8 +31113,8 @@ var require_client_h22 = __commonJS({
       this[kSocket][kError] = err;
       this[kClient][kOnError](err);
     }
-    function onHttp2FrameError(type, code, id) {
-      if (id === 0) {
+    function onHttp2FrameError(type, code, id2) {
+      if (id2 === 0) {
         const err = new InformationalError(`HTTP/2: "frameError" received - type ${type}, code ${code}`);
         this[kSocket][kError] = err;
         this[kClient][kOnError](err);
@@ -31650,8 +31650,8 @@ var require_redirect_handler2 = __commonJS({
         return true;
       }
       if (unknownOrigin && (header.length === 13 || header.length === 6 || header.length === 19)) {
-        const name = util.headerNameToString(header);
-        return name === "authorization" || name === "cookie" || name === "proxy-authorization";
+        const name2 = util.headerNameToString(header);
+        return name2 === "authorization" || name2 === "cookie" || name2 === "proxy-authorization";
       }
       return false;
     }
@@ -34904,13 +34904,13 @@ var require_mock_utils2 = __commonJS({
       for (let i = 0; i < keys2.length; ++i) {
         const key = keys2[i];
         const value = data[key];
-        const name = Buffer.from(`${key}`);
+        const name2 = Buffer.from(`${key}`);
         if (Array.isArray(value)) {
           for (let j2 = 0; j2 < value.length; ++j2) {
-            result.push(name, Buffer.from(`${value[j2]}`));
+            result.push(name2, Buffer.from(`${value[j2]}`));
           }
         } else {
-          result.push(name, Buffer.from(`${value}`));
+          result.push(name2, Buffer.from(`${value}`));
         }
       }
       return result;
@@ -36060,12 +36060,12 @@ var require_headers2 = __commonJS({
         });
       }
     }
-    function appendHeader(headers, name, value) {
+    function appendHeader(headers, name2, value) {
       value = headerValueNormalize(value);
-      if (!isValidHeaderName(name)) {
+      if (!isValidHeaderName(name2)) {
         throw webidl.errors.invalidArgument({
           prefix: "Headers.append",
-          value: name,
+          value: name2,
           type: "header name"
         });
       } else if (!isValidHeaderValue(value)) {
@@ -36078,7 +36078,7 @@ var require_headers2 = __commonJS({
       if (getHeadersGuard(headers) === "immutable") {
         throw new TypeError("immutable");
       }
-      return getHeadersList(headers).append(name, value, false);
+      return getHeadersList(headers).append(name2, value, false);
     }
     function compareHeaderName(a2, b) {
       return a2[0] < b[0] ? -1 : 1;
@@ -36101,8 +36101,8 @@ var require_headers2 = __commonJS({
        * @param {string} name
        * @param {boolean} isLowerCase
        */
-      contains(name, isLowerCase) {
-        return this[kHeadersMap].has(isLowerCase ? name : name.toLowerCase());
+      contains(name2, isLowerCase) {
+        return this[kHeadersMap].has(isLowerCase ? name2 : name2.toLowerCase());
       }
       clear() {
         this[kHeadersMap].clear();
@@ -36115,9 +36115,9 @@ var require_headers2 = __commonJS({
        * @param {string} value
        * @param {boolean} isLowerCase
        */
-      append(name, value, isLowerCase) {
+      append(name2, value, isLowerCase) {
         this[kHeadersSortedMap] = null;
-        const lowercaseName = isLowerCase ? name : name.toLowerCase();
+        const lowercaseName = isLowerCase ? name2 : name2.toLowerCase();
         const exists2 = this[kHeadersMap].get(lowercaseName);
         if (exists2) {
           const delimiter = lowercaseName === "cookie" ? "; " : ", ";
@@ -36126,7 +36126,7 @@ var require_headers2 = __commonJS({
             value: `${exists2.value}${delimiter}${value}`
           });
         } else {
-          this[kHeadersMap].set(lowercaseName, { name, value });
+          this[kHeadersMap].set(lowercaseName, { name: name2, value });
         }
         if (lowercaseName === "set-cookie") {
           (this.cookies ??= []).push(value);
@@ -36138,26 +36138,26 @@ var require_headers2 = __commonJS({
        * @param {string} value
        * @param {boolean} isLowerCase
        */
-      set(name, value, isLowerCase) {
+      set(name2, value, isLowerCase) {
         this[kHeadersSortedMap] = null;
-        const lowercaseName = isLowerCase ? name : name.toLowerCase();
+        const lowercaseName = isLowerCase ? name2 : name2.toLowerCase();
         if (lowercaseName === "set-cookie") {
           this.cookies = [value];
         }
-        this[kHeadersMap].set(lowercaseName, { name, value });
+        this[kHeadersMap].set(lowercaseName, { name: name2, value });
       }
       /**
        * @see https://fetch.spec.whatwg.org/#concept-header-list-delete
        * @param {string} name
        * @param {boolean} isLowerCase
        */
-      delete(name, isLowerCase) {
+      delete(name2, isLowerCase) {
         this[kHeadersSortedMap] = null;
-        if (!isLowerCase) name = name.toLowerCase();
-        if (name === "set-cookie") {
+        if (!isLowerCase) name2 = name2.toLowerCase();
+        if (name2 === "set-cookie") {
           this.cookies = null;
         }
-        this[kHeadersMap].delete(name);
+        this[kHeadersMap].delete(name2);
       }
       /**
        * @see https://fetch.spec.whatwg.org/#concept-header-list-get
@@ -36165,19 +36165,19 @@ var require_headers2 = __commonJS({
        * @param {boolean} isLowerCase
        * @returns {string | null}
        */
-      get(name, isLowerCase) {
-        return this[kHeadersMap].get(isLowerCase ? name : name.toLowerCase())?.value ?? null;
+      get(name2, isLowerCase) {
+        return this[kHeadersMap].get(isLowerCase ? name2 : name2.toLowerCase())?.value ?? null;
       }
       *[Symbol.iterator]() {
-        for (const { 0: name, 1: { value } } of this[kHeadersMap]) {
-          yield [name, value];
+        for (const { 0: name2, 1: { value } } of this[kHeadersMap]) {
+          yield [name2, value];
         }
       }
       get entries() {
         const headers = {};
         if (this[kHeadersMap].size !== 0) {
-          for (const { name, value } of this[kHeadersMap].values()) {
-            headers[name] = value;
+          for (const { name: name2, value } of this[kHeadersMap].values()) {
+            headers[name2] = value;
           }
         }
         return headers;
@@ -36188,13 +36188,13 @@ var require_headers2 = __commonJS({
       get entriesList() {
         const headers = [];
         if (this[kHeadersMap].size !== 0) {
-          for (const { 0: lowerName, 1: { name, value } } of this[kHeadersMap]) {
+          for (const { 0: lowerName, 1: { name: name2, value } } of this[kHeadersMap]) {
             if (lowerName === "set-cookie") {
               for (const cookie of this.cookies) {
-                headers.push([name, cookie]);
+                headers.push([name2, cookie]);
               }
             } else {
-              headers.push([name, value]);
+              headers.push([name2, value]);
             }
           }
         }
@@ -36240,8 +36240,8 @@ var require_headers2 = __commonJS({
           return array2;
         } else {
           let i = 0;
-          for (const { 0: name, 1: { value } } of this[kHeadersMap]) {
-            array2[i++] = [name, value];
+          for (const { 0: name2, 1: { value } } of this[kHeadersMap]) {
+            array2[i++] = [name2, value];
             assert2(value !== null);
           }
           return array2.sort(compareHeaderName);
@@ -36264,77 +36264,77 @@ var require_headers2 = __commonJS({
         }
       }
       // https://fetch.spec.whatwg.org/#dom-headers-append
-      append(name, value) {
+      append(name2, value) {
         webidl.brandCheck(this, _Headers);
         webidl.argumentLengthCheck(arguments, 2, "Headers.append");
         const prefix = "Headers.append";
-        name = webidl.converters.ByteString(name, prefix, "name");
+        name2 = webidl.converters.ByteString(name2, prefix, "name");
         value = webidl.converters.ByteString(value, prefix, "value");
-        return appendHeader(this, name, value);
+        return appendHeader(this, name2, value);
       }
       // https://fetch.spec.whatwg.org/#dom-headers-delete
-      delete(name) {
+      delete(name2) {
         webidl.brandCheck(this, _Headers);
         webidl.argumentLengthCheck(arguments, 1, "Headers.delete");
         const prefix = "Headers.delete";
-        name = webidl.converters.ByteString(name, prefix, "name");
-        if (!isValidHeaderName(name)) {
+        name2 = webidl.converters.ByteString(name2, prefix, "name");
+        if (!isValidHeaderName(name2)) {
           throw webidl.errors.invalidArgument({
             prefix: "Headers.delete",
-            value: name,
+            value: name2,
             type: "header name"
           });
         }
         if (this.#guard === "immutable") {
           throw new TypeError("immutable");
         }
-        if (!this.#headersList.contains(name, false)) {
+        if (!this.#headersList.contains(name2, false)) {
           return;
         }
-        this.#headersList.delete(name, false);
+        this.#headersList.delete(name2, false);
       }
       // https://fetch.spec.whatwg.org/#dom-headers-get
-      get(name) {
+      get(name2) {
         webidl.brandCheck(this, _Headers);
         webidl.argumentLengthCheck(arguments, 1, "Headers.get");
         const prefix = "Headers.get";
-        name = webidl.converters.ByteString(name, prefix, "name");
-        if (!isValidHeaderName(name)) {
+        name2 = webidl.converters.ByteString(name2, prefix, "name");
+        if (!isValidHeaderName(name2)) {
           throw webidl.errors.invalidArgument({
             prefix,
-            value: name,
+            value: name2,
             type: "header name"
           });
         }
-        return this.#headersList.get(name, false);
+        return this.#headersList.get(name2, false);
       }
       // https://fetch.spec.whatwg.org/#dom-headers-has
-      has(name) {
+      has(name2) {
         webidl.brandCheck(this, _Headers);
         webidl.argumentLengthCheck(arguments, 1, "Headers.has");
         const prefix = "Headers.has";
-        name = webidl.converters.ByteString(name, prefix, "name");
-        if (!isValidHeaderName(name)) {
+        name2 = webidl.converters.ByteString(name2, prefix, "name");
+        if (!isValidHeaderName(name2)) {
           throw webidl.errors.invalidArgument({
             prefix,
-            value: name,
+            value: name2,
             type: "header name"
           });
         }
-        return this.#headersList.contains(name, false);
+        return this.#headersList.contains(name2, false);
       }
       // https://fetch.spec.whatwg.org/#dom-headers-set
-      set(name, value) {
+      set(name2, value) {
         webidl.brandCheck(this, _Headers);
         webidl.argumentLengthCheck(arguments, 2, "Headers.set");
         const prefix = "Headers.set";
-        name = webidl.converters.ByteString(name, prefix, "name");
+        name2 = webidl.converters.ByteString(name2, prefix, "name");
         value = webidl.converters.ByteString(value, prefix, "value");
         value = headerValueNormalize(value);
-        if (!isValidHeaderName(name)) {
+        if (!isValidHeaderName(name2)) {
           throw webidl.errors.invalidArgument({
             prefix,
-            value: name,
+            value: name2,
             type: "header name"
           });
         } else if (!isValidHeaderValue(value)) {
@@ -36347,7 +36347,7 @@ var require_headers2 = __commonJS({
         if (this.#guard === "immutable") {
           throw new TypeError("immutable");
         }
-        this.#headersList.set(name, value, false);
+        this.#headersList.set(name2, value, false);
       }
       // https://fetch.spec.whatwg.org/#dom-headers-getsetcookie
       getSetCookie() {
@@ -36370,13 +36370,13 @@ var require_headers2 = __commonJS({
           return this.#headersList[kHeadersSortedMap] = names;
         }
         for (let i = 0; i < names.length; ++i) {
-          const { 0: name, 1: value } = names[i];
-          if (name === "set-cookie") {
+          const { 0: name2, 1: value } = names[i];
+          if (name2 === "set-cookie") {
             for (let j2 = 0; j2 < cookies.length; ++j2) {
-              headers.push([name, cookies[j2]]);
+              headers.push([name2, cookies[j2]]);
             }
           } else {
-            headers.push([name, value]);
+            headers.push([name2, value]);
           }
         }
         return this.#headersList[kHeadersSortedMap] = headers;
@@ -36796,23 +36796,23 @@ var require_response2 = __commonJS({
     webidl.converters.URLSearchParams = webidl.interfaceConverter(
       URLSearchParams
     );
-    webidl.converters.XMLHttpRequestBodyInit = function(V, prefix, name) {
+    webidl.converters.XMLHttpRequestBodyInit = function(V, prefix, name2) {
       if (typeof V === "string") {
-        return webidl.converters.USVString(V, prefix, name);
+        return webidl.converters.USVString(V, prefix, name2);
       }
       if (isBlobLike(V)) {
-        return webidl.converters.Blob(V, prefix, name, { strict: false });
+        return webidl.converters.Blob(V, prefix, name2, { strict: false });
       }
       if (ArrayBuffer.isView(V) || types2.isArrayBuffer(V)) {
-        return webidl.converters.BufferSource(V, prefix, name);
+        return webidl.converters.BufferSource(V, prefix, name2);
       }
       if (util.isFormDataLike(V)) {
-        return webidl.converters.FormData(V, prefix, name, { strict: false });
+        return webidl.converters.FormData(V, prefix, name2, { strict: false });
       }
       if (V instanceof URLSearchParams) {
-        return webidl.converters.URLSearchParams(V, prefix, name);
+        return webidl.converters.URLSearchParams(V, prefix, name2);
       }
-      return webidl.converters.DOMString(V, prefix, name);
+      return webidl.converters.DOMString(V, prefix, name2);
     };
     webidl.converters.BodyInit = function(V, prefix, argument) {
       if (V instanceof ReadableStream) {
@@ -37183,8 +37183,8 @@ var require_request4 = __commonJS({
           const headers = init2.headers !== void 0 ? init2.headers : new HeadersList(headersList);
           headersList.clear();
           if (headers instanceof HeadersList) {
-            for (const { name, value } of headers.rawValues()) {
-              headersList.append(name, value, false);
+            for (const { name: name2, value } of headers.rawValues()) {
+              headersList.append(name2, value, false);
             }
             headersList.cookies = headers.cookies;
           } else {
@@ -40188,9 +40188,9 @@ var require_util15 = __commonJS({
       }
       return false;
     }
-    function validateCookieName(name) {
-      for (let i = 0; i < name.length; ++i) {
-        const code = name.charCodeAt(i);
+    function validateCookieName(name2) {
+      for (let i = 0; i < name2.length; ++i) {
+        const code = name2.charCodeAt(i);
         if (code < 33 || // exclude CTLs (0-31), SP and HT
         code > 126 || // exclude non-ascii and DEL
         code === 34 || // "
@@ -40397,7 +40397,7 @@ var require_parse2 = __commonJS({
       }
       let nameValuePair = "";
       let unparsedAttributes = "";
-      let name = "";
+      let name2 = "";
       let value = "";
       if (header.includes(";")) {
         const position = { position: 0 };
@@ -40410,20 +40410,20 @@ var require_parse2 = __commonJS({
         value = nameValuePair;
       } else {
         const position = { position: 0 };
-        name = collectASequenceOfCodePointsFast(
+        name2 = collectASequenceOfCodePointsFast(
           "=",
           nameValuePair,
           position
         );
         value = nameValuePair.slice(position.position + 1);
       }
-      name = name.trim();
+      name2 = name2.trim();
       value = value.trim();
-      if (name.length + value.length > maxNameValuePairSize) {
+      if (name2.length + value.length > maxNameValuePairSize) {
         return null;
       }
       return {
-        name,
+        name: name2,
         value,
         ...parseUnparsedAttributes(unparsedAttributes)
       };
@@ -40536,19 +40536,19 @@ var require_cookies2 = __commonJS({
         return out;
       }
       for (const piece of cookie.split(";")) {
-        const [name, ...value] = piece.split("=");
-        out[name.trim()] = value.join("=");
+        const [name2, ...value] = piece.split("=");
+        out[name2.trim()] = value.join("=");
       }
       return out;
     }
-    function deleteCookie(headers, name, attributes) {
+    function deleteCookie(headers, name2, attributes) {
       webidl.brandCheck(headers, Headers3, { strict: false });
       const prefix = "deleteCookie";
       webidl.argumentLengthCheck(arguments, 2, prefix);
-      name = webidl.converters.DOMString(name, prefix, "name");
+      name2 = webidl.converters.DOMString(name2, prefix, "name");
       attributes = webidl.converters.DeleteCookieAttributes(attributes);
       setCookie(headers, {
-        name,
+        name: name2,
         value: "",
         expires: /* @__PURE__ */ new Date(0),
         ...attributes
@@ -41110,9 +41110,9 @@ var require_util16 = __commonJS({
       const extensionList = /* @__PURE__ */ new Map();
       while (position.position < extensions.length) {
         const pair = collectASequenceOfCodePointsFast(";", extensions, position);
-        const [name, value = ""] = pair.split("=");
+        const [name2, value = ""] = pair.split("=");
         extensionList.set(
-          removeHTTPWhitespace(name, true, false),
+          removeHTTPWhitespace(name2, true, false),
           removeHTTPWhitespace(value, false, true)
         );
         position.position++;
@@ -43995,11 +43995,11 @@ var require_re = __commonJS({
       }
       return value;
     };
-    var createToken = (name, value, isGlobal) => {
+    var createToken = (name2, value, isGlobal) => {
       const safe = makeSafeRegex(value);
       const index = R3++;
-      debug2(name, index, value);
-      t3[name] = index;
+      debug2(name2, index, value);
+      t3[name2] = index;
       src[index] = value;
       safeSrc[index] = safe;
       re2[index] = new RegExp(value, isGlobal ? "g" : void 0);
@@ -44160,14 +44160,14 @@ var require_semver = __commonJS({
         if (!m[4]) {
           this.prerelease = [];
         } else {
-          this.prerelease = m[4].split(".").map((id) => {
-            if (/^[0-9]+$/.test(id)) {
-              const num = +id;
+          this.prerelease = m[4].split(".").map((id2) => {
+            if (/^[0-9]+$/.test(id2)) {
+              const num = +id2;
               if (num >= 0 && num < MAX_SAFE_INTEGER) {
                 return num;
               }
             }
-            return id;
+            return id2;
           });
         }
         this.build = m[5] ? m[5].split(".") : [];
@@ -45036,7 +45036,7 @@ var require_range = __commonJS({
       debug2("stars", comp);
       return comp;
     };
-    var isX = (id) => !id || id.toLowerCase() === "x" || id === "*";
+    var isX = (id2) => !id2 || id2.toLowerCase() === "x" || id2 === "*";
     var invalidXRangeOrder = (M2, m, p3) => isX(M2) && !isX(m) || isX(m) && p3 && !isX(p3);
     var replaceTildes = (comp, options) => {
       return comp.trim().split(/\s+/).map((c2) => replaceTilde(c2, options)).join(" ");
@@ -46049,9 +46049,9 @@ var require_id = __commonJS({
   "node_modules/inversify/lib/cjs/utils/id.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.id = id;
+    exports2.id = id2;
     var idCounter = 0;
-    function id() {
+    function id2() {
       return idCounter++;
     }
   }
@@ -46142,9 +46142,9 @@ var require_error_msgs = __commonJS({
     exports2.AMBIGUOUS_MATCH = "Ambiguous match found for serviceIdentifier:";
     exports2.CANNOT_UNBIND = "Could not unbind serviceIdentifier:";
     exports2.NOT_REGISTERED = "No matching bindings found for serviceIdentifier:";
-    var TRYING_TO_RESOLVE_BINDINGS = (name) => `Trying to resolve bindings for "${name}"`;
+    var TRYING_TO_RESOLVE_BINDINGS = (name2) => `Trying to resolve bindings for "${name2}"`;
     exports2.TRYING_TO_RESOLVE_BINDINGS = TRYING_TO_RESOLVE_BINDINGS;
-    var UNDEFINED_INJECT_ANNOTATION = (name) => `@inject called with undefined this could mean that the class ${name} has a circular dependency problem. You can use a LazyServiceIdentifer to overcome this limitation.`;
+    var UNDEFINED_INJECT_ANNOTATION = (name2) => `@inject called with undefined this could mean that the class ${name2} has a circular dependency problem. You can use a LazyServiceIdentifer to overcome this limitation.`;
     exports2.UNDEFINED_INJECT_ANNOTATION = UNDEFINED_INJECT_ANNOTATION;
     exports2.CIRCULAR_DEPENDENCY = "Circular dependency found:";
     exports2.INVALID_BINDING_TYPE = "Invalid binding type:";
@@ -46155,7 +46155,7 @@ var require_error_msgs = __commonJS({
     exports2.LAZY_IN_SYNC = LAZY_IN_SYNC;
     exports2.INVALID_TO_SELF_VALUE = "The toSelf function can only be applied when a constructor is used as service identifier";
     exports2.INVALID_DECORATOR_OPERATION = "The @inject @multiInject @tagged and @named decorators must be applied to the parameters of a class constructor or a class property.";
-    var ARGUMENTS_LENGTH_MISMATCH = (name) => `The number of constructor arguments in the derived class ${name} must be >= than the number of constructor arguments of its base class.`;
+    var ARGUMENTS_LENGTH_MISMATCH = (name2) => `The number of constructor arguments in the derived class ${name2} must be >= than the number of constructor arguments of its base class.`;
     exports2.ARGUMENTS_LENGTH_MISMATCH = ARGUMENTS_LENGTH_MISMATCH;
     exports2.CONTAINER_OPTIONS_MUST_BE_AN_OBJECT = "Invalid Container constructor argument. Container options must be an object.";
     exports2.CONTAINER_OPTIONS_INVALID_DEFAULT_SCOPE = 'Invalid Container option. Default scope must be a string ("singleton" or "transient").';
@@ -46826,7 +46826,7 @@ var require_getTargetId = __commonJS({
       if (targetId === Number.MAX_SAFE_INTEGER) {
         (0, reflect_metadata_utils_1.updateReflectMetadata)(Object, ID_METADATA, targetId, () => Number.MIN_SAFE_INTEGER);
       } else {
-        (0, reflect_metadata_utils_1.updateReflectMetadata)(Object, ID_METADATA, targetId, (id) => id + 1);
+        (0, reflect_metadata_utils_1.updateReflectMetadata)(Object, ID_METADATA, targetId, (id2) => id2 + 1);
       }
       return targetId;
     }
@@ -46916,11 +46916,11 @@ var require_LegacyTargetImpl = __commonJS({
       isTagged() {
         return this.#metadata.tags.size > 0;
       }
-      matchesArray(name) {
-        return this.isArray() && this.#metadata.value === name;
+      matchesArray(name2) {
+        return this.isArray() && this.#metadata.value === name2;
       }
-      matchesNamedTag(name) {
-        return this.#metadata.name === name;
+      matchesNamedTag(name2) {
+        return this.#metadata.name === name2;
       }
       matchesTag(key) {
         return (value) => this.metadata.some((metadata) => metadata.key === key && metadata.value === value);
@@ -47165,12 +47165,12 @@ var require_serialization = __commonJS({
       if (registeredBindings.length !== 0) {
         registeredBindingsList = "\nRegistered bindings:";
         registeredBindings.forEach((binding) => {
-          let name = "Object";
+          let name2 = "Object";
           if (binding.implementationType !== null) {
-            name = getFunctionName(binding.implementationType);
+            name2 = getFunctionName(binding.implementationType);
           }
           registeredBindingsList = `${registeredBindingsList}
- ${name}`;
+ ${name2}`;
           if (binding.constraint.metaData) {
             registeredBindingsList = `${registeredBindingsList} - ${binding.constraint.metaData}`;
           }
@@ -47232,9 +47232,9 @@ var require_serialization = __commonJS({
       if (func.name != null && func.name !== "") {
         return func.name;
       } else {
-        const name = func.toString();
-        const match = name.match(/^function\s*([^\s(]+)/);
-        return match === null ? `Anonymous function: ${name}` : match[1];
+        const name2 = func.toString();
+        const match = name2.match(/^function\s*([^\s(]+)/);
+        return match === null ? `Anonymous function: ${name2}` : match[1];
       }
     }
     function getSymbolDescription(symbol2) {
@@ -48322,8 +48322,8 @@ var require_binding_when_syntax = __commonJS({
         this._binding.constraint = constraint;
         return new binding_on_syntax_1.BindingOnSyntax(this._binding);
       }
-      whenTargetNamed(name) {
-        this._binding.constraint = (0, constraint_helpers_1.namedConstraint)(name);
+      whenTargetNamed(name2) {
+        this._binding.constraint = (0, constraint_helpers_1.namedConstraint)(name2);
         return new binding_on_syntax_1.BindingOnSyntax(this._binding);
       }
       whenTargetIsDefault() {
@@ -48347,8 +48347,8 @@ var require_binding_when_syntax = __commonJS({
         this._binding.constraint = (request2) => request2 !== null && (0, constraint_helpers_1.typeConstraint)(parent)(request2.parentRequest);
         return new binding_on_syntax_1.BindingOnSyntax(this._binding);
       }
-      whenParentNamed(name) {
-        this._binding.constraint = (request2) => request2 !== null && (0, constraint_helpers_1.namedConstraint)(name)(request2.parentRequest);
+      whenParentNamed(name2) {
+        this._binding.constraint = (request2) => request2 !== null && (0, constraint_helpers_1.namedConstraint)(name2)(request2.parentRequest);
         return new binding_on_syntax_1.BindingOnSyntax(this._binding);
       }
       whenParentTagged(tag, value) {
@@ -48363,12 +48363,12 @@ var require_binding_when_syntax = __commonJS({
         this._binding.constraint = (request2) => request2 !== null && !(0, constraint_helpers_1.traverseAncerstors)(request2, (0, constraint_helpers_1.typeConstraint)(ancestor));
         return new binding_on_syntax_1.BindingOnSyntax(this._binding);
       }
-      whenAnyAncestorNamed(name) {
-        this._binding.constraint = (request2) => request2 !== null && (0, constraint_helpers_1.traverseAncerstors)(request2, (0, constraint_helpers_1.namedConstraint)(name));
+      whenAnyAncestorNamed(name2) {
+        this._binding.constraint = (request2) => request2 !== null && (0, constraint_helpers_1.traverseAncerstors)(request2, (0, constraint_helpers_1.namedConstraint)(name2));
         return new binding_on_syntax_1.BindingOnSyntax(this._binding);
       }
-      whenNoAncestorNamed(name) {
-        this._binding.constraint = (request2) => request2 !== null && !(0, constraint_helpers_1.traverseAncerstors)(request2, (0, constraint_helpers_1.namedConstraint)(name));
+      whenNoAncestorNamed(name2) {
+        this._binding.constraint = (request2) => request2 !== null && !(0, constraint_helpers_1.traverseAncerstors)(request2, (0, constraint_helpers_1.namedConstraint)(name2));
         return new binding_on_syntax_1.BindingOnSyntax(this._binding);
       }
       whenAnyAncestorTagged(tag, value) {
@@ -48437,8 +48437,8 @@ var require_binding_when_on_syntax = __commonJS({
       when(constraint) {
         return this._bindingWhenSyntax.when(constraint);
       }
-      whenTargetNamed(name) {
-        return this._bindingWhenSyntax.whenTargetNamed(name);
+      whenTargetNamed(name2) {
+        return this._bindingWhenSyntax.whenTargetNamed(name2);
       }
       whenTargetIsDefault() {
         return this._bindingWhenSyntax.whenTargetIsDefault();
@@ -48449,8 +48449,8 @@ var require_binding_when_on_syntax = __commonJS({
       whenInjectedInto(parent) {
         return this._bindingWhenSyntax.whenInjectedInto(parent);
       }
-      whenParentNamed(name) {
-        return this._bindingWhenSyntax.whenParentNamed(name);
+      whenParentNamed(name2) {
+        return this._bindingWhenSyntax.whenParentNamed(name2);
       }
       whenParentTagged(tag, value) {
         return this._bindingWhenSyntax.whenParentTagged(tag, value);
@@ -48461,14 +48461,14 @@ var require_binding_when_on_syntax = __commonJS({
       whenNoAncestorIs(ancestor) {
         return this._bindingWhenSyntax.whenNoAncestorIs(ancestor);
       }
-      whenAnyAncestorNamed(name) {
-        return this._bindingWhenSyntax.whenAnyAncestorNamed(name);
+      whenAnyAncestorNamed(name2) {
+        return this._bindingWhenSyntax.whenAnyAncestorNamed(name2);
       }
       whenAnyAncestorTagged(tag, value) {
         return this._bindingWhenSyntax.whenAnyAncestorTagged(tag, value);
       }
-      whenNoAncestorNamed(name) {
-        return this._bindingWhenSyntax.whenNoAncestorNamed(name);
+      whenNoAncestorNamed(name2) {
+        return this._bindingWhenSyntax.whenNoAncestorNamed(name2);
       }
       whenNoAncestorTagged(tag, value) {
         return this._bindingWhenSyntax.whenNoAncestorTagged(tag, value);
@@ -48552,8 +48552,8 @@ var require_binding_in_when_on_syntax = __commonJS({
       when(constraint) {
         return this._bindingWhenSyntax.when(constraint);
       }
-      whenTargetNamed(name) {
-        return this._bindingWhenSyntax.whenTargetNamed(name);
+      whenTargetNamed(name2) {
+        return this._bindingWhenSyntax.whenTargetNamed(name2);
       }
       whenTargetIsDefault() {
         return this._bindingWhenSyntax.whenTargetIsDefault();
@@ -48564,8 +48564,8 @@ var require_binding_in_when_on_syntax = __commonJS({
       whenInjectedInto(parent) {
         return this._bindingWhenSyntax.whenInjectedInto(parent);
       }
-      whenParentNamed(name) {
-        return this._bindingWhenSyntax.whenParentNamed(name);
+      whenParentNamed(name2) {
+        return this._bindingWhenSyntax.whenParentNamed(name2);
       }
       whenParentTagged(tag, value) {
         return this._bindingWhenSyntax.whenParentTagged(tag, value);
@@ -48576,14 +48576,14 @@ var require_binding_in_when_on_syntax = __commonJS({
       whenNoAncestorIs(ancestor) {
         return this._bindingWhenSyntax.whenNoAncestorIs(ancestor);
       }
-      whenAnyAncestorNamed(name) {
-        return this._bindingWhenSyntax.whenAnyAncestorNamed(name);
+      whenAnyAncestorNamed(name2) {
+        return this._bindingWhenSyntax.whenAnyAncestorNamed(name2);
       }
       whenAnyAncestorTagged(tag, value) {
         return this._bindingWhenSyntax.whenAnyAncestorTagged(tag, value);
       }
-      whenNoAncestorNamed(name) {
-        return this._bindingWhenSyntax.whenNoAncestorNamed(name);
+      whenNoAncestorNamed(name2) {
+        return this._bindingWhenSyntax.whenNoAncestorNamed(name2);
       }
       whenNoAncestorTagged(tag, value) {
         return this._bindingWhenSyntax.whenNoAncestorTagged(tag, value);
@@ -49896,8 +49896,8 @@ var require_named = __commonJS({
     var METADATA_KEY = __importStar(require_metadata_keys());
     var metadata_1 = require_metadata();
     var decorator_utils_1 = require_decorator_utils();
-    function named(name) {
-      return (0, decorator_utils_1.createTaggedDecorator)(new metadata_1.Metadata(METADATA_KEY.NAMED_TAG, name));
+    function named(name2) {
+      return (0, decorator_utils_1.createTaggedDecorator)(new metadata_1.Metadata(METADATA_KEY.NAMED_TAG, name2));
     }
   }
 });
@@ -50178,9 +50178,9 @@ var require_target_name = __commonJS({
     var METADATA_KEY = __importStar(require_metadata_keys());
     var metadata_1 = require_metadata();
     var decorator_utils_1 = require_decorator_utils();
-    function targetName(name) {
+    function targetName(name2) {
       return function(target, targetKey, index) {
-        const metadata = new metadata_1.Metadata(METADATA_KEY.NAME_TAG, name);
+        const metadata = new metadata_1.Metadata(METADATA_KEY.NAME_TAG, name2);
         (0, decorator_utils_1.tagParameter)(target, targetKey, index, metadata);
       };
     }
@@ -50552,8 +50552,8 @@ var require_provide_in_when_on_syntax = __commonJS({
         ProvideInWhenOnSyntax2.prototype.when = function(constraint) {
           return this._provideWhenSyntax.when(constraint);
         };
-        ProvideInWhenOnSyntax2.prototype.whenTargetNamed = function(name) {
-          return this._provideWhenSyntax.whenTargetNamed(name);
+        ProvideInWhenOnSyntax2.prototype.whenTargetNamed = function(name2) {
+          return this._provideWhenSyntax.whenTargetNamed(name2);
         };
         ProvideInWhenOnSyntax2.prototype.whenTargetTagged = function(tag, value) {
           return this._provideWhenSyntax.whenTargetTagged(tag, value);
@@ -50561,8 +50561,8 @@ var require_provide_in_when_on_syntax = __commonJS({
         ProvideInWhenOnSyntax2.prototype.whenInjectedInto = function(parent) {
           return this._provideWhenSyntax.whenInjectedInto(parent);
         };
-        ProvideInWhenOnSyntax2.prototype.whenParentNamed = function(name) {
-          return this._provideWhenSyntax.whenParentNamed(name);
+        ProvideInWhenOnSyntax2.prototype.whenParentNamed = function(name2) {
+          return this._provideWhenSyntax.whenParentNamed(name2);
         };
         ProvideInWhenOnSyntax2.prototype.whenParentTagged = function(tag, value) {
           return this._provideWhenSyntax.whenParentTagged(tag, value);
@@ -50573,14 +50573,14 @@ var require_provide_in_when_on_syntax = __commonJS({
         ProvideInWhenOnSyntax2.prototype.whenNoAncestorIs = function(ancestor) {
           return this._provideWhenSyntax.whenNoAncestorIs(ancestor);
         };
-        ProvideInWhenOnSyntax2.prototype.whenAnyAncestorNamed = function(name) {
-          return this._provideWhenSyntax.whenAnyAncestorNamed(name);
+        ProvideInWhenOnSyntax2.prototype.whenAnyAncestorNamed = function(name2) {
+          return this._provideWhenSyntax.whenAnyAncestorNamed(name2);
         };
         ProvideInWhenOnSyntax2.prototype.whenAnyAncestorTagged = function(tag, value) {
           return this._provideWhenSyntax.whenAnyAncestorTagged(tag, value);
         };
-        ProvideInWhenOnSyntax2.prototype.whenNoAncestorNamed = function(name) {
-          return this._provideWhenSyntax.whenNoAncestorNamed(name);
+        ProvideInWhenOnSyntax2.prototype.whenNoAncestorNamed = function(name2) {
+          return this._provideWhenSyntax.whenNoAncestorNamed(name2);
         };
         ProvideInWhenOnSyntax2.prototype.whenNoAncestorTagged = function(tag, value) {
           return this._provideWhenSyntax.whenNoAncestorTagged(tag, value);
@@ -50710,10 +50710,10 @@ var require_provide_when_syntax = __commonJS({
           var whenDoneSyntax = new provide_done_syntax_1.default(bindingOnSyntax);
           return new provide_on_syntax_1.default(bindingOnSyntax, whenDoneSyntax);
         };
-        ProvideWhenSyntax2.prototype.whenTargetNamed = function(name) {
+        ProvideWhenSyntax2.prototype.whenTargetNamed = function(name2) {
           var _this = this;
           var bindingOnSyntax = function(bind2, target) {
-            return _this._bindingWhenSyntax(bind2, target).whenTargetNamed(name);
+            return _this._bindingWhenSyntax(bind2, target).whenTargetNamed(name2);
           };
           var whenDoneSyntax = new provide_done_syntax_1.default(bindingOnSyntax);
           return new provide_on_syntax_1.default(bindingOnSyntax, whenDoneSyntax);
@@ -50734,10 +50734,10 @@ var require_provide_when_syntax = __commonJS({
           var whenDoneSyntax = new provide_done_syntax_1.default(bindingOnSyntax);
           return new provide_on_syntax_1.default(bindingOnSyntax, whenDoneSyntax);
         };
-        ProvideWhenSyntax2.prototype.whenParentNamed = function(name) {
+        ProvideWhenSyntax2.prototype.whenParentNamed = function(name2) {
           var _this = this;
           var bindingOnSyntax = function(bind2, target) {
-            return _this._bindingWhenSyntax(bind2, target).whenParentNamed(name);
+            return _this._bindingWhenSyntax(bind2, target).whenParentNamed(name2);
           };
           var whenDoneSyntax = new provide_done_syntax_1.default(bindingOnSyntax);
           return new provide_on_syntax_1.default(bindingOnSyntax, whenDoneSyntax);
@@ -50766,10 +50766,10 @@ var require_provide_when_syntax = __commonJS({
           var whenDoneSyntax = new provide_done_syntax_1.default(bindingOnSyntax);
           return new provide_on_syntax_1.default(bindingOnSyntax, whenDoneSyntax);
         };
-        ProvideWhenSyntax2.prototype.whenAnyAncestorNamed = function(name) {
+        ProvideWhenSyntax2.prototype.whenAnyAncestorNamed = function(name2) {
           var _this = this;
           var bindingOnSyntax = function(bind2, target) {
-            return _this._bindingWhenSyntax(bind2, target).whenAnyAncestorNamed(name);
+            return _this._bindingWhenSyntax(bind2, target).whenAnyAncestorNamed(name2);
           };
           var whenDoneSyntax = new provide_done_syntax_1.default(bindingOnSyntax);
           return new provide_on_syntax_1.default(bindingOnSyntax, whenDoneSyntax);
@@ -50782,10 +50782,10 @@ var require_provide_when_syntax = __commonJS({
           var whenDoneSyntax = new provide_done_syntax_1.default(bindingOnSyntax);
           return new provide_on_syntax_1.default(bindingOnSyntax, whenDoneSyntax);
         };
-        ProvideWhenSyntax2.prototype.whenNoAncestorNamed = function(name) {
+        ProvideWhenSyntax2.prototype.whenNoAncestorNamed = function(name2) {
           var _this = this;
           var bindingOnSyntax = function(bind2, target) {
-            return _this._bindingWhenSyntax(bind2, target).whenNoAncestorNamed(name);
+            return _this._bindingWhenSyntax(bind2, target).whenNoAncestorNamed(name2);
           };
           var whenDoneSyntax = new provide_done_syntax_1.default(bindingOnSyntax);
           return new provide_on_syntax_1.default(bindingOnSyntax, whenDoneSyntax);
@@ -50839,8 +50839,8 @@ var require_provide_when_on_syntax = __commonJS({
         ProvideWhenOnSyntax2.prototype.when = function(constraint) {
           return this._provideWhenSyntax.when(constraint);
         };
-        ProvideWhenOnSyntax2.prototype.whenTargetNamed = function(name) {
-          return this._provideWhenSyntax.whenTargetNamed(name);
+        ProvideWhenOnSyntax2.prototype.whenTargetNamed = function(name2) {
+          return this._provideWhenSyntax.whenTargetNamed(name2);
         };
         ProvideWhenOnSyntax2.prototype.whenTargetTagged = function(tag, value) {
           return this._provideWhenSyntax.whenTargetTagged(tag, value);
@@ -50848,8 +50848,8 @@ var require_provide_when_on_syntax = __commonJS({
         ProvideWhenOnSyntax2.prototype.whenInjectedInto = function(parent) {
           return this._provideWhenSyntax.whenInjectedInto(parent);
         };
-        ProvideWhenOnSyntax2.prototype.whenParentNamed = function(name) {
-          return this._provideWhenSyntax.whenParentNamed(name);
+        ProvideWhenOnSyntax2.prototype.whenParentNamed = function(name2) {
+          return this._provideWhenSyntax.whenParentNamed(name2);
         };
         ProvideWhenOnSyntax2.prototype.whenParentTagged = function(tag, value) {
           return this._provideWhenSyntax.whenParentTagged(tag, value);
@@ -50860,14 +50860,14 @@ var require_provide_when_on_syntax = __commonJS({
         ProvideWhenOnSyntax2.prototype.whenNoAncestorIs = function(ancestor) {
           return this._provideWhenSyntax.whenNoAncestorIs(ancestor);
         };
-        ProvideWhenOnSyntax2.prototype.whenAnyAncestorNamed = function(name) {
-          return this._provideWhenSyntax.whenAnyAncestorNamed(name);
+        ProvideWhenOnSyntax2.prototype.whenAnyAncestorNamed = function(name2) {
+          return this._provideWhenSyntax.whenAnyAncestorNamed(name2);
         };
         ProvideWhenOnSyntax2.prototype.whenAnyAncestorTagged = function(tag, value) {
           return this._provideWhenSyntax.whenAnyAncestorTagged(tag, value);
         };
-        ProvideWhenOnSyntax2.prototype.whenNoAncestorNamed = function(name) {
-          return this._provideWhenSyntax.whenNoAncestorNamed(name);
+        ProvideWhenOnSyntax2.prototype.whenNoAncestorNamed = function(name2) {
+          return this._provideWhenSyntax.whenNoAncestorNamed(name2);
         };
         ProvideWhenOnSyntax2.prototype.whenNoAncestorTagged = function(tag, value) {
           return this._provideWhenSyntax.whenNoAncestorTagged(tag, value);
@@ -53119,9 +53119,9 @@ var require_extension = __commonJS({
   "node_modules/ws/lib/extension.js"(exports2, module2) {
     "use strict";
     var { tokenChars } = require_validation();
-    function push(dest, name, elem) {
-      if (dest[name] === void 0) dest[name] = [elem];
-      else dest[name].push(elem);
+    function push(dest, name2, elem) {
+      if (dest[name2] === void 0) dest[name2] = [elem];
+      else dest[name2].push(elem);
     }
     function parse6(header) {
       const offers = /* @__PURE__ */ Object.create(null);
@@ -53147,12 +53147,12 @@ var require_extension = __commonJS({
               throw new SyntaxError(`Unexpected character at index ${i}`);
             }
             if (end === -1) end = i;
-            const name = header.slice(start, end);
+            const name2 = header.slice(start, end);
             if (code === 44) {
-              push(offers, name, params);
+              push(offers, name2, params);
               params = /* @__PURE__ */ Object.create(null);
             } else {
-              extensionName = name;
+              extensionName = name2;
             }
             start = end = -1;
           } else {
@@ -65072,26 +65072,26 @@ var require_get_intrinsic = __commonJS({
       }
     }
     var errorProto;
-    var doEval = function doEval2(name) {
+    var doEval = function doEval2(name2) {
       var value;
-      if (name === "%AsyncFunction%") {
+      if (name2 === "%AsyncFunction%") {
         value = getEvalledConstructor("async function () {}");
-      } else if (name === "%GeneratorFunction%") {
+      } else if (name2 === "%GeneratorFunction%") {
         value = getEvalledConstructor("function* () {}");
-      } else if (name === "%AsyncGeneratorFunction%") {
+      } else if (name2 === "%AsyncGeneratorFunction%") {
         value = getEvalledConstructor("async function* () {}");
-      } else if (name === "%AsyncGenerator%") {
+      } else if (name2 === "%AsyncGenerator%") {
         var fn = doEval2("%AsyncGeneratorFunction%");
         if (fn) {
           value = fn.prototype;
         }
-      } else if (name === "%AsyncIteratorPrototype%") {
+      } else if (name2 === "%AsyncIteratorPrototype%") {
         var gen = doEval2("%AsyncGenerator%");
         if (gen && getProto) {
           value = getProto(gen.prototype);
         }
       }
-      INTRINSICS[name] = value;
+      INTRINSICS[name2] = value;
       return value;
     };
     var LEGACY_ALIASES = {
@@ -65171,8 +65171,8 @@ var require_get_intrinsic = __commonJS({
       });
       return result;
     };
-    var getBaseIntrinsic = function getBaseIntrinsic2(name, allowMissing) {
-      var intrinsicName = name;
+    var getBaseIntrinsic = function getBaseIntrinsic2(name2, allowMissing) {
+      var intrinsicName = name2;
       var alias;
       if (hasOwn(LEGACY_ALIASES, intrinsicName)) {
         alias = LEGACY_ALIASES[intrinsicName];
@@ -65184,7 +65184,7 @@ var require_get_intrinsic = __commonJS({
           value = doEval(intrinsicName);
         }
         if (typeof value === "undefined" && !allowMissing) {
-          throw new $TypeError("intrinsic " + name + " exists, but is not available. Please file an issue!");
+          throw new $TypeError("intrinsic " + name2 + " exists, but is not available. Please file an issue!");
         }
         return {
           alias,
@@ -65192,19 +65192,19 @@ var require_get_intrinsic = __commonJS({
           value
         };
       }
-      throw new $SyntaxError("intrinsic " + name + " does not exist!");
+      throw new $SyntaxError("intrinsic " + name2 + " does not exist!");
     };
-    module2.exports = function GetIntrinsic(name, allowMissing) {
-      if (typeof name !== "string" || name.length === 0) {
+    module2.exports = function GetIntrinsic(name2, allowMissing) {
+      if (typeof name2 !== "string" || name2.length === 0) {
         throw new $TypeError("intrinsic name must be a non-empty string");
       }
       if (arguments.length > 1 && typeof allowMissing !== "boolean") {
         throw new $TypeError('"allowMissing" argument must be a boolean');
       }
-      if ($exec(/^%?[^%]*%?$/, name) === null) {
+      if ($exec(/^%?[^%]*%?$/, name2) === null) {
         throw new $SyntaxError("`%` may not be present anywhere but at the beginning and end of the intrinsic name");
       }
-      var parts = stringToPath(name);
+      var parts = stringToPath(name2);
       var intrinsicBaseName = parts.length > 0 ? parts[0] : "";
       var intrinsic = getBaseIntrinsic("%" + intrinsicBaseName + "%", allowMissing);
       var intrinsicRealName = intrinsic.name;
@@ -65232,7 +65232,7 @@ var require_get_intrinsic = __commonJS({
         } else if (value != null) {
           if (!(part in value)) {
             if (!allowMissing) {
-              throw new $TypeError("base intrinsic for " + name + " exists, but the property is not available.");
+              throw new $TypeError("base intrinsic for " + name2 + " exists, but the property is not available.");
             }
             return void undefined2;
           }
@@ -65745,9 +65745,9 @@ var require_ms = __commonJS({
       }
       return ms + " ms";
     }
-    function plural2(ms, msAbs, n, name) {
+    function plural2(ms, msAbs, n, name2) {
       var isPlural = msAbs >= n * 1.5;
-      return Math.round(ms / n) + " " + name + (isPlural ? "s" : "");
+      return Math.round(ms / n) + " " + name2 + (isPlural ? "s" : "");
     }
   }
 });
@@ -65900,14 +65900,14 @@ var require_common = __commonJS({
         createDebug.enable("");
         return namespaces;
       }
-      function enabled(name) {
+      function enabled(name2) {
         for (const skip of createDebug.skips) {
-          if (matchesTemplate(name, skip)) {
+          if (matchesTemplate(name2, skip)) {
             return false;
           }
         }
         for (const ns of createDebug.names) {
-          if (matchesTemplate(name, ns)) {
+          if (matchesTemplate(name2, ns)) {
             return true;
           }
         }
@@ -66223,15 +66223,15 @@ var require_node = __commonJS({
       return "colors" in exports2.inspectOpts ? Boolean(exports2.inspectOpts.colors) : tty.isatty(process.stderr.fd);
     }
     function formatArgs(args) {
-      const { namespace: name, useColors: useColors2 } = this;
+      const { namespace: name2, useColors: useColors2 } = this;
       if (useColors2) {
         const c2 = this.color;
         const colorCode = "\x1B[3" + (c2 < 8 ? c2 : "8;5;" + c2);
-        const prefix = `  ${colorCode};1m${name} \x1B[0m`;
+        const prefix = `  ${colorCode};1m${name2} \x1B[0m`;
         args[0] = prefix + args[0].split("\n").join("\n" + prefix);
         args.push(colorCode + "m+" + module2.exports.humanize(this.diff) + "\x1B[0m");
       } else {
-        args[0] = getDate() + name + " " + args[0];
+        args[0] = getDate() + name2 + " " + args[0];
       }
     }
     function getDate() {
@@ -66659,8 +66659,8 @@ var require_agent3 = __commonJS({
           }
           headers.Host = host;
           headers.Connection = "close";
-          for (const name of Object.keys(headers)) {
-            payload += `${name}: ${headers[name]}\r
+          for (const name2 of Object.keys(headers)) {
+            payload += `${name2}: ${headers[name2]}\r
 `;
           }
           const proxyResponsePromise = parse_proxy_response_1.default(socket);
@@ -66908,13 +66908,13 @@ var require_follow_redirects = __commonJS({
         this._ending = true;
       }
     };
-    RedirectableRequest.prototype.setHeader = function(name, value) {
-      this._options.headers[name] = value;
-      this._currentRequest.setHeader(name, value);
+    RedirectableRequest.prototype.setHeader = function(name2, value) {
+      this._options.headers[name2] = value;
+      this._currentRequest.setHeader(name2, value);
     };
-    RedirectableRequest.prototype.removeHeader = function(name) {
-      delete this._options.headers[name];
-      this._currentRequest.removeHeader(name);
+    RedirectableRequest.prototype.removeHeader = function(name2) {
+      delete this._options.headers[name2];
+      this._currentRequest.removeHeader(name2);
     };
     RedirectableRequest.prototype.setTimeout = function(msecs, callback) {
       var self2 = this;
@@ -67676,20 +67676,20 @@ var require_axios = __commonJS({
     var reduceDescriptors = (obj, reducer) => {
       const descriptors = Object.getOwnPropertyDescriptors(obj);
       const reducedDescriptors = {};
-      forEach(descriptors, (descriptor, name) => {
+      forEach(descriptors, (descriptor, name2) => {
         let ret;
-        if ((ret = reducer(descriptor, name, obj)) !== false) {
-          reducedDescriptors[name] = ret || descriptor;
+        if ((ret = reducer(descriptor, name2, obj)) !== false) {
+          reducedDescriptors[name2] = ret || descriptor;
         }
       });
       Object.defineProperties(obj, reducedDescriptors);
     };
     var freezeMethods = (obj) => {
-      reduceDescriptors(obj, (descriptor, name) => {
-        if (isFunction$1(obj) && ["arguments", "caller", "callee"].includes(name)) {
+      reduceDescriptors(obj, (descriptor, name2) => {
+        if (isFunction$1(obj) && ["arguments", "caller", "callee"].includes(name2)) {
           return false;
         }
-        const value = obj[name];
+        const value = obj[name2];
         if (!isFunction$1(value)) return;
         descriptor.enumerable = false;
         if ("writable" in descriptor) {
@@ -67698,7 +67698,7 @@ var require_axios = __commonJS({
         }
         if (!descriptor.set) {
           descriptor.set = () => {
-            throw Error("Can not rewrite read-only method '" + name + "'");
+            throw Error("Can not rewrite read-only method '" + name2 + "'");
           };
         }
       });
@@ -67979,11 +67979,11 @@ var require_axios = __commonJS({
         if (equals < 1) {
           return;
         }
-        const name = trimOWS(part.slice(0, equals));
-        if (!parameterNameRE.test(name)) {
+        const name2 = trimOWS(part.slice(0, equals));
+        if (!parameterNameRE.test(name2)) {
           return;
         }
-        const normalizedName = name.toLowerCase();
+        const normalizedName = name2.toLowerCase();
         if (normalizedName === "__proto__" || normalizedName === "constructor" || normalizedName === "prototype") {
           return;
         }
@@ -68424,8 +68424,8 @@ var require_axios = __commonJS({
         throw new TypeError("target must be an object");
       }
       formData = formData || new (FormData$1 || FormData)();
-      const option = (name, fallback) => {
-        const value = utils$1.getSafeProp(options, name);
+      const option = (name2, fallback) => {
+        const value = utils$1.getSafeProp(options, name2);
         return utils$1.isUndefined(value) ? fallback : value;
       };
       const metaTokens = option("metaTokens", true);
@@ -68555,8 +68555,8 @@ var require_axios = __commonJS({
       params && toFormData(params, this, options);
     }
     var prototype = AxiosURLSearchParams.prototype;
-    prototype.append = function append(name, value) {
-      this._pairs.push([name, value]);
+    prototype.append = function append(name2, value) {
+      this._pairs.push([name2, value]);
     };
     prototype.toString = function toString3(encoder) {
       const _encode3 = encoder ? (value) => encoder.call(this, value, encode$1) : encode$1;
@@ -68614,9 +68614,9 @@ var require_axios = __commonJS({
         if (!length) {
           internals.handlerEntries.clear();
         } else {
-          internals.handlerEntries.forEach(function removeStaleEntry(entry, id) {
+          internals.handlerEntries.forEach(function removeStaleEntry(entry, id2) {
             if (handlers[entry.index] !== entry.handler) {
-              internals.handlerEntries.delete(id);
+              internals.handlerEntries.delete(id2);
             }
           });
         }
@@ -68655,14 +68655,14 @@ var require_axios = __commonJS({
           this.handlers = [];
         }
         syncHandlerEntries(this, internals);
-        const id = internals.nextId++;
+        const id2 = internals.nextId++;
         this.handlers.push(handler2);
-        internals.handlerEntries.set(id, {
+        internals.handlerEntries.set(id2, {
           handler: handler2,
           index: this.handlers.length - 1
         });
         internals.handlersLength = this.handlers.length;
-        return id;
+        return id2;
       }
       /**
        * Remove an interceptor from the stack
@@ -68671,12 +68671,12 @@ var require_axios = __commonJS({
        *
        * @returns {void}
        */
-      eject(id) {
+      eject(id2) {
         const internals = this[$internals];
         syncHandlerEntries(this, internals);
-        const entry = internals.handlerEntries.get(id);
+        const entry = internals.handlerEntries.get(id2);
         if (entry) {
-          internals.handlerEntries.delete(id);
+          internals.handlerEntries.delete(id2);
           if (this.handlers[entry.index] !== entry.handler) {
             return;
           }
@@ -68804,11 +68804,11 @@ var require_axios = __commonJS({
         throw new AxiosError("FormData field is too deeply nested (" + index + " levels). Max depth: " + MAX_DEPTH, AxiosError.ERR_FORM_DATA_DEPTH_EXCEEDED);
       }
     }
-    function parsePropPath(name) {
+    function parsePropPath(name2) {
       const path4 = [];
       const pattern = /[^.[\]]+|\[([^.[\]]*)]/g;
       let match;
-      while ((match = pattern.exec(name)) !== null) {
+      while ((match = pattern.exec(name2)) !== null) {
         throwIfDepthExceeded(path4.length);
         path4.push(match[0] === "[]" ? "" : match[1] || match[0]);
       }
@@ -68829,32 +68829,32 @@ var require_axios = __commonJS({
     function formDataToJSON(formData) {
       function buildPath(path4, value, target, index) {
         throwIfDepthExceeded(index);
-        let name = path4[index++];
-        if (name === "__proto__") return true;
-        const isNumericKey = Number.isFinite(+name);
+        let name2 = path4[index++];
+        if (name2 === "__proto__") return true;
+        const isNumericKey = Number.isFinite(+name2);
         const isLast = index >= path4.length;
-        name = !name && utils$1.isArray(target) ? target.length : name;
+        name2 = !name2 && utils$1.isArray(target) ? target.length : name2;
         if (isLast) {
-          if (utils$1.hasOwnProp(target, name)) {
-            target[name] = utils$1.isArray(target[name]) ? target[name].concat(value) : [target[name], value];
+          if (utils$1.hasOwnProp(target, name2)) {
+            target[name2] = utils$1.isArray(target[name2]) ? target[name2].concat(value) : [target[name2], value];
           } else {
-            target[name] = value;
+            target[name2] = value;
           }
           return !isNumericKey;
         }
-        if (!utils$1.hasOwnProp(target, name) || !utils$1.isObject(target[name])) {
-          target[name] = [];
+        if (!utils$1.hasOwnProp(target, name2) || !utils$1.isObject(target[name2])) {
+          target[name2] = [];
         }
-        const result = buildPath(path4, value, target[name], index);
-        if (result && utils$1.isArray(target[name])) {
-          target[name] = arrayToObject(target[name]);
+        const result = buildPath(path4, value, target[name2], index);
+        if (result && utils$1.isArray(target[name2])) {
+          target[name2] = arrayToObject(target[name2]);
         }
         return !isNumericKey;
       }
       if (utils$1.isFormData(formData) && utils$1.isFunction(formData.entries)) {
         const obj = {};
-        utils$1.forEachEntry(formData, (name, value) => {
-          buildPath(parsePropPath(name), value, obj, 0);
+        utils$1.forEachEntry(formData, (name2, value) => {
+          buildPath(parsePropPath(name2), value, obj, 0);
         });
         return obj;
       }
@@ -69319,12 +69319,12 @@ var require_axios = __commonJS({
     var CRLF_BYTES = textEncoder.encode(CRLF);
     var CRLF_BYTES_COUNT = 2;
     var FormDataPart = class {
-      constructor(name, value) {
+      constructor(name2, value) {
         const {
           escapeName
         } = this.constructor;
         const isStringValue = utils$1.isString(value);
-        let headers = `Content-Disposition: form-data; name="${escapeName(name)}"${!isStringValue && value.name ? `; filename="${escapeName(value.name)}"` : ""}${CRLF}`;
+        let headers = `Content-Disposition: form-data; name="${escapeName(name2)}"${!isStringValue && value.name ? `; filename="${escapeName(value.name)}"` : ""}${CRLF}`;
         if (isStringValue) {
           value = textEncoder.encode(String(value).replace(/\r?\n|\r\n?/g, CRLF));
         } else {
@@ -69334,7 +69334,7 @@ var require_axios = __commonJS({
         this.headers = textEncoder.encode(headers + CRLF);
         this.contentLength = isStringValue ? value.byteLength : value.size;
         this.size = this.headers.byteLength + this.contentLength + CRLF_BYTES_COUNT;
-        this.name = name;
+        this.name = name2;
         this.value = value;
       }
       async *encode() {
@@ -69349,8 +69349,8 @@ var require_axios = __commonJS({
         }
         yield CRLF_BYTES;
       }
-      static escapeName(name) {
-        return String(name).replace(/[\r\n"]/g, (match) => ({
+      static escapeName(name2) {
+        return String(name2).replace(/[\r\n"]/g, (match) => ({
           "\r": "%0D",
           "\n": "%0A",
           '"': "%22"
@@ -69372,8 +69372,8 @@ var require_axios = __commonJS({
       const boundaryBytes = textEncoder.encode("--" + boundary + CRLF);
       const footerBytes = textEncoder.encode("--" + boundary + "--" + CRLF);
       let contentLength = footerBytes.byteLength;
-      const parts = Array.from(form.entries()).map(([name, value]) => {
-        const part = new FormDataPart(name, value);
+      const parts = Array.from(form.entries()).map(([name2, value]) => {
+        const part = new FormDataPart(name2, value);
         contentLength += part.size;
         return part;
       });
@@ -70181,9 +70181,9 @@ var require_axios = __commonJS({
         }
       }
       if (isRedirect2 && options.headers) {
-        for (const name of Object.keys(options.headers)) {
-          if (name.toLowerCase() === "proxy-authorization") {
-            delete options.headers[name];
+        for (const name2 of Object.keys(options.headers)) {
+          if (name2.toLowerCase() === "proxy-authorization") {
+            delete options.headers[name2];
           }
         }
       }
@@ -70242,8 +70242,8 @@ var require_axios = __commonJS({
             options.headers["Proxy-Authorization"] = "Basic " + base643;
           }
           let hasUserHostHeader = false;
-          for (const name of Object.keys(options.headers)) {
-            if (name.toLowerCase() === "host") {
+          for (const name2 of Object.keys(options.headers)) {
+            if (name2.toLowerCase() === "host") {
               hasUserHostHeader = true;
               break;
             }
@@ -70347,8 +70347,8 @@ var require_axios = __commonJS({
           [HTTP2_HEADER_METHOD]: options.method,
           [HTTP2_HEADER_PATH]: options.path
         };
-        utils$1.forEach(headers, (header, name) => {
-          name.charAt(0) !== ":" && (http2Headers[name] = header);
+        utils$1.forEach(headers, (header, name2) => {
+          name2.charAt(0) !== ":" && (http2Headers[name2] = header);
         });
         const req = session.request(http2Headers);
         req.once("response", (responseHeaders) => {
@@ -70934,9 +70934,9 @@ var require_axios = __commonJS({
     var cookies = platform2.hasStandardBrowserEnv ? (
       // Standard browser envs support document.cookie
       {
-        write(name, value, expires, path4, domain2, secure, sameSite) {
+        write(name2, value, expires, path4, domain2, secure, sameSite) {
           if (typeof document === "undefined") return;
-          const cookie = [`${name}=${encodeURIComponent(value)}`];
+          const cookie = [`${name2}=${encodeURIComponent(value)}`];
           if (utils$1.isNumber(expires)) {
             cookie.push(`expires=${new Date(expires).toUTCString()}`);
           }
@@ -70954,13 +70954,13 @@ var require_axios = __commonJS({
           }
           document.cookie = cookie.join("; ");
         },
-        read(name) {
+        read(name2) {
           if (typeof document === "undefined") return null;
           const cookies2 = document.cookie.split(";");
           for (let i = 0; i < cookies2.length; i++) {
             const cookie = cookies2[i].replace(/^\s+/, "");
             const eq = cookie.indexOf("=");
-            if (eq !== -1 && cookie.slice(0, eq) === name) {
+            if (eq !== -1 && cookie.slice(0, eq) === name2) {
               try {
                 return decodeURIComponent(cookie.slice(eq + 1));
               } catch (e2) {
@@ -70970,8 +70970,8 @@ var require_axios = __commonJS({
           }
           return null;
         },
-        remove(name) {
-          this.write(name, "", Date.now() - 864e5, "/");
+        remove(name2) {
+          this.write(name2, "", Date.now() - 864e5, "/");
         }
       }
     ) : (
@@ -71871,21 +71871,21 @@ var require_axios = __commonJS({
       const rejectedReasons = {};
       for (let i = 0; i < length; i++) {
         nameOrAdapter = adapters2[i];
-        let id;
+        let id2;
         adapter = nameOrAdapter;
         if (!isResolvedHandle(nameOrAdapter)) {
-          adapter = knownAdapters[(id = String(nameOrAdapter)).toLowerCase()];
+          adapter = knownAdapters[(id2 = String(nameOrAdapter)).toLowerCase()];
           if (adapter === void 0) {
-            throw new AxiosError(`Unknown adapter '${id}'`);
+            throw new AxiosError(`Unknown adapter '${id2}'`);
           }
         }
         if (adapter && (utils$1.isFunction(adapter) || (adapter = adapter.get(config2)))) {
           break;
         }
-        rejectedReasons[id || "#" + i] = adapter;
+        rejectedReasons[id2 || "#" + i] = adapter;
       }
       if (!adapter) {
-        const reasons = Object.entries(rejectedReasons).map(([id, state]) => `adapter ${id} ` + (state === false ? "is not supported by the environment" : "is not available in the build"));
+        const reasons = Object.entries(rejectedReasons).map(([id2, state]) => `adapter ${id2} ` + (state === false ? "is not supported by the environment" : "is not available in the build"));
         let s2 = length ? reasons.length > 1 ? "since :\n" + reasons.map(renderReason).join("\n") : " " + renderReason(reasons[0]) : "as no adapter specified";
         throw new AxiosError(`There is no suitable adapter to dispatch the request ` + s2, AxiosError.ERR_NOT_SUPPORT);
       }
@@ -73443,11 +73443,11 @@ var require_crypto_key = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.checkSigCryptoKey = checkSigCryptoKey;
     exports2.checkEncCryptoKey = checkEncCryptoKey;
-    function unusable(name, prop = "algorithm.name") {
-      return new TypeError(`CryptoKey does not support this operation, its ${prop} must be ${name}`);
+    function unusable(name2, prop = "algorithm.name") {
+      return new TypeError(`CryptoKey does not support this operation, its ${prop} must be ${name2}`);
     }
-    function isAlgorithm(algorithm, name) {
-      return algorithm.name === name;
+    function isAlgorithm(algorithm, name2) {
+      return algorithm.name === name2;
     }
     function getHashLength(hash2) {
       return parseInt(hash2.name.slice(4), 10);
@@ -78516,12 +78516,12 @@ var require_api3 = __commonJS({
              * @param {*} [options] Override http request option.
              * @throws { FgaError }
              */
-        async listStores(pageSize, continuationToken, name, options) {
+        async listStores(pageSize, continuationToken, name2, options) {
           return api.executeApiRequest({
             operationName: "ListStores",
             method: "GET",
             path: "/stores",
-            queryParams: { page_size: pageSize, continuation_token: continuationToken, name }
+            queryParams: { page_size: pageSize, continuation_token: continuationToken, name: name2 }
           }, options);
         },
         /**
@@ -78588,14 +78588,14 @@ var require_api3 = __commonJS({
              * @param {*} [options] Override http request option.
              * @throws { FgaError }
              */
-        async readAuthorizationModel(storeId, id, options) {
+        async readAuthorizationModel(storeId, id2, options) {
           (0, validation_1.assertParamExists)("readAuthorizationModel", "storeId", storeId);
-          (0, validation_1.assertParamExists)("readAuthorizationModel", "id", id);
+          (0, validation_1.assertParamExists)("readAuthorizationModel", "id", id2);
           return api.executeApiRequest({
             operationName: "ReadAuthorizationModel",
             method: "GET",
             path: "/stores/{store_id}/authorization-models/{id}",
-            pathParams: { store_id: storeId, id }
+            pathParams: { store_id: storeId, id: id2 }
           }, options);
         },
         /**
@@ -78825,8 +78825,8 @@ var require_api3 = __commonJS({
              * @param {*} [options] Override http request option.
              * @throws { FgaError }
              */
-        listStores(pageSize, continuationToken, name, options) {
-          return localVarFp.listStores(pageSize, continuationToken, name, options).then((request2) => request2(axios));
+        listStores(pageSize, continuationToken, name2, options) {
+          return localVarFp.listStores(pageSize, continuationToken, name2, options).then((request2) => request2(axios));
         },
         /**
              * The ListUsers API returns a list of all the users of a specific type that have a relation to a given object.  To arrive at a result, the API uses: an authorization model, explicit tuples written through the Write API, contextual tuples present in the request, and implicit tuples that exist by virtue of applying set theory (such as `document:2021-budget#viewer@document:2021-budget#viewer`; the set of users who are viewers of `document:2021-budget` are the set of users who are the viewers of `document:2021-budget`). An `authorization_model_id` may be specified in the body. If it is not specified, the latest authorization model ID will be used. It is strongly recommended to specify authorization model id for better performance. You may also specify `contextual_tuples` that will be treated as regular tuples. Each of these tuples may have an associated `condition`. You may also provide a `context` object that will be used to evaluate the conditioned tuples in the system. It is strongly recommended to provide a value for all the input parameters of all the conditions, to ensure that all tuples be evaluated correctly. The response will contain the related users in an array in the \"users\" field of the response. These results may include specific objects, usersets  or type-bound public access. Each of these types of results is encoded in its own type and not represented as a string.In cases where a type-bound public access result is returned (e.g. `user:*`), it cannot be inferred that all subjects of that type have a relation to the object; it is possible that negations exist and checks should still be queried on individual subjects to ensure access to that document.The number of users in the response array will be limited by the execution timeout specified in the flag OPENFGA_LIST_USERS_DEADLINE and by the upper bound specified in the flag OPENFGA_LIST_USERS_MAX_RESULTS, whichever is hit first. The returned users will not be sorted, and therefore two identical calls may yield different sets of users.
@@ -78869,8 +78869,8 @@ var require_api3 = __commonJS({
              * @param {*} [options] Override http request option.
              * @throws { FgaError }
              */
-        readAuthorizationModel(storeId, id, options) {
-          return localVarFp.readAuthorizationModel(storeId, id, options).then((request2) => request2(axios));
+        readAuthorizationModel(storeId, id2, options) {
+          return localVarFp.readAuthorizationModel(storeId, id2, options).then((request2) => request2(axios));
         },
         /**
              * The ReadAuthorizationModels API will return all the authorization models for a certain store. OpenFGA\'s response will contain an array of all authorization models, sorted in descending order of creation.  ## Example Assume that a store\'s authorization model has been configured twice. To get all the authorization models that have been created in this store, call GET authorization-models. The API will return a response that looks like: ```json {   \"authorization_models\": [     {       \"id\": \"01G50QVV17PECNVAHX1GG4Y5NC\",       \"type_definitions\": [...]     },     {       \"id\": \"01G4ZW8F4A07AKQ8RHSVG9RW04\",       \"type_definitions\": [...]     },   ],   \"continuation_token\": \"eyJwayI6IkxBVEVTVF9OU0NPTkZJR19hdXRoMHN0b3JlIiwic2siOiIxem1qbXF3MWZLZExTcUoyN01MdTdqTjh0cWgifQ==\" } ``` If there are no more authorization models available, the `continuation_token` field will be empty ```json {   \"authorization_models\": [     {       \"id\": \"01G50QVV17PECNVAHX1GG4Y5NC\",       \"type_definitions\": [...]     },     {       \"id\": \"01G4ZW8F4A07AKQ8RHSVG9RW04\",       \"type_definitions\": [...]     },   ],   \"continuation_token\": \"\" } ```
@@ -79055,8 +79055,8 @@ var require_api3 = __commonJS({
          * @throws { FgaError }
          * @memberof OpenFgaApi
          */
-      listStores(pageSize, continuationToken, name, options) {
-        return (0, exports2.OpenFgaApiFp)(this.configuration, this.credentials).listStores(pageSize, continuationToken, name, options).then((request2) => request2(this.axios));
+      listStores(pageSize, continuationToken, name2, options) {
+        return (0, exports2.OpenFgaApiFp)(this.configuration, this.credentials).listStores(pageSize, continuationToken, name2, options).then((request2) => request2(this.axios));
       }
       /**
          * The ListUsers API returns a list of all the users of a specific type that have a relation to a given object.  To arrive at a result, the API uses: an authorization model, explicit tuples written through the Write API, contextual tuples present in the request, and implicit tuples that exist by virtue of applying set theory (such as `document:2021-budget#viewer@document:2021-budget#viewer`; the set of users who are viewers of `document:2021-budget` are the set of users who are the viewers of `document:2021-budget`). An `authorization_model_id` may be specified in the body. If it is not specified, the latest authorization model ID will be used. It is strongly recommended to specify authorization model id for better performance. You may also specify `contextual_tuples` that will be treated as regular tuples. Each of these tuples may have an associated `condition`. You may also provide a `context` object that will be used to evaluate the conditioned tuples in the system. It is strongly recommended to provide a value for all the input parameters of all the conditions, to ensure that all tuples be evaluated correctly. The response will contain the related users in an array in the \"users\" field of the response. These results may include specific objects, usersets  or type-bound public access. Each of these types of results is encoded in its own type and not represented as a string.In cases where a type-bound public access result is returned (e.g. `user:*`), it cannot be inferred that all subjects of that type have a relation to the object; it is possible that negations exist and checks should still be queried on individual subjects to ensure access to that document.The number of users in the response array will be limited by the execution timeout specified in the flag OPENFGA_LIST_USERS_DEADLINE and by the upper bound specified in the flag OPENFGA_LIST_USERS_MAX_RESULTS, whichever is hit first. The returned users will not be sorted, and therefore two identical calls may yield different sets of users.
@@ -79103,8 +79103,8 @@ var require_api3 = __commonJS({
          * @throws { FgaError }
          * @memberof OpenFgaApi
          */
-      readAuthorizationModel(storeId, id, options) {
-        return (0, exports2.OpenFgaApiFp)(this.configuration, this.credentials).readAuthorizationModel(storeId, id, options).then((request2) => request2(this.axios));
+      readAuthorizationModel(storeId, id2, options) {
+        return (0, exports2.OpenFgaApiFp)(this.configuration, this.credentials).readAuthorizationModel(storeId, id2, options).then((request2) => request2(this.axios));
       }
       /**
          * The ReadAuthorizationModels API will return all the authorization models for a certain store. OpenFGA\'s response will contain an array of all authorization models, sorted in descending order of creation.  ## Example Assume that a store\'s authorization model has been configured twice. To get all the authorization models that have been created in this store, call GET authorization-models. The API will return a response that looks like: ```json {   \"authorization_models\": [     {       \"id\": \"01G50QVV17PECNVAHX1GG4Y5NC\",       \"type_definitions\": [...]     },     {       \"id\": \"01G4ZW8F4A07AKQ8RHSVG9RW04\",       \"type_definitions\": [...]     },   ],   \"continuation_token\": \"eyJwayI6IkxBVEVTVF9OU0NPTkZJR19hdXRoMHN0b3JlIiwic2siOiIxem1qbXF3MWZLZExTcUoyN01MdTdqTjh0cWgifQ==\" } ``` If there are no more authorization models available, the `continuation_token` field will be empty ```json {   \"authorization_models\": [     {       \"id\": \"01G50QVV17PECNVAHX1GG4Y5NC\",       \"type_definitions\": [...]     },     {       \"id\": \"01G4ZW8F4A07AKQ8RHSVG9RW04\",       \"type_definitions\": [...]     },   ],   \"continuation_token\": \"\" } ```
@@ -81748,9 +81748,9 @@ var require_sasl = __commonJS({
           if (!/^.=/.test(attrValue)) {
             throw new Error("SASL: Invalid attribute pair entry");
           }
-          const name = attrValue[0];
+          const name2 = attrValue[0];
           const value = attrValue.substring(2);
-          return [name, value];
+          return [name2, value];
         })
       );
     }
@@ -82527,10 +82527,10 @@ var require_messages = __commonJS({
       length: 4
     };
     var DatabaseError2 = class extends Error {
-      constructor(message, length, name) {
+      constructor(message, length, name2) {
         super(message);
         this.length = length;
-        this.name = name;
+        this.name = name2;
       }
     };
     exports2.DatabaseError = DatabaseError2;
@@ -82543,17 +82543,17 @@ var require_messages = __commonJS({
     };
     exports2.CopyDataMessage = CopyDataMessage;
     var CopyResponse = class {
-      constructor(length, name, binary, columnCount) {
+      constructor(length, name2, binary, columnCount) {
         this.length = length;
-        this.name = name;
+        this.name = name2;
         this.binary = binary;
         this.columnTypes = new Array(columnCount);
       }
     };
     exports2.CopyResponse = CopyResponse;
     var Field = class {
-      constructor(name, tableID, columnID, dataTypeID, dataTypeSize, dataTypeModifier, format) {
-        this.name = name;
+      constructor(name2, tableID, columnID, dataTypeID, dataTypeSize, dataTypeModifier, format) {
+        this.name = name2;
         this.tableID = tableID;
         this.columnID = columnID;
         this.dataTypeID = dataTypeID;
@@ -82808,15 +82808,15 @@ var require_serializer = __commonJS({
     };
     var emptyArray = [];
     var parse6 = (query2) => {
-      const name = query2.name || "";
-      if (name.length > 63) {
+      const name2 = query2.name || "";
+      if (name2.length > 63) {
         console.error("Warning! Postgres only supports 63 characters for query names.");
-        console.error("You supplied %s (%s)", name, name.length);
+        console.error("You supplied %s (%s)", name2, name2.length);
         console.error("This can cause conflicts and silent errors executing queries");
       }
       const types2 = query2.types || emptyArray;
       const len = types2.length;
-      const buffer = writer.addCString(name).addCString(query2.text).addInt16(len);
+      const buffer = writer.addCString(name2).addCString(query2.text).addInt16(len);
       for (let i = 0; i < len; i++) {
         buffer.addInt32(types2[i]);
       }
@@ -83232,14 +83232,14 @@ var require_parser = __commonJS({
       return message;
     };
     var parseField = (reader) => {
-      const name = reader.cstring();
+      const name2 = reader.cstring();
       const tableID = reader.uint32();
       const columnID = reader.int16();
       const dataTypeID = reader.uint32();
       const dataTypeSize = reader.int16();
       const dataTypeModifier = reader.int32();
       const mode = reader.int16() === 0 ? "text" : "binary";
-      return new messages_1.Field(name, tableID, columnID, dataTypeID, dataTypeSize, dataTypeModifier, mode);
+      return new messages_1.Field(name2, tableID, columnID, dataTypeID, dataTypeSize, dataTypeModifier, mode);
     };
     var parseParameterDescriptionMessage = (reader) => {
       const parameterCount = reader.int16();
@@ -83259,9 +83259,9 @@ var require_parser = __commonJS({
       return new messages_1.DataRowMessage(LATEINIT_LENGTH, fields);
     };
     var parseParameterStatusMessage = (reader) => {
-      const name = reader.cstring();
+      const name2 = reader.cstring();
       const value = reader.cstring();
-      return new messages_1.ParameterStatusMessage(LATEINIT_LENGTH, name, value);
+      return new messages_1.ParameterStatusMessage(LATEINIT_LENGTH, name2, value);
     };
     var parseBackendKeyData = (reader) => {
       const processID = reader.int32();
@@ -83315,7 +83315,7 @@ var require_parser = __commonJS({
       }
       return message;
     };
-    var parseErrorMessage = (reader, name) => {
+    var parseErrorMessage = (reader, name2) => {
       const fields = {};
       let fieldType = reader.string(1);
       while (fieldType !== "\0") {
@@ -83323,7 +83323,7 @@ var require_parser = __commonJS({
         fieldType = reader.string(1);
       }
       const messageValue = fields.M;
-      const message = name === "notice" ? new messages_1.NoticeMessage(LATEINIT_LENGTH, messageValue) : new messages_1.DatabaseError(messageValue, LATEINIT_LENGTH, name);
+      const message = name2 === "notice" ? new messages_1.NoticeMessage(LATEINIT_LENGTH, messageValue) : new messages_1.DatabaseError(messageValue, LATEINIT_LENGTH, name2);
       message.severity = fields.S;
       message.code = fields.C;
       message.detail = fields.D;
@@ -85698,9 +85698,9 @@ var require_ProxyLogger = __commonJS({
     exports2.ProxyLogger = void 0;
     var NoopLogger_1 = require_NoopLogger();
     var ProxyLogger = class {
-      constructor(provider, name, version2, options) {
+      constructor(provider, name2, version2, options) {
         this._provider = provider;
-        this.name = name;
+        this.name = name2;
         this.version = version2;
         this.options = options;
       }
@@ -85744,9 +85744,9 @@ var require_ProxyLoggerProvider = __commonJS({
     var NoopLoggerProvider_1 = require_NoopLoggerProvider();
     var ProxyLogger_1 = require_ProxyLogger();
     var ProxyLoggerProvider = class {
-      getLogger(name, version2, options) {
+      getLogger(name2, version2, options) {
         var _a3;
-        return (_a3 = this._getDelegateLogger(name, version2, options)) !== null && _a3 !== void 0 ? _a3 : new ProxyLogger_1.ProxyLogger(this, name, version2, options);
+        return (_a3 = this._getDelegateLogger(name2, version2, options)) !== null && _a3 !== void 0 ? _a3 : new ProxyLogger_1.ProxyLogger(this, name2, version2, options);
       }
       /**
        * Get the delegate logger provider.
@@ -85767,9 +85767,9 @@ var require_ProxyLoggerProvider = __commonJS({
       /**
        * @internal
        */
-      _getDelegateLogger(name, version2, options) {
+      _getDelegateLogger(name2, version2, options) {
         var _a3;
-        return (_a3 = this._delegate) === null || _a3 === void 0 ? void 0 : _a3.getLogger(name, version2, options);
+        return (_a3 = this._delegate) === null || _a3 === void 0 ? void 0 : _a3.getLogger(name2, version2, options);
       }
     };
     exports2.ProxyLoggerProvider = ProxyLoggerProvider;
@@ -85825,8 +85825,8 @@ var require_logs = __commonJS({
        * @param options The options of the logger or instrumentation library.
        * @returns {@link Logger}
        */
-      getLogger(name, version2, options) {
-        return this.getLoggerProvider().getLogger(name, version2, options);
+      getLogger(name2, version2, options) {
+        return this.getLoggerProvider().getLogger(name2, version2, options);
       }
       /** Remove the global logger provider */
       disable() {
@@ -86019,9 +86019,9 @@ var require_scope2 = __commonJS({
     exports2.ValueScope = exports2.ValueScopeName = exports2.Scope = exports2.varKinds = exports2.UsedValueState = void 0;
     var code_1 = require_code();
     var ValueError = class extends Error {
-      constructor(name) {
-        super(`CodeGen: "code" for ${name} not defined`);
-        this.value = name.value;
+      constructor(name2) {
+        super(`CodeGen: "code" for ${name2} not defined`);
+        this.value = name2.value;
       }
     };
     var UsedValueState;
@@ -86088,8 +86088,8 @@ var require_scope2 = __commonJS({
         var _a3;
         if (value.ref === void 0)
           throw new Error("CodeGen: ref must be passed in value");
-        const name = this.toName(nameOrPrefix);
-        const { prefix } = name;
+        const name2 = this.toName(nameOrPrefix);
+        const { prefix } = name2;
         const valueKey = (_a3 = value.key) !== null && _a3 !== void 0 ? _a3 : value.ref;
         let vs = this._values[prefix];
         if (vs) {
@@ -86099,12 +86099,12 @@ var require_scope2 = __commonJS({
         } else {
           vs = this._values[prefix] = /* @__PURE__ */ new Map();
         }
-        vs.set(valueKey, name);
+        vs.set(valueKey, name2);
         const s2 = this._scope[prefix] || (this._scope[prefix] = []);
         const itemIndex = s2.length;
         s2[itemIndex] = value.ref;
-        name.setValue(value, { property: prefix, itemIndex });
-        return name;
+        name2.setValue(value, { property: prefix, itemIndex });
+        return name2;
       }
       getValue(prefix, keyOrRef) {
         const vs = this._values[prefix];
@@ -86113,17 +86113,17 @@ var require_scope2 = __commonJS({
         return vs.get(keyOrRef);
       }
       scopeRefs(scopeName, values = this._values) {
-        return this._reduceValues(values, (name) => {
-          if (name.scopePath === void 0)
-            throw new Error(`CodeGen: name "${name}" has no value`);
-          return (0, code_1._)`${scopeName}${name.scopePath}`;
+        return this._reduceValues(values, (name2) => {
+          if (name2.scopePath === void 0)
+            throw new Error(`CodeGen: name "${name2}" has no value`);
+          return (0, code_1._)`${scopeName}${name2.scopePath}`;
         });
       }
       scopeCode(values = this._values, usedValues, getCode) {
-        return this._reduceValues(values, (name) => {
-          if (name.value === void 0)
-            throw new Error(`CodeGen: name "${name}" has no value`);
-          return name.value.code;
+        return this._reduceValues(values, (name2) => {
+          if (name2.value === void 0)
+            throw new Error(`CodeGen: name "${name2}" has no value`);
+          return name2.value.code;
         }, usedValues, getCode);
       }
       _reduceValues(values, valueCode, usedValues = {}, getCode) {
@@ -86133,20 +86133,20 @@ var require_scope2 = __commonJS({
           if (!vs)
             continue;
           const nameSet = usedValues[prefix] = usedValues[prefix] || /* @__PURE__ */ new Map();
-          vs.forEach((name) => {
-            if (nameSet.has(name))
+          vs.forEach((name2) => {
+            if (nameSet.has(name2))
               return;
-            nameSet.set(name, UsedValueState.Started);
-            let c2 = valueCode(name);
+            nameSet.set(name2, UsedValueState.Started);
+            let c2 = valueCode(name2);
             if (c2) {
               const def = this.opts.es5 ? exports2.varKinds.var : exports2.varKinds.const;
-              code = (0, code_1._)`${code}${def} ${name} = ${c2};${this.opts._n}`;
-            } else if (c2 = getCode === null || getCode === void 0 ? void 0 : getCode(name)) {
+              code = (0, code_1._)`${code}${def} ${name2} = ${c2};${this.opts._n}`;
+            } else if (c2 = getCode === null || getCode === void 0 ? void 0 : getCode(name2)) {
               code = (0, code_1._)`${code}${c2}${this.opts._n}`;
             } else {
-              throw new ValueError(name);
+              throw new ValueError(name2);
             }
-            nameSet.set(name, UsedValueState.Completed);
+            nameSet.set(name2, UsedValueState.Completed);
           });
         }
         return code;
@@ -86223,10 +86223,10 @@ var require_codegen = __commonJS({
       }
     };
     var Def = class extends Node {
-      constructor(varKind, name, rhs) {
+      constructor(varKind, name2, rhs) {
         super();
         this.varKind = varKind;
-        this.name = name;
+        this.name = name2;
         this.rhs = rhs;
       }
       render({ es5, _n }) {
@@ -86446,17 +86446,17 @@ var require_codegen = __commonJS({
       }
     };
     var ForRange = class extends For {
-      constructor(varKind, name, from, to) {
+      constructor(varKind, name2, from, to) {
         super();
         this.varKind = varKind;
-        this.name = name;
+        this.name = name2;
         this.from = from;
         this.to = to;
       }
       render(opts) {
         const varKind = opts.es5 ? scope_1.varKinds.var : this.varKind;
-        const { name, from, to } = this;
-        return `for(${varKind} ${name}=${from}; ${name}<${to}; ${name}++)` + super.render(opts);
+        const { name: name2, from, to } = this;
+        return `for(${varKind} ${name2}=${from}; ${name2}<${to}; ${name2}++)` + super.render(opts);
       }
       get names() {
         const names = addExprNames(super.names, this.from);
@@ -86464,11 +86464,11 @@ var require_codegen = __commonJS({
       }
     };
     var ForIter = class extends For {
-      constructor(loop, varKind, name, iterable) {
+      constructor(loop, varKind, name2, iterable) {
         super();
         this.loop = loop;
         this.varKind = varKind;
-        this.name = name;
+        this.name = name2;
         this.iterable = iterable;
       }
       render(opts) {
@@ -86485,9 +86485,9 @@ var require_codegen = __commonJS({
       }
     };
     var Func = class extends BlockNode {
-      constructor(name, args, async) {
+      constructor(name2, args, async) {
         super();
-        this.name = name;
+        this.name = name2;
         this.args = args;
         this.async = async;
       }
@@ -86574,10 +86574,10 @@ var require_codegen = __commonJS({
       }
       // reserves unique name in the external scope and assigns value to it
       scopeValue(prefixOrName, value) {
-        const name = this._extScope.value(prefixOrName, value);
-        const vs = this._values[name.prefix] || (this._values[name.prefix] = /* @__PURE__ */ new Set());
-        vs.add(name);
-        return name;
+        const name2 = this._extScope.value(prefixOrName, value);
+        const vs = this._values[name2.prefix] || (this._values[name2.prefix] = /* @__PURE__ */ new Set());
+        vs.add(name2);
+        return name2;
       }
       getScopeValue(prefix, keyOrRef) {
         return this._extScope.getValue(prefix, keyOrRef);
@@ -86591,11 +86591,11 @@ var require_codegen = __commonJS({
         return this._extScope.scopeCode(this._values);
       }
       _def(varKind, nameOrPrefix, rhs, constant) {
-        const name = this._scope.toName(nameOrPrefix);
+        const name2 = this._scope.toName(nameOrPrefix);
         if (rhs !== void 0 && constant)
-          this._constants[name.str] = rhs;
-        this._leafNode(new Def(varKind, name, rhs));
-        return name;
+          this._constants[name2.str] = rhs;
+        this._leafNode(new Def(varKind, name2, rhs));
+        return name2;
       }
       // `const` declaration (`var` in es5 mode)
       const(nameOrPrefix, rhs, _constant) {
@@ -86676,20 +86676,20 @@ var require_codegen = __commonJS({
       }
       // `for` statement for a range of values
       forRange(nameOrPrefix, from, to, forBody, varKind = this.opts.es5 ? scope_1.varKinds.var : scope_1.varKinds.let) {
-        const name = this._scope.toName(nameOrPrefix);
-        return this._for(new ForRange(varKind, name, from, to), () => forBody(name));
+        const name2 = this._scope.toName(nameOrPrefix);
+        return this._for(new ForRange(varKind, name2, from, to), () => forBody(name2));
       }
       // `for-of` statement (in es5 mode replace with a normal for loop)
       forOf(nameOrPrefix, iterable, forBody, varKind = scope_1.varKinds.const) {
-        const name = this._scope.toName(nameOrPrefix);
+        const name2 = this._scope.toName(nameOrPrefix);
         if (this.opts.es5) {
           const arr = iterable instanceof code_1.Name ? iterable : this.var("_arr", iterable);
           return this.forRange("_i", 0, (0, code_1._)`${arr}.length`, (i) => {
-            this.var(name, (0, code_1._)`${arr}[${i}]`);
-            forBody(name);
+            this.var(name2, (0, code_1._)`${arr}[${i}]`);
+            forBody(name2);
           });
         }
-        return this._for(new ForIter("of", varKind, name, iterable), () => forBody(name));
+        return this._for(new ForIter("of", varKind, name2, iterable), () => forBody(name2));
       }
       // `for-in` statement.
       // With option `ownProperties` replaced with a `for-of` loop for object keys
@@ -86697,8 +86697,8 @@ var require_codegen = __commonJS({
         if (this.opts.ownProperties) {
           return this.forOf(nameOrPrefix, (0, code_1._)`Object.keys(${obj})`, forBody);
         }
-        const name = this._scope.toName(nameOrPrefix);
-        return this._for(new ForIter("in", varKind, name, obj), () => forBody(name));
+        const name2 = this._scope.toName(nameOrPrefix);
+        return this._for(new ForIter("in", varKind, name2, obj), () => forBody(name2));
       }
       // end `for` loop
       endFor() {
@@ -86763,8 +86763,8 @@ var require_codegen = __commonJS({
         return this;
       }
       // `function` heading (or definition if funcBody is passed)
-      func(name, args = code_1.nil, async, funcBody) {
-        this._blockNode(new Func(name, args, async));
+      func(name2, args = code_1.nil, async, funcBody) {
+        this._blockNode(new Func(name2, args, async));
         if (funcBody)
           this.code(funcBody).endFunc();
         return this;
@@ -88024,10 +88024,10 @@ var require_resolve = __commonJS({
       }
       return count;
     }
-    function getFullPath(resolver, id = "", normalize2) {
+    function getFullPath(resolver, id2 = "", normalize2) {
       if (normalize2 !== false)
-        id = normalizeId(id);
-      const p3 = resolver.parse(id);
+        id2 = normalizeId(id2);
+      const p3 = resolver.parse(id2);
       return _getFullPath(resolver, p3);
     }
     exports2.getFullPath = getFullPath;
@@ -88037,13 +88037,13 @@ var require_resolve = __commonJS({
     }
     exports2._getFullPath = _getFullPath;
     var TRAILING_SLASH_HASH = /#\/?$/;
-    function normalizeId(id) {
-      return id ? id.replace(TRAILING_SLASH_HASH, "") : "";
+    function normalizeId(id2) {
+      return id2 ? id2.replace(TRAILING_SLASH_HASH, "") : "";
     }
     exports2.normalizeId = normalizeId;
-    function resolveUrl(resolver, baseId, id) {
-      id = normalizeId(id);
-      return resolver.resolve(baseId, id);
+    function resolveUrl(resolver, baseId, id2) {
+      id2 = normalizeId(id2);
+      return resolver.resolve(baseId, id2);
     }
     exports2.resolveUrl = resolveUrl;
     var ANCHOR = /^[a-z_][-a-z0-9._]*$/i;
@@ -88813,8 +88813,8 @@ var require_compile = __commonJS({
       if (Object.keys(root.schema).length > 0 && refPath === baseId) {
         return getJsonPointer.call(this, p3, root);
       }
-      const id = (0, resolve_1.normalizeId)(refPath);
-      const schOrRef = this.refs[id] || this.schemas[id];
+      const id2 = (0, resolve_1.normalizeId)(refPath);
+      const schOrRef = this.refs[id2] || this.schemas[id2];
       if (typeof schOrRef == "string") {
         const sch = resolveSchema.call(this, root, schOrRef);
         if (typeof (sch === null || sch === void 0 ? void 0 : sch.schema) !== "object")
@@ -88825,7 +88825,7 @@ var require_compile = __commonJS({
         return;
       if (!schOrRef.validate)
         compileSchema.call(this, schOrRef);
-      if (id === (0, resolve_1.normalizeId)(ref)) {
+      if (id2 === (0, resolve_1.normalizeId)(ref)) {
         const { schema } = schOrRef;
         const { schemaId } = this.opts;
         const schId = schema[schemaId];
@@ -89491,10 +89491,10 @@ var require_schemes = __commonJS({
         "mailto"
       ]
     );
-    function isValidSchemeName(name) {
+    function isValidSchemeName(name2) {
       return supportedSchemeNames.indexOf(
         /** @type {*} */
-        name
+        name2
       ) !== -1;
     }
     function wsIsSecure(wsComponent) {
@@ -89789,8 +89789,8 @@ var require_schemes = __commonJS({
             mailtoComponent.error = mailtoComponent.error || "URI mailto has malformed header fields.";
             continue;
           }
-          const name = decodeHex(eqIdx === -1 ? token : token.slice(0, eqIdx));
-          const normalizedName = name.toLowerCase();
+          const name2 = decodeHex(eqIdx === -1 ? token : token.slice(0, eqIdx));
+          const normalizedName = name2.toLowerCase();
           const value = eqIdx === -1 ? "" : token.slice(eqIdx + 1);
           if (normalizedName === "to") {
             const addrs = value.split(",");
@@ -89807,7 +89807,7 @@ var require_schemes = __commonJS({
           }
           if (headers === null) headers = /** @type {Record<string,string>} */
           /* @__PURE__ */ Object.create(null);
-          headers[name] = decodeHex(value);
+          headers[name2] = decodeHex(value);
         }
         if (headers !== null) mailtoComponent.headers = headers;
       }
@@ -89833,23 +89833,23 @@ var require_schemes = __commonJS({
       if (to.length) mailtoComponent.to = to;
       return mailtoComponent;
     }
-    function mailtoEncodeHeaderName(name) {
-      return encodeWithAllow(name.replace(/%/gu, "%25"), HFNAME);
+    function mailtoEncodeHeaderName(name2) {
+      return encodeWithAllow(name2.replace(/%/gu, "%25"), HFNAME);
     }
     function mailtoSerialize(component, options) {
       const mailtoComponent = component;
       const to = Array.isArray(mailtoComponent.to) ? mailtoComponent.to.slice() : [];
       const sourceHeaders = mailtoComponent.headers && typeof mailtoComponent.headers === "object" ? Object.assign(/* @__PURE__ */ Object.create(null), mailtoComponent.headers) : /* @__PURE__ */ Object.create(null);
       const headers = /* @__PURE__ */ Object.create(null);
-      for (const name in sourceHeaders) {
-        const normalizedName = name.toLowerCase();
+      for (const name2 in sourceHeaders) {
+        const normalizedName = name2.toLowerCase();
         if (normalizedName === "to") {
-          const addrs = String(sourceHeaders[name]).split(",");
+          const addrs = String(sourceHeaders[name2]).split(",");
           for (let i = 0; i < addrs.length; i++) to.push(addrs[i]);
         } else if (normalizedName === "subject" || normalizedName === "body") {
-          headers[normalizedName] = sourceHeaders[name];
+          headers[normalizedName] = sourceHeaders[name2];
         } else {
-          headers[name] = sourceHeaders[name];
+          headers[name2] = sourceHeaders[name2];
         }
       }
       if (mailtoComponent.subject !== void 0) headers.subject = mailtoComponent.subject;
@@ -89876,9 +89876,9 @@ var require_schemes = __commonJS({
       }
       let query = "";
       let count = 0;
-      for (const name in headers) {
+      for (const name2 in headers) {
         if (count++ !== 0) query += "&";
-        query += mailtoEncodeHeaderName(name) + "=" + encodeWithAllow(String(headers[name]), HFNAME);
+        query += mailtoEncodeHeaderName(name2) + "=" + encodeWithAllow(String(headers[name2]), HFNAME);
       }
       if (count !== 0) {
         mailtoComponent.query = query;
@@ -90642,15 +90642,15 @@ var require_core = __commonJS({
             this.addSchema(sch, void 0, _meta, _validateSchema);
           return this;
         }
-        let id;
+        let id2;
         if (typeof schema === "object") {
           const { schemaId } = this.opts;
-          id = schema[schemaId];
-          if (id !== void 0 && typeof id != "string") {
+          id2 = schema[schemaId];
+          if (id2 !== void 0 && typeof id2 != "string") {
             throw new Error(`schema ${schemaId} must be string`);
           }
         }
-        key = (0, resolve_1.normalizeId)(key || id);
+        key = (0, resolve_1.normalizeId)(key || id2);
         this._checkUnique(key);
         this.schemas[key] = this._addSchema(schema, _meta, key, _validateSchema, true);
         return this;
@@ -90729,11 +90729,11 @@ var require_core = __commonJS({
           case "object": {
             const cacheKey = schemaKeyRef;
             this._cache.delete(cacheKey);
-            let id = schemaKeyRef[this.opts.schemaId];
-            if (id) {
-              id = (0, resolve_1.normalizeId)(id);
-              delete this.schemas[id];
-              delete this.refs[id];
+            let id2 = schemaKeyRef[this.opts.schemaId];
+            if (id2) {
+              id2 = (0, resolve_1.normalizeId)(id2);
+              delete this.schemas[id2];
+              delete this.refs[id2];
             }
             return this;
           }
@@ -90795,10 +90795,10 @@ var require_core = __commonJS({
         return this;
       }
       // Add format
-      addFormat(name, format) {
+      addFormat(name2, format) {
         if (typeof format == "string")
           format = new RegExp(format);
-        this.formats[name] = format;
+        this.formats[name2] = format;
         return this;
       }
       errorsText(errors = this.errors, { separator = ", ", dataVar = "data" } = {}) {
@@ -90840,10 +90840,10 @@ var require_core = __commonJS({
         }
       }
       _addSchema(schema, meta3, baseId, validateSchema = this.opts.validateSchema, addSchema = this.opts.addUsedSchema) {
-        let id;
+        let id2;
         const { schemaId } = this.opts;
         if (typeof schema == "object") {
-          id = schema[schemaId];
+          id2 = schema[schemaId];
         } else {
           if (this.opts.jtd)
             throw new Error("schema must be object");
@@ -90853,7 +90853,7 @@ var require_core = __commonJS({
         let sch = this._cache.get(schema);
         if (sch !== void 0)
           return sch;
-        baseId = (0, resolve_1.normalizeId)(id || baseId);
+        baseId = (0, resolve_1.normalizeId)(id2 || baseId);
         const localRefs = resolve_1.getSchemaRefs.call(this, schema, baseId);
         sch = new compile_1.SchemaEnv({ schema, schemaId, meta: meta3, baseId, localRefs });
         this._cache.set(sch.schema, sch);
@@ -90866,9 +90866,9 @@ var require_core = __commonJS({
           this.validateSchema(schema, true);
         return sch;
       }
-      _checkUnique(id) {
-        if (this.schemas[id] || this.refs[id]) {
-          throw new Error(`schema with key or id "${id}" already exists`);
+      _checkUnique(id2) {
+        if (this.schemas[id2] || this.refs[id2]) {
+          throw new Error(`schema with key or id "${id2}" already exists`);
         }
       }
       _compileSchemaEnv(sch) {
@@ -90915,10 +90915,10 @@ var require_core = __commonJS({
           this.addSchema(optsSchemas[key], key);
     }
     function addInitialFormats() {
-      for (const name in this.opts.formats) {
-        const format = this.opts.formats[name];
+      for (const name2 in this.opts.formats) {
+        const format = this.opts.formats[name2];
         if (format)
-          this.addFormat(name, format);
+          this.addFormat(name2, format);
       }
     }
     function addInitialKeywords(defs) {
@@ -93358,11 +93358,11 @@ var require_dist5 = __commonJS({
         (0, limit_1.default)(ajv);
       return ajv;
     };
-    formatsPlugin.get = (name, mode = "full") => {
+    formatsPlugin.get = (name2, mode = "full") => {
       const formats = mode === "fast" ? formats_1.fastFormats : formats_1.fullFormats;
-      const f3 = formats[name];
+      const f3 = formats[name2];
       if (!f3)
-        throw new Error(`Unknown format "${name}"`);
+        throw new Error(`Unknown format "${name2}"`);
       return f3;
     };
     function addFormats2(ajv, list, fs2, exportName) {
@@ -93398,33 +93398,33 @@ function getUserAgent() {
 }
 
 // node_modules/@octokit/core/node_modules/before-after-hook/lib/register.js
-function register(state, name, method, options) {
+function register(state, name2, method, options) {
   if (typeof method !== "function") {
     throw new Error("method for before hook must be a function");
   }
   if (!options) {
     options = {};
   }
-  if (Array.isArray(name)) {
-    return name.reverse().reduce((callback, name2) => {
-      return register.bind(null, state, name2, callback, options);
+  if (Array.isArray(name2)) {
+    return name2.reverse().reduce((callback, name3) => {
+      return register.bind(null, state, name3, callback, options);
     }, method)();
   }
   return Promise.resolve().then(() => {
-    if (!state.registry[name]) {
+    if (!state.registry[name2]) {
       return method(options);
     }
-    return state.registry[name].reduce((method2, registered) => {
+    return state.registry[name2].reduce((method2, registered) => {
       return registered.hook.bind(null, method2, options);
     }, method)();
   });
 }
 
 // node_modules/@octokit/core/node_modules/before-after-hook/lib/add.js
-function addHook(state, kind, name, hook2) {
+function addHook(state, kind, name2, hook2) {
   const orig = hook2;
-  if (!state.registry[name]) {
-    state.registry[name] = [];
+  if (!state.registry[name2]) {
+    state.registry[name2] = [];
   }
   if (kind === "before") {
     hook2 = (method, options) => {
@@ -93449,38 +93449,38 @@ function addHook(state, kind, name, hook2) {
       });
     };
   }
-  state.registry[name].push({
+  state.registry[name2].push({
     hook: hook2,
     orig
   });
 }
 
 // node_modules/@octokit/core/node_modules/before-after-hook/lib/remove.js
-function removeHook(state, name, method) {
-  if (!state.registry[name]) {
+function removeHook(state, name2, method) {
+  if (!state.registry[name2]) {
     return;
   }
-  const index = state.registry[name].map((registered) => {
+  const index = state.registry[name2].map((registered) => {
     return registered.orig;
   }).indexOf(method);
   if (index === -1) {
     return;
   }
-  state.registry[name].splice(index, 1);
+  state.registry[name2].splice(index, 1);
 }
 
 // node_modules/@octokit/core/node_modules/before-after-hook/index.js
 var bind = Function.bind;
 var bindable = bind.bind(bind);
-function bindApi(hook2, state, name) {
+function bindApi(hook2, state, name2) {
   const removeHookRef = bindable(removeHook, null).apply(
     null,
-    name ? [state, name] : [state]
+    name2 ? [state, name2] : [state]
   );
   hook2.api = { remove: removeHookRef };
   hook2.remove = removeHookRef;
   ["before", "error", "after", "wrap"].forEach((kind) => {
-    const args = name ? [state, kind, name] : [state, kind];
+    const args = name2 ? [state, kind, name2] : [state, kind];
     hook2[kind] = hook2.api[kind] = bindable(addHook, null).apply(null, args);
   });
 }
@@ -93592,11 +93592,11 @@ function addQueryParameters(url2, parameters) {
   if (names.length === 0) {
     return url2;
   }
-  return url2 + separator + names.map((name) => {
-    if (name === "q") {
+  return url2 + separator + names.map((name2) => {
+    if (name2 === "q") {
       return "q=" + parameters.q.split("+").map(encodeURIComponent).join("+");
     }
-    return `${name}=${encodeURIComponent(parameters[name])}`;
+    return `${name2}=${encodeURIComponent(parameters[name2])}`;
   }).join("&");
 }
 var urlVariableRegex = /\{[^{}}]+\}/g;
@@ -93982,8 +93982,8 @@ async function fetchWrapper(requestOptions) {
   const parseSuccessResponseBody = requestOptions.request?.parseSuccessResponseBody !== false;
   const body = isPlainObject2(requestOptions.body) || Array.isArray(requestOptions.body) ? JSONStringify(requestOptions.body) : requestOptions.body;
   const requestHeaders = Object.fromEntries(
-    Object.entries(requestOptions.headers).map(([name, value]) => [
-      name,
+    Object.entries(requestOptions.headers).map(([name2, value]) => [
+      name2,
       String(value)
     ])
   );
@@ -96970,17 +96970,17 @@ function decorate(octokit, scope, methodName, defaults3, decorations) {
     }
     if (decorations.renamedParameters) {
       const options2 = requestWithDefaults.endpoint.merge(...args);
-      for (const [name, alias] of Object.entries(
+      for (const [name2, alias] of Object.entries(
         decorations.renamedParameters
       )) {
-        if (name in options2) {
+        if (name2 in options2) {
           octokit.log.warn(
-            `"${name}" parameter is deprecated for "octokit.${scope}.${methodName}()". Use "${alias}" instead`
+            `"${name2}" parameter is deprecated for "octokit.${scope}.${methodName}()". Use "${alias}" instead`
           );
           if (!(alias in options2)) {
-            options2[alias] = options2[name];
+            options2[alias] = options2[name2];
           }
-          delete options2[name];
+          delete options2[name2];
         }
       }
       return requestWithDefaults(options2);
@@ -97051,26 +97051,26 @@ var isSerializableError = (x2) => {
 };
 var MUTABLE_REGISTRY = /* @__PURE__ */ new Map();
 var REGISTRY = MUTABLE_REGISTRY;
-var doRegisterError = (name, target) => {
-  name = name ?? target.name;
-  if (!name) {
-    throw new Error(`no name given, got: <${name}>`);
+var doRegisterError = (name2, target) => {
+  name2 = name2 ?? target.name;
+  if (!name2) {
+    throw new Error(`no name given, got: <${name2}>`);
   }
-  if ("Error" === name) {
+  if ("Error" === name2) {
     throw new Error("registering under the name 'Error' is forbidden");
   }
   const regged = target;
   if (regged.hasOwnProperty("__registeredName")) {
-    throw new Error(`target already has __registeredName set to '${regged.__registeredName}' (already registered?). Trying to (re)register under '${name}': ${target}`);
+    throw new Error(`target already has __registeredName set to '${regged.__registeredName}' (already registered?). Trying to (re)register under '${name2}': ${target}`);
   }
-  regged.__registeredName = name;
-  const have = MUTABLE_REGISTRY.get(name);
+  regged.__registeredName = name2;
+  const have = MUTABLE_REGISTRY.get(name2);
   if (have) {
-    throw new Error(`Duplicate error registration for '${name}' (already registered: ${have}), got: ${target}`);
+    throw new Error(`Duplicate error registration for '${name2}' (already registered: ${have}), got: ${target}`);
   }
-  MUTABLE_REGISTRY.set(name, target);
+  MUTABLE_REGISTRY.set(name2, target);
 };
-var registerError = (name) => doRegisterError.bind(null, name);
+var registerError = (name2) => doRegisterError.bind(null, name2);
 
 // packages/utils/common/lib/format.js
 var trimPrefix = (s2, prefix) => s2.startsWith(prefix) ? s2.slice(prefix.length) : s2;
@@ -97295,16 +97295,16 @@ var INTERNAL_EXCEPTION_MSG = "Internal server error";
 var getOtelTraceId = () => trace.getSpan(context.active())?.spanContext().traceId;
 var InternalException = InternalException_1 = class InternalException2 extends Exception {
   constructor({ traceId, opts } = {}) {
-    const id = traceId ?? getOtelTraceId() ?? randomString(InternalException_1.ID_LENGTH);
-    super(`${INTERNAL_EXCEPTION_MSG} ${id}`, opts);
-    this.traceId = id;
+    const id2 = traceId ?? getOtelTraceId() ?? randomString(InternalException_1.ID_LENGTH);
+    super(`${INTERNAL_EXCEPTION_MSG} ${id2}`, opts);
+    this.traceId = id2;
   }
   static fromJson(x2) {
-    const id = trimPrefix(ignoreError(() => JSON.parse(x2)) ?? x2, INTERNAL_EXCEPTION_MSG).trim();
-    if (!(matchesRandomString(id, InternalException_1.ID_LENGTH) || matchesRandomString(id, InternalException_1.OTEL_TRACEID_LENGTH))) {
-      throw new TypeError(`${id} not a serialized InternalException`);
+    const id2 = trimPrefix(ignoreError(() => JSON.parse(x2)) ?? x2, INTERNAL_EXCEPTION_MSG).trim();
+    if (!(matchesRandomString(id2, InternalException_1.ID_LENGTH) || matchesRandomString(id2, InternalException_1.OTEL_TRACEID_LENGTH))) {
+      throw new TypeError(`${id2} not a serialized InternalException`);
     }
-    return new this({ traceId: id });
+    return new this({ traceId: id2 });
   }
   toJSON() {
     return this.traceId;
@@ -97881,8 +97881,8 @@ var objectSize = (obj) => {
 };
 
 // packages/utils/common/lib/typing/number.js
-var toRestrictedNumber = (name, test) => (x2) => {
-  const makeEx = () => new TypeConversionFailure(name, x2);
+var toRestrictedNumber = (name2, test) => (x2) => {
+  const makeEx = () => new TypeConversionFailure(name2, x2);
   return rethrow(() => {
     if (test(toNumber(x2))) {
       return x2;
@@ -97896,7 +97896,7 @@ var toInteger = (x2) => {
   }
   throw new TypeConversionFailure("Integer", x2);
 };
-var toRestrictedInteger = (name, test) => toRestrictedNumber(name, (n) => test(toInteger(n)));
+var toRestrictedInteger = (name2, test) => toRestrictedNumber(name2, (n) => test(toInteger(n)));
 var toNonNegativeInteger = toRestrictedInteger("NonNegativeInteger", (n) => n >= 0);
 var toPositiveInteger = toRestrictedInteger("PositiveInteger", (n) => n > 0);
 var toPositiveNumber = toRestrictedNumber("toPositiveNumber", (n) => n > 0);
@@ -97991,21 +97991,21 @@ var toNull = (x2) => {
 var toNullOr = (convert1, ...convertN) => {
   return toOr(toNull, convert1, ...convertN);
 };
-var toNumericEnum = (name, e2) => {
+var toNumericEnum = (name2, e2) => {
   return (x2) => {
     const v3 = isNumber(x2) ? e2[x2] : void 0;
     if (v3 === void 0) {
-      throw new TypeConversionFailure(`NumericEnum(${name})`, x2);
+      throw new TypeConversionFailure(`NumericEnum(${name2})`, x2);
     }
     return x2;
   };
 };
-var toStringEnum = (name, e2) => {
+var toStringEnum = (name2, e2) => {
   const revE = Object.fromEntries(Object.entries(e2).map(([n, v3]) => [v3, n]));
   return (x2) => {
     const v3 = isString(x2) ? revE[x2] : void 0;
     if (v3 === void 0) {
-      throw new TypeConversionFailure(`StringEnum(${name})`, x2);
+      throw new TypeConversionFailure(`StringEnum(${name2})`, x2);
     }
     return x2;
   };
@@ -98018,11 +98018,11 @@ var toLiteral = (value) => {
     return value;
   };
 };
-var toLiteralUnion = (name, union2) => {
+var toLiteralUnion = (name2, union2) => {
   return (x2) => {
     if (!union2.includes(x2)) {
       const entries = Array.from(union2).sort().join("|");
-      throw new TypeConversionFailure(`LiteralUnion(${name}: ${entries})`, x2);
+      throw new TypeConversionFailure(`LiteralUnion(${name2}: ${entries})`, x2);
     }
     return x2;
   };
@@ -98067,12 +98067,12 @@ var toNonEmptyString = (x2) => {
   }
   throw new TypeConversionFailure("non-empty string", x2);
 };
-var toStringMatchingRegex = (name, regExp) => {
+var toStringMatchingRegex = (name2, regExp) => {
   return (x2) => {
     if (regExp.test(toString(x2))) {
       return x2;
     }
-    throw new TypeConversionFailure(name, x2);
+    throw new TypeConversionFailure(name2, x2);
   };
 };
 var toIp = toStringMatchingRegex("v4 or v6 IP-Address", ip_regex_default({ exact: true }));
@@ -98081,24 +98081,24 @@ var toUuid = (x2) => toStringMatchingRegex("uuid", uuidRegex)(x2);
 var isRecord2 = (x2) => isObject(x2);
 var toObject = (spec, options) => {
   return (obj) => {
-    const expectedObj = pp`${mapEntries(spec, (name, convert) => [name, convert.name])}`;
+    const expectedObj = pp`${mapEntries(spec, (name2, convert) => [name2, convert.name])}`;
     if (!isRecord2(obj)) {
       throw new TypeConversionFailure(expectedObj, obj);
     }
-    const entries = Object.entries(spec).map(([name, convert]) => {
+    const entries = Object.entries(spec).map(([name2, convert]) => {
       try {
-        if (options?.strict && !(name in obj)) {
+        if (options?.strict && !(name2 in obj)) {
           return [
-            name,
+            name2,
             {
-              error: new TypeConversionFailure("not absent", name)
+              error: new TypeConversionFailure("not absent", name2)
             }
           ];
         }
-        return [name, { value: convert(obj[name]) }];
+        return [name2, { value: convert(obj[name2]) }];
       } catch (e2) {
         if (e2 instanceof TypeConversionFailure) {
-          return [name, { error: e2 }];
+          return [name2, { error: e2 }];
         }
         throw e2;
       }
@@ -98115,16 +98115,16 @@ var asObjectNoCopy = (spec) => {
     if (!isRecord2(obj)) {
       throw new TypeConversionFailure("object", obj);
     }
-    const failures = Object.entries(spec).map(([name, convert]) => {
+    const failures = Object.entries(spec).map(([name2, convert]) => {
       try {
-        const c2 = convert(obj[name]);
-        if (c2 !== void 0 || name in obj) {
-          obj[name] = c2;
+        const c2 = convert(obj[name2]);
+        if (c2 !== void 0 || name2 in obj) {
+          obj[name2] = c2;
         }
         return void 0;
       } catch (e2) {
         if (e2 instanceof TypeConversionFailure) {
-          return [name, e2];
+          return [name2, e2];
         }
         throw e2;
       }
@@ -98700,10 +98700,10 @@ var ExitCode;
   ExitCode2[ExitCode2["Success"] = 0] = "Success";
   ExitCode2[ExitCode2["Failure"] = 1] = "Failure";
 })(ExitCode || (ExitCode = {}));
-function getInput(name, options) {
-  const val = process.env[`INPUT_${name.replace(/ /g, "_").toUpperCase()}`] || "";
+function getInput(name2, options) {
+  const val = process.env[`INPUT_${name2.replace(/ /g, "_").toUpperCase()}`] || "";
   if (options && options.required && !val) {
-    throw new Error(`Input required and not supplied: ${name}`);
+    throw new Error(`Input required and not supplied: ${name2}`);
   }
   if (options && options.trimWhitespace === false) {
     return val;
@@ -98893,14 +98893,14 @@ var nextDurationMs = (lastMs, config2) => {
 
 // packages/utils/node/lib/getEnv.js
 var EnvVariableNotSetError = class extends RuntimeError {
-  constructor(name) {
-    super(`Environment variable ${name} is not set.`);
+  constructor(name2) {
+    super(`Environment variable ${name2} is not set.`);
   }
 };
-var getEnv = (name) => {
-  const value = process.env[name];
+var getEnv = (name2) => {
+  const value = process.env[name2];
   if (!has(value)) {
-    throw new EnvVariableNotSetError(name);
+    throw new EnvVariableNotSetError(name2);
   }
   return value;
 };
@@ -98966,8 +98966,8 @@ var toCreateDeploymentResponse = toObject({
   data: toObject({ id: toNumber })
 });
 var InvalidGitHubEvent = class extends Exception {
-  constructor(name) {
-    super(`Unsupported GitHub event: ${name}.`);
+  constructor(name2) {
+    super(`Unsupported GitHub event: ${name2}.`);
   }
 };
 var UnsupportedGitHubRef = class extends Exception {
@@ -99070,17 +99070,17 @@ var fetchGitHubRepository = async () => {
   };
 };
 var MAX_PULL_REQUESTS_PER_PAGE = 100;
-var listOpenPullRequestNumbers = async (octokit, { owner, name }) => {
+var listOpenPullRequestNumbers = async (octokit, { owner, name: name2 }) => {
   const pullRequests = await octokit.paginate(octokit.rest.pulls.list, {
     owner,
-    repo: name,
+    repo: name2,
     state: "open",
     per_page: MAX_PULL_REQUESTS_PER_PAGE
   });
   return new Set(pullRequests.map((pr) => pr.number));
 };
-function getActionInput(name, required2 = false) {
-  const input2 = getInput(name, { required: required2 });
+function getActionInput(name2, required2 = false) {
+  const input2 = getInput(name2, { required: required2 });
   return input2 === "" ? null : input2;
 }
 var isRequestResponse = (e2) => isObject(e2) && "status" in e2 && isNumber(e2.status);
@@ -99104,9 +99104,9 @@ var listDeployments = async (octokit, owner, repo, environment, headCommitSha) =
     throw e2;
   }
 };
-var getCurrentDeployment = async (token, { owner, name }, environment, headCommitSha) => {
+var getCurrentDeployment = async (token, { owner, name: name2 }, environment, headCommitSha) => {
   const octokit = new Octokit2({ auth: token, request: { fetch: fetch2 } });
-  const deployments = await listDeployments(octokit, owner, name, environment, headCommitSha);
+  const deployments = await listDeployments(octokit, owner, name2, environment, headCommitSha);
   if (0 === deployments.length) {
     throw new NotFound(`No deployment for ${headCommitSha} found.`);
   }
@@ -99531,6 +99531,7 @@ var AVAILABLE_INTERNAL_FLAGS = [
   "cimg-private-registry",
   "cluster-admin",
   "coco-dev",
+  "coco-enforced",
   "coco-secrets",
   "custom-image-entrypoint-autostart",
   "custom-service-image",
@@ -99612,11 +99613,11 @@ var toFlags = toObject({
   })
 });
 var enabledFlags;
-var isEnabled = (name) => {
+var isEnabled = (name2) => {
   if (!enabledFlags) {
     throw new Uninitialized("initFlags() was not called");
   }
-  return enabledFlags.has(name);
+  return enabledFlags.has(name2);
 };
 var allEnabled = () => {
   if (!enabledFlags) {
@@ -99716,8 +99717,8 @@ var toFeatures = toObject({
   available: toReadOnly(toArray(toFeatureName)),
   enabled: toReadOnly(toArray(toFeatureName))
 });
-var isFeatureEnabled = (name) => {
-  return isEnabled(name);
+var isFeatureEnabled = (name2) => {
+  return isEnabled(name2);
 };
 var initFeatures = (features = []) => {
   const result = setEnabledFlags({ features });
@@ -99823,8 +99824,8 @@ var createServiceUrl = (protocol, host, servicePath, dc) => {
   u2.pathname = servicePath;
   return u2;
 };
-var getHeader = (headers, name) => {
-  const lowerName = name.toLowerCase();
+var getHeader = (headers, name2) => {
+  const lowerName = name2.toLowerCase();
   for (const [key, value] of Object.entries(headers)) {
     if (key.toLowerCase() === lowerName) {
       return value;
@@ -99937,52 +99938,53 @@ var toSemVer = (x2) => {
 var HELM_RELEASE_NAME_REGEX = /^[a-z]([-a-z0-9]*[a-z0-9])?$/;
 var MAX_HELM_RELEASE_NAME_LENGTH = 53;
 var validateDeployStageV03 = (stage) => {
-  const routers = Object.entries(stage).filter(([name, service]) => isRouterService(service));
+  const routers = Object.entries(stage).filter(([name2, service]) => isRouterService(service));
   if (routers.length > 1) {
-    throw invalid(routers, `Landscape must configure at most one router service, found ${routers.length}: ${routers.map(([name]) => name).join(", ")}.`);
+    throw invalid(routers, `Landscape must configure at most one router service, found ${routers.length}: ${routers.map(([name2]) => name2).join(", ")}.`);
   }
-  const servers = Object.entries(stage).filter(([name, service]) => isDeployStageServerV02(service));
-  for (const [name, service] of servers) {
-    validateUniquePorts(name, service);
+  const servers = Object.entries(stage).filter(([name2, service]) => isDeployStageServerV02(service));
+  for (const [name2, service] of servers) {
+    validateUniquePorts(name2, service);
   }
   validateAtMostOneLandscapeGateway(stage);
-  for (const [name, service] of servers) {
-    validateLandscapeGatewayHttpPort(name, service);
+  for (const [name2, service] of servers) {
+    validateLandscapeGatewayHttpPort(name2, service);
   }
   if (has(routers[0])) {
-    const [name, router] = routers[0];
-    validateRouterPaths(stage, name, router);
+    const [name2, router] = routers[0];
+    validateRouterPaths(stage, name2, router);
   }
-  for (const [name, service] of Object.entries(stage)) {
+  for (const [name2, service] of Object.entries(stage)) {
     if (isHelmReleaseConfig(service)) {
-      validateHelmReleaseName(name, service);
+      validateHelmReleaseName(name2, service);
     }
   }
 };
-var validateHelmReleaseName = (name, release) => {
-  if (name.length > MAX_HELM_RELEASE_NAME_LENGTH || !HELM_RELEASE_NAME_REGEX.test(name)) {
-    throw invalid(release, `Helm release '${name}' must have a name of at most ${MAX_HELM_RELEASE_NAME_LENGTH} lowercase letters, digits and '-', starting with a letter and ending with a letter or digit.`);
+var isValidHelmReleaseName = (name2) => name2.length <= MAX_HELM_RELEASE_NAME_LENGTH && HELM_RELEASE_NAME_REGEX.test(name2);
+var validateHelmReleaseName = (name2, release) => {
+  if (!isValidHelmReleaseName(name2)) {
+    throw invalid(release, `Helm release '${name2}' must have a name of at most ${MAX_HELM_RELEASE_NAME_LENGTH} lowercase letters, digits and '-', starting with a letter and ending with a letter or digit.`);
   }
 };
-var validateUniquePorts = (name, service) => {
+var validateUniquePorts = (name2, service) => {
   const duplicates = findDuplicates(service.network.ports);
   if (hasDuplicates(service.network.ports)) {
-    throw invalid(service, `Service '${name}' must not configure the same port more than once, but port(s) ${duplicates.join(", ")} are duplicated.`);
+    throw invalid(service, `Service '${name2}' must not configure the same port more than once, but port(s) ${duplicates.join(", ")} are duplicated.`);
   }
 };
 var validateAtMostOneLandscapeGateway = (deployStage) => {
-  const gatewayNames = Object.entries(deployStage).filter(([_3, service]) => isDeployStageServerV02(service) && has(service.network.landscapeGateway) || isRouterService(service) && service.network.isLandscapeGateway).map(([name, _3]) => name);
+  const gatewayNames = Object.entries(deployStage).filter(([_3, service]) => isDeployStageServerV02(service) && has(service.network.landscapeGateway) || isRouterService(service) && service.network.isLandscapeGateway).map(([name2, _3]) => name2);
   if (gatewayNames.length > 1) {
     throw invalid(gatewayNames, `Landscape must configure at most one landscape gateway, found ${gatewayNames.length}: ${gatewayNames.join(", ")}.`);
   }
 };
-var validateLandscapeGatewayHttpPort = (name, service) => {
+var validateLandscapeGatewayHttpPort = (name2, service) => {
   const { landscapeGateway, ports } = service.network;
   if (!has(landscapeGateway)) {
     return;
   }
   if (!ports.includes(landscapeGateway.httpPort)) {
-    throw invalid(service, `Service '${name}' is configured as the landscape gateway with httpPort ${landscapeGateway.httpPort}, which is not one of its configured ports (${ports.join(", ")}).`);
+    throw invalid(service, `Service '${name2}' is configured as the landscape gateway with httpPort ${landscapeGateway.httpPort}, which is not one of its configured ports (${ports.join(", ")}).`);
   }
 };
 var validateRouterPaths = (stage, routerName, router) => {
@@ -100305,9 +100307,9 @@ var prepareRegexps = () => {
   const host = `(?:${domainName}|${ipv6address})`;
   const domainAndPort = `${host}(?::[0-9]+)?`;
   const tag = "[\\w][\\w.-]{0,127}";
-  const name = `(?:${domainAndPort}/)?${remoteName}`;
+  const name2 = `(?:${domainAndPort}/)?${remoteName}`;
   return {
-    reference: new RegExp(`^(${name})(?::(${tag}))?(?:@(${digestPattern}))?$`),
+    reference: new RegExp(`^(${name2})(?::(${tag}))?(?:@(${digestPattern}))?$`),
     name: new RegExp(`^(?:(${domainAndPort})/)?(${remoteName})$`),
     registry: new RegExp(`^${domainAndPort}$`),
     registryAddress: new RegExp(`^(${domainAndPort})(?:/(${remoteName}))?$`),
@@ -100334,25 +100336,25 @@ var withOfficialPrefix = (domain2, remoteName) => {
   return { domain: domain2, remoteName };
 };
 var isRegistryDomain = (segment) => segment === localhost || segment.includes(".") || segment.includes(":") || segment.toLowerCase() !== segment;
-var splitDomain = (name) => {
-  const slash = name.indexOf("/");
+var splitDomain = (name2) => {
+  const slash = name2.indexOf("/");
   if (slash < 0) {
-    return withOfficialPrefix(defaultDomain, name);
+    return withOfficialPrefix(defaultDomain, name2);
   }
-  const maybeDomain = name.slice(0, slash);
+  const maybeDomain = name2.slice(0, slash);
   if (!isRegistryDomain(maybeDomain)) {
-    return withOfficialPrefix(defaultDomain, name);
+    return withOfficialPrefix(defaultDomain, name2);
   }
-  return withOfficialPrefix(normalizeOciRegistry(maybeDomain), name.slice(slash + 1));
+  return withOfficialPrefix(normalizeOciRegistry(maybeDomain), name2.slice(slash + 1));
 };
 var isParsableReference = (reference) => {
   const match = referenceRegexp.exec(reference);
   if (!match) {
     return false;
   }
-  const [, name] = match;
-  const nameMatch = nameRegexp.exec(name);
-  const path3 = nameMatch?.[2] ?? name;
+  const [, name2] = match;
+  const nameMatch = nameRegexp.exec(name2);
+  const path3 = nameMatch?.[2] ?? name2;
   return path3.length <= repositoryNameTotalLengthMax;
 };
 var isOciImageRef = (s2) => {
@@ -100549,10 +100551,10 @@ var configToLandscape = (config2, profile) => {
     return deployStageServerToLandscape(k2, v3, profile);
   }).filter((x2) => x2 !== void 0);
 };
-var routerServiceToServer = (name, config2, profile) => {
+var routerServiceToServer = (name2, config2, profile) => {
   const isLandscapeGateway = config2.network.isLandscapeGateway === true;
   return toServer({
-    name,
+    name: name2,
     planId: config2.plan,
     replicas: config2.replicaCount,
     baseImage: ROUTER_BASE_IMAGE,
@@ -100579,19 +100581,19 @@ var routerServiceToServer = (name, config2, profile) => {
     }
   });
 };
-var v05ServerToServer = (name, config2, profile) => {
+var v05ServerToServer = (name2, config2, profile) => {
   const ports = config2.network.ports.map((port) => ({
     port,
     isPublic: false
   }));
   const network = config2.network.landscapeGateway ? { ports, landscapeGateway: config2.network.landscapeGateway } : { ports, paths: [] };
-  return deployStageServerToLandscape(name, { ...config2, network }, profile);
+  return deployStageServerToLandscape(name2, { ...config2, network }, profile);
 };
-var deployStageServerToLandscape = (name, config2, profile) => {
+var deployStageServerToLandscape = (name2, config2, profile) => {
   const network = config2.network;
   const isLandscapeGateway = has(network) && isLandscapeGatewayNetworkConfig(network);
   return toServer({
-    name,
+    name: name2,
     planId: config2.plan,
     replicas: config2.replicas ?? 1,
     env: config2.env,
@@ -100649,9 +100651,9 @@ var workspaceNameForRef = (repoName, ref) => {
   const maxBaseLength = MAX_WORKSPACE_NAME_LENGTH - hash2.length - 1;
   return `${base.slice(0, maxBaseLength)}-${hash2}`;
 };
-var pullRequestNumberOf = (repoName, name) => {
-  const prNumber = Number(name.slice(name.lastIndexOf("#") + 1));
-  return isOfType(prNumber, toPositiveInteger) && workspaceName(repoName, prNumber) === name ? prNumber : void 0;
+var pullRequestNumberOf = (repoName, name2) => {
+  const prNumber = Number(name2.slice(name2.lastIndexOf("#") + 1));
+  return isOfType(prNumber, toPositiveInteger) && workspaceName(repoName, prNumber) === name2 ? prNumber : void 0;
 };
 var codesphereWorkspaceUrl = (apiUrl, w) => {
   return new URL(import_path4.default.posix.join(apiUrl.pathname, `/ide/teams/${w.teamId}/workspaces/${w.id}`), apiUrl);
@@ -100777,8 +100779,8 @@ var PublicApiClient = class {
   async listGitProviders() {
     return await this.get("metadata/git-providers", toArray(toGitProvider2));
   }
-  async listWorkspaces(teamId) {
-    return await this.get(`workspaces/team/${teamId}`, toArray(toWorkspace2));
+  async listWorkspaces(teamId2) {
+    return await this.get(`workspaces/team/${teamId2}`, toArray(toWorkspace2));
   }
   async createWorkspace(args) {
     return await this.send({
@@ -101150,14 +101152,14 @@ var cleanupStaleDeploymentsWithClient = async (api, config2, listOpenPullRequest
     await deleteWorkspaceIfExists(api, w);
   }
 };
-var getTeam = async (api, name) => {
-  logI(`Fetching team ${name} from Codesphere.`);
-  const teams = (await api.listTeams()).filter((t3) => t3.name === name);
+var getTeam = async (api, name2) => {
+  logI(`Fetching team ${name2} from Codesphere.`);
+  const teams = (await api.listTeams()).filter((t3) => t3.name === name2);
   if (0 === teams.length) {
-    throw new NotFound(`Team ${name} does not exist.`);
+    throw new NotFound(`Team ${name2} does not exist.`);
   }
   if (teams.length > 1) {
-    throw new MultipleMatchesFound(`Found ${teams.length} teams with the exact name ${name}.`);
+    throw new MultipleMatchesFound(`Found ${teams.length} teams with the exact name ${name2}.`);
   }
   return teams[0];
 };
@@ -101184,29 +101186,29 @@ var removeDeployment = async (api, team2, c2, status) => {
 };
 var deployWorkspace = async (api, team2, c2) => {
   logI("Starting deployment to Codesphere");
-  const name = c2.workspaceName ?? workspaceNameForRef(c2.repository.name, c2.gitRef);
-  const existing = await findWorkspace(api, team2, name);
+  const name2 = c2.workspaceName ?? workspaceNameForRef(c2.repository.name, c2.gitRef);
+  const existing = await findWorkspace(api, team2, name2);
   if (existing) {
-    logI(`Workspace ${name} (id: ${existing.id}) already exists.`);
+    logI(`Workspace ${name2} (id: ${existing.id}) already exists.`);
   }
-  const w = existing ?? await createWorkspace(api, team2, c2, name);
+  const w = existing ?? await createWorkspace(api, team2, c2, name2);
   if (existing) {
-    logI(`Starting workspace ${name} (id: ${w.id}).`);
+    logI(`Starting workspace ${name2} (id: ${w.id}).`);
     await api.updateWorkspace(w.id, { replicas: w.replicas });
   }
   await waitUntilWorkspaceRunning(api, w.id);
   return w;
 };
-var findWorkspace = async (api, team2, name) => (await api.listWorkspaces(team2.id)).find((w) => w.name === name);
-var createWorkspace = async (api, team2, c2, name) => {
+var findWorkspace = async (api, team2, name2) => (await api.listWorkspaces(team2.id)).find((w) => w.name === name2);
+var createWorkspace = async (api, team2, c2, name2) => {
   if (!isProviderSupportedBy(c2.repository, await api.listGitProviders())) {
     throw new InvalidState(`Codesphere can't clone from the git provider of ${c2.repository.url}.`);
   }
   const plan = findPlan(await api.listWorkspacePlans(), c2.planTitle, c2.onDemand);
-  logI(`Creating workspace ${name} in Codesphere.`);
+  logI(`Creating workspace ${name2} in Codesphere.`);
   const workspace2 = await api.createWorkspace({
     teamId: team2.id,
-    name,
+    name: name2,
     planId: plan.id,
     replicas: 1,
     baseImage: c2.baseImage,
@@ -101219,9 +101221,9 @@ var createWorkspace = async (api, team2, c2, name) => {
     restricted: c2.restricted,
     vpnConfig: c2.vpnConfigName,
     sharedVaultName: c2.sharedVaultName,
-    env: Object.entries(c2.envVars).map(([name2, value]) => ({ name: name2, value }))
+    env: Object.entries(c2.envVars).map(([name3, value]) => ({ name: name3, value }))
   });
-  logI(`Created workspace ${name} (id: ${workspace2.id}).`);
+  logI(`Created workspace ${name2} (id: ${workspace2.id}).`);
   return workspace2;
 };
 var waitUntilWorkspaceRunning = async (api, workspaceId) => {
@@ -101234,11 +101236,11 @@ var waitUntilWorkspaceRunning = async (api, workspaceId) => {
   });
   logI(`Workspace ${workspaceId} is ready.`);
 };
-var deleteWorkspace = async (api, team2, name) => {
-  logI(`Deleting workspace ${name} in Codesphere.`);
-  const w = await findWorkspace(api, team2, name);
+var deleteWorkspace = async (api, team2, name2) => {
+  logI(`Deleting workspace ${name2} in Codesphere.`);
+  const w = await findWorkspace(api, team2, name2);
   if (!w) {
-    logI(`Workspace ${name} doesn't exist. Nothing to delete.`);
+    logI(`Workspace ${name2} doesn't exist. Nothing to delete.`);
     return;
   }
   await deleteWorkspaceIfExists(api, w);
@@ -101412,7 +101414,7 @@ var nn = Zt(f2, "Cannot apply @preDestroy decorator multiple times in the same c
 
 // packages/utils/common/lib/injectable.js
 var import_inversify_binding_decorators = __toESM(require_lib2(), 1);
-var serviceId = (name) => Symbol.for(name);
+var serviceId = (name2) => Symbol.for(name2);
 
 // packages/streamy/common/lib/api.js
 var StreamStatus;
@@ -101438,14 +101440,14 @@ var RpcThrew = class extends RpcException {
 var RpcTimedOut = class extends RpcException {
 };
 var StreamClosed = class extends Exception {
-  constructor(id, method, recvStatus, sendStatus, reason, cause) {
+  constructor(id2, method, recvStatus, sendStatus, reason, cause) {
     super([
-      `stream id=${id}, method=${method},`,
+      `stream id=${id2}, method=${method},`,
       ` recv status=${StreamStatus[recvStatus]},`,
       ` send status=${StreamStatus[sendStatus]}`,
       `: ${reason}`
     ].join(""));
-    this.id = id;
+    this.id = id2;
     this.method = method;
     this.recvStatus = recvStatus;
     this.sendStatus = sendStatus;
@@ -101475,16 +101477,16 @@ var createStubSubClass = ({ spec, base, call, stream: stream2 }) => {
   class Klass extends base {
   }
   const p3 = Klass.prototype;
-  for (const [name, m] of Object.entries(spec.methods)) {
+  for (const [name2, m] of Object.entries(spec.methods)) {
     switch (m.kind) {
       case "rpc":
-        p3[name] = async function(req, opts) {
+        p3[name2] = async function(req, opts) {
           const finalOpts = m.defaultOptions || opts ? { ...m.defaultOptions, ...opts } : void 0;
           return call({
             stub: this,
             client: this.client,
             context: () => this.context,
-            methodName: name,
+            methodName: name2,
             methodSpec: m,
             reqData: req,
             finalOpts
@@ -101492,12 +101494,12 @@ var createStubSubClass = ({ spec, base, call, stream: stream2 }) => {
         };
         break;
       case "stream":
-        p3[name] = async function() {
+        p3[name2] = async function() {
           return stream2({
             stub: this,
             client: this.client,
             context: () => this.context,
-            methodName: name,
+            methodName: name2,
             methodSpec: m
           });
         };
@@ -101584,9 +101586,9 @@ var createAuthnStubSubClass = (spec, base) => createStubSubClass({
     authenticate: stub.authenticate.bind(stub)
   } : void 0)
 });
-var createAuthnStubClass = (name, spec) => {
+var createAuthnStubClass = (name2, spec) => {
   const klass = createAuthnStubSubClass(spec, AuthnStub);
-  klass.ID = serviceId(name);
+  klass.ID = serviceId(name2);
   return klass;
 };
 
@@ -101787,6 +101789,10 @@ var toWorkspaceRoleChange = toObject({
 var toChangeWorkspaceRolesArgs = toObject({
   workspaceId: toNonNegativeInteger,
   changes: toNonEmptyArray(toWorkspaceRoleChange)
+});
+var toRevokeWorkspaceRolesArgs = toObject({
+  teamIds: toNonEmptyArray(toNonNegativeInteger),
+  userIds: toNonEmptyArray(toNonNegativeInteger)
 });
 var toHasAccessArgs = toObject({
   ...workspaceServiceArgs,
@@ -102006,6 +102012,19 @@ var toRouterStatus = toObject({
   status: toRouterStatusEnum,
   readyReplicas: toNonNegativeInteger,
   desiredReplicas: toUndefOr(toNonNegativeInteger)
+});
+var toHelmReleaseStatus = toObject({
+  name: toString,
+  createdAt: toUndefOr(toDate),
+  chart: toUndefOr(toString),
+  version: toUndefOr(toString),
+  namespace: toString,
+  state: toLiteralUnion("HelmReleaseState", [
+    "failed",
+    "pending",
+    "ready"
+  ]),
+  message: toString
 });
 
 // packages/deployment-service/common/lib/utils/exceptions.js
@@ -103261,14 +103280,14 @@ var procedureResponseFromLegacy = (msg) => {
   const replyMsg = msg;
   const isOk = Status2.Ok === (replyMsg.reply?.code ?? Status2.Ok);
   const r2 = replyMsg.reply;
-  const id = toNonNegativeInteger(replyMsg.endpointId);
+  const id2 = toNonNegativeInteger(replyMsg.endpointId);
   return isOk ? {
     kind: MessageKind.ProcedureResponse,
-    id,
+    id: id2,
     data: r2.data
   } : {
     kind: MessageKind.ProcedureError,
-    id,
+    id: id2,
     error: {
       name: `${r2.errName}`,
       data: `${r2.errMessage}`
@@ -103637,15 +103656,15 @@ var SendStreamSide = class extends StreamSide {
   }
 };
 var ChannelStream = class _ChannelStream {
-  static async create(transport, serializer, id, service, method, toResponse, toRequest, protocol = ProtocolVersion.Legacy, context4) {
-    const cs = new _ChannelStream(transport, serializer, id, service, method, toResponse, toRequest, protocol);
+  static async create(transport, serializer, id2, service, method, toResponse, toRequest, protocol = ProtocolVersion.Legacy, context4) {
+    const cs = new _ChannelStream(transport, serializer, id2, service, method, toResponse, toRequest, protocol);
     await cs.open(context4);
     return cs;
   }
-  constructor(transport, serializer, id, service, method, toResponse, _toRequest, protocol) {
+  constructor(transport, serializer, id2, service, method, toResponse, _toRequest, protocol) {
     this.transport = transport;
     this.serializer = serializer;
-    this.id = id;
+    this.id = id2;
     this.service = service;
     this.method = method;
     this.toResponse = toResponse;
@@ -104113,13 +104132,13 @@ var SimpleStreamyClient = class _SimpleStreamyClient {
     });
   }
   async callImmediately(service, method, data, context4, opts) {
-    const id = nextRequestId();
-    const resp = this.rpcs[id] = resolvablePromise();
+    const id2 = nextRequestId();
+    const resp = this.rpcs[id2] = resolvablePromise();
     try {
       injectTraceContext(context4);
       const req = procedureRequestToWire({
         kind: MessageKind.ProcedureRequest,
-        id,
+        id: id2,
         service,
         method,
         context: context4,
@@ -104127,19 +104146,19 @@ var SimpleStreamyClient = class _SimpleStreamyClient {
       }, this.protocol);
       await this.transport.send(this.serializer.encode(req));
     } catch (e2) {
-      delete this.rpcs[id];
+      delete this.rpcs[id2];
       resp.reject(toError(e2));
       await resp;
     }
     const traceId = trace.getActiveSpan()?.spanContext().traceId;
-    const timeoutMsg = `timeout: service=${service}, method=${method}, id=${id}, traceId=${traceId}`;
+    const timeoutMsg = `timeout: service=${service}, method=${method}, id=${id2}, traceId=${traceId}`;
     try {
       return await throwOnTimeout({
         timeoutMs: opts.timeout,
         promise: resp,
         interrupt: () => {
           resp.reject(new RpcTimedOut(timeoutMsg));
-          delete this.rpcs[id];
+          delete this.rpcs[id2];
         }
       });
     } catch (e2) {
@@ -104155,8 +104174,8 @@ var SimpleStreamyClient = class _SimpleStreamyClient {
       await this.contextUpdate;
     }
     this.throwIfNotReady();
-    const id = nextRequestId();
-    return this.streams[id] = await ChannelStream.create(this.transport, this.serializer, id, service, method, toResponse, toRequest, this.protocol, context4 ?? this.context);
+    const id2 = nextRequestId();
+    return this.streams[id2] = await ChannelStream.create(this.transport, this.serializer, id2, service, method, toResponse, toRequest, this.protocol, context4 ?? this.context);
   }
   async close() {
     await this.doClose();
@@ -104202,15 +104221,15 @@ var SimpleStreamyClient = class _SimpleStreamyClient {
     if (!r2) {
       return false;
     }
-    const id = r2.streamId;
-    const s2 = this.streams[id];
+    const id2 = r2.streamId;
+    const s2 = this.streams[id2];
     if (!s2) {
       return false;
     }
     try {
       await s2.processResponse(r2);
       if (!s2.isAlive) {
-        delete this.streams[id];
+        delete this.streams[id2];
       }
     } catch (e2) {
       logE(e2);
@@ -104223,15 +104242,15 @@ var SimpleStreamyClient = class _SimpleStreamyClient {
       return;
     }
     const msg = toProcedureResponse(data, this.protocol);
-    const id = msg.id;
-    const resp = this.rpcs[id];
+    const id2 = msg.id;
+    const resp = this.rpcs[id2];
     if (!resp) {
       const msgContent = pp`${msg.kind === MessageKind.ProcedureResponse ? msg.data : msg.error}`;
-      logE(`StreamyClient received spurious (late?) response, (${this}, id=${id}, kind=${MessageKind[msg.kind]},
+      logE(`StreamyClient received spurious (late?) response, (${this}, id=${id2}, kind=${MessageKind[msg.kind]},
 msg=${msgContent})`);
       return;
     }
-    delete this.rpcs[id];
+    delete this.rpcs[id2];
     if (msg.kind === MessageKind.ProcedureResponse) {
       resp.resolve(msg.data);
     } else {
@@ -104258,11 +104277,11 @@ var injectTraceContext = (context4) => {
   propagation.inject(context.active(), context4.requestHeaders);
 };
 var callViaProcedureTransport = async (procedureTransport, service, method, data, context4, opts) => {
-  const id = nextRequestId();
+  const id2 = nextRequestId();
   injectTraceContext(context4);
   const req = {
     kind: MessageKind.ProcedureRequest,
-    id,
+    id: id2,
     service,
     method,
     context: context4,
@@ -104277,7 +104296,7 @@ var callViaProcedureTransport = async (procedureTransport, service, method, data
     throw deserializeError2(msg.error);
   } catch (e2) {
     if (e2 instanceof TimedOut) {
-      const timeoutMsg = `timeout: service=${service}, method=${method}, id=${id}, traceId=${traceId}`;
+      const timeoutMsg = `timeout: service=${service}, method=${method}, id=${id2}, traceId=${traceId}`;
       throw new RpcTimedOut(timeoutMsg);
     }
     throw e2;
@@ -104672,11 +104691,11 @@ var __decorate13 = function(decorators, target, key, desc) {
   else for (var i = decorators.length - 1; i >= 0; i--) if (d4 = decorators[i]) r2 = (c2 < 3 ? d4(r2) : c2 > 3 ? d4(target, key, r2) : d4(target, key)) || r2;
   return c2 > 3 && r2 && Object.defineProperty(target, key, r2), r2;
 };
-var workspaceAlreadyExists = (name) => `The workspace with the name "${name}" already exists`;
+var workspaceAlreadyExists = (name2) => `The workspace with the name "${name2}" already exists`;
 var FreeWorkspaceLimitReached = class FreeWorkspaceLimitReached2 extends SimpleSerializableException {
-  static create({ teamId, planId, limit, inUse, requested }) {
+  static create({ teamId: teamId2, planId, limit, inUse, requested }) {
     return new this([
-      `Request would exceed the team=${teamId} limit`,
+      `Request would exceed the team=${teamId2} limit`,
       ` of ${limit} free replicas for plan ${planId}`,
       ` (in use: ${inUse}, requested: ${requested}).`
     ].join(""), { scope: "public" });
@@ -104882,6 +104901,21 @@ var toWorkspaceRoleAssignment = toObject({
   assigned: toWorkspaceRole,
   inherited: toUndefOr(toWorkspaceRole)
 });
+var toTeamsWorkspacesArgs = toObject({
+  teamIds: toArray(toNonNegativeInteger)
+});
+var { id, name, teamId, dataCenterId, createdAt } = workspace;
+var toWorkspaceSummary = toObject({
+  id,
+  name,
+  teamId,
+  dataCenterId,
+  createdAt
+});
+var toTeamWorkspaceCount = toObject({
+  teamId: toNonNegativeInteger,
+  count: toNonNegativeInteger
+});
 var workspacesService = {
   name: "Workspaces",
   methods: {
@@ -104896,6 +104930,18 @@ var workspacesService = {
     revokeTeamWorkspaceRoles: rpc({
       request: toTeamServiceOnBehalfOfUserArgs,
       response: toVoid
+    }),
+    revokeWorkspaceRoles: rpc({
+      request: toRevokeWorkspaceRolesArgs,
+      response: toVoid
+    }),
+    listTeamsWorkspaces: rpc({
+      request: toTeamsWorkspacesArgs,
+      response: toArray(toWorkspaceSummary)
+    }),
+    countTeamsWorkspaces: rpc({
+      request: toTeamsWorkspacesArgs,
+      response: toArray(toTeamWorkspaceCount)
     }),
     createWorkspace: rpc({
       request: toCreateWorkspaceServiceArgs,
@@ -104962,6 +105008,7 @@ WorkspacesStub = __decorate14([
 var toReplicaSum = toObject({
   replicas: toUndefOr(toNullOr(toOr(toNumber, toString)))
 });
+var toWorkspaceCountRows = toArray(toObject({ teamId: toNumber, count: toOr(toNumber, toString) }));
 
 // packages/workspace-service/node/lib/data-access/WorkspacesDAO.js
 var ALREADY_EXISTS_ERROR = "Team already has a workspace with the given name.";
@@ -105049,11 +105096,11 @@ var authenticate = async (authUrl, email3, password) => {
     ...session
   };
 };
-var deleteWorkspace2 = async (workspaces, teamId, wsName) => {
+var deleteWorkspace2 = async (workspaces, teamId2, wsName) => {
   logI(`Deleting workspace ${wsName} in Codesphere.`);
   try {
     await workspaces.deleteWorkspace({
-      workspaceId: (await findWorkspace2(workspaces, teamId, wsName)).id
+      workspaceId: (await findWorkspace2(workspaces, teamId2, wsName)).id
     });
     logI(`Workspace ${wsName} successfully deleted.`);
     return;
@@ -105065,11 +105112,11 @@ var deleteWorkspace2 = async (workspaces, teamId, wsName) => {
     throw e2;
   }
 };
-var createWorkspaceIfNotExist = async (workspaces, { teamId, planId, workspaceName: workspaceName2, gitUrl, isPrivateRepo, initialBranch, cloneDepth, skipLfs, recurseSubmodules, vpnConfig, sharedVaultName, restricted, baseImage: baseImage2, envVars }) => {
+var createWorkspaceIfNotExist = async (workspaces, { teamId: teamId2, planId, workspaceName: workspaceName2, gitUrl, isPrivateRepo, initialBranch, cloneDepth, skipLfs, recurseSubmodules, vpnConfig, sharedVaultName, restricted, baseImage: baseImage2, envVars }) => {
   try {
     return {
       ws: await workspaces.createWorkspace({
-        teamId,
+        teamId: teamId2,
         name: workspaceName2,
         planId,
         isPrivateRepo,
@@ -105091,14 +105138,14 @@ var createWorkspaceIfNotExist = async (workspaces, { teamId, planId, workspaceNa
     };
   } catch (e2) {
     if (e2 instanceof RpcThrew && isWorkspaceAlreadyExists(e2, workspaceName2)) {
-      const ws = await findWorkspace2(workspaces, teamId, workspaceName2);
+      const ws = await findWorkspace2(workspaces, teamId2, workspaceName2);
       logI(`Workspace ${workspaceName2} (id: ${ws.id}) already exists.`);
       return { ws, created: false };
     }
     throw e2;
   }
 };
-var findWorkspace2 = async (workspaces, teamId, name) => getFirst((await workspaces.listWorkspaces({ teamId })).filter((w) => w.name === name));
+var findWorkspace2 = async (workspaces, teamId2, name2) => getFirst((await workspaces.listWorkspaces({ teamId: teamId2 })).filter((w) => w.name === name2));
 var isWorkspaceAlreadyExists = (e2, workspaceName2) => [workspaceAlreadyExists(workspaceName2), ALREADY_EXISTS_ERROR].some((m) => e2.message === m);
 var deployWorkspace2 = async (workspaces, deployment, replica, args) => {
   logI("Starting deployment to Codesphere");
@@ -105113,14 +105160,14 @@ var deployWorkspace2 = async (workspaces, deployment, replica, args) => {
   await waitForWorkspaceStatus(replica, ws.id, (info) => isReplicaInfo(info) && info.server === IDE_SERVER_NAME && info.status === WorkspaceStatus.Running);
   return ws;
 };
-var getTeam2 = async (team2, name) => {
-  logI(`Fetching team ${name} from Codesphere.`);
-  const teams = (await team2.listTeams()).filter((t3) => t3.name === name);
+var getTeam2 = async (team2, name2) => {
+  logI(`Fetching team ${name2} from Codesphere.`);
+  const teams = (await team2.listTeams()).filter((t3) => t3.name === name2);
   if (0 === teams.length) {
-    throw new NotFound(`Team ${name} does not exist.`);
+    throw new NotFound(`Team ${name2} does not exist.`);
   }
   if (teams.length > 1) {
-    throw new MultipleMatchesFound2(`Found ${teams.length} teams with the exact name ${name}.`);
+    throw new MultipleMatchesFound2(`Found ${teams.length} teams with the exact name ${name2}.`);
   }
   return teams[0];
 };
@@ -106931,12 +106978,12 @@ function merge2(a2, b) {
   });
   return clone(a2, def);
 }
-function partial(Class2, schema, mask, name = "partial") {
+function partial(Class2, schema, mask, name2 = "partial") {
   const currDef = schema._zod.def;
   const checks = currDef.checks;
   const hasChecks = checks && checks.length > 0;
   if (hasChecks) {
-    throw new Error(`.${name}() cannot be used on object schemas containing refinements`);
+    throw new Error(`.${name2}() cannot be used on object schemas containing refinements`);
   }
   const selected = mask ? new Set(maskedKeys(schema, mask)) : void 0;
   const newShape = {};
@@ -107276,7 +107323,7 @@ function newError(Definition) {
   return new Definition();
 }
 // @__NO_SIDE_EFFECTS__
-function $constructor(name, initializer3, proto, params) {
+function $constructor(name2, initializer3, proto, params) {
   const zodProto = {};
   function Internals(def) {
     this.def = def;
@@ -107294,10 +107341,10 @@ function $constructor(name, initializer3, proto, params) {
       } finally {
         _zodDesc.value = void 0;
       }
-    } else if (inst._zod.traits.has(name)) {
+    } else if (inst._zod.traits.has(name2)) {
       return;
     }
-    inst._zod.traits.add(name);
+    inst._zod.traits.add(name2);
     initializer3(inst, def);
     if (initialized) {
       const own2 = Object.getPrototypeOf(inst);
@@ -107323,7 +107370,7 @@ function $constructor(name, initializer3, proto, params) {
   const Parent = params?.Parent ?? Object;
   class Definition extends Parent {
   }
-  Object.defineProperty(Definition, "name", { value: name });
+  Object.defineProperty(Definition, "name", { value: name2 });
   function _3(def) {
     const inst = params?.Parent ? newError(Definition) : this;
     init2(inst, def);
@@ -107344,10 +107391,10 @@ function $constructor(name, initializer3, proto, params) {
     value: (inst) => {
       if (params?.Parent && inst instanceof params.Parent)
         return true;
-      return inst?._zod?.traits?.has(name);
+      return inst?._zod?.traits?.has(name2);
     }
   });
-  Object.defineProperty(_3, "name", { value: name });
+  Object.defineProperty(_3, "name", { value: name2 });
   return _3;
 }
 var $brand = /* @__PURE__ */ Symbol("zod_brand");
@@ -107357,8 +107404,8 @@ var $ZodAsyncError = class extends Error {
   }
 };
 var $ZodEncodeError = class extends Error {
-  constructor(name) {
-    super(`Encountered unidirectional transform during encode: ${name}`);
+  constructor(name2) {
+    super(`Encountered unidirectional transform during encode: ${name2}`);
     this.name = "ZodEncodeError";
   }
 };
@@ -109430,15 +109477,15 @@ var $ZodObjectJIT = /* @__PURE__ */ $constructor("$ZodObjectJIT", (inst, def) =>
     const syms = normalized.symbolKeys;
     const doc = new Doc(["payload", "ctx"], { shape, inst, memo: memo2, syms });
     const parseStr = (k2) => `shape[${k2}]._zod.run({ value: input[${k2}], issues: [] }, ctx)`;
-    const prefixStr = (id, k2) => `
-          let ${id}_ab = false;
-          for (let i = 0; i < ${id}.issues.length; i++) {
-            const iss = ${id}.issues[i];
+    const prefixStr = (id2, k2) => `
+          let ${id2}_ab = false;
+          for (let i = 0; i < ${id2}.issues.length; i++) {
+            const iss = ${id2}.issues[i];
             iss.path = iss.path ? [${k2}, ...iss.path] : [${k2}];
             payload.issues.push(iss);
-            if (iss.continue !== true) ${id}_ab = true;
+            if (iss.continue !== true) ${id2}_ab = true;
           }
-          if (${id}_ab && ctx && ctx.abortEarly) {
+          if (${id2}_ab && ctx && ctx.abortEarly) {
             payload.value = newResult;
             return payload;
           }`;
@@ -109452,34 +109499,34 @@ var $ZodObjectJIT = /* @__PURE__ */ $constructor("$ZodObjectJIT", (inst, def) =>
     for (const key of normalized.allKeys) {
       if (key === "__proto__")
         continue;
-      const id = ids[key];
+      const id2 = ids[key];
       const k2 = typeof key === "symbol" ? `syms[${syms.indexOf(key)}]` : esc(key);
       const isPresent = `${k2} in input`;
       const schema = shape[key];
       const optin = schema?._zod?.optin;
       const isOptionalIn = optin !== void 0;
       const isOptionalOut = schema?._zod?.optout === "optional";
-      doc.write(`const ${id} = ${parseStr(k2)};`);
+      doc.write(`const ${id2} = ${parseStr(k2)};`);
       if (isOptionalIn && isOptionalOut) {
-        const assign = optin === "optional" ? `${id}_present` : `${id}.value !== undefined || ${id}_present`;
+        const assign = optin === "optional" ? `${id2}_present` : `${id2}.value !== undefined || ${id2}_present`;
         doc.write(`
-        const ${id}_present = ${isPresent};
-        if (!${id}.issues.length || ${id}_present) {
-          if (${id}.issues.length) {${prefixStr(id, k2)}
+        const ${id2}_present = ${isPresent};
+        if (!${id2}.issues.length || ${id2}_present) {
+          if (${id2}.issues.length) {${prefixStr(id2, k2)}
           }
 
           if (${assign}) {
-            newResult[${k2}] = ${id}.value;
+            newResult[${k2}] = ${id2}.value;
           }
         }
 
       `);
       } else if (!isOptionalIn) {
         doc.write(`
-        const ${id}_present = ${isPresent};
-        if (${id}.issues.length) {${prefixStr(id, k2)}
+        const ${id2}_present = ${isPresent};
+        if (${id2}.issues.length) {${prefixStr(id2, k2)}
         }
-        if (!${id}_present && !${id}.issues.length) {
+        if (!${id2}_present && !${id2}.issues.length) {
           payload.issues.push({
             code: "invalid_type",
             expected: "nonoptional",
@@ -109492,22 +109539,22 @@ var $ZodObjectJIT = /* @__PURE__ */ $constructor("$ZodObjectJIT", (inst, def) =>
           }
         }
 
-        if (${id}_present) {
-          newResult[${k2}] = ${id}.value;
+        if (${id2}_present) {
+          newResult[${k2}] = ${id2}.value;
         }
 
       `);
       } else {
         doc.write(`
-        if (${id}.issues.length) {${prefixStr(id, k2)}
+        if (${id2}.issues.length) {${prefixStr(id2, k2)}
         }
       `);
         if (optin === "defaulted") {
-          doc.write(`newResult[${k2}] = ${id}.value;`);
+          doc.write(`newResult[${k2}] = ${id2}.value;`);
         } else {
           doc.write(`
-        if (${id}.value !== undefined || ${isPresent}) {
-          newResult[${k2}] = ${id}.value;
+        if (${id2}.value !== undefined || ${isPresent}) {
+          newResult[${k2}] = ${id2}.value;
         }
       `);
         }
@@ -118885,13 +118932,13 @@ ${code}
   return fn;
 }
 function addConstant(ctx, value) {
-  for (const [name2, v3] of ctx.constants) {
+  for (const [name3, v3] of ctx.constants) {
     if (v3 === value)
-      return name2;
+      return name3;
   }
-  const name = `c${ctx.constantCounter++}`;
-  ctx.constants.set(name, value);
-  return name;
+  const name2 = `c${ctx.constantCounter++}`;
+  ctx.constants.set(name2, value);
+  return name2;
 }
 function addUserConstant(ctx, fn) {
   ctx.definite = false;
@@ -121535,26 +121582,26 @@ function extractDefs(ctx, schema) {
     return;
   const idToSchema = /* @__PURE__ */ new Map();
   for (const entry of ctx.seen.entries()) {
-    const id = ctx.metadataRegistry.get(entry[0])?.id;
-    if (id) {
-      const existing = idToSchema.get(id);
+    const id2 = ctx.metadataRegistry.get(entry[0])?.id;
+    if (id2) {
+      const existing = idToSchema.get(id2);
       if (existing && existing !== entry[0]) {
-        throw new Error(`Duplicate schema id "${id}" detected during JSON Schema conversion. Two different schemas cannot share the same id when converted together.`);
+        throw new Error(`Duplicate schema id "${id2}" detected during JSON Schema conversion. Two different schemas cannot share the same id when converted together.`);
       }
-      idToSchema.set(id, entry[0]);
+      idToSchema.set(id2, entry[0]);
     }
   }
   const makeURI = (entry) => {
     const defsSegment = ctx.target === "draft-2020-12" ? "$defs" : "definitions";
     if (ctx.external) {
       const externalId = ctx.external.registry.get(entry[0])?.id;
-      const uriGenerator = ctx.external.uri ?? ((id2) => id2);
+      const uriGenerator = ctx.external.uri ?? ((id3) => id3);
       if (externalId) {
         return { ref: uriGenerator(externalId) };
       }
-      const id = entry[1].defId ?? entry[1].schema.id ?? `schema${ctx.counter++}`;
-      entry[1].defId = id;
-      return { defId: id, ref: `${uriGenerator("__shared")}#/${defsSegment}/${encodeJSONPointerSegment(id)}` };
+      const id2 = entry[1].defId ?? entry[1].schema.id ?? `schema${ctx.counter++}`;
+      entry[1].defId = id2;
+      return { defId: id2, ref: `${uriGenerator("__shared")}#/${defsSegment}/${encodeJSONPointerSegment(id2)}` };
     }
     const uriPrefix = `#`;
     const defUriPrefix = `${uriPrefix}/${defsSegment}/`;
@@ -121602,8 +121649,8 @@ Set the \`cycles\` parameter to \`"ref"\` to resolve cyclical schemas with defs.
         continue;
       }
     }
-    const id = ctx.metadataRegistry.get(entry[0])?.id;
-    if (id) {
+    const id2 = ctx.metadataRegistry.get(entry[0])?.id;
+    if (id2) {
       extractToDef(entry);
       continue;
     }
@@ -121836,10 +121883,10 @@ function finalize(ctx, schema) {
   } else {
   }
   if (ctx.external?.uri) {
-    const id = ctx.external.registry.get(schema)?.id;
-    if (!id)
+    const id2 = ctx.external.registry.get(schema)?.id;
+    if (!id2)
       throw new Error("Schema is missing an `id` property");
-    result.$id = ctx.external.uri(id);
+    result.$id = ctx.external.uri(id2);
   }
   assignProps(result, root.defId ? root.schema : root.def ?? root.schema);
   const rootMetaId = ctx.metadataRegistry.get(schema)?.id;
@@ -122445,7 +122492,7 @@ function stringifyKeyNames(bySchema, json2, visited) {
   const values = json2.enum ?? (json2.const !== void 0 ? [json2.const] : void 0);
   if (!numericType && !values?.some((v3) => typeof v3 === "number"))
     return json2;
-  const { minimum, maximum, exclusiveMinimum, exclusiveMaximum, multipleOf, format, id, ...rest } = json2;
+  const { minimum, maximum, exclusiveMinimum, exclusiveMaximum, multipleOf, format, id: id2, ...rest } = json2;
   if (rest.enum)
     rest.enum = rest.enum.map((v3) => typeof v3 === "number" ? String(v3) : v3);
   else if (typeof rest.const === "number")
@@ -126997,8 +127044,8 @@ var __decorate19 = function(decorators, target, key, desc) {
   return c2 > 3 && r2 && Object.defineProperty(target, key, r2), r2;
 };
 var MissingProviderCapabilities = class MissingProviderCapabilities2 extends InvalidArgument {
-  static create({ name, schemaVersion }, missingCaps) {
-    return new this(`The operation couldn't be performed because the provider ${name} / ${schemaVersion} doesn't have capabilities: ${missingCaps.join(", ")}.`, { scope: "public" });
+  static create({ name: name2, schemaVersion }, missingCaps) {
+    return new this(`The operation couldn't be performed because the provider ${name2} / ${schemaVersion} doesn't have capabilities: ${missingCaps.join(", ")}.`, { scope: "public" });
   }
 };
 MissingProviderCapabilities = __decorate19([
@@ -127182,6 +127229,20 @@ var toLandscapeDeployStatus = toOr(toObject({
   kind: toLiteral(LandscapeDeployStatusKind.Error),
   details: toString
 }));
+var toReactiveServer = toObject({
+  config: toUndefOr(toServer),
+  replicas: toRecord(toObject({ deploy: toLandscapeDeployStatus }))
+});
+var toReactives = toObject({
+  deploy: toUndefOr(toLandscapeDeployStatus),
+  servers: toRecord(toReactiveServer)
+});
+var toLandscapeStateStreamResponse = toObject({
+  headlessServices: toUndefOr(toRecord(toHeadlessServiceConfig)),
+  managedServices: toUndefOr(toRecord(toManagedService2)),
+  vms: toUndefOr(toRecord(toVirtualMachineConfig)),
+  reactives: toUndefOr(toReactives)
+});
 var landscapeService = {
   name: "landscape",
   familiar: "alex",
@@ -127193,6 +127254,10 @@ var landscapeService = {
     stateStream: stream({
       request: toObject({ workspaceId: toNonNegativeInteger }),
       response: toStateStreamResponse
+    }),
+    landscapeStateStream: stream({
+      request: toObject({ workspaceId: toNonNegativeInteger }),
+      response: toLandscapeStateStreamResponse
     }),
     getLandscape: rpc({
       request: toObject({ workspaceId: toNonNegativeInteger }),
@@ -127255,12 +127320,12 @@ LandscapeStub = __decorate20([
 
 // packages/integrations/lib/streamyDeploy.js
 var planIdByConfig = async (products, planTitle, onDemand = false) => findPlan(await products.listHostingPlans(), planTitle, onDemand).id;
-var withStubs = async (dataCenterId, creds, serviceUrlDc, fn) => {
+var withStubs = async (dataCenterId2, creds, serviceUrlDc, fn) => {
   const man = new StreamyClientManager({
     createTransport: connectWebSocketTransport,
     resolveAddress: async (service) => {
       const sv = toCodesphereService(service);
-      return new URL(`${serviceUrlDc(sv, dataCenterId)}`);
+      return new URL(`${serviceUrlDc(sv, dataCenterId2)}`);
     }
   });
   const clients = [];
@@ -127293,8 +127358,8 @@ var serviceUrlCreators = (apiUrl) => {
   const serviceUrl = (service) => {
     return createServiceUrl("http", apiUrl.host, service);
   };
-  const serviceUrlDc = (service, dataCenterId) => {
-    return createServiceUrl("http", apiUrl.host, service, dataCenterId);
+  const serviceUrlDc = (service, dataCenterId2) => {
+    return createServiceUrl("http", apiUrl.host, service, dataCenterId2);
   };
   return { serviceUrl, serviceUrlDc };
 };
@@ -127558,11 +127623,11 @@ var getConfig = async () => {
   };
 };
 var GitHubDeployment = class _GitHubDeployment {
-  constructor(octokit, owner, repo, id, environment, codesphereUrl) {
+  constructor(octokit, owner, repo, id2, environment, codesphereUrl) {
     this.octokit = octokit;
     this.owner = owner;
     this.repo = repo;
-    this.id = id;
+    this.id = id2;
     this.environment = environment;
     this.codesphereUrl = codesphereUrl;
   }
@@ -127577,7 +127642,7 @@ var GitHubDeployment = class _GitHubDeployment {
       }
     }
     logI(`Creating GitHub Deployment for ${environment}.`);
-    const { id } = toCreateDeploymentResponse(await octokit.rest.repos.createDeployment({
+    const { id: id2 } = toCreateDeploymentResponse(await octokit.rest.repos.createDeployment({
       owner,
       repo,
       ref: gitRefHeadCommitSha(gitRef),
@@ -127587,8 +127652,8 @@ var GitHubDeployment = class _GitHubDeployment {
       transient_environment: false,
       required_contexts: []
     })).data;
-    logI(`Successfully created deployment ${id}`);
-    return new _GitHubDeployment(octokit, owner, repo, id, environment, codesphereUrl);
+    logI(`Successfully created deployment ${id2}`);
+    return new _GitHubDeployment(octokit, owner, repo, id2, environment, codesphereUrl);
   }
   async setWorkspace(w) {
     this.workspace = w;
